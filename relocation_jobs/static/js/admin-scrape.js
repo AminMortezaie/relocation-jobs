@@ -7,14 +7,11 @@ import {
   getFetchStatus,
   startFetchRequest,
 } from "./api.js";
+import { $, escapeHtml, formatActivityBadge, formatFetchDuration, parseFetchTimestamp, elapsedSecondsBetween, elapsedSecondsSince } from "./utils.js";
 
 let pollTimer = null;
 let fetchBusy = false;
 let scrapeConfig = { default_concurrency: 16, max_concurrency: 64, scrape_enabled: true };
-
-function $(id) {
-  return document.getElementById(id);
-}
 
 function toast(message) {
   const el = $("adminFetchToast");
@@ -76,65 +73,6 @@ function updateActivity(st) {
       })
       .join("");
   }
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function formatActivityBadge(ts) {
-  const value = (ts || "").trim();
-  if (!value) return "—";
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-
-  const cleaned = value.replace(/\.\d+(?=[Z+-]|$)/, "");
-  const parsed = new Date(cleaned.includes("T") ? cleaned : `${cleaned}T00:00:00`);
-  if (!Number.isNaN(parsed.getTime())) {
-    const pad = (n) => String(n).padStart(2, "0");
-    const date = `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())}`;
-    if (!/[T ]\d{2}:\d{2}/.test(value)) return date;
-    return `${date} ${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`;
-  }
-
-  const match = value.match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))/);
-  if (match) return `${match[1]} ${match[2]}`;
-  return value.split(/[T+]/)[0] || value;
-}
-
-function formatFetchDuration(seconds) {
-  const total = Math.max(0, Math.round(Number(seconds) || 0));
-  if (total < 60) return `${total}s`;
-  const mins = Math.floor(total / 60);
-  const secs = total % 60;
-  if (mins < 60) return secs ? `${mins}m ${secs}s` : `${mins}m`;
-  const hours = Math.floor(mins / 60);
-  const remMins = mins % 60;
-  return remMins ? `${hours}h ${remMins}m` : `${hours}h`;
-}
-
-function parseFetchTimestamp(ts) {
-  const value = (ts || "").trim();
-  if (!value) return null;
-  const cleaned = value.replace(/\.\d+(?=[Z+-]|$)/, "").replace(/Z$/, "+00:00");
-  const parsed = new Date(cleaned.includes("T") ? cleaned : `${cleaned}T00:00:00`);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function elapsedSecondsBetween(startedAt, finishedAt) {
-  const start = parseFetchTimestamp(startedAt);
-  const finish = parseFetchTimestamp(finishedAt);
-  if (!start || !finish) return null;
-  return Math.max(0, Math.round((finish.getTime() - start.getTime()) / 1000));
-}
-
-function elapsedSecondsSince(startedAt) {
-  const start = parseFetchTimestamp(startedAt);
-  if (!start) return null;
-  return Math.max(0, Math.round((Date.now() - start.getTime()) / 1000));
 }
 
 function hideFetchCompletion() {

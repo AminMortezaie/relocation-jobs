@@ -2,7 +2,7 @@
 
 import { setOnUnauthorized } from "./state.js";
 import { showLogin, refreshAuth, setLoginMode } from "./auth.js";
-import { loadConfig, loadCountries, loadCities, loadJobs, showJobsLoading } from "./data.js";
+import { loadConfig, loadCountries, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
 import { bindDialogEvents } from "./dialogs.js";
 import { bindEvents } from "./events.js";
 import { bindFilterBar, refreshFilterBar } from "./filters.js";
@@ -35,11 +35,14 @@ async function init() {
   if (!ok) return;
 
   showJobsLoading();
-  await loadConfig();
+  setLoadingProgress(10);
+  await Promise.all([loadConfig(), loadCountries()]);
+  setLoadingProgress(40);
   refreshFilterBar();
-  await loadCountries();
   await loadCities();
+  setLoadingProgress(60);
   await loadJobs();
+  finishLoadingProgress();
   await resumeFetchIfRunning();
 }
 

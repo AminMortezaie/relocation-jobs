@@ -4079,3 +4079,143 @@ body.fetch-modal-open {
 .admin-back-link:hover {
   background: var(--accent-hover);
 }
+
+/* ── Loading progress bar ──────────────────────────────── */
+#loadingBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 9999;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#loadingBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--visa));
+  width: 0%;
+  opacity: 1;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease 0.15s;
+  will-change: width, opacity;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+#loadingBar.done #loadingBarFill {
+  opacity: 0;
+}
+
+/* ── Skeleton loaders ──────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.skeleton-block {
+  background: linear-gradient(
+    90deg,
+    var(--surface2) 25%,
+    var(--surface-hover) 50%,
+    var(--surface2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.skeleton-name {
+  height: 17px;
+  width: 180px;
+}
+
+.skeleton-badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.skeleton-badge {
+  height: 22px;
+  width: 56px;
+  border-radius: var(--radius-pill);
+}
+
+.skeleton-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0 0 0.75rem;
+}
+
+.skeleton-jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-job {
+  height: 34px;
+  width: 100%;
+}
+
+.skeleton-job--short {
+  width: 72%;
+}
+
+/* ── Admin skeleton ────────────────────────────────────── */
+.skeleton-admin-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+
+.skeleton-admin-stat {
+  height: 72px;
+  flex: 1 1 140px;
+  border-radius: var(--radius);
+}
+
+.skeleton-admin-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.skeleton-admin-row {
+  height: 38px;
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Company card fade-in ──────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.company-card {
+  animation: fadeInUp 0.25s ease both;
+}
+
+.company-card:nth-child(1)  { animation-delay: 0ms; }
+.company-card:nth-child(2)  { animation-delay: 30ms; }
+.company-card:nth-child(3)  { animation-delay: 60ms; }
+.company-card:nth-child(4)  { animation-delay: 90ms; }
+.company-card:nth-child(5)  { animation-delay: 120ms; }
+.company-card:nth-child(n+6){ animation-delay: 150ms; }

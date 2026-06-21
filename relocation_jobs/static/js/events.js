@@ -1,7 +1,7 @@
 /** DOM event listeners for the jobs panel. */
 
 import { state, companyKey } from "./state.js";
-import { $, toast } from "./utils.js";
+import { $, toast, atsScoreTone } from "./utils.js";
 import {
   removeCompany,
   toggleFetchProblem,
@@ -36,12 +36,6 @@ import { openEditCareersDialog, openEditCompanyNameDialog, openEditCityDialog } 
 import { saveCollapsedCompanies } from "./storage.js";
 import { logout, submitAuth, setLoginMode } from "./auth.js";
 import { closeAllHeaderPopovers } from "./header.js";
-
-function atsScoreTone(score) {
-  if (score >= 80) return "ats-high";
-  if (score >= 60) return "ats-mid";
-  return "ats-low";
-}
 
 let atsScrollListener = null;
 let hideReasonScrollListener = null;

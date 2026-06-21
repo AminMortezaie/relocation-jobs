@@ -30,10 +30,6 @@ function syncSelectFromSortCheckbox() {
   $("sortSelect").value = $("sortNewestFetch").checked ? "newest" : "name";
 }
 
-export function setScrapeFiltersVisible(_visible) {
-  /* Country fetch moved to admin panel; no scrape filters on job panel. */
-}
-
 function activeFilters() {
   return FILTER_DEFS.filter((f) => $(f.id).checked);
 }

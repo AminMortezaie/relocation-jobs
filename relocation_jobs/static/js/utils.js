@@ -63,3 +63,75 @@ export function formatAppliedHistoryTitle(events = []) {
   if (!list.length) return "";
   return `Applied on: ${list.join(", ")}`;
 }
+
+export function formatActivityBadge(ts) {
+  const value = (ts || "").trim();
+  if (!value) return "—";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const cleaned = value.replace(/\.\d+(?=[Z+-]|$)/, "");
+  const parsed = new Date(cleaned.includes("T") ? cleaned : `${cleaned}T00:00:00`);
+  if (!Number.isNaN(parsed.getTime())) {
+    const pad = (n) => String(n).padStart(2, "0");
+    const date = `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())}`;
+    if (!/[T ]\d{2}:\d{2}/.test(value)) return date;
+    return `${date} ${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`;
+  }
+  const match = value.match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))/);
+  if (match) return `${match[1]} ${match[2]}`;
+  return value.split(/[T+]/)[0] || value;
+}
+
+export function formatFetchDuration(seconds) {
+  const total = Math.max(0, Math.round(Number(seconds) || 0));
+  if (total < 60) return `${total}s`;
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  if (mins < 60) return secs ? `${mins}m ${secs}s` : `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  const remMins = mins % 60;
+  return remMins ? `${hours}h ${remMins}m` : `${hours}h`;
+}
+
+export function parseFetchTimestamp(ts) {
+  const value = (ts || "").trim();
+  if (!value) return null;
+  const cleaned = value.replace(/\.\d+(?=[Z+-]|$)/, "").replace(/Z$/, "+00:00");
+  const parsed = new Date(cleaned.includes("T") ? cleaned : `${cleaned}T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function elapsedSecondsBetween(startedAt, finishedAt) {
+  const start = parseFetchTimestamp(startedAt);
+  const finish = parseFetchTimestamp(finishedAt);
+  if (!start || !finish) return null;
+  return Math.max(0, Math.round((finish.getTime() - start.getTime()) / 1000));
+}
+
+export function elapsedSecondsSince(startedAt) {
+  const start = parseFetchTimestamp(startedAt);
+  if (!start) return null;
+  return Math.max(0, Math.round((Date.now() - start.getTime()) / 1000));
+}
+
+export function atsScoreTone(score) {
+  if (score >= 80) return "ats-high";
+  if (score >= 60) return "ats-mid";
+  return "ats-low";
+}
+
+export function setLoadingProgress(pct) {
+  const fill = document.getElementById("loadingBarFill");
+  const bar = document.getElementById("loadingBar");
+  if (!fill || !bar) return;
+  bar.classList.remove("done");
+  fill.style.opacity = "1";
+  fill.style.width = `${pct}%`;
+}
+
+export function finishLoadingProgress() {
+  const fill = document.getElementById("loadingBarFill");
+  const bar = document.getElementById("loadingBar");
+  if (!fill || !bar) return;
+  fill.style.width = "100%";
+  setTimeout(() => bar.classList.add("done"), 380);
+}

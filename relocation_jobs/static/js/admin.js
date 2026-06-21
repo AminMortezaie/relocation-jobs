@@ -1,17 +1,31 @@
 /** Admin dashboard — catalog ops, users, fetch history, system config. */
 
 import { initAdminFetch } from "./admin-scrape.js";
+import { $, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
 
-function $(id) {
-  return document.getElementById(id);
+function skeletonRows(n = 4) {
+  return Array(n).fill(0).map(() =>
+    `<div class="skeleton-block skeleton-admin-row"></div>`
+  ).join("");
 }
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function skeletonStatCards(n = 4) {
+  return Array(n).fill(0).map(() =>
+    `<div class="skeleton-block skeleton-admin-stat"></div>`
+  ).join("");
+}
+
+function showAdminSkeletons() {
+  const overview = $("adminOverview");
+  const catalog = $("adminCatalog");
+  const users = $("adminUsers");
+  const runs = $("adminFetchRuns");
+  const config = $("adminConfig");
+  if (overview) overview.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(6)}</div>`;
+  if (catalog) catalog.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(5)}</div>`;
+  if (users)   users.innerHTML   = `<div class="skeleton-admin-table">${skeletonRows(3)}</div>`;
+  if (runs)    runs.innerHTML    = `<div class="skeleton-admin-table">${skeletonRows(6)}</div>`;
+  if (config)  config.innerHTML  = `<div class="skeleton-admin-table">${skeletonRows(4)}</div>`;
 }
 
 function formatTs(value) {
@@ -351,6 +365,8 @@ function renderConfig(data) {
 
 async function loadDashboard() {
   $("adminError").hidden = true;
+  showAdminSkeletons();
+  setLoadingProgress(15);
   const [overview, catalog, users, runs, config] = await Promise.all([
     apiGet("/api/admin/overview"),
     apiGet("/api/admin/catalog"),
@@ -358,11 +374,13 @@ async function loadDashboard() {
     apiGet("/api/admin/fetch-runs?limit=50"),
     apiGet("/api/admin/config"),
   ]);
+  setLoadingProgress(80);
   renderOverview(overview);
   renderCatalog(catalog);
   renderUsers(users);
   renderFetchRuns(runs);
   renderConfig(config);
+  finishLoadingProgress();
 }
 
 window.adminReloadDashboard = loadDashboard;

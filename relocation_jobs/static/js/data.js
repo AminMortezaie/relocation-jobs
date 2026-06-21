@@ -1,14 +1,34 @@
 /** Load config, countries, and job listings from the API. */
 
 import { state } from "./state.js";
-import { $, escapeAttr, escapeHtml } from "./utils.js";
+import { $, escapeAttr, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
 import { fetchConfig, fetchCountries, fetchLocations, fetchJobs } from "./api.js";
 import { renderStats, renderCompanies } from "./render.js";
 
-export function showJobsLoading(message = "Loading companies…") {
+function skeletonCard() {
+  return `
+    <div class="skeleton-card">
+      <div class="skeleton-card-header">
+        <div class="skeleton-block skeleton-name"></div>
+        <div class="skeleton-badges">
+          <div class="skeleton-block skeleton-badge"></div>
+          <div class="skeleton-block skeleton-badge"></div>
+        </div>
+      </div>
+      <hr class="skeleton-divider" />
+      <div class="skeleton-jobs">
+        <div class="skeleton-block skeleton-job"></div>
+        <div class="skeleton-block skeleton-job skeleton-job--short"></div>
+      </div>
+    </div>`;
+}
+
+export { setLoadingProgress, finishLoadingProgress };
+
+export function showJobsLoading() {
   const list = $("jobs");
   if (list) {
-    list.innerHTML = `<div class="empty">${escapeHtml(message)}</div>`;
+    list.innerHTML = Array(4).fill(0).map(skeletonCard).join("");
   }
 }
 

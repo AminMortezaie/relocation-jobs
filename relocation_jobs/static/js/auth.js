@@ -2,7 +2,7 @@
 
 import { state } from "./state.js";
 import { $ } from "./utils.js";
-import { loadConfig, loadCountries, loadCities, loadJobs, showJobsLoading } from "./data.js";
+import { loadConfig, loadCountries, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
 
 export function showLogin(message = "") {
   $("mainContent").classList.add("hidden");
@@ -83,10 +83,13 @@ export async function submitAuth(e) {
     $("loginError").textContent = "";
     showApp();
     showJobsLoading();
-    await loadConfig();
-    await loadCountries();
+    setLoadingProgress(10);
+    await Promise.all([loadConfig(), loadCountries()]);
+    setLoadingProgress(40);
     await loadCities();
+    setLoadingProgress(60);
     await loadJobs();
+    finishLoadingProgress();
   } catch {
     $("loginError").textContent = "Network error";
   } finally {

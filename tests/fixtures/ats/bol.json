@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "results": {
+    "hits": {
+      "hits": [
+        {
+          "_source": {
+            "publicatienaam": "Backend Engineer",
+            "slug": "/en/jobs/backend-engineer"
+          }
+        },
+        {
+          "_source": {
+            "publicatienaam": "Marketing Specialist",
+            "slug": "/en/jobs/marketing-specialist"
+          }
+        }
+      ]
+    }
+  }
+}

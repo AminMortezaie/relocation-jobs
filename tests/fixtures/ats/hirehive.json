@@ -1,0 +1,12 @@
+{
+  "jobs": [
+    {
+      "title": "Software Engineer",
+      "hostedUrl": "https://acme.hirehive.com/job/software-engineer"
+    },
+    {
+      "title": "Recruiter",
+      "hostedUrl": "https://acme.hirehive.com/job/recruiter"
+    }
+  ]
+}

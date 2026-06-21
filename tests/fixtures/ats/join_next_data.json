@@ -1,0 +1,24 @@
+{
+  "props": {
+    "pageProps": {
+      "initialState": {
+        "company": {
+          "id": 4242,
+          "domain": "acme-corp"
+        },
+        "jobs": {
+          "items": [
+            {
+              "title": "Backend Engineer",
+              "idParam": "backend-engineer-123"
+            },
+            {
+              "title": "Designer",
+              "idParam": "designer-456"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

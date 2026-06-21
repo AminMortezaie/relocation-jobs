@@ -1,0 +1,2351 @@
+{
+  "source": "https://relocate.me/companies-hiring/netherlands",
+  "fetched": "2026-06-02",
+  "updated": "2026-06-21T01:22:40+00:00",
+  "jobs_fetched": "2026-06-21T01:22:40+00:00",
+  "total": 48,
+  "last_fetch_new_jobs": 0,
+  "companies": [
+    {
+      "name": "Adyen",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://careers.adyen.com/locations/amsterdam",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/adyen",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-07",
+      "updated": "2026-06-21T01:19:32+00:00",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer - Observability",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7650293",
+          "fetched": "2026-06-19T11:36:09+00:00",
+          "last_seen": "2026-06-19T11:36:09+00:00",
+          "idempotency_key": "82c0302b45797efc5016499e55fef8a0f964765f2a38ee47186b4cfd9f92a0ce",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Software Engineer (Java) - Revenue Connect",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7342888",
+          "fetched": "2026-06-18T12:39:49+00:00",
+          "last_seen": "2026-06-18T12:39:49+00:00",
+          "idempotency_key": "93cf4932ea18559c0df9872314ed50c90f489e8fc969367033ae81cdb7433a5b",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Software Engineer - Release Tooling",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7978714",
+          "fetched": "2026-06-16T13:22:11+00:00",
+          "last_seen": "2026-06-16T13:22:11+00:00",
+          "idempotency_key": "a0424379f15860a8b2781e80e0cab5c2b7cdbbe0f5493f5a1809dff9e52edac8",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Senior Full Stack Software Engineer",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7985496",
+          "fetched": "2026-06-14T10:53:50+00:00",
+          "last_seen": "2026-06-14T10:53:50+00:00",
+          "idempotency_key": "93233b570375c818221a85b0c49f599211125120739c7d9fa568b143a3619001",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Data Platform Engineer - OLAP",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7068985",
+          "fetched": "2026-06-11T10:30:18+00:00",
+          "last_seen": "2026-06-11T10:30:18+00:00",
+          "idempotency_key": "cbb95f748657c5252b6671a99266de14bfe5ee3229ead62e2d4b1040e7dc5b97",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Senior Software Engineer (Java) - Financial Products",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7573921",
+          "fetched": "2026-06-11T10:30:18+00:00",
+          "last_seen": "2026-06-11T10:30:18+00:00",
+          "idempotency_key": "94d9135c5946c11be7afad50da9b4f81ddbd3e2b03586da09eac2afaa18b3890",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Software Engineer I (Java) -Authorisation Optimisation",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7992221",
+          "fetched": "2026-06-09T17:54:05+00:00",
+          "last_seen": "2026-06-09T17:54:05+00:00",
+          "idempotency_key": "56f314f583570822ff90f499b289888c934478584483a56877332f91ac034347",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Solutions Engineer",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7645479",
+          "fetched": "2026-06-09T17:54:05+00:00",
+          "last_seen": "2026-06-09T17:54:05+00:00",
+          "idempotency_key": "dd7473b16a1b87812d00e6ecbe4152d163c43b453d9eebea20f42a63b14d60bb",
+          "visa_sponsorship": null,
+          "location": "Paris"
+        },
+        {
+          "title": "Java Engineer (Affirmative Action for Women)",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7128258",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "beeb2aebadb97249166c5b3eda0e44550ff6d6761f2e709da9b1a52931f38d21",
+          "visa_sponsorship": null,
+          "location": "Sao Jose dos Campos"
+        },
+        {
+          "title": "Partner Solutions Engineer",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7897113",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "86e8ed251e12236e3c510a58d35ea2d057a847ca7246e9ea1e559dc0435a969c",
+          "visa_sponsorship": null,
+          "location": "Chicago; New York; San Francisco"
+        },
+        {
+          "title": "Senior Data Platform Engineer",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7068990",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "ef9a971de925132a30622eb5fb9f4bacc845ce70875056dec66873d8efb81e79",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Observability Infrastructure Engineer",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7607691",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "ea99a426e9c115e1718156d2728ad338efc5ad57cbdba9c2d55d21ced37b33b2",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Senior Platform Engineer",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7547055",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "c58fad1230a1ff36f83131284734fa8db809c64c8a7fff34c7f56617eaeab0cc",
+          "visa_sponsorship": null,
+          "location": "Bengaluru"
+        },
+        {
+          "title": "Senior Platform Engineer - ACS Infra Services",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7547029",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "476c4798edef97824a7586daf525e33c816bf9feedf376c227998dd7d9043f0b",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Software Engineer (Java) - Bank Payments",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7407270",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "1efba86ebc0b0ffea3131319a4dfa6b9f5bf4b887bd28a7bd11f768a0fd01da8",
+          "visa_sponsorship": null,
+          "location": "Chicago"
+        },
+        {
+          "title": "Senior Software Engineer (Java) - Banking Network",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7919162",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "9ea79e84f8ac05200d696cef66bf55dbcbac847b46fe6e4ce0c37600ebfaca1d",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Software Engineer (Java) - Card Payments",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/6761879",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "2e6ae9c0d614846bf3bf3283330fe586928a02f356dadb529e2173a2fe552723",
+          "visa_sponsorship": null,
+          "location": "Chicago"
+        },
+        {
+          "title": "Senior Software Engineer (Java) - Data Extraction & Accessibility",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7342905",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "53e245f1fdeefa4a6072281ccad73943e7e0b2438def1791a8edbdcc8db66509",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Senior Software Engineer (Java) - Issuing",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7919165",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "b2b4f6d0332d3fcf63935ce91413bd9c724a1f356fe126e8b21145d37fa5059c",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Software Engineer (Java) - Pricing",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7779456",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "d59f3c0318a33e0afebde004e6e2fedbd2178ada743ee822cbbb5023ea58a90b",
+          "visa_sponsorship": null,
+          "location": "Chicago"
+        },
+        {
+          "title": "Senior Software Engineer - Customer Developer Observability",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7821078",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "c71b89e634f544345b7f31c6fa66530f7f88bda435aad2bb590dd4a07f9406b9",
+          "visa_sponsorship": null,
+          "location": "San Francisco"
+        },
+        {
+          "title": "Senior Software Engineer - Financial Products",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7683100",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "cfff06419f1bba0fc75b6755e39aee44407631941aa7f0e397684cf600f2e537",
+          "visa_sponsorship": null,
+          "location": "San Francisco"
+        },
+        {
+          "title": "Software Engineer (Java)",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7095304",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "331d3ced3193329f89e4ed8552a79edb8ce59e6320dc001467ac9f8390f3dfe9",
+          "visa_sponsorship": null,
+          "location": "Sao Jose dos Campos"
+        },
+        {
+          "title": "Software Engineer (Java)",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7219290",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "5801781b97ba222b3d704372bdf6969e6b7d162a91a99225a3a3efb9daf79ed8",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Software Engineer (Java)",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/6924441",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "b23524c61b0797bf47724b9edcc4d06741d0a7629e88da2ada0e68c57e6376c1",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Software Engineer (Java) - Unified Platform",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7342887",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "7a8bd7a9b115525d940798b18a75913c58c2af9a2d0d5723de7c881df398c4e4",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Solutions Engineer",
+          "url": "https://job-boards.greenhouse.io/adyen/jobs/7613503",
+          "fetched": "2026-06-07T17:32:40+00:00",
+          "last_seen": "2026-06-07T17:32:40+00:00",
+          "idempotency_key": "235c74d7a7189654cc3ecbedad4df462c0da303559772e1fcbee9353198a00cf",
+          "visa_sponsorship": null,
+          "location": "São Paulo"
+        }
+      ]
+    },
+    {
+      "name": "Atlassian",
+      "city": "",
+      "cities": [],
+      "locations": [],
+      "size": "",
+      "careers_url": "https://www.atlassian.com/company/careers/all-jobs?team=&location=Germany%2CNetherlands%2CUnited%20Kingdom&search=",
+      "ats_type": "atlassian",
+      "ats_url": "https://www.atlassian.com/company/careers/all-jobs?location=Netherlands",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-07",
+      "updated": "2026-06-21T01:20:07+00:00",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Solutions Engineer, Enterprise, DACH (German Speaking)",
+          "url": "https://www.atlassian.com/company/careers/details/22385",
+          "fetched": "2026-06-17T11:04:49+00:00",
+          "last_seen": "2026-06-17T11:04:49+00:00",
+          "idempotency_key": "236a7e4b27f8d08ab95a3ca957f0a2d02ff058c276c1fd84466edd61e89c6bf6",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Manager, Enterprise Solutions Engineering — Nordics & BeNeLux",
+          "url": "https://www.atlassian.com/company/careers/details/25232",
+          "fetched": "2026-06-11T10:30:43+00:00",
+          "last_seen": "2026-06-11T10:30:43+00:00",
+          "idempotency_key": "5ae7f9cdb3360ae1faf480a8435afe0e51003486e7fca9c7e75f7a0be4c2588a",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "Backbase",
+      "city": "",
+      "cities": [],
+      "locations": [],
+      "size": "",
+      "careers_url": "https://www.backbase.com/careers/jobs?department_equal=%5B%22Services%22%5D&location_equal=%5B%22Amsterdam%22%2C%22Melbourne%22%5D",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-07",
+      "updated": "2026-06-21T01:20:18+00:00",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Engineer",
+          "url": "https://www.backbase.com/careers/jobs/7941757-senior-backend-engineer",
+          "fetched": "2026-06-14T10:54:21+00:00",
+          "last_seen": "2026-06-14T10:54:21+00:00",
+          "idempotency_key": "3ccd8c8e53b706970e1fc408f469554e69030a26ec70a4869318007abc01a888",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Platform Engineer",
+          "url": "https://www.backbase.com/careers/jobs/7960036-senior-platform-engineer",
+          "fetched": "2026-06-10T09:24:52+00:00",
+          "last_seen": "2026-06-10T09:24:52+00:00",
+          "idempotency_key": "6d23c9034468b6c8917a97e873ed09052150a8c9cccc2068779c87268cc3b5f3",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "bol",
+      "city": "Utrecht (Netherlands)",
+      "cities": [
+        "Utrecht"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Utrecht",
+          "country_label": "Netherlands",
+          "key": "netherlands:utrecht",
+          "label": "Utrecht (Netherlands)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://careers.bol.com/en/jobs/?doelgroep[]=12124747002",
+      "ats_type": "bol",
+      "ats_url": "https://careers.bol.com/wp-json/wp/v2/hggns/multilanguage_vacature_search",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:32+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Platform Engineer: Observability and Insights",
+          "url": "https://careers.bol.com/en/job/platform-engineer-oai-devex",
+          "fetched": "2026-06-09T17:54:05+00:00",
+          "last_seen": "2026-06-09T17:54:05+00:00",
+          "idempotency_key": "c2fc0392ef1071dce8212467dba69fd0c95ebec313e1752d6ba7c49c53c53922",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Expert Software Engineer",
+          "url": "https://careers.bol.com/en/job/expert-software-engineer",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "b562df379764e96d4ac4ab05ed1f6a7c5fe284dac6f960f39560d4129825619e",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Full-stack Engineer– Marketing and Advertisement",
+          "url": "https://careers.bol.com/en/job/full-stack-engineer-marketing-and-advertisement",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "990c4ca2dcb1a6d6454a35e56ec88ac9dc88455ffe0ff42e6f6e54c5168f0e5e",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Platform Engineer - Cloud Compute",
+          "url": "https://careers.bol.com/en/job/platform-engineer-cloud-compute",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "468862c5511c62edc3db8587bc0d78c32e1b5dbcb0710f037db5c04ca5751fb3",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Software engineer – Data Platform",
+          "url": "https://careers.bol.com/en/job/software-engineer-data-platform",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "0ebf1352187429e45a50a95092b7ee246fc31feb416b36145000984e2c1533e3",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "Booking.com",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "10,001+",
+      "careers_url": "https://jobs.booking.com/booking/jobs",
+      "ats_type": "jibe",
+      "ats_url": "https://jobs.booking.com/booking/jobs",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:43+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Software Engineer II - BDX Developer Experience",
+          "url": "https://jobs.booking.com/booking/jobs/29266",
+          "fetched": "2026-06-19T11:37:03+00:00",
+          "last_seen": "2026-06-19T11:37:03+00:00",
+          "idempotency_key": "6dfcbfae2f4b81710c7b92e9d0a9b7b64745767a5672d4680bc1d3dd0fb2c301",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "AI Backend Software Engineer II - AI Application Platform",
+          "url": "https://jobs.booking.com/booking/jobs/29229",
+          "fetched": "2026-06-16T13:23:00+00:00",
+          "last_seen": "2026-06-16T13:23:00+00:00",
+          "idempotency_key": "c4a47e8e6483d207079150d3f890ff62715b1ca8f400e3b68fe0c9d2aed03888",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Full Stack Software Engineer II",
+          "url": "https://jobs.booking.com/booking/jobs/13402",
+          "fetched": "2026-06-07T18:25:55+00:00",
+          "last_seen": "2026-06-07T18:25:55+00:00",
+          "idempotency_key": "129f6397325f94e24c6136b4dfc09821f54e11313bc2f60f103d73e8a5f3b34d",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Full Stack Software Engineer II - Payments Tech, Fintech",
+          "url": "https://jobs.booking.com/booking/jobs/29050",
+          "fetched": "2026-06-07T18:25:55+00:00",
+          "last_seen": "2026-06-07T18:25:55+00:00",
+          "idempotency_key": "d3a75f74d0595c0eb563a6a1eff6b1bc5bd6e34f4bccbe3852a6126dfee347d5",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Software Engineer II, Marketplace- Genius",
+          "url": "https://jobs.booking.com/booking/jobs/28696",
+          "fetched": "2026-06-07T18:25:55+00:00",
+          "last_seen": "2026-06-07T18:25:55+00:00",
+          "idempotency_key": "fadca6204d314eb94d14857a650f5eb079a131b3dbd77056f8595af07630e796",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "Bunq",
+      "city": "",
+      "cities": [],
+      "locations": [],
+      "size": "",
+      "careers_url": "https://careers.bunq.com/positions",
+      "ats_type": "recruitee",
+      "ats_url": "https://bunq.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-05",
+      "updated": "2026-06-21T01:19:30+00:00",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "C Teleport",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://cteleport.com/careers/",
+      "ats_type": "teamtailor",
+      "ats_url": "https://careers.cteleport.com/jobs",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:06+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Catawiki",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.catawiki.com",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/catawiki",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:32+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Backend Software Engineer",
+          "url": "https://job-boards.greenhouse.io/catawiki/jobs/5758060",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:11+00:00",
+          "idempotency_key": "3a83b852f9969fc19182ab6e2b7b83a926190ebcc7983e866c7ea6b14443d7fe",
+          "visa_sponsorship": true,
+          "location": "Lisbon, Portugal"
+        },
+        {
+          "title": "Senior Backend Software Engineer",
+          "url": "https://job-boards.greenhouse.io/catawiki/jobs/7132968",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:11+00:00",
+          "idempotency_key": "42e944def4969df625d5dffa7eb126b97d13eb76e387ae0530f9edb7b4bf4ac1",
+          "visa_sponsorship": true,
+          "location": "Lisbon, Portugal"
+        },
+        {
+          "title": "Senior Backend Software Engineer",
+          "url": "https://job-boards.greenhouse.io/catawiki/jobs/7645749",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:11+00:00",
+          "idempotency_key": "7e9e75259eed78a8a80aaf6d1042d554c7f9de25621c28387a9bb3de070c5e01",
+          "visa_sponsorship": true,
+          "location": "Lisbon, Portugal"
+        }
+      ]
+    },
+    {
+      "name": "Creative Fabrica",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://careers.creativefabrica.com/",
+      "ats_type": "greenhouse_eu",
+      "ats_url": "https://boards.eu.greenhouse.io/creativefabrica",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:32+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Engineer (Go) | Studio AI",
+          "url": "https://job-boards.eu.greenhouse.io/creativefabrica/jobs/4846650101",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "b90b6071ab3d8e095ac33cacd9c54c59c4339ac4620dd2060178017d4475bd41",
+          "visa_sponsorship": null,
+          "location": "Amsterdam, North Holland, Netherlands"
+        }
+      ]
+    },
+    {
+      "name": "Crytek",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.crytek.com/career",
+      "ats_type": "lever",
+      "ats_url": "https://jobs.lever.co/crytek",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:40+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Programmer",
+          "url": "https://jobs.lever.co/crytek/66ad8579-ce10-4f77-9685-cb64cecf2ca1",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "7fd3173df40c4227f227f415fc754f424239cdc2b88f885ba9dcb8d87a6fc51c",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Elements",
+      "city": "Almere (Netherlands)",
+      "cities": [
+        "Almere"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Almere",
+          "country_label": "Netherlands",
+          "key": "netherlands:almere",
+          "label": "Almere (Netherlands)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.elements.nl/en/careers",
+      "ats_type": "workable",
+      "ats_url": "https://apply.workable.com/elements/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:19:30+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "EPAM",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "10,001+",
+      "careers_url": "https://careers.epam.com/",
+      "ats_type": "epam",
+      "ats_url": "https://careers.epam.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:32+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Platform Engineer",
+          "url": "https://careers.epam.com/en/vacancy/senior-platform-engineer-blt0210e551862e3687_en",
+          "fetched": "2026-06-07T18:26:08+00:00",
+          "last_seen": "2026-06-07T18:26:08+00:00",
+          "idempotency_key": "869f2cef33639f440f7a5c7eb2296251d12a167a7f57ce0cabe88870ebb4de6e",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "EVBox",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://evbox.com/en/about/careers",
+      "ats_type": "rss",
+      "ats_url": "https://evbox.com/en/about/careers/feed/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:19:30+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Fashion Cloud",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.fashion.cloud/career/open-positions#jobs",
+      "ats_type": "recruitee",
+      "ats_url": "https://fashioncloudgmbh.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:30+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Flow Traders",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.flowtraders.com/careers",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/flowtraders",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:19:32+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer, C++",
+          "url": "https://job-boards.greenhouse.io/flowtraders/jobs/7992594",
+          "fetched": "2026-06-14T10:53:50+00:00",
+          "last_seen": "2026-06-14T10:53:50+00:00",
+          "idempotency_key": "1cb9fe971125a57b7dff345f4f0bb6729bbcb26a8dede05ce176933d90571b88",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Software Engineer, C++",
+          "url": "https://job-boards.greenhouse.io/flowtraders/jobs/6993714",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "6cdb1827f6d7beb68ed2a9f33e387596c82658e1a5411922206672efc09b02b2",
+          "visa_sponsorship": false,
+          "location": "Hong Kong"
+        }
+      ]
+    },
+    {
+      "name": "GreenFlux",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.greenflux.eu/jobs",
+      "ats_type": "recruitee",
+      "ats_url": "https://greenflux.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:30+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "(Senior)  Software Engineer",
+          "url": "https://greenflux.recruitee.com/o/senior-net-back-end-software-engineer-2-3",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:11+00:00",
+          "idempotency_key": "2c62cc4ddcdbe27a78fd45e97921c680fb2bfcc089868572d4ff8e17af77b073",
+          "visa_sponsorship": false,
+          "location": "Amsterdam, Noord-Holland, Netherlands"
+        }
+      ]
+    },
+    {
+      "name": "Housing Anywhere",
+      "city": "Rotterdam (Netherlands)",
+      "cities": [
+        "Rotterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Rotterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:rotterdam",
+          "label": "Rotterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://job-boards.greenhouse.io/housinganywhere",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/housinganywhere",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:41+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Insify",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://careers.insify.nl/",
+      "ats_type": "lever",
+      "ats_url": "https://jobs.lever.co/insify",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:50+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Software Engineer, Claims Platform",
+          "url": "https://jobs.lever.co/insify/b9855ef7-c77f-40ad-b64a-cf05eda5cd33",
+          "fetched": "2026-06-09T17:54:14+00:00",
+          "last_seen": "2026-06-09T17:54:14+00:00",
+          "idempotency_key": "2f9fe414e839d28e14c98a969b62a75f4572dce9f66c4f5640f232387a43b0af",
+          "visa_sponsorship": null,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Software Engineer, AI Automation",
+          "url": "https://jobs.lever.co/insify/286879bf-d515-4feb-bb05-327eed68d521",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "1b77ae489479afbdd5842cdf54d5e836ae8f1f24d399c7557e6601019d1814b3",
+          "visa_sponsorship": false,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Software Engineer, Payments Platform",
+          "url": "https://jobs.lever.co/insify/07554a93-2649-4c44-9fb7-065bf1d06dbe",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "5f5d15c34acaef8155732cabd3bd4f32e1f9807bfcb8739023ad494527429b00",
+          "visa_sponsorship": false,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Software Platform Engineer, Insurance Infrastructure",
+          "url": "https://jobs.lever.co/insify/6cf27b3d-2343-492a-a3e6-071f8762b3f0",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "5600c6e21aa96a0e10101c4521c565ddc8e8ee6988a5e050104b5d6c44e5afd0",
+          "visa_sponsorship": false,
+          "location": "Amsterdam"
+        }
+      ]
+    },
+    {
+      "name": "Inverid",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.signicat.com/about/careers",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:22+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Java Cloud Developer",
+          "url": "https://signicat.teamtailor.com/jobs/6743675-senior-java-cloud-developer",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:25+00:00",
+          "idempotency_key": "a3193dd8988682526e41a26a5eb60094871ba378b96574c4deff8c3dae090e57",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Java/Kotlin Developer - eID & Wallet Integration Team",
+          "url": "https://signicat.teamtailor.com/jobs/7730237-senior-java-kotlin-developer-eid-wallet-integration-team",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:25+00:00",
+          "idempotency_key": "9be1f3de4ab5713950bc1188495790360341c28ef91d265509e6e7023b35e77d",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer, Full Stack (Angular/Spring Boot)",
+          "url": "https://signicat.teamtailor.com/jobs/7803791-senior-software-engineer-full-stack-angular-spring-boot",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:25+00:00",
+          "idempotency_key": "71e9edbbba38a39ac38bb5d3fcb323ed6372564367e036b2aea13b9f4f7c77d9",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Jumbo",
+      "city": "Veghel (Netherlands)",
+      "cities": [
+        "Veghel"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Veghel",
+          "country_label": "Netherlands",
+          "key": "netherlands:veghel",
+          "label": "Veghel (Netherlands)"
+        }
+      ],
+      "size": "10,001+",
+      "careers_url": "https://nl.jobs.jumbo.com/en/jobs/?country[]=nl&job_type[]=baan&travel_arrival_time=60&travel_mode=driving",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:03+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Java Developer",
+          "url": "https://nl.jobs.jumbo.com/en/job/java-developer/2026-35478",
+          "fetched": "2026-06-09T17:55:00+00:00",
+          "last_seen": "2026-06-09T17:55:00+00:00",
+          "idempotency_key": "fc2fefae700bf4536551668111cf1ae26c03c2bf3f4c13aadb8bdfe7af5ec406",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Java solutions Engineer",
+          "url": "https://nl.jobs.jumbo.com/en/job/java-solutions-engineer/2026-35807",
+          "fetched": "2026-06-07",
+          "last_seen": "2026-06-06T22:09:51+00:00",
+          "idempotency_key": "fd9366d7c2fd8c6556b346bdc1b7c9f76e31b263f89d41c31106008a5a05defd",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Java/ EBX Developer",
+          "url": "https://nl.jobs.jumbo.com/en/job/java-ebx-developer/2026-35964",
+          "fetched": "2026-06-07",
+          "last_seen": "2026-06-06T22:09:51+00:00",
+          "idempotency_key": "bf4b9b09d6933c3e4e97e217855a1015281a00ffae6580eb621d3b1b3cdd207d",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Data Platform Engineer",
+          "url": "https://nl.jobs.jumbo.com/en/job/senior-data-platform-engineer/2026-35474",
+          "fetched": "2026-06-07",
+          "last_seen": "2026-06-06T22:09:51+00:00",
+          "idempotency_key": "3139d32811577f8e65742bf3d513b3b48de504bc97901eabbe2b517c5b821490",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Full Stack Engineer (Node.js/AWS)",
+          "url": "https://nl.jobs.jumbo.com/en/job/senior-full-stack-engineer-nodejsaws/2026-33502",
+          "fetched": "2026-06-07",
+          "last_seen": "2026-06-06T22:09:51+00:00",
+          "idempotency_key": "4de432b85c8d2114ff3d857f7e250006d28a0b0288dd0016de8e0e908b8fcff0",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "Just Eat Takeaway.com",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://careers.justeattakeaway.com/global/en/c/tech-product-jobs#phw-4HhFD",
+      "ats_type": "workday",
+      "ats_url": "https://wd3.myworkdaysite.com/wday/cxs/takeaway/JET-ECS-R/jobs|https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:20:09+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Software Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Fleet-Place-Office/Software-Engineer_R_051526",
+          "fetched": "2026-06-17T11:05:08+00:00",
+          "last_seen": "2026-06-17T11:05:08+00:00",
+          "idempotency_key": "48441f3051fab22f03e0737a854dd5c39fd44724b24d88109df734c906be89c9",
+          "visa_sponsorship": null,
+          "location": "Fleet Place Office"
+        },
+        {
+          "title": "Golang Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Fleet-Place-Office/Golang-Engineer_R_051100-1",
+          "fetched": "2026-06-16T13:22:43+00:00",
+          "last_seen": "2026-06-16T13:22:43+00:00",
+          "idempotency_key": "cf55d1bcf1ab4e67124dddade23aa00ad2e3a2470cacab737d10905bf5817872",
+          "visa_sponsorship": null,
+          "location": "Fleet Place Office"
+        },
+        {
+          "title": "React Native Software Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Sofia-Office/React-Native-Software-Engineer_R_051600-1",
+          "fetched": "2026-06-16T13:22:43+00:00",
+          "last_seen": "2026-06-16T13:22:43+00:00",
+          "idempotency_key": "5f1babe2c266f4ac5cd78a118cb19a0ad78a7d53f911ad5056999bb95ad84c73",
+          "visa_sponsorship": null,
+          "location": "Sofia Office"
+        },
+        {
+          "title": "Software Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Enschede-De-Ruyterlaan-Office/Software-Engineer_R_051847",
+          "fetched": "2026-06-16T13:22:43+00:00",
+          "last_seen": "2026-06-16T13:22:43+00:00",
+          "idempotency_key": "b9970be8459707e6fad568622aa7a368fa74c1843a1ee0434c293f09130d6eca",
+          "visa_sponsorship": null,
+          "location": "Enschede De Ruyterlaan Office"
+        },
+        {
+          "title": "Senior Java Software Developer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Berlin-Office/Senior-Java-Software-Developer_R_051123",
+          "fetched": "2026-06-11T19:53:16+00:00",
+          "last_seen": "2026-06-11T19:53:16+00:00",
+          "idempotency_key": "99e4843cf07ac6a18d53b26b228a337df03d80b00b59e63020eb6e5ed600764a",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Java Developer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Canada-ON-Remote/Senior-Java-Developer_R_052163-1",
+          "fetched": "2026-06-10T09:24:45+00:00",
+          "last_seen": "2026-06-10T09:24:45+00:00",
+          "idempotency_key": "3f816814e76b99435246f4941c49694eb86c6652cd8ca259c6744bb2561bf914",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Java Developer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Canada-AB-Remote/Senior-Java-Developer_R_050717",
+          "fetched": "2026-06-09T17:54:35+00:00",
+          "last_seen": "2026-06-09T17:54:35+00:00",
+          "idempotency_key": "b56038a812089d1360f1ec06461c80fc1b218f00aef728331c1888fb56dc5cec",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "CRM Platform Engineer (12 Month FTC)",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Amsterdam-Office/CRM-Platform-Engineer--FTC-_R_050843",
+          "fetched": "2026-06-07T18:26:14+00:00",
+          "last_seen": "2026-06-07T18:26:14+00:00",
+          "idempotency_key": "dd1f8444c0971f97ba0054547c5bf5a18b97d36286341ffdd7371eaa30afb18f",
+          "visa_sponsorship": null,
+          "location": "Amsterdam Office"
+        },
+        {
+          "title": "Senior .Net Software Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Tel-Aviv-Azrieli-Office/Senior-Net-Software-Engineer_R_047700",
+          "fetched": "2026-06-07T18:26:14+00:00",
+          "last_seen": "2026-06-07T18:26:14+00:00",
+          "idempotency_key": "09e7fa3d7783eb58e7b1337fa83c1511bb3339ff3c692426937045706db6b00a",
+          "visa_sponsorship": null,
+          "location": "Tel Aviv Azrieli Office"
+        },
+        {
+          "title": "Senior Java Developer (m/w/d)",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Berlin-Office/Senior-Software-Engineer--m-w-d-_R_051116",
+          "fetched": "2026-06-07T18:26:14+00:00",
+          "last_seen": "2026-06-07T18:26:14+00:00",
+          "idempotency_key": "cdf913b2aded84c305948ccc3859f32393fe4ca245917b6f30fb2fe69b6e216b",
+          "visa_sponsorship": null,
+          "location": "Berlin Office"
+        },
+        {
+          "title": "Senior Software Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Enschede-De-Ruyterlaan-Office/Professional---Engineering_R_051839",
+          "fetched": "2026-06-07T18:26:14+00:00",
+          "last_seen": "2026-06-07T18:26:14+00:00",
+          "idempotency_key": "221ae470c01cc937034837c631786fa9a6a41cd6d3a906b9fe1fd90aed67d23d",
+          "visa_sponsorship": null,
+          "location": "Enschede De Ruyterlaan Office"
+        },
+        {
+          "title": "Software Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Fleet-Place-Office/Software-Engineer_R_050778",
+          "fetched": "2026-06-07T18:26:14+00:00",
+          "last_seen": "2026-06-07T18:26:14+00:00",
+          "idempotency_key": "4c1052e6d10364e6d3ce5b336a844ac1da50001d039098b5014af7d24a9389ca",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Software Engineer",
+          "url": "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R/job/Sofia-Office/Professional---Engineering_R_050320-1",
+          "fetched": "2026-06-07T18:26:14+00:00",
+          "last_seen": "2026-06-07T18:26:14+00:00",
+          "idempotency_key": "c87e1542c9e9b72b0926e93c25b147533ca759c317f584a20d2634cf76d84eaa",
+          "visa_sponsorship": null,
+          "location": "Sofia Office"
+        }
+      ]
+    },
+    {
+      "name": "LeaseWeb",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://leaseweb.teamtailor.com/jobs",
+      "ats_type": "teamtailor",
+      "ats_url": "https://leaseweb.teamtailor.com/jobs",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:21:07+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Golang Developer - Developer Platform Team",
+          "url": "https://leaseweb.teamtailor.com/jobs/7287091-senior-golang-developer-developer-platform-team",
+          "fetched": "2026-06-07",
+          "last_seen": "2026-06-06T22:09:23+00:00",
+          "idempotency_key": "14a0f463994ac67b8c780b98a8575bfe91e09e95911f46c67c8f27975de0a502",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Software Developer - Developer Platform",
+          "url": "https://leaseweb.teamtailor.com/jobs/7486362-software-developer-developer-platform",
+          "fetched": "2026-06-07",
+          "last_seen": "2026-06-06T22:09:23+00:00",
+          "idempotency_key": "70f2aa023829eb578d1efee0783c6d5f48d04d74601196269b2738b4b4f8d1aa",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "Lemonade",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://makers.lemonade.com",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:21:40+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "LINKIT",
+      "city": "Veenendaal (Netherlands)",
+      "cities": [
+        "Veenendaal"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Veenendaal",
+          "country_label": "Netherlands",
+          "key": "netherlands:veenendaal",
+          "label": "Veenendaal (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://careers.linkit.nl",
+      "ats_type": "recruitee",
+      "ats_url": "https://linkit.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:42+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Platform Engineer",
+          "url": "https://careers.linkit.nl/o/platform-engineer",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "56c3a8048ba29bfdfeda6cdcab0090c31ac638828e341d09259eae287faad6d2",
+          "visa_sponsorship": false,
+          "location": "De Meern, Utrecht, Nederland"
+        }
+      ]
+    },
+    {
+      "name": "Mollie",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://jobs.mollie.com",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/mollie",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:41+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Platform Engineer II - Internal Hosting Platform",
+          "url": "https://jobs.ashbyhq.com/mollie/bf75b361-c569-4479-9495-21eeafb2414e",
+          "fetched": "2026-06-18T12:39:59+00:00",
+          "last_seen": "2026-06-18T12:39:59+00:00",
+          "idempotency_key": "7bf2c2a6d6435f9bd8113fbf287299daba339d2120d008d27f1700894dcf7c24",
+          "visa_sponsorship": null,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Senior Application Engineer",
+          "url": "https://jobs.ashbyhq.com/mollie/f62986be-80fb-4878-8c33-138ca4c87634",
+          "fetched": "2026-06-07",
+          "last_seen": "2026-06-07",
+          "idempotency_key": "0bd6c91efd65102e3be9436ed1ab16a1b8cac0b161be3dc3526a42b8f67e4704",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Platform Engineer II",
+          "url": "https://jobs.ashbyhq.com/mollie/a65af8b8-92b7-4458-9335-b03b4561b531",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "36815632512ac300e94a4a6dd96ded20ad38c61de934667b9854fae5de6ec128",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "Online Payment Platform",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://jobs.onlinepaymentplatform.com/",
+      "ats_type": "recruitee",
+      "ats_url": "https://careers-analytics.recruitee.com/api/event",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:45+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Optiver",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://optiver.com/working-at-optiver/career-hub/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:57+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Picnic",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://jobs.picnic.app/nl/",
+      "ats_type": "smartrecruiters",
+      "ats_url": "https://api.smartrecruiters.com/v1/companies/picnic/postings",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:45+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Profitap",
+      "city": "Eindhoven (Netherlands)",
+      "cities": [
+        "Eindhoven"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Eindhoven",
+          "country_label": "Netherlands",
+          "key": "netherlands:eindhoven",
+          "label": "Eindhoven (Netherlands)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://jobs.profitap.com/",
+      "ats_type": "recruitee",
+      "ats_url": "https://careers-analytics.recruitee.com/api/event",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:45+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Protolabs",
+      "city": "Rhône-Alpes (Netherlands)",
+      "cities": [
+        "Rhône-Alpes"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Rhône-Alpes",
+          "country_label": "Netherlands",
+          "key": "netherlands:rhone-alpes",
+          "label": "Rhône-Alpes (Netherlands)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://www.protolabs.com/about-us/careers/",
+      "ats_type": "lever",
+      "ats_url": "https://jobs.lever.co/protolabs",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:07+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Software Engineer",
+          "url": "https://jobs.lever.co/protolabs/929fbd6f-878b-4042-a702-77390078618e",
+          "fetched": "2026-06-06T21:59:56+00:00",
+          "last_seen": "2026-06-06T22:16:14+00:00",
+          "idempotency_key": "91eebffe102f37d33815d8fc12d007e343dc9d7dbad211a09c5abd7b2820460a",
+          "visa_sponsorship": null,
+          "location": "Maple Plain, MN"
+        },
+        {
+          "title": "Associate Software Engineer – Web & Visualization",
+          "url": "https://jobs.lever.co/protolabs/76d12509-aae6-405e-939a-b0a11cfb804d",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:14+00:00",
+          "idempotency_key": "4d1f9734e9f9b613a4333b7a8e93d1d06bd4fd08c102f38b7c1b40537c5284ef",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Python Developer (Backend)",
+          "url": "https://jobs.lever.co/protolabs/2f3f40e7-afa2-410e-983d-09148e28716b",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:14+00:00",
+          "idempotency_key": "ed19c18a28dbca736b70043eeddac794fb0271cedfcedf001b142c1f699db2a5",
+          "visa_sponsorship": false,
+          "location": "Amsterdam"
+        },
+        {
+          "title": "Senior Software Engineer",
+          "url": "https://jobs.lever.co/protolabs/2f758815-79ca-43bd-ba0e-cab053e84867",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:14+00:00",
+          "idempotency_key": "a18ce645926255234a7579246e96c6fa6475f91d0a35355c735c62f9557dabcf",
+          "visa_sponsorship": false,
+          "location": "Nashua, NH"
+        },
+        {
+          "title": "Sr. Software Engineer—Catalog Domain",
+          "url": "https://jobs.lever.co/protolabs/df1f1f64-11ee-4d4b-9cbc-4c87d79cf853",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:14+00:00",
+          "idempotency_key": "412a83118878e90bd0aff40480c3665ebc48d5b0cd2dfa39d76d77834aba140f",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Quin",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.quin.md",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:21:56+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Ravecruitment",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://www.ravecruitment.com",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:21:56+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Reaktor",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.reaktor.com/careers",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/reaktor",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:07+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Full Stack Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/0b3c4d59-67f8-48f3-a573-5d62b89620c4",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "da18bf116c09637fb6fc6f079bc7c75c3cd678abdfe31466dc0608d4533f6613",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Full Stack Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/2b395d5c-42d7-4ccf-b0ac-d8b33da65299",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "2428f4cc1a1d4c647d332c1aa063ef54f9850a12de34c0c0e1dc1b65f734d6a6",
+          "visa_sponsorship": false,
+          "location": "Tampere"
+        },
+        {
+          "title": "Full Stack Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/f83f80d7-9e44-4578-816e-8ace0db6bb8a",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "697bad503b1b96055e244d965ad07d369cbee4c0b1367b5b983f0deec778d308",
+          "visa_sponsorship": false,
+          "location": "Turku"
+        },
+        {
+          "title": "Full-Stack Developer (Lisbon)",
+          "url": "https://jobs.ashbyhq.com/reaktor/11ed03b2-c6bb-41d1-95a0-798606ddcb4c",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "b7226e60a36c4dc7c4660e406343eb0a305064cc6cdc0d97f544fa21b9962b37",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Platform Engineer (AWS), Gaming & Entertainment",
+          "url": "https://jobs.ashbyhq.com/reaktor/64ae7af1-c686-458f-b33b-4f46d1361d2c",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "64c28cc19cabe0ea0d6bd0a2ce947f853793a1d58e2b76cd2d7d3376df9263e2",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Platform Engineer (Azure), Industrial",
+          "url": "https://jobs.ashbyhq.com/reaktor/dcf90ab2-51e3-4d67-b99a-71ab3b0a8def",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "c0acb99b825c0c4eb1b85295c563141bfb790e1f6a089771997b706cd17c0787",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Senior Software Engineer",
+          "url": "https://jobs.ashbyhq.com/reaktor/a4372903-eaff-4182-8239-175bde733820",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "40d477b378e2aea71a1fbe6cd983fb6b684b8958050cace2b9f5433bef4b6237",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Software Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/6765adc3-7d16-4378-bcfa-8bf3dd99b83b",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "3e15d1f73143d1a9e044b320ad8e030b5d24ed855f151a65b394c2d619274c06",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Software Engineer",
+          "url": "https://jobs.ashbyhq.com/reaktor/1b89ab8a-3cfe-4c24-82c0-4ba109381a39",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "6e9fa071af42316858869685e986256501e4375aa68f4fb30102ffdc4e813576",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        }
+      ]
+    },
+    {
+      "name": "Realworks",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://jobs.realworks.nl/",
+      "ats_type": "recruitee",
+      "ats_url": "https://careers-analytics.recruitee.com/api/event",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:50+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Recharge",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://getrecharge.com/careers/",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/recharge",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:06+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Sam Media",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.sammedia.com",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:40+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "SkillLab",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://skilllab.io/en-us/company/jobs",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:02+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "SnipTech",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://join.com/companies/frankenergie",
+      "ats_type": "join",
+      "ats_url": "https://join.com/companies/frankenergie",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-14",
+      "updated": "2026-06-21T01:20:10+00:00",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Storyteq",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://apply.workable.com/storyteq/",
+      "ats_type": "workable",
+      "ats_url": "https://apply.workable.com/storyteq/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:09+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "AI Data Platform Engineer",
+          "url": "https://apply.workable.com/storyteq/j/4B8EAF16BB/",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "3c3b2ecac8702feccfb97f18f55209d5717c7a24bfe8145fa3f49b185a6a9003",
+          "visa_sponsorship": false,
+          "location": "Cape Town, Western Cape, South Africa"
+        },
+        {
+          "title": "Senior Full Stack Engineer (Angular + Node.js)",
+          "url": "https://apply.workable.com/storyteq/j/679A2F71F8/",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "5378f47da68e755015d8af6203771e3bcc77b3e09073347f885f6f2b3dfb3b2a",
+          "visa_sponsorship": false,
+          "location": "South Africa"
+        },
+        {
+          "title": "Senior Full Stack Engineer - PHP (Laravel)",
+          "url": "https://apply.workable.com/storyteq/j/F768E97028/",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:13+00:00",
+          "idempotency_key": "b80e5338077bf399f976ffa3d69f8f5833c403f8cbb0140418e6b1d7d8f5522b",
+          "visa_sponsorship": false,
+          "location": "South Africa"
+        }
+      ]
+    },
+    {
+      "name": "Stream",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://jobs.ashbyhq.com/stream?departmentId=bcea6e5b-d84d-4fa5-afec-434ce5e40092&locationId=001efa32-21c1-456c-be57-e022a185b9f7",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/stream",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:08+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Swisscom",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.swisscom.ch/jobs/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:13+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Textkernel",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://careers.bullhorn.com/",
+      "ats_type": "recruitee",
+      "ats_url": "https://bullhorn.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:09+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Tiqets",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://jobs.tiqets.work/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:15+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "TomTom",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://www.tomtom.com/careers/joboverview/",
+      "ats_type": "lever_eu",
+      "ats_url": "https://jobs.eu.lever.co/tomtom",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:17+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Medior Software Engineer",
+          "url": "https://jobs.eu.lever.co/tomtom/aecd9b82-a413-42b3-a4d2-7df10bfb7885",
+          "fetched": "2026-06-11T19:53:16+00:00",
+          "last_seen": "2026-06-11T19:53:16+00:00",
+          "idempotency_key": "d342a81bd587b8fd18292797c07d25bfef588ad27d797753c9f3a820a9883c89",
+          "visa_sponsorship": null,
+          "location": "Gent, Belgium"
+        },
+        {
+          "title": "Medior Software Engineer",
+          "url": "https://jobs.eu.lever.co/tomtom/f8c8d8fb-81be-46ae-81eb-9d419a09a7a6",
+          "fetched": "2026-06-09T17:54:35+00:00",
+          "last_seen": "2026-06-09T17:54:35+00:00",
+          "idempotency_key": "4cf99e86bd7a8e1fc813d015c1df4b44ca7250d6579c9abda11477119dd4f557",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Platform Engineer - Developer Platform",
+          "url": "https://jobs.eu.lever.co/tomtom/83311532-2a1a-45c4-bc49-fb9ff0e492c2",
+          "fetched": "2026-06-07T18:26:16+00:00",
+          "last_seen": "2026-06-07T18:26:16+00:00",
+          "idempotency_key": "72d130c81e8008bd481018571216b061c5f86cc9f0940d8db1ff9bb5a3cc411d",
+          "visa_sponsorship": null,
+          "location": "Amsterdam, The Netherlands"
+        },
+        {
+          "title": "Platform Engineer - Kubernetes",
+          "url": "https://jobs.eu.lever.co/tomtom/ebd37a66-e1a1-4584-ab6e-e2e996c59d5e",
+          "fetched": "2026-06-07T18:26:16+00:00",
+          "last_seen": "2026-06-07T18:26:16+00:00",
+          "idempotency_key": "064d9e2b0dd605307d1058737f00c85d4626651520ead169c241b67c4afc32c4",
+          "visa_sponsorship": null,
+          "location": "Amsterdam, The Netherlands"
+        },
+        {
+          "title": "Platform Engineer - Observability",
+          "url": "https://jobs.eu.lever.co/tomtom/c99537c7-0a5f-4eb9-8230-f2aab8236691",
+          "fetched": "2026-06-07T18:26:16+00:00",
+          "last_seen": "2026-06-07T18:26:16+00:00",
+          "idempotency_key": "ba834e79c7bf0c92189a8f083ec999112f975b4f9e732bae5861bf35209d1e9e",
+          "visa_sponsorship": null,
+          "location": "Amsterdam, The Netherlands"
+        },
+        {
+          "title": "Software Engineer",
+          "url": "https://jobs.eu.lever.co/tomtom/6a277ac9-65ec-45e3-8c49-eee1c2a4bd0b",
+          "fetched": "2026-06-07T18:26:16+00:00",
+          "last_seen": "2026-06-07T18:26:16+00:00",
+          "idempotency_key": "2ec1b22a50b3eb6a5d41af28dd36e317307d3e1f9155acce834f78e31f92e97e",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "TOPIC Embedded Systems",
+      "city": "Eindhoven (Netherlands)",
+      "cities": [
+        "Eindhoven"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Eindhoven",
+          "country_label": "Netherlands",
+          "key": "netherlands:eindhoven",
+          "label": "Eindhoven (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://werkenbijtopic.nl/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:16+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Topic Software Development",
+      "city": "Eindhoven (Netherlands)",
+      "cities": [
+        "Eindhoven"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Eindhoven",
+          "country_label": "Netherlands",
+          "key": "netherlands:eindhoven",
+          "label": "Eindhoven (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://werkenbijtopic.nl/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:08+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Vio.com",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.vio.com/careers",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/vio",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:18+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Engineer - Golang",
+          "url": "https://jobs.ashbyhq.com/vio/f70bf925-dc81-486f-ad1d-5178285cbb20",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:09:30+00:00",
+          "idempotency_key": "cc9cdac5ffe6e5db15245cf17e2a33cd33b35bf2cea46d36e086b9f019600e9f",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "ZooStation",
+      "city": "Amsterdam (Netherlands)",
+      "cities": [
+        "Amsterdam"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Amsterdam",
+          "country_label": "Netherlands",
+          "key": "netherlands:amsterdam",
+          "label": "Amsterdam (Netherlands)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://yourexpats.nl/over-ons/#vacancies",
+      "ats_type": "hirehive",
+      "ats_url": "https://zoostation-bv.hirehive.com",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:20:20+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    }
+  ]
+}

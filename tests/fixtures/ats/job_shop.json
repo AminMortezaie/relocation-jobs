@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "found": 1,
+      "hits": [
+        {
+          "document": {
+            "title": "Backend Developer",
+            "url": "https://careers.acme.example.com/jobs/backend-developer"
+          }
+        },
+        {
+          "document": {
+            "title": "Sales Representative",
+            "url": "https://careers.acme.example.com/jobs/sales-rep"
+          }
+        }
+      ]
+    }
+  ]
+}

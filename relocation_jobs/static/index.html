@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relocation Jobs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=22" />
+</head>
+<body>
+  <div class="layout">
+    <div id="loginPanel" class="login-panel" hidden>
+      <h2 id="loginTitle">Sign in</h2>
+      <p class="hint" id="loginHint">Your applied / not-for-me tracking is stored per user in the database.</p>
+      <div class="login-error" id="loginError"></div>
+      <form id="loginForm">
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" autocomplete="username" required />
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required />
+        <div class="login-actions">
+          <button type="button" class="link-btn" id="toggleRegister" hidden>Create account</button>
+          <button type="submit" class="primary" id="loginSubmit">Sign in</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="mainContent" class="main-content hidden">
+    <header class="app-header">
+      <h1 class="app-title">Relocation Jobs</h1>
+
+      <div class="app-header-main">
+        <div class="header-field country-field">
+          <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>
+          </svg>
+          <label class="visually-hidden" for="country">Country</label>
+          <select id="country" class="header-select" aria-label="Country"></select>
+        </div>
+
+        <div class="header-field location-field">
+          <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>
+          </svg>
+          <label class="visually-hidden" for="location">Location</label>
+          <select id="location" class="header-select" aria-label="Location">
+            <option value="all">All locations</option>
+          </select>
+        </div>
+
+        <div class="header-menu scrape-settings" id="scrapeSettingsWrap" hidden></div>
+
+        <div class="header-action-group">
+          <a href="/admin" class="header-secondary-btn admin-header-btn" id="adminPanelBtn" hidden>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <span class="header-btn-text">Admin</span>
+          </a>
+          <button type="button" class="header-secondary-btn" id="addCompanyBtn" title="Add company">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/>
+            </svg>
+            <span class="header-btn-text">Add company</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="user-menu">
+        <button type="button" class="user-avatar-btn" id="userMenuBtn" aria-expanded="false" aria-controls="userMenuPopover" aria-label="Account menu">
+          <span id="userAvatar">?</span>
+        </button>
+        <div class="user-dropdown" id="userMenuPopover" hidden>
+          <p class="user-dropdown-name" id="userName">Account</p>
+          <a href="/admin" class="user-dropdown-admin" id="adminLink" hidden>Admin panel</a>
+          <button type="button" class="user-dropdown-signout" id="logoutBtn">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="filter-bar">
+      <div class="search-field">
+        <svg class="search-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/>
+        </svg>
+        <input type="search" id="search" placeholder="Search title or company…" autocomplete="off" />
+      </div>
+
+      <div class="filter-bar-actions">
+        <div class="filter-control sort-control">
+          <label class="visually-hidden" for="sortSelect">Sort</label>
+          <select id="sortSelect" class="filter-select" aria-label="Sort companies">
+            <option value="newest">Newest first</option>
+            <option value="name">Company A–Z</option>
+          </select>
+          <input type="checkbox" id="sortNewestFetch" checked hidden aria-hidden="true" tabindex="-1" />
+        </div>
+
+        <div class="filter-control filter-dropdown">
+          <button type="button" class="filter-btn" id="filterBtn" aria-expanded="false" aria-controls="filterPopover">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 6h16M7 12h10M10 18h4"/>
+            </svg>
+            Filters
+            <span class="filter-badge" id="filterBadge" hidden>0</span>
+          </button>
+          <div class="filter-popover" id="filterPopover" hidden>
+            <div class="filter-popover-header">
+              <span class="filter-popover-title">Filters</span>
+              <button type="button" class="link-btn" id="clearFilters">Clear all</button>
+            </div>
+            <p class="filter-popover-section">Positions</p>
+            <ul class="filter-list">
+              <li>
+                <label class="filter-toggle" for="hidePositionApplied">
+                  <span class="filter-toggle-label">Hide applied positions</span>
+                  <input type="checkbox" id="hidePositionApplied" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="positionAppliedOnly">
+                  <span class="filter-toggle-label">Applied positions only</span>
+                  <input type="checkbox" id="positionAppliedOnly" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="positionRejectedOnly">
+                  <span class="filter-toggle-label">Rejections only</span>
+                  <input type="checkbox" id="positionRejectedOnly" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="positionLookingToApplyOnly">
+                  <span class="filter-toggle-label">Looking to apply only</span>
+                  <input type="checkbox" id="positionLookingToApplyOnly" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+            </ul>
+            <div class="filter-popover-divider"></div>
+            <p class="filter-popover-section">Companies</p>
+            <ul class="filter-list">
+              <li>
+                <label class="filter-toggle" for="hideApplied" title="Hides companies where you applied to at least one role">
+                  <span class="filter-toggle-label">Hide applied companies</span>
+                  <input type="checkbox" id="hideApplied" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="hideEmpty">
+                  <span class="filter-toggle-label">Hide companies with no jobs</span>
+                  <input type="checkbox" id="hideEmpty" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="hideCollapsedCompanies" title="Hides companies where you clicked Hide positions">
+                  <span class="filter-toggle-label">Hide collapsed companies</span>
+                  <input type="checkbox" id="hideCollapsedCompanies" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="notAppliedOnly" title="Show only companies you have not applied to that still have at least one matching role">
+                  <span class="filter-toggle-label">Not applied, has openings</span>
+                  <input type="checkbox" id="notAppliedOnly" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="fetchOkOnly">
+                  <span class="filter-toggle-label">Fetch OK only</span>
+                  <input type="checkbox" id="fetchOkOnly" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+              <li>
+                <label class="filter-toggle" for="fetchProblemOnly">
+                  <span class="filter-toggle-label">Fetch problems only</span>
+                  <input type="checkbox" id="fetchProblemOnly" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+            </ul>
+            <div class="filter-popover-divider"></div>
+            <p class="filter-popover-section">Roles</p>
+            <ul class="filter-list">
+              <li>
+                <label class="filter-toggle" for="visaOnly">
+                  <span class="filter-toggle-label">Visa / relocation only</span>
+                  <input type="checkbox" id="visaOnly" class="filter-toggle-input" />
+                  <span class="filter-toggle-track" aria-hidden="true"></span>
+                </label>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-chips" id="filterChips" hidden></div>
+    </div>
+
+    <div class="job-list" id="jobs"></div>
+    </div>
+  </div>
+
+  <div class="ats-score-backdrop" id="atsScoreBackdrop" hidden aria-hidden="true"></div>
+  <div class="referral-backdrop" id="referralBackdrop" hidden aria-hidden="true"></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="dialog-backdrop" id="addCompanyDialog" aria-hidden="true">
+    <form class="dialog dialog-add-company" id="addCompanyForm">
+      <div class="dialog-header">
+        <div class="dialog-header-text">
+          <h2>Add company</h2>
+          <p class="dialog-subtitle">Name and careers URL are required. Country, ATS, and cities are optional hints.</p>
+        </div>
+        <button type="button" class="dialog-close" id="addCompanyClose" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dialog-body dialog-add-company-body">
+        <div class="dialog-field">
+          <label class="dialog-field-label" for="addCompanyName">Company name</label>
+          <div class="dialog-input-wrap">
+            <span class="dialog-input-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+              </svg>
+            </span>
+            <input type="text" id="addCompanyName" required autocomplete="organization" placeholder="ASML" />
+          </div>
+        </div>
+
+        <div class="dialog-field">
+          <label class="dialog-field-label" for="addCompanyUrl">Careers page URL</label>
+          <div class="dialog-input-wrap">
+            <span class="dialog-input-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </span>
+            <input type="url" id="addCompanyUrl" required autocomplete="url" placeholder="https://company.com/careers" />
+          </div>
+        </div>
+
+        <section class="add-company-section">
+          <div class="add-company-section-head">
+            <h3 class="add-company-section-title">Optional hints</h3>
+            <p class="add-company-section-desc">Expand a section only when you need it — defaults stay on auto.</p>
+          </div>
+
+          <div class="add-company-accordion">
+            <div class="add-company-accordion-item" id="addCompanyAtsAccordion">
+              <button
+                type="button"
+                class="add-company-accordion-trigger"
+                id="addCompanyAtsTrigger"
+                aria-expanded="false"
+                aria-controls="addCompanyAtsPanel"
+              >
+                <span class="add-company-accordion-main">
+                  <span class="add-company-accordion-title">ATS system</span>
+                  <span class="add-company-accordion-summary" id="addCompanyAtsSummary">Auto-detect</span>
+                </span>
+                <svg class="add-company-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+              <div class="add-company-accordion-panel" id="addCompanyAtsPanel" hidden>
+                <div class="add-company-accordion-panel-inner">
+                  <div class="dialog-field-head">
+                    <p class="dialog-field-hint">Pick the board when fetches use the wrong ATS.</p>
+                    <button type="button" class="link-btn" id="addCompanyAtsAutoBtn" hidden>Use auto</button>
+                  </div>
+                  <input type="hidden" id="addCompanyAts" value="auto" />
+                  <div class="add-company-chip-panel add-company-ats-panel">
+                    <div class="country-chips add-company-ats-chips" role="group" aria-labelledby="addCompanyAtsLabel">
+                      <div class="country-chips-list" id="addCompanyAtsOptions"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="add-company-accordion-item" id="addCompanyCountryAccordion">
+              <button
+                type="button"
+                class="add-company-accordion-trigger"
+                id="addCompanyCountryTrigger"
+                aria-expanded="false"
+                aria-controls="addCompanyCountryPanel"
+              >
+                <span class="add-company-accordion-main">
+                  <span class="add-company-accordion-title">Countries</span>
+                  <span class="add-company-accordion-summary" id="addCompanyCountrySummary">Auto from URL</span>
+                </span>
+                <svg class="add-company-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+              <div class="add-company-accordion-panel" id="addCompanyCountryPanel" hidden>
+                <div class="add-company-accordion-panel-inner">
+                  <div class="dialog-field-head">
+                    <p class="dialog-field-hint">First country is used for the catalog file.</p>
+                    <button type="button" class="link-btn" id="addCompanyCountryAutoBtn">Use auto</button>
+                  </div>
+                  <input type="hidden" id="addCompanyCountryMode" value="auto" />
+                  <div class="add-company-chip-panel add-company-country-panel">
+                    <div class="country-chips add-company-country-chips" role="group" aria-labelledby="addCompanyCountryLabel">
+                      <div class="country-chips-list" id="addCompanyCountryOptions"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="add-company-accordion-item" id="addCompanyLocationsAccordion" hidden>
+              <button
+                type="button"
+                class="add-company-accordion-trigger"
+                id="addCompanyLocationsTrigger"
+                aria-expanded="false"
+                aria-controls="addCompanyLocationsPanel"
+              >
+                <span class="add-company-accordion-main">
+                  <span class="add-company-accordion-title">Office cities</span>
+                  <span class="add-company-accordion-summary" id="addCompanyLocationsSummary">None selected</span>
+                </span>
+                <svg class="add-company-accordion-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+              <div class="add-company-accordion-panel" id="addCompanyLocationsPanel" hidden>
+                <div class="add-company-accordion-panel-inner">
+                  <div class="dialog-field-head">
+                    <p class="dialog-field-hint">Cities from your selected countries.</p>
+                    <button type="button" class="link-btn" id="addCompanyLocationsClear">Clear</button>
+                  </div>
+                  <input type="hidden" id="addCompanyLocationsValue" value="[]" />
+                  <div class="dialog-input-wrap add-company-location-search-wrap">
+                    <span class="dialog-input-icon" aria-hidden="true">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+                      </svg>
+                    </span>
+                    <input type="search" id="addCompanyLocationSearch" placeholder="Filter cities…" autocomplete="off" />
+                  </div>
+                  <div class="add-company-chip-panel add-company-locations-panel">
+                    <div class="country-chips add-company-location-chips" role="group" aria-labelledby="addCompanyLocationsLabel">
+                      <div id="addCompanyLocationOptions"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="visually-hidden" id="addCompanyAtsLabel">ATS system</span>
+          <span class="visually-hidden" id="addCompanyCountryLabel">Countries</span>
+          <span class="visually-hidden" id="addCompanyLocationsLabel">Office cities</span>
+        </section>
+      </div>
+
+      <div class="dialog-footer">
+        <button type="button" class="dialog-btn dialog-btn-ghost" id="addCompanyCancel">Cancel</button>
+        <button type="submit" class="dialog-btn primary" id="addCompanySubmit">
+          <span class="dialog-btn-spinner" id="addCompanySubmitSpinner" hidden aria-hidden="true"></span>
+          <span id="addCompanySubmitLabel">Add company</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-backdrop fetch-panel-backdrop" id="fetchPanelBackdrop" aria-hidden="true">
+    <div
+      class="fetch-panel"
+      id="fetchPanel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="fetchTitle"
+    >
+      <div class="fetch-panel-top">
+        <div class="fetch-panel-title-wrap">
+          <h2 class="fetch-panel-title" id="fetchTitle">Fetching companies</h2>
+          <p class="fetch-panel-subtitle" id="fetchSubtitle">Starting…</p>
+          <div class="fetch-completion" id="fetchCompletion" hidden>
+            <p class="fetch-completion-label" id="fetchCompletionLabel">Current run</p>
+            <dl class="fetch-completion-grid">
+              <div><dt>Started</dt><dd id="fetchCompletionStarted">—</dd></div>
+              <div><dt>Finished</dt><dd id="fetchCompletionFinished">—</dd></div>
+              <div><dt>Duration</dt><dd id="fetchCompletionDuration">—</dd></div>
+              <div><dt>New roles</dt><dd id="fetchCompletionNewJobs">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="fetch-panel-actions">
+          <button type="button" class="fetch-cancel-btn" id="fetchCancelBtn" hidden>Cancel</button>
+          <button type="button" class="fetch-close-btn" id="fetchCloseBtn" aria-label="Close panel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="fetch-panel-body">
+        <div class="fetch-progress-wrap" id="fetchProgressWrap" hidden>
+          <div class="fetch-progress-meta">
+            <span id="fetchProgressLabel">0 / 0 companies</span>
+            <span id="fetchProgressPct">0%</span>
+          </div>
+          <div class="fetch-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="fetchProgressTrack">
+            <div class="fetch-progress-bar" id="fetchProgressBar"></div>
+          </div>
+          <p class="fetch-current-company" id="fetchCurrentCompany"></p>
+        </div>
+
+        <div class="fetch-activity" id="fetchActivity" hidden>
+          <div class="fetch-activity-current">
+            <span class="fetch-activity-pulse" aria-hidden="true"></span>
+            <div class="fetch-activity-copy">
+              <p class="fetch-activity-step" id="fetchActivityStep">Starting…</p>
+              <p class="fetch-activity-detail" id="fetchActivityDetail" hidden></p>
+            </div>
+          </div>
+          <ol class="fetch-activity-log" id="fetchActivityLog"></ol>
+        </div>
+
+        <div class="fetch-review" id="fetchReview" hidden>
+          <p class="fetch-review-hint" id="fetchReviewHint">
+            Roles on the careers page that did not match your filters. Select any to add manually.
+          </p>
+          <div class="fetch-review-section" id="fetchReviewFiltered">
+            <div class="fetch-review-section-head">
+              <h3 class="fetch-review-heading" id="fetchReviewFilteredTitle">Filtered out</h3>
+              <button type="button" class="fetch-review-add-btn" id="fetchReviewAddBtn" hidden>Add selected</button>
+            </div>
+            <ul class="fetch-review-list fetch-review-checklist" id="fetchReviewFilteredList"></ul>
+            <button type="button" class="fetch-review-expand-btn" id="fetchReviewExpandBtn" hidden>Show more</button>
+          </div>
+          <div class="fetch-review-section" id="fetchReviewIncluded" hidden>
+            <h3 class="fetch-review-heading" id="fetchReviewIncludedTitle">Matched</h3>
+            <ul class="fetch-review-list" id="fetchReviewIncludedList"></ul>
+          </div>
+        </div>
+
+        <pre class="fetch-log" id="fetchLog"></pre>
+      </div>
+
+      <div class="fetch-panel-footer" id="fetchPanelFooter" hidden>
+        <div class="fetch-review-feedback" id="fetchReviewFeedback">
+          <div class="fetch-review-feedback-prompt" id="fetchReviewFeedbackPrompt">
+            <span class="fetch-review-feedback-label" id="fetchReviewFeedbackLabel">Did the fetch work correctly?</span>
+            <div class="fetch-review-feedback-actions" id="fetchReviewFeedbackActions">
+              <button type="button" class="fetch-review-ok-btn" id="fetchReviewOkBtn">Yes, looks good</button>
+              <button type="button" class="fetch-review-problem-btn" id="fetchReviewProblemBtn">No, fetch problem</button>
+            </div>
+          </div>
+          <div class="fetch-review-feedback-result" id="fetchReviewFeedbackResult" hidden></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-backdrop" id="editCompanyNameDialog" aria-hidden="true">
+    <form class="dialog dialog-edit-careers" id="editCompanyNameForm">
+      <div class="dialog-header">
+        <div class="dialog-header-text">
+          <h2>Rename company</h2>
+          <p class="dialog-subtitle">Updates the catalog and your applied / rejected tracking for this company.</p>
+          <div class="edit-careers-company-chip" id="editCompanyNameChip">
+            <span class="edit-careers-company-name" id="editCompanyNameCurrent">Company</span>
+            <span class="edit-careers-company-country" id="editCompanyNameCountry">Country</span>
+          </div>
+        </div>
+        <button type="button" class="dialog-close" id="editCompanyNameClose" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        <div class="dialog-field">
+          <label class="dialog-field-label" for="editCompanyNameInput">New company name</label>
+          <div class="dialog-input-wrap">
+            <span class="dialog-input-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+              </svg>
+            </span>
+            <input type="text" id="editCompanyNameInput" required autocomplete="organization" spellcheck="false" />
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button type="button" class="dialog-btn" id="editCompanyNameCancel">Cancel</button>
+        <button type="submit" class="dialog-btn primary" id="editCompanyNameSubmit">
+          <span id="editCompanyNameSubmitLabel">Save name</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-backdrop" id="editCareersDialog" aria-hidden="true">
+    <form class="dialog dialog-edit-careers" id="editCareersForm">
+      <div class="dialog-header">
+        <div class="dialog-header-text">
+          <h2>Edit careers page</h2>
+          <p class="dialog-subtitle">Fix the careers URL when fetches return zero roles or the wrong board.</p>
+          <div class="edit-careers-company-chip" id="editCareersCompanyChip">
+            <span class="edit-careers-company-name" id="editCareersCompanyName">Company</span>
+            <span class="edit-careers-company-country" id="editCareersCompanyCountry">Country</span>
+          </div>
+        </div>
+        <button type="button" class="dialog-close" id="editCareersClose" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        <div class="dialog-field">
+          <label class="dialog-field-label" for="editCareersUrl">Careers page URL</label>
+          <div class="dialog-input-wrap">
+            <span class="dialog-input-icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </span>
+            <input type="url" id="editCareersUrl" required autocomplete="url" spellcheck="false" placeholder="https://example.com/careers" />
+          </div>
+          <p class="dialog-field-hint">Use the page that lists open roles, not a single job posting.</p>
+        </div>
+
+        <div class="dialog-field">
+          <label class="filter-toggle dialog-setting-toggle">
+            <span class="dialog-setting-copy">
+              <span class="dialog-setting-title">Re-detect ATS</span>
+              <span class="dialog-setting-desc">Identify Greenhouse, Recruitee, Lever, and other boards from the URL</span>
+            </span>
+            <input type="checkbox" id="editCareersRedetect" class="filter-toggle-input" checked />
+            <span class="filter-toggle-track" aria-hidden="true"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button type="button" class="dialog-btn" id="editCareersCancel">Cancel</button>
+        <button type="submit" class="dialog-btn primary" id="editCareersSubmit">
+          <svg class="dialog-btn-icon" id="editCareersSubmitIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v5h-5"/>
+          </svg>
+          <span id="editCareersSubmitLabel">Save &amp; detect</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-backdrop" id="editCityDialog" aria-hidden="true">
+    <form class="dialog dialog-edit-careers" id="editCityForm">
+      <div class="dialog-header">
+        <div class="dialog-header-text">
+          <h2>Set company locations</h2>
+          <p class="dialog-subtitle">Tag cities across countries — e.g. Amsterdam and Munich for the same company.</p>
+          <div class="edit-careers-company-chip" id="editCityCompanyChip">
+            <span class="edit-careers-company-name" id="editCityCompanyName">Company</span>
+            <span class="edit-careers-company-country" id="editCityCompanyCountry">Country</span>
+          </div>
+        </div>
+        <button type="button" class="dialog-close" id="editCityClose" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        <div class="dialog-field">
+          <div class="dialog-field-head">
+            <span class="dialog-field-label" id="editCityLabel">Locations</span>
+            <button type="button" class="link-btn" id="editCityClearAll">Clear all</button>
+          </div>
+          <p class="dialog-field-hint">Select one or more city + country pairs. A company shows up when any tag matches your filters.</p>
+          <input type="hidden" id="editCityValue" value="[]" />
+          <div class="custom-city-add-row edit-city-add-row">
+            <select id="editCityAddCountry" aria-label="Country for new city"></select>
+            <input
+              type="text"
+              id="editCityAddCity"
+              class="custom-city-add-input"
+              placeholder="Add a city…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button type="button" class="dialog-btn dialog-btn-ghost custom-city-add-btn" id="editCityAddBtn">Add city</button>
+          </div>
+          <div class="country-chips city-chips" role="group" aria-labelledby="editCityLabel">
+            <div class="country-chips-list" id="editCityOptions"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button type="button" class="dialog-btn" id="editCityCancel">Cancel</button>
+        <button type="submit" class="dialog-btn primary" id="editCitySubmit">
+          <svg class="dialog-btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
+          <span id="editCitySubmitLabel">Save locations</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script type="module" src="/static/js/main.js?v=73"></script>
+</body>
+</html>

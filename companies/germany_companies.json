@@ -1,0 +1,3652 @@
+{
+  "source": "https://relocate.me/companies-hiring/germany",
+  "fetched": "2026-06-02",
+  "updated": "2026-06-06",
+  "jobs_fetched": "2026-06-06",
+  "total": 88,
+  "last_fetch_new_jobs": 0,
+  "companies": [
+    {
+      "name": "adjoe",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://adjoe.io/careers/open-positions/",
+      "ats_type": "lever",
+      "ats_url": "https://jobs.lever.co/applike",
+      "fetch_problem": true,
+      "fetch_problem_date": "2026-06-05",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Alteos",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.alteos.com/unternehmen/karriere",
+      "ats_type": "personio",
+      "ats_url": "https://alteos.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer (m/w/d)",
+          "url": "https://alteos.jobs.personio.de/job/2577851",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "9666f5a24beedf7d43358367a21ac4b0dedbf6df775b4dd92c8840b5021373f3",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Amazon Logistik Achim",
+      "city": "Bremen (Germany)",
+      "cities": [
+        "Bremen"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Bremen",
+          "country_label": "Germany",
+          "key": "germany:bremen",
+          "label": "Bremen (Germany)"
+        }
+      ],
+      "size": "10,001+",
+      "careers_url": "https://amazon.jobs/content/de/locations/germany/achim",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "arculus",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.arculus.de/apply",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "awork",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.awork.com/jobs",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "🛠️ Engineering 🛸 AI Product Engineer - Backend Flexible - Worldwide Full-time m/f/d Open",
+          "url": "https://www.awork.com/jobs/ai-product-engineer-backend",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "d2eb3afe38d44476c6e2678c4e0f47c56f327e5cafda1d263373db0cf0f0a854",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "BackMarket",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://jobs.backmarket.com/",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/backmarket",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer - Order Management System ",
+          "url": "https://jobs.ashbyhq.com/backmarket/48758c30-b07d-4f01-984a-22d97a1ae384",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "3a68ce3dc42d6644c7cf10d470214792eab94ea555395a92d41daf30f6e4e8dc",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Software Engineer - Payment ",
+          "url": "https://jobs.ashbyhq.com/backmarket/084dfb27-d951-4dfd-b0a5-489510fac28f",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "9a265f572aee7c0972e47c8c559cc6162042459294d9f14e6e6e89778139084b",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - PayOut & Fraud ",
+          "url": "https://jobs.ashbyhq.com/backmarket/e8a34750-ef67-4569-a152-a843cb536367",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "f0876ceb6515ef49348b5f993a2f30c9a28f5167d7bcfad9487a87b95a261075",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "BASF",
+      "city": "Ludwigshafen (Germany)",
+      "cities": [
+        "Ludwigshafen"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Ludwigshafen",
+          "country_label": "Germany",
+          "key": "germany:ludwigshafen",
+          "label": "Ludwigshafen (Germany)"
+        }
+      ],
+      "size": "10,001+",
+      "careers_url": "https://www.basf.com/global/en/careers",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Bigpoint",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.bigpoint.net/careers/",
+      "ats_type": "personio",
+      "ats_url": "https://bigpoint.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Blinkist",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.blinkist.com/en/jobs",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Bonial",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.careers.bonial.com/de/",
+      "ats_type": "recruitee",
+      "ats_url": "https://bonial.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Engineer [Node.js]",
+          "url": "https://bonial.recruitee.com/o/senior-backend-engineer-nodejs",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "da2a1bc0d18656226cc4bfee4066b2c6030a5a21929e95ce2232f04e4410ffbd",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Capmo",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://capmo.jobs.personio.de/",
+      "ats_type": "personio",
+      "ats_url": "https://capmo.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer (all genders)",
+          "url": "https://capmo.jobs.personio.de/job/421537",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "0e76c99ed9988614b6935dfb1b0c289307295d810a24828b90fd1d67ded0feb8",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Celonis",
+      "city": "",
+      "cities": [],
+      "locations": [],
+      "size": "",
+      "careers_url": "https://careers.celonis.com/join-us/open-positions/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-04",
+      "updated": "2026-06-06",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer - Java",
+          "url": "https://careers.celonis.com/join-us/open-positions/job-detail?jobId=7559335003",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "17cfebf9133fd046a97e0d6f93798294b72d476dbb706fd00f689cff8f268cb1",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Orchestration and Automation",
+          "url": "https://careers.celonis.com/join-us/open-positions/job-detail?jobId=7678804003",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "ada04cfd9391a32c8dcba600a04a366c8e3350f936381c880541acfe0ffed8f3",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Provisioning and Licensing",
+          "url": "https://careers.celonis.com/join-us/open-positions/job-detail?jobId=7712675003",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "754d99be42d413f6e2cdee21cc37da096e811cb2abb37e99f509370705d77a27",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - SAP ABAP",
+          "url": "https://careers.celonis.com/join-us/open-positions/job-detail?jobId=7559294003",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "bce7d4dc324cf23edca45965d57163bfed44e420d21b802d2b7b3f456aea94dc",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Software Engineer - SAP ABAP",
+          "url": "https://careers.celonis.com/join-us/open-positions/job-detail?jobId=7559247003",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "1ebd5f87199ba996843b91a6ef8666d319dea6d2b5157c9f61be70d9e401863d",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Contentful",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.contentful.com/careers/",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/contentful",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": " Senior Software Engineer - Machine Learning (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7487850",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "d635456b0d30551e8b13cdad7f3605958f142680478c88db20e4aa638c3704a7",
+          "visa_sponsorship": false
+        },
+        {
+          "title": " Senior Software Engineer - Machine Learning (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7557680",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "446f9427afd6014e871fb44b92a1dd425ddad246d1c119f54126528e937b704e",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Full Stack Engineer - Analytics (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7905720",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "48ce8c458374a457cde52a9bdbbc658e80833d6ff4ae150f74a9b41df9d52492",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Fullstack Software Engineer (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7557586",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "a0cacacb40e7b263eee5c747be77f71ed18b302163d3d2e7e03ee4661ced9c66",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Fullstack Software Engineer (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7557597",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "aae247411598ed998119bbfc46b5556801b01f25a5aa10f569d87134e49ad142",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Fullstack Software Engineer (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7553930",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "f33269db5a57c1deed69073a43f1a2c61a98ce827de3e66e82887b766be5b787",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer - AI Platform (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7776562",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "a0fd8be89e98874610a76946cc9b62d5bfcfcedaa3f8098c28a250b0ef6962bc",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer - AI Platform (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7753183",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "e1a1fefa681b006c36bdb42752f22e2649ab5115851dda92a4d87cf9e4dc203d",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Backend & Infrastructure (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7757968",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "a05cf322dd8b7b348f3f3f72491d51d7a29b21b6c7c1eec6b59e8617eb73312d",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Backend & Infrastructure (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7760962",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "57f8c8e6f6bbdbfd4e4aa72d17abf17a9545eace0c913233b1854e1835ce48b5",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Backend & Infrastructure (f/m/d)",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7760966",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "986b35f382c67633696e31668a99c21d3273f2cd3ee7499c85b65283f40cdd7a",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Crytek",
+      "city": "Frankfurt (Germany)",
+      "cities": [
+        "Frankfurt"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Frankfurt",
+          "country_label": "Germany",
+          "key": "germany:frankfurt",
+          "label": "Frankfurt (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.crytek.com/career",
+      "ats_type": "lever",
+      "ats_url": "https://jobs.lever.co/crytek",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Programmer",
+          "url": "https://jobs.lever.co/crytek/66ad8579-ce10-4f77-9685-cb64cecf2ca1",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "7fd3173df40c4227f227f415fc754f424239cdc2b88f885ba9dcb8d87a6fc51c",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "DeepSpin",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "2-10",
+      "careers_url": "https://deepspin-gmbh.jobs.personio.com/?language=en",
+      "ats_type": "personio",
+      "ats_url": "https://deepspin-gmbh.jobs.personio.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "e-bot7",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://e-bot7.com/careers",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Ecosia",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://www.ecosia.org/about/careers/",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/ecosia.org",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "endios",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://www.endios.de/en/karriere/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "enmacc",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://enmacc.com/careers/",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/enmacc",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "(Mid & Senior) Backend Engineer (m/f/d)",
+          "url": "https://job-boards.eu.greenhouse.io/enmacc/jobs/4849720101",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "19d6b96fa4e2d29c7c9b6aa988bfdd1ae136b31104c7cad61a3f3e33cc1eedeb",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Fullstack Engineer (m/f/d)",
+          "url": "https://job-boards.eu.greenhouse.io/enmacc/jobs/4743281101",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "b18ef8704530d7b740d2e8e1a0bb46cc3307a3ac966ce07a69ab36e75634fd0c",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "ePages",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://epages.com/en/career",
+      "ats_type": "personio",
+      "ats_url": "https://epages-gmbh.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "epilot",
+      "city": "Cologne (Germany)",
+      "cities": [
+        "Cologne"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Cologne",
+          "country_label": "Germany",
+          "key": "germany:cologne",
+          "label": "Cologne (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.epilot.cloud/en/company/careers",
+      "ats_type": "recruitee",
+      "ats_url": "https://epilot.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Eurowings Digital",
+      "city": "Cologne (Germany)",
+      "cities": [
+        "Cologne"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Cologne",
+          "country_label": "Germany",
+          "key": "germany:cologne",
+          "label": "Cologne (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://eurowings-digital.de/all-jobs/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Fashion Cloud",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.fashion.cloud/career/open-positions",
+      "ats_type": "recruitee",
+      "ats_url": "https://fashioncloudgmbh.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "FINN",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "101-250",
+      "careers_url": "https://jobs.lever.co/finn",
+      "ats_type": "lever",
+      "ats_url": "https://jobs.lever.co/finn",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Associate SAP Software Engineer (m/f/x)",
+          "url": "https://jobs.lever.co/finn/fca68fd4-f1d8-4b65-b6c2-cbf7e8ea31b8",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "1d5a8c4870e0e8227061d345b66dab1372db0e44af339f14e944529bd2da1427",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior SAP Software Engineer (m/f/x)",
+          "url": "https://jobs.lever.co/finn/339b5d0d-fede-47d5-baa6-8eda494d47d5",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "5fb4e97a830fd57668103a709abece3505c095751cc025a598236d5b27ec2ff9",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "FISHLABS GmbH",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://fishlabs.de/careers/jobs",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "FlixBus",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://flix.careers/jobs/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Full-stack (Java/Kotlin) Engineer (m/f/d) - Team Payments Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8525969002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "4309c424eefbe373a346119de60406a2dc553fba6b03bd2383b1f6772e62605a",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Full-stack (Java/Kotlin) Engineer (m/f/d) - Team Payments Munich Regular",
+          "url": "https://flix.careers/job/?jobid=8525970002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "41e56c523f0055f15c1365b4a070bde9d97a36de3b2e8322d28bc51659c5d4f4",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Full-stack (Kotlin) Engineer (m/f/d) - Team Payments Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8404507002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "d2ade0c919e19a77bec7890a3d9205f6f51b2d9c67249d5739ae4876eca706e8",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Full-stack (Kotlin) Engineer (m/f/d) - Team Payments Munich Regular",
+          "url": "https://flix.careers/job/?jobid=8441797002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "7f30f4c0354f128efd6499ddf73c723af96506a4fed8ed94b24925cf49039b97",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Data Platform Engineer Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8565089002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "4eb414909eaa01b3f23bd05fdf30abc907dbbd1e5298bc1a1355ec4a69241517",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Full Stack Engineer (m/f/d) Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8526445002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "887ca40a8fbdcd31f357d1f45c98e5e9580cc58679458dc7aeb7e3e74d6fc5ca",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Full-Stack Engineer (m/f/d) - Station Management & Inventory Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8485039002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "1c698739b478c7f51d4509b32b4d2b5829e013b6ee7e62660e28c9704b21142b",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Full-Stack Kotlin Engineer (m/f/d) - Station Management & Inventory Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8444606002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "fcad9d45e0e372af4893b90dfcd43db26765907186352931bf309a6a126dd572",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Java Engineer (m/f/d) - FlixTrain Fleet Management System Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8547109002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "b547f7c4ef96499969b42388ecf6188119f9379c069a55349c0194eb7b608a5f",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Kotlin Backend Engineer (m/f/d) Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8578265002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "0753bc07346958b0e4a1131b9878489d345328c25361ec7bd5ffd20753b43bd0",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Kotlin Backend Engineer (m/f/d) Munich Regular",
+          "url": "https://flix.careers/job/?jobid=8578268002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "187dbd98c76cde979439007fd75c1c125a51c343ad29ef92ec310b7e48099cc5",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer (m/f/d) Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8545023002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "e05368158cf67c4eedfebd6c6ee19947d3e28fbc894dfecfc20ec7ccee53a448",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer (m/f/d) Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8537445002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "dd1e5959ae96e3f397c61ed841752381cd55692b5613c1f03a0687d0efc37c06",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Software Engineer (Kotlin, Java) (m/f/d) - Capacity Management team Berlin Regular",
+          "url": "https://flix.careers/job/?jobid=8464616002",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "c835b36707894535b8faad60917601d36a840b3b2c1e01521ef4111def46f0bd",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "foodspring",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.researchgate.net/careers",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Freeletics",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.freeletics.com/en/corporate/jobs",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "GetYourGuide",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.getyourguide.careers/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer (Backend focused) - Supply Berlin",
+          "url": "https://www.getyourguide.careers/jobs/7518806",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "90ff15b756011a2daa9d5ff7c7e8f4bda8580230e71deb916f089b79f790df90",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer (Backend focused) Berlin",
+          "url": "https://www.getyourguide.careers/jobs/7526177",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "13e3c32fed66bca579b9c479ee0d8a4153f7d7b7a06dd3074fd567d940295103",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer, Developer Enablement Berlin",
+          "url": "https://www.getyourguide.careers/jobs/7234277",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "654cb0eddc80c9c0e53f4320e8aff319a130431b637a1e9afc9cb159087f842c",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer, GraphQL - API Platform Berlin",
+          "url": "https://www.getyourguide.careers/jobs/6986390",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "08ce79d9ec7065f9f82f37d939916a5183bc0b7fdd998902fb2f4d83f379cfe6",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer, Search Platform Berlin",
+          "url": "https://www.getyourguide.careers/jobs/7581804",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "63d641c95f229dbe8559a676b215c1814d628d64e0edd1edacf70ec46218ece7",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Gnosis",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://gnosis.io/careers",
+      "ats_type": "personio",
+      "ats_url": "https://gnosis.jobs.personio.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "HAWK:AI",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://hawk.ai/careers",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/hawk",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Full Stack Engineer",
+          "url": "https://jobs.ashbyhq.com/hawk/b850bd68-1ac9-44fa-af93-45e5fc85bafa",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "c6b0243baa6b41402a65a93434ba08fdfaf79fb8755e2528e42811c900619a2b",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Fullstack Java Developer",
+          "url": "https://jobs.ashbyhq.com/hawk/1df16a30-c9d2-4c0e-8ebf-9377ceec11fb",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "1f8e5e53835c165bbb6d77cc5f13502f32fea48142c38e8b590c86fe4e5f3b10",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "HeavenHR",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://apply.workable.com/heavenhr/",
+      "ats_type": "workable",
+      "ats_url": "https://apply.workable.com/heavenhr/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "HelloBetter",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://hellobetter.de/jobs",
+      "ats_type": "personio",
+      "ats_url": "https://geton.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "HelloFresh",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://careers.hellofresh.com/",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/hellofresh",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Backend Engineer, Consumer",
+          "url": "https://careers.hellofresh.com/global/en/job/7408822?gh_jid=7408822",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "adfb1aa7a515b38648a41b0345c69b5c674e03633d1e67ee034d71583a43cdc0",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Backend Engineer, Consumer Alliance ",
+          "url": "https://careers.hellofresh.com/global/en/job/7950249?gh_jid=7950249",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "5b00e9f4aa7e3641e3b3c0674f56ed34459340b3d48091e19704383ca4d801c1",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Backend Engineer, Growth Alliance(m/f/d)",
+          "url": "https://careers.hellofresh.com/global/en/job/7653839?gh_jid=7653839",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "5b8d85772f34378d1a7857832177c9acbb6105430fed019f0dab0036654402fd",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer ",
+          "url": "https://careers.hellofresh.com/global/en/job/7864482?gh_jid=7864482",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "ecb6b0ed3fc082dc36a1b32eee67a20f3c732ccd71a103251c5cac7c1c617ce2",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer - Plans Squad (f/m/x)",
+          "url": "https://careers.hellofresh.com/global/en/job/7757846?gh_jid=7757846",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "bff20c41d7c5bc6d87df1cb75a78af78057f8af4da923b8efc35882e9f26cc89",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Active Journey Alliance ",
+          "url": "https://careers.hellofresh.com/global/en/job/7618894?gh_jid=7618894",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "1e1bbc1a2fe1532b4ca83152bf73ded44ccf996bcf57a1dee343333efc61b973",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Consumer ",
+          "url": "https://careers.hellofresh.com/global/en/job/7858597?gh_jid=7858597",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "eff3b15273a0636f8114c48fe76c0cdd2cbc343f21ed239a842816736dcf6289",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Deliveries & Orders (f/m/x)",
+          "url": "https://careers.hellofresh.com/global/en/job/7758211?gh_jid=7758211",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "e83d4f0d83b8645cc1c66bfa9a06c921694f9fd7e8ace6d4584747a8a8aba3ae",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Deliveries and Orders",
+          "url": "https://careers.hellofresh.com/global/en/job/7757845?gh_jid=7757845",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "3ab0dc0146cbb3926a16adfb3173ddc521a3d6ed9c40ea8c3d9c46f42e6c2f13",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Finance Tech",
+          "url": "https://careers.hellofresh.com/global/en/job/7774546?gh_jid=7774546",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "97d79c6855329bef816d7a1e09020f23c7bdc34d78bf0c805b6a2795f0b9dc19",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Food Systems (all genders) ",
+          "url": "https://careers.hellofresh.com/global/en/job/7884372?gh_jid=7884372",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "becaf1db602268d0c6f1592450fcbaffbb199c837ed9f63986bd977232a1b3b0",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Growth Alliance",
+          "url": "https://careers.hellofresh.com/global/en/job/7668433?gh_jid=7668433",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "30b4ebd00e5e7eeb1b578cf14b3b376bde7c5a9997cb7ee51907c1b1fab32cb9",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Growth Alliance (f/m/x) ",
+          "url": "https://careers.hellofresh.com/global/en/job/7618797?gh_jid=7618797",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "b0509570e095b7d14b330514f309aa61dd1b0fa459ecd5e0709739250b1e1ffb",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Menu Personalization ",
+          "url": "https://careers.hellofresh.com/global/en/job/7921488?gh_jid=7921488",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "a38a0adb9c0c9faef90272f9afb53c3c8bdd7972999d42196e5cd0762179bbed",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Operations",
+          "url": "https://careers.hellofresh.com/global/en/job/7404963?gh_jid=7404963",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "9ed451c49dbbb880672e4aab86a8f3035269abfef8b84c5e32e12c0481ec6ab7",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer, Operations (f/m/x)",
+          "url": "https://careers.hellofresh.com/global/en/job/7864484?gh_jid=7864484",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "398cebd969adc1e344c46f1e4c39f0586f136d347074c72ae3c3b1c7b3fb10e6",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Fullstack Developer, Consumer",
+          "url": "https://careers.hellofresh.com/global/en/job/7908601?gh_jid=7908601",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "a23c18f6d11887c55a677786baa56ce3d516457f2113d0c3c12112f1bba99488",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Infrastructure Engineer, Intelligent Platforms ",
+          "url": "https://careers.hellofresh.com/global/en/job/7696242?gh_jid=7696242",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "1a65e0539d77b9a6a99a751c61ac52c40bb281c8781afd4de52359ed0480969d",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Infrastructure Engineer, Intelligent Platforms ",
+          "url": "https://careers.hellofresh.com/global/en/job/7731719?gh_jid=7731719",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "e92ebe6e0fd088b1aa79d5e7fae913e11d65075860b0119045c99f11ade5072a",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer ",
+          "url": "https://careers.hellofresh.com/global/en/job/7921474?gh_jid=7921474",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "370050cfe92d67b6692d24308cbe64980494d65254a91eff450db8e2f6216013",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Highsnobiety",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://company.highsnobiety.com/jobs",
+      "ats_type": "teamtailor",
+      "ats_url": "KgRa_9irgDNXSf7nuil0A_ySurtx4Xgw0OGFvkFb",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Holoplot",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://holoplot.jobs.personio.de/",
+      "ats_type": "personio",
+      "ats_url": "https://holoplot.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "HomeToGo",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.hometogo.com/careers",
+      "ats_type": "personio",
+      "ats_url": "https://hometogo.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer (PHP)",
+          "url": "https://hometogo.jobs.personio.de/job/2537554",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "9a1bf55028e47276fc2e31891247d33684605c92c058a8e356cf55bb9661d696",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer (PHP)",
+          "url": "https://hometogo.jobs.personio.de/job/2595767",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "83b07330e53561c8d39b9ad6bb5f8fe31a5b00c8f7ea3678e7288edd42f97ca3",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Software Engineer (PHP)",
+          "url": "https://hometogo.jobs.personio.de/job/2595367",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "9e3f12fae18958a201e1a3f7f7b5a4412312540b722e3084b4b95cf15ff5f098",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "InnoGames",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.innogames.com/career/",
+      "ats_type": "lever_eu",
+      "ats_url": "https://jobs.eu.lever.co/innogames",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Instapro Group",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://careers.instapro.group/",
+      "ats_type": "recruitee",
+      "ats_url": "https://instaprogroup.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "JOIN",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://join.com/companies/join",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "JUCR",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://join.com/companies/jucr1",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "justDice",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://justdice.io/jobs/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "justtrack",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://justtrack.io/company/careers/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Kaufland e-commerce",
+      "city": "Cologne (Germany)",
+      "cities": [
+        "Cologne"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Cologne",
+          "country_label": "Germany",
+          "key": "germany:cologne",
+          "label": "Cologne (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://kaufland-ecommerce.com/en/careers/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "(Senior) Full-Stack Engineer | Tracking",
+          "url": "https://kaufland-ecommerce.com/en/job/senior-full-stack-web-analytics-engineer-all-genders/",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "7e0a1d9cb714bfd8f1a39457b4fddb84e23e369e298ea63c125fcbee68295ee5",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Platform Engineer",
+          "url": "https://kaufland-ecommerce.com/en/job/senior-platform-engineer-all-genders/",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "35e511b33371db0d18bcd3e85a70e204bc7def3eaa8419b4d316edb0a1462ede",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Klarna",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://www.klarna.com/careers/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Kolibri Games",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.kolibrigames.com/career/",
+      "ats_type": "lever",
+      "ats_url": "https://jobs.lever.co/kolibrigames",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "lemon.markets",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://jobs.ashbyhq.com/lemon-markets?departmentId=38097582-9236-46b1-9b0d-3d5961085d51",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/lemon-markets",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "(Senior) Backend Engineer (f/m/d)",
+          "url": "https://jobs.ashbyhq.com/lemon-markets/a2fa9c37-a62c-4376-8fb0-bcca7b80b2fd",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "ef864da725f0cc04b27739596541e2040fa1da061f0fdf22ac20d25a7ab8a7f3",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Limehome",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://career.limehome.de/",
+      "ats_type": "recruitee",
+      "ats_url": "https://limehome.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Micropsi Industries",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.micropsi-industries.com/join-us",
+      "ats_type": "personio",
+      "ats_url": "https://micropsi-industries.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "MOIA",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.moia.io/en/career",
+      "ats_type": "greenhouse_eu",
+      "ats_url": "https://boards.eu.greenhouse.io/moia",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "(Senior) Data Platform Engineer (all genders) - Parental leave cover 12 months",
+          "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4880620101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "983ecc155268e06956523727840e89b5b7a36f4476347c2c78fcc1ef48ccd038",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Data Platform Engineer (all genders) - Parental leave cover 12 months",
+          "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4880621101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "2b48fd337ffb70169ad0a2229125c4baeedde6c730138239f4defac556f8a787",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Platform Engineer (all genders)",
+          "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4833653101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "5e773b366dd681ab05d6f440c3742ab4a306ae91ab62ddf4afbb8ca8bd2a08b2",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Scala Software Engineer (all genders) - Payment",
+          "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4497068101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "285077c112864f2a60857a621fc502c3a699fbde255a10a316f8f2edc8706be2",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Backend Engineer (all genders) - Vehicle Foundation",
+          "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4860627101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "6cc87150039d647f8baf02549d82de8685016e59eb8d302e6261e36d342fda4a",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Mondu",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.mondu.ai/careers/",
+      "ats_type": "workable",
+      "ats_url": "https://apply.workable.com/mondu/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "movingimage",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.movingimage.com/careers/#jobs",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "N26",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://n26.com/en-eu/careers",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "NavVis",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.navvis.com/company/careers",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/navvis",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Software Engineer - Build Systems and Tooling (C++/Python) (F/M/D) ",
+          "url": "https://job-boards.eu.greenhouse.io/navvis/jobs/4885295101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "dc1bdcf60eea98f0bc57df3565d8a4c6d51c9589be4aa56806c5659e6903776d",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Join our Talent Pool - Software Engineering (F/M/D)",
+          "url": "https://job-boards.eu.greenhouse.io/navvis/jobs/4536438101",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "ada1e59f630e8412101145d86cf85f37556f536bbd3b24f55b00c074dbbab162",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Cloud Software Engineer  (Python & AWS) (F/M/D)",
+          "url": "https://job-boards.eu.greenhouse.io/navvis/jobs/4723895101",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "80260f246334981924f4258a3d7df555f7e2c22deb064c05ae4cdef05612ab97",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Software Engineer (C++ and Python) (F/M/D)",
+          "url": "https://job-boards.eu.greenhouse.io/navvis/jobs/4809045101",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "cc9e2dea6a499bb958bb83ee305bb506655ad60add4ed34e5209b1c8d2b890cd",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Software Engineer, Full-Stack (Java, Spring & Angular) (F/M/D) ",
+          "url": "https://job-boards.eu.greenhouse.io/navvis/jobs/4792456101",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "011aa72d2131eef2b6d4b8b9dd69581ecbca05571765cde071277fec50d7574f",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Neocom",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.neocom.ai/careers#section-job-openings",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Oda",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://careers.oda.com/jobs",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Oetker Digital",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://careers.oetkerdigital.com/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Onefootball",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://onefootball.applytojob.com",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Orbem",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://orbem.ai/career-open-positions/",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/orbem",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer - Hardware Integration (f/m/d)",
+          "url": "https://jobs.ashbyhq.com/orbem/2b2a4eef-70a1-492a-ad12-ddcecbb495dc",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "c5e23e425898548b9cc663d459dd8825a22f0107b2af9205a1cdc5f4678b11a4",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "PAIR Finance",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://pairfinance.com/en/careers/",
+      "ats_type": "personio",
+      "ats_url": "https://pair.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Payrails",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://www.payrails.com/careers",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/payrails",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Engineer",
+          "url": "https://jobs.ashbyhq.com/payrails/d5a82e6a-2adc-4a82-8e78-730199a68639",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "5cd8e155b6ade1948d3f1d5af3b4ff60ce2a3bde7650334454ee40afc7c9017a",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Backend Engineer",
+          "url": "https://jobs.ashbyhq.com/payrails/03d0ef29-181d-4380-91d0-0d0312d8d276",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "7927edaaf71d1b4629a6d5bbb138ba93d5f3dde2ccd6e042c3e5d7b3aec877dd",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer",
+          "url": "https://jobs.ashbyhq.com/payrails/190ab6d8-b73a-4728-afb2-0ab1325a7d3a",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "9bf90ccf00148dc38b68d7b8e1b5be98de868334a888c369f5a7c8224d836df8",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Personio",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://www.personio.com/about-personio/careers/",
+      "ats_type": "personio",
+      "ats_url": "https://www.personio.com/api/careers/jobs/list",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior FullStack Engineer - Munich - Payroll Experience team (d/f/m)",
+          "url": "https://www.personio.com/careers/d87ec69a-f0d7-4d2b-9242-f05d8fe987e0/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "56cb27513759060b5eeb673347227062e4d9f3a7d814ed863454aa759d9b9669",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Platform Engineer - Developer Experience (d/f/m)",
+          "url": "https://www.personio.com/careers/14f8cbc7-055c-4519-84bb-67dd40f2557f/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "9be2697f40b0ca8cf52af9be0556b4a5ee3b41093668cdb973ee2cd25b6c3c3c",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Backend  D/F/M",
+          "url": "https://www.personio.com/careers/256c9c42-b3a6-429a-a836-316ad8616bb6/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "902f1e1654ad496a4326c8d0d466957d3a5c89e59c3c43de5ad11dae48ea38ee",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - EO - Munich/London (d/f/m)",
+          "url": "https://www.personio.com/careers/91a97230-58e8-4ba1-94c9-befbddff25b6/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "e862709690d467351d4ab8cdb694b2908512bc2025c1271a41e0d09ce48ef930",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Payroll Foundation - Munich/London - (d/f/m)",
+          "url": "https://www.personio.com/careers/a441faaa-1c38-4243-b888-38686b6bc617/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "70ab63a39fd934b1decad6d38ef52b58f59e946e6529741f90c3a0777b515158",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer - Time - London ",
+          "url": "https://www.personio.com/careers/ad28f064-a4db-450b-a8ac-f668fd9b169a/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "93109555743043954ebb267267fc9ddb2041db4460ad7406134539fec46d2179",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer – Backend / Fullstack (d/f/m)",
+          "url": "https://www.personio.com/careers/3994eea1-edac-40c7-886b-61a92dfa813d/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "d2d5ae540ae46e8cb3043b2f2a48585e6a4eef4acfdbdaf586d729e0c214de9b",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer – Payroll Social Insurance - Munich - (d/f/m)",
+          "url": "https://www.personio.com/careers/5a4d9bca-8c1c-4fd1-98fd-658bf1d16105/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "005be4e6c1b37e31e4be14332a3008bc3e5c93a4bd72fa06b6809e1f83d038cf",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer, L5 (Full-stack / Backend) - Recruiting (d/f/m)",
+          "url": "https://www.personio.com/careers/9105e5a2-7255-464b-a150-64dc4830f69e/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "a8093c1e5212426ce91a130efc72cb61dbe314860360008adb104a2e0e07922c",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Software Engineer - ML (d/f/m)",
+          "url": "https://www.personio.com/careers/604ba425-f6b8-4baf-9aee-817ecc09eb30/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "f6f3f4faa11eb25b973615ef8580b234fa88df9c8702bfdbc779d50c2410e167",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Testing Platform Engineer - Developer Experience (d/f/m)",
+          "url": "https://www.personio.com/careers/a384ca49-214d-4cc1-b215-72f324ac1763/",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "a46ea1924f5e87aca185dcf87099901227b9e43a693ad41b93804b40c34fd977",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Prime Intellect",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "2-10",
+      "careers_url": "https://www.primeintellect.ai/careers",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Project A Ventures",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.project-a.vc/careers",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "real.digital",
+      "city": "Cologne (Germany)",
+      "cities": [
+        "Cologne"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Cologne",
+          "country_label": "Germany",
+          "key": "germany:cologne",
+          "label": "Cologne (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.real-digital.de/karriere/unsere-stellenangebote/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "(Senior) Full-Stack Engineer | Tracking",
+          "url": "https://kaufland-ecommerce.com/job/senior-full-stack-web-analytics-engineer-all-genders/",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "ddb5bd27abbca14801437ace58bc3dd181f3bddf06e525c26d7dcca2f8b30624",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Platform Engineer",
+          "url": "https://kaufland-ecommerce.com/job/senior-platform-engineer-all-genders/",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "c40823208c20136346cb18477306bb4e2ecb727006123ccfe6eb40ec2fd469e4",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Scalable Capital",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://de.scalable.capital/en/careers",
+      "ats_type": "smartrecruiters",
+      "ats_url": "https://careers.smartrecruiters.com/ScalableGmbH",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "(Senior) Fullstack Engineer (TypeScript / Java-Kotlin) - Marketing Growth (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000123931921",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "87be4436a8dbed76381a612f69893833bf22ff866cf752a4230e7ac46b6a58eb",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Fullstack Engineer (TypeScript / Java-Kotlin) - Marketing Growth (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000123931773",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "7008b689607f04b65bdbb5671438322465a68adea8f0e7e8c6980714f1878950",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Kotlin / Java Software Engineer - Broker (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000130377690",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "b849f745e86c04931b919af1eb6db03d78be531001c655496a6c997c2575b9f9",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Kotlin / Java Software Engineer - Broker (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000130377955",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "7c6b7fdf8ffa3d4accb97bb7c7def38b3579b5e80ce7d7d15ba0c89df7c169c1",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Kotlin / Java Software Engineer - Banking Platform (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129392179",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "5476a09381d0945e0e1fe1bfcae10d2df1315cde1913212c6522987ba9435735",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Kotlin / Java Software Engineer - Banking Platform (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129391969",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "3d9bbe6636375fb72729fb15893ce22b2d14ecdf7b115a939f1b34f56785e595",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Rust Software Engineer - Banking Platform (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129388911",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "75249a325b438baa554056e6dbc44b956a6c0aee2744b8b187fb020ea360152d",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Rust Software Engineer - Banking Platform (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129390289",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "54b24ff50d2054cd7dff083f86af05efa009d6aee7acde55fed2881e2898e9f0",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "AI Software Engineer – Python (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000128882669",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "9daf63501ea9973700a976e11e70ce74a735add88d743fd8cb92220c040ba966",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "AI Software Engineer – Python (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000128882599",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "004580ff08533697b726bdf300961392bb174a69aea2f0aaf102e1056b5bdc09",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Kotlin / Java Software Engineer - Client Technology (m/f/x) ",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129669828",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "b0e2222778a7ca9121498e5f92711e5c3fe57ac1fb17ce3e831ec49fbaa849d0",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Kotlin / Java Software Engineer - Client Technology (m/f/x) ",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129669586",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "c4e53d1a20b391000207c1ae672b8a97935dc1868f591bfcf52ebfd222e823b2",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Scout24",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://www.scout24.com/en/career",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Secfix",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://jobs.ashbyhq.com/secfix",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/secfix",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "SimScale",
+      "city": "Munich (Germany)",
+      "cities": [
+        "Munich"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Munich",
+          "country_label": "Germany",
+          "key": "germany:munich",
+          "label": "Munich (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.simscale.com/jobs/",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/simscale",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Solsten",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://boards.greenhouse.io/solsten",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/solsten",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Solvians",
+      "city": "Frankfurt (Germany)",
+      "cities": [
+        "Frankfurt"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Frankfurt",
+          "country_label": "Germany",
+          "key": "germany:frankfurt",
+          "label": "Frankfurt (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.solvians.com/career",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "SoundCloud",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://careers.soundcloud.com",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/soundcloud71",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Full Stack Engineer, Insights",
+          "url": "https://job-boards.greenhouse.io/soundcloud71/jobs/8487916002",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "3ccd5f5b5604876ddf9f24ced2aaab33f2b4ac1210b2d90a20453422637cc2fc",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Statista",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://www.statista.com/career/",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/statista",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Full-Stack ML Engineer - Data Products (m/f/d)",
+          "url": "https://jobs.ashbyhq.com/statista/c7e90252-36d3-47bc-955a-04b2ac00180c",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "de3b660eedba80b2c0c907dfbcd5dd9c9b07b7f211483ebe5aa62eddcd5851d3",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer – Rust & AWS APIs (m/f/d)",
+          "url": "https://jobs.ashbyhq.com/statista/d9723cb3-4639-4132-b0f6-3184be1b3381",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-04",
+          "idempotency_key": "73f1715c327f418caf959507f5f8f0c8aee1e166614bec6ac5e84b5d6f564911",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "straiv",
+      "city": "Stuttgart (Germany)",
+      "cities": [
+        "Stuttgart"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Stuttgart",
+          "country_label": "Germany",
+          "key": "germany:stuttgart",
+          "label": "Stuttgart (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://straiv.io/en/career",
+      "ats_type": "recruitee",
+      "ats_url": "https://straiv.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Superchat",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.superchat.com/careers",
+      "ats_type": "greenhouse_eu",
+      "ats_url": "https://boards.eu.greenhouse.io/superchat",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Synergeticon",
+      "city": "Hamburg (Germany)",
+      "cities": [
+        "Hamburg"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Hamburg",
+          "country_label": "Germany",
+          "key": "germany:hamburg",
+          "label": "Hamburg (Germany)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Talon.One",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.talon.one/opportunities",
+      "ats_type": "greenhouse_eu",
+      "ats_url": "https://boards.eu.greenhouse.io/talonone",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Fullstack Engineer, Shopify ",
+          "url": "https://www.talon.one/job-listing?gh_jid=4805569101",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "23a18d7b76e1465d62e9732aedb6e31d63c04d62baee84ab19f2fcaf57a14e8c",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Backend Engineer - Go",
+          "url": "https://www.talon.one/job-listing?gh_jid=4490400101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "80ae0b391da3f36adbf8ea8d7e39f573878a052365ea713d8a4259f945b356f9",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Platform Engineer ",
+          "url": "https://www.talon.one/job-listing?gh_jid=4807160101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "6f908199733dd86edf05cf25b1f43a30f445cb6d78a263ab8ee8f8e0ab916939",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Taxfix",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://taxfix.de/en/job-openings/",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/taxfix",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "ToolTime",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://www.tooltime.app/careers",
+      "ats_type": "teamtailor",
+      "ats_url": "ot2xtYSXyjp5WG59fCbHpro2vAcLiljIDNfSfqps",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Trivago",
+      "city": "",
+      "cities": [],
+      "locations": [],
+      "size": "",
+      "careers_url": "https://careers.trivago.com/jobs/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-05",
+      "updated": "2026-06-06",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Fullstack Engineer (Product Minded)- Ai-first – Marketing",
+          "url": "https://careers.trivago.com/job/r8554686002/",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06",
+          "idempotency_key": "0df969bf7b3f28c6f17f5b28387c86568e0aa653e6edb44cf0c056491af91ea6",
+          "visa_sponsorship": true
+        }
+      ]
+    },
+    {
+      "name": "Ubisoft Blue Byte",
+      "city": "Düsseldorf (Germany)",
+      "cities": [
+        "Düsseldorf"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Düsseldorf",
+          "country_label": "Germany",
+          "key": "germany:dusseldorf",
+          "label": "Düsseldorf (Germany)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://bluebyte.ubisoft.com/en/careers/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Verimi",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://verimi.de/en/career/",
+      "ats_type": "personio",
+      "ats_url": "https://verimi.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Vimcar",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.shiftmove.com/careers/home",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Wise",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://wise.jobs/",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Backend Engineer - Hold Team",
+          "url": "https://wise.jobs/job/backend-engineer-hold-team-in-london-jid-2175",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "11a04f424b038dce6e934a03f44ae6b21125669101fd821cceae46ff7c4dd14a",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Senior Software Engineer II - Wise for Enterprise",
+          "url": "https://wise.jobs/job/senior-software-engineer-ii-wise-for-enterprise-in-london-jid-3216",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-05",
+          "idempotency_key": "a3bd3650b1ebf8e490d42785f96705e024a3cc0b7024ed2e6d1a7f28fb6053da",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "Wooga",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.wooga.com/jobs",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/wooga",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "YAGER",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://yager.de/careers/",
+      "ats_type": "personio",
+      "ats_url": "https://yager.jobs.personio.de/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Zalando",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "10,001+",
+      "careers_url": "https://jobs.zalando.com/en",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-05-28",
+      "updated": "2026-06-06",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Ziegert Group",
+      "city": "Berlin (Germany)",
+      "cities": [
+        "Berlin"
+      ],
+      "locations": [
+        {
+          "country": "germany",
+          "city": "Berlin",
+          "country_label": "Germany",
+          "key": "germany:berlin",
+          "label": "Berlin (Germany)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://ziegert-group.com/en/careers",
+      "ats_type": "generic",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-02",
+      "updated": "2026-06-06",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    }
+  ]
+}

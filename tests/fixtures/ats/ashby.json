@@ -1,0 +1,17 @@
+{
+  "jobs": [
+    {
+      "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      "title": "Senior Backend Engineer",
+      "jobUrl": "https://jobs.ashbyhq.com/acme/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      "location": "Berlin, Germany",
+      "descriptionHtml": "<p>We offer visa sponsorship and relocation support.</p>"
+    },
+    {
+      "id": "bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+      "title": "Marketing Manager",
+      "jobUrl": "https://jobs.ashbyhq.com/acme/bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+      "location": "Berlin, Germany"
+    }
+  ]
+}

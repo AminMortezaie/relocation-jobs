@@ -1,0 +1,15 @@
+{
+  "total": 1,
+  "jobPostings": [
+    {
+      "title": "Backend Engineer",
+      "externalPath": "/job/backend-engineer",
+      "locationsText": "Amsterdam, Netherlands"
+    },
+    {
+      "title": "Product Manager",
+      "externalPath": "/job/product-manager",
+      "locationsText": "Amsterdam, Netherlands"
+    }
+  ]
+}

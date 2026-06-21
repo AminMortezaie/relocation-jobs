@@ -1,0 +1,147 @@
+{
+  "source": "test-fixture",
+  "fetched": "2025-06-01",
+  "updated": "2026-06-21",
+  "jobs_fetched": "2025-06-01",
+  "total": 4,
+  "last_fetch_new_jobs": 1,
+  "companies": [
+    {
+      "name": "Acme Backend Ltd",
+      "city": "London (United Kingdom)",
+      "cities": [
+        "London"
+      ],
+      "locations": [
+        {
+          "country": "uk",
+          "city": "London",
+          "country_label": "United Kingdom",
+          "key": "uk:london",
+          "label": "London (United Kingdom)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://boards.greenhouse.io/acmebackend",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/acmebackend",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2025-06-01",
+      "updated": "2026-06-21",
+      "sources": [],
+      "matching_jobs": [
+        {
+          "title": "Manual Role",
+          "url": "https://example.com/manual-role-999",
+          "fetched": "2026-06-21",
+          "last_seen": "2026-06-21",
+          "idempotency_key": "400e4cf58f6b934e366ec6d101dbc000a3fadbe6daf6650d6ea0077b1db7a747",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Backend Engineer",
+          "url": "https://boards.greenhouse.io/acmebackend/jobs/123456?gh_jid=123456",
+          "fetched": "2025-06-01",
+          "last_seen": "2025-06-01",
+          "idempotency_key": "9387d13b9a92100fb02e54bb0839be249c7d1726d3ceed4b4497d8dfd0e09cec",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Staff Software Engineer",
+          "url": "https://boards.greenhouse.io/acmebackend/jobs/789012?gh_jid=789012",
+          "fetched": "2025-06-01",
+          "last_seen": "2025-06-01",
+          "idempotency_key": "a8958530584ceff61c0c71d33949f047b6952dd5e95b5b2151ad6cf84d48c4fc",
+          "visa_sponsorship": null
+        }
+      ]
+    },
+    {
+      "name": "Empty Corp",
+      "city": "Manchester (United Kingdom)",
+      "cities": [
+        "Manchester"
+      ],
+      "locations": [
+        {
+          "country": "uk",
+          "city": "Manchester",
+          "country_label": "United Kingdom",
+          "key": "uk:manchester",
+          "label": "Manchester (United Kingdom)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://example.co.uk/empty",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2025-06-01",
+      "updated": "2025-06-01",
+      "sources": [],
+      "matching_jobs": []
+    },
+    {
+      "name": "Fetch OK Ltd",
+      "city": "London (United Kingdom)",
+      "cities": [
+        "London"
+      ],
+      "locations": [
+        {
+          "country": "uk",
+          "city": "London",
+          "country_label": "United Kingdom",
+          "key": "uk:london",
+          "label": "London (United Kingdom)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://example.co.uk/ok",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2025-06-01",
+      "added": "2025-06-01",
+      "updated": "2025-06-01",
+      "sources": [],
+      "matching_jobs": []
+    },
+    {
+      "name": "Fetch Problem Inc",
+      "city": "London (United Kingdom)",
+      "cities": [
+        "London"
+      ],
+      "locations": [
+        {
+          "country": "uk",
+          "city": "London",
+          "country_label": "United Kingdom",
+          "key": "uk:london",
+          "label": "London (United Kingdom)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://example.co.uk/problem",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": true,
+      "fetch_problem_date": "2025-06-01",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2025-06-01",
+      "updated": "2025-06-01",
+      "sources": [],
+      "matching_jobs": []
+    }
+  ]
+}

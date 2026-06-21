@@ -1,0 +1,19 @@
+{
+  "jobs": [
+    {
+      "title": "Senior Backend Engineer",
+      "absolute_url": "https://boards.greenhouse.io/acmebackend/jobs/123456",
+      "location": {"name": "London, UK"}
+    },
+    {
+      "title": "Marketing Manager",
+      "absolute_url": "https://boards.greenhouse.io/acmebackend/jobs/999999",
+      "location": {"name": "London, UK"}
+    },
+    {
+      "title": "Principal Software Engineer",
+      "absolute_url": "https://boards.greenhouse.io/acmebackend/jobs/555555",
+      "location": {"name": "Remote"}
+    }
+  ]
+}

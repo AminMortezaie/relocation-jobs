@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Careers Feed</title>
+    <item>
+      <title>Backend Engineer</title>
+      <link>https://example.com/jobs/backend-engineer</link>
+    </item>
+    <item>
+      <title>Marketing Manager</title>
+      <link>https://example.com/jobs/marketing-manager</link>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,527 @@
+{
+  "source": "https://relocate.me/companies-hiring/portugal",
+  "fetched": "2026-06-02",
+  "updated": "2026-06-21T01:15:52+00:00",
+  "jobs_fetched": "2026-06-21T01:15:52+00:00",
+  "total": 10,
+  "last_fetch_new_jobs": 0,
+  "companies": [
+    {
+      "name": "BytePitch - Software Labs",
+      "city": "Porto (Portugal)",
+      "cities": [
+        "Porto"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Porto",
+          "country_label": "Portugal",
+          "key": "portugal:porto",
+          "label": "Porto (Portugal)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://bytepitch.com/careers",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:37+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Software Engineering",
+          "url": "https://bytepitch.com/software-engineering",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "80be9b12614ded0b23a7dc269a14f0b438fb1f7f339fa285a342f442852c22e0",
+          "visa_sponsorship": false
+        }
+      ]
+    },
+    {
+      "name": "CELUS",
+      "city": "Porto (Portugal)",
+      "cities": [
+        "Porto"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Porto",
+          "country_label": "Portugal",
+          "key": "portugal:porto",
+          "label": "Porto (Portugal)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://celus.jobs.personio.de",
+      "ats_type": "personio",
+      "ats_url": "https://celus.jobs.personio.de",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:09+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Dashlane",
+      "city": "Lisbon (Portugal)",
+      "cities": [
+        "Lisbon"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Lisbon",
+          "country_label": "Portugal",
+          "key": "portugal:lisbon",
+          "label": "Lisbon (Portugal)"
+        }
+      ],
+      "size": "201-500",
+      "careers_url": "https://www.dashlane.com/about/careers",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/dashlane",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:20+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Senior Software Engineer - Web Platform",
+          "url": "https://job-boards.greenhouse.io/dashlane/jobs/7976533",
+          "fetched": "2026-06-21T01:15:20+00:00",
+          "last_seen": "2026-06-21T01:15:20+00:00",
+          "idempotency_key": "7ad64e9e028abe5411f379652069844ba0db025090e9b70ee70336bf1c5440c2",
+          "visa_sponsorship": null,
+          "location": "Lisbon, Portugal"
+        },
+        {
+          "title": "Software Engineer - Backend",
+          "url": "https://job-boards.greenhouse.io/dashlane/jobs/7742768",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "f7d6f7c67f65968c533b567ff224c76e3e3bb099795ec530ce3664bf44807030",
+          "visa_sponsorship": true,
+          "location": "Lisbon, Portugal"
+        }
+      ]
+    },
+    {
+      "name": "eDreams ODIGEO",
+      "city": "Porto (Portugal)",
+      "cities": [
+        "Porto"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Porto",
+          "country_label": "Portugal",
+          "key": "portugal:porto",
+          "label": "Porto (Portugal)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "http://www.edreamsodigeocareers.com/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:28+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "EXADS",
+      "city": "Porto (Portugal)",
+      "cities": [
+        "Porto"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Porto",
+          "country_label": "Portugal",
+          "key": "portugal:porto",
+          "label": "Porto (Portugal)"
+        }
+      ],
+      "size": "11-50",
+      "careers_url": "https://www.exads.com/exads-careers",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:43+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Mollie",
+      "city": "Lisbon (Portugal)",
+      "cities": [
+        "Lisbon"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Lisbon",
+          "country_label": "Portugal",
+          "key": "portugal:lisbon",
+          "label": "Lisbon (Portugal)"
+        }
+      ],
+      "size": "501-1,000",
+      "careers_url": "https://jobs.mollie.com",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/mollie",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:12+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Platform Engineer II - Internal Hosting Platform",
+          "url": "https://jobs.ashbyhq.com/mollie/bf75b361-c569-4479-9495-21eeafb2414e",
+          "fetched": "2026-06-21T01:15:12+00:00",
+          "last_seen": "2026-06-21T01:15:12+00:00",
+          "idempotency_key": "7bf2c2a6d6435f9bd8113fbf287299daba339d2120d008d27f1700894dcf7c24",
+          "visa_sponsorship": null,
+          "location": "Lisbon"
+        }
+      ]
+    },
+    {
+      "name": "Reaktor",
+      "city": "Lisbon (Portugal)",
+      "cities": [
+        "Lisbon"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Lisbon",
+          "country_label": "Portugal",
+          "key": "portugal:lisbon",
+          "label": "Lisbon (Portugal)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.reaktor.com/careers",
+      "ats_type": "ashby",
+      "ats_url": "https://jobs.ashbyhq.com/reaktor",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:15:12+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Full Stack Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/0b3c4d59-67f8-48f3-a573-5d62b89620c4",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "da18bf116c09637fb6fc6f079bc7c75c3cd678abdfe31466dc0608d4533f6613",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Full Stack Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/2b395d5c-42d7-4ccf-b0ac-d8b33da65299",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "2428f4cc1a1d4c647d332c1aa063ef54f9850a12de34c0c0e1dc1b65f734d6a6",
+          "visa_sponsorship": false,
+          "location": "Tampere"
+        },
+        {
+          "title": "Full Stack Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/f83f80d7-9e44-4578-816e-8ace0db6bb8a",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "697bad503b1b96055e244d965ad07d369cbee4c0b1367b5b983f0deec778d308",
+          "visa_sponsorship": false,
+          "location": "Turku"
+        },
+        {
+          "title": "Full-Stack Developer (Lisbon)",
+          "url": "https://jobs.ashbyhq.com/reaktor/11ed03b2-c6bb-41d1-95a0-798606ddcb4c",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "b7226e60a36c4dc7c4660e406343eb0a305064cc6cdc0d97f544fa21b9962b37",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Platform Engineer (AWS), Gaming & Entertainment",
+          "url": "https://jobs.ashbyhq.com/reaktor/64ae7af1-c686-458f-b33b-4f46d1361d2c",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "64c28cc19cabe0ea0d6bd0a2ce947f853793a1d58e2b76cd2d7d3376df9263e2",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Platform Engineer (Azure), Industrial",
+          "url": "https://jobs.ashbyhq.com/reaktor/dcf90ab2-51e3-4d67-b99a-71ab3b0a8def",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "c0acb99b825c0c4eb1b85295c563141bfb790e1f6a089771997b706cd17c0787",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Senior Software Engineer",
+          "url": "https://jobs.ashbyhq.com/reaktor/a4372903-eaff-4182-8239-175bde733820",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "40d477b378e2aea71a1fbe6cd983fb6b684b8958050cace2b9f5433bef4b6237",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Software Developer",
+          "url": "https://jobs.ashbyhq.com/reaktor/6765adc3-7d16-4378-bcfa-8bf3dd99b83b",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "3e15d1f73143d1a9e044b320ad8e030b5d24ed855f151a65b394c2d619274c06",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        },
+        {
+          "title": "Software Engineer",
+          "url": "https://jobs.ashbyhq.com/reaktor/1b89ab8a-3cfe-4c24-82c0-4ba109381a39",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "6e9fa071af42316858869685e986256501e4375aa68f4fb30102ffdc4e813576",
+          "visa_sponsorship": false,
+          "location": "Helsinki"
+        }
+      ]
+    },
+    {
+      "name": "Revolut",
+      "city": "",
+      "cities": [],
+      "locations": [],
+      "size": "10,001+",
+      "careers_url": "https://www.revolut.com/careers/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:48+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Uphold",
+      "city": "Porto (Portugal)",
+      "cities": [
+        "Porto"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Porto",
+          "country_label": "Portugal",
+          "key": "portugal:porto",
+          "label": "Porto (Portugal)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://uphold.com/careers",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:15:52+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Volkswagen Digital Solutions",
+      "city": "Lisbon (Portugal)",
+      "cities": [
+        "Lisbon"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Lisbon",
+          "country_label": "Portugal",
+          "key": "portugal:lisbon",
+          "label": "Lisbon (Portugal)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.vwds.pt/careers",
+      "ats_type": "lever_eu",
+      "ats_url": "https://jobs.eu.lever.co/vwgds",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:15:13+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Backend Developer (AWS)",
+          "url": "https://jobs.eu.lever.co/vwgds/ffdebf08-191f-463b-9e23-72681d278851",
+          "fetched": "2026-06-21T01:15:13+00:00",
+          "last_seen": "2026-06-21T01:15:13+00:00",
+          "idempotency_key": "4b4601bb4b21e74c92bba1031348f08bf3d617ccce5ee6d8a2ea6c6a95a19c7d",
+          "visa_sponsorship": null,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Senior Fullstack Developer (Angular+Java/Springboot)",
+          "url": "https://jobs.eu.lever.co/vwgds/80128258-a531-4fe1-b310-83852ade3336",
+          "fetched": "2026-06-21T01:15:13+00:00",
+          "last_seen": "2026-06-21T01:15:13+00:00",
+          "idempotency_key": "afb9c19da90d715bd9dad848a125ba71c82bcbfa7de878ab414fd3c17f5b8b03",
+          "visa_sponsorship": null,
+          "location": "Lisbon"
+        },
+        {
+          "title": "AWS/Backend Developer",
+          "url": "https://jobs.eu.lever.co/vwgds/77b6f8fb-ec35-48c4-9cff-1946739e4f02",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "f62875f5e05b7c4c95a0e644e15d5a96936914c5c290cfe1249bffbc30d7ce1a",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Backend Developer (Java/Kotlin)",
+          "url": "https://jobs.eu.lever.co/vwgds/c692ccbc-12fb-4260-a0d5-3bb1ad22d9c0",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "0250f82fc481a870334a2a6df9ba8d8a60b46ae3e099f3ee6857db9e6ff965fd",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Data Platform Engineer - AWS",
+          "url": "https://jobs.eu.lever.co/vwgds/14e9d32a-48cd-493a-8323-d3253bc24642",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "6185ba752c8e98d48a7d24acc838fafe16b8ccbb9b7581c8a47c24453502b67d",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Fullstack Developer",
+          "url": "https://jobs.eu.lever.co/vwgds/b0ed4c11-0bd4-4122-8993-2ad205a14a83",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "91524f8ae7d62fc00e148d4da225e2a6abab1c279268b25ddb010b1811a4e800",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Fullstack Developer (.Net/Angular)",
+          "url": "https://jobs.eu.lever.co/vwgds/0d497006-7c35-4862-836f-9932fcc620cb",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "55d484cba4813a5652f683970347533cac85c0dfe1ad79ead9f45dfdf2199f56",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Fullstack Developer (Infra & Cloud)",
+          "url": "https://jobs.eu.lever.co/vwgds/397b32c1-ca94-4b3d-afff-a558e2dfdd98",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "0461fa5cfca64789b203848adfbdadde721bdbc812f39eaafff694898fadec86",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Fullstack Developer (Java+Angular)",
+          "url": "https://jobs.eu.lever.co/vwgds/f3a6b974-d9cf-4068-9f6c-c9887816398b",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "34e60af18fc2732054011b8e6f9f407653410342ade06cdd4a34c738701bece6",
+          "visa_sponsorship": false
+        },
+        {
+          "title": "Fullstack Developer (Java+React)",
+          "url": "https://jobs.eu.lever.co/vwgds/28bd7fe1-2c8f-42b1-ad6d-3d97d481d8d6",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "9e87c2829c1f0d0b19c7582663ca860fa7552fa90e139e3d76533ad1dac622b6",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Fullstack Developer (Kotlin & Spring + react)",
+          "url": "https://jobs.eu.lever.co/vwgds/3a531868-b961-4971-8c4b-c3414b7cb549",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "f91ca93d1305ef29d189ddb0baef95dfb42c780f846a619d06f757f611c695df",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        },
+        {
+          "title": "Senior AWS Java Developer",
+          "url": "https://jobs.eu.lever.co/vwgds/2b032e05-0149-4678-aa1f-39d7324dfb2b",
+          "fetched": "2026-06-02",
+          "last_seen": "2026-06-02",
+          "idempotency_key": "4d6e2ea7c13233a6db85676959741667f71e53d19fef54f8820c10427fd7a840",
+          "visa_sponsorship": false,
+          "location": "Lisbon"
+        }
+      ]
+    }
+  ]
+}

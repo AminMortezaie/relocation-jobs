@@ -1,0 +1,32 @@
+{
+  "source": "test-fixture",
+  "fetched": "2025-06-01",
+  "updated": "2025-06-01",
+  "jobs_fetched": "2025-06-01",
+  "total": 1,
+  "last_fetch_new_jobs": 1,
+  "companies": [
+    {
+      "name": "Acme Backend Ltd",
+      "city": "London",
+      "size": "51-200",
+      "careers_url": "https://boards.greenhouse.io/acmebackend",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/acmebackend",
+      "matching_jobs": [
+        {
+          "title": "Senior Backend Engineer",
+          "url": "https://boards.greenhouse.io/acmebackend/jobs/123456?gh_jid=123456",
+          "fetched": "2025-06-01",
+          "last_seen": "2025-06-01"
+        },
+        {
+          "title": "Staff Software Engineer",
+          "url": "https://boards.greenhouse.io/acmebackend/jobs/789012?gh_jid=789012",
+          "fetched": "2025-06-01",
+          "last_seen": "2025-06-01"
+        }
+      ]
+    }
+  ]
+}

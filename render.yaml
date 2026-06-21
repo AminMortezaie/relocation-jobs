@@ -1,0 +1,31 @@
+# Render Blueprint — free web tier
+#
+# Free plan has no persistent disk. Use:
+# - DATABASE_URL → free Neon Postgres (auth + tracking survive restarts)
+# - JSON in git → bundled in the Docker image on each deploy
+# - PANEL_SCRAPE_ENABLED=0 → scraping runs locally (512MB RAM limit on free)
+
+services:
+  - type: web
+    name: relocation-jobs
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /api/auth/status
+    envVars:
+      - key: PANEL_DATA_DIR
+        value: /tmp/panel-data
+      - key: PANEL_SCRAPE_ENABLED
+        value: "0"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PANEL_SECRET_KEY
+        generateValue: true
+      - key: PANEL_ADMIN_USER
+        value: admin
+      - key: PANEL_ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: PANEL_ALLOW_REGISTER
+        value: "0"

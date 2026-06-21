@@ -1,0 +1,20 @@
+{
+  "offers": [
+    {
+      "id": 101,
+      "slug": "backend-developer",
+      "title": "Backend Developer",
+      "careers_url": "https://acme.recruitee.com/o/backend-developer",
+      "location": "Amsterdam",
+      "city": "Amsterdam",
+      "country": "Netherlands"
+    },
+    {
+      "id": 102,
+      "slug": "hr-manager",
+      "title": "HR Manager",
+      "careers_url": "https://acme.recruitee.com/o/hr-manager",
+      "location": "Amsterdam"
+    }
+  ]
+}

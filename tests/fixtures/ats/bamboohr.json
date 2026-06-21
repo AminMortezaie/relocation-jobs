@@ -1,0 +1,21 @@
+{
+  "result": [
+    {
+      "id": 42,
+      "jobOpeningName": "Backend Engineer",
+      "location": {
+        "city": "Frankfurt am Main",
+        "state": null,
+        "addressCountry": "Germany"
+      }
+    },
+    {
+      "id": 43,
+      "jobOpeningName": "Legal Counsel",
+      "location": {
+        "city": "Amsterdam",
+        "state": null
+      }
+    }
+  ]
+}

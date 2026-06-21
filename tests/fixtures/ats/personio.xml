@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workzag>
+  <position>
+    <id>54321</id>
+    <name>Platform Engineer</name>
+    <office>Munich</office>
+  </position>
+  <position>
+    <id>11111</id>
+    <name>Recruiter</name>
+    <office>Munich</office>
+  </position>
+</workzag>

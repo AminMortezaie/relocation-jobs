@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Relocation Jobs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=21" />
+</head>
+<body>
+  <div class="layout admin-layout">
+    <div id="adminLoginPanel" class="login-panel" hidden>
+      <h2>Admin sign in</h2>
+      <p class="hint">Admin access is required. Use the bootstrap admin account.</p>
+      <div class="login-error" id="adminLoginError"></div>
+      <form id="adminLoginForm">
+        <label for="adminLoginUsername">Username</label>
+        <input type="text" id="adminLoginUsername" autocomplete="username" required />
+        <label for="adminLoginPassword">Password</label>
+        <input type="password" id="adminLoginPassword" autocomplete="current-password" required />
+        <div class="login-actions">
+          <a href="/" class="link-btn">Back to jobs</a>
+          <button type="submit" class="primary">Sign in</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="adminDenied" class="admin-denied" hidden>
+      <h2>Access denied</h2>
+      <p class="hint">Your account does not have admin privileges.</p>
+      <a href="/" class="primary admin-back-link">Back to job panel</a>
+    </div>
+
+    <div id="adminContent" class="admin-content hidden">
+      <header class="admin-header">
+        <div class="admin-header-left">
+          <h1 class="app-title">Admin</h1>
+          <p class="admin-subtitle">Catalog, users, scraping ops, and system config</p>
+        </div>
+        <div class="admin-header-actions">
+          <a href="/" class="header-secondary-btn admin-nav-link">Job panel</a>
+          <button type="button" class="header-secondary-btn" id="adminRefreshBtn">Refresh</button>
+          <button type="button" class="header-secondary-btn" id="adminLogoutBtn">Sign out</button>
+        </div>
+      </header>
+
+      <div id="adminError" class="admin-error" hidden></div>
+
+      <section class="admin-panel admin-fetch-panel" id="adminFetchSection">
+        <h2 class="admin-panel-title">Country fetch</h2>
+        <p class="hint admin-fetch-hint">Scrape all companies in a country. Per-company fetch stays on the job panel.</p>
+        <p class="hint admin-fetch-disabled" id="adminFetchDisabledHint" hidden>
+          Scraping is disabled on this host — run fetches locally, then push catalog JSON.
+        </p>
+        <div class="admin-fetch-controls">
+          <label class="admin-fetch-field">
+            <span>Country</span>
+            <select id="adminFetchCountry" class="header-select"></select>
+          </label>
+          <label class="admin-fetch-field">
+            <span>Parallel companies</span>
+            <input type="number" id="adminFetchConcurrency" class="scrape-setting-input" min="1" max="64" value="16" />
+          </label>
+          <label class="admin-fetch-check">
+            <input type="checkbox" id="adminFetchSkipFilled" />
+            Skip companies that already have jobs
+          </label>
+          <div class="admin-fetch-actions">
+            <button type="button" class="header-primary-btn" id="adminFetchStartBtn">Fetch country</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="adminOverview" class="admin-section"></div>
+      <div id="adminCatalog" class="admin-section"></div>
+      <div id="adminFetchProblems" class="admin-section"></div>
+      <div id="adminUsers" class="admin-section"></div>
+      <div id="adminFetchRuns" class="admin-section"></div>
+      <div id="adminConfig" class="admin-section"></div>
+    </div>
+  </div>
+
+  <div class="toast admin-fetch-toast" id="adminFetchToast"></div>
+
+  <div class="dialog-backdrop fetch-panel-backdrop" id="adminFetchBackdrop" aria-hidden="true">
+    <div class="fetch-panel" id="adminFetchPanel" role="dialog" aria-modal="true" aria-labelledby="adminFetchTitle">
+      <div class="fetch-panel-top">
+        <div class="fetch-panel-title-wrap">
+          <h2 class="fetch-panel-title" id="adminFetchTitle">Fetching companies</h2>
+          <p class="fetch-panel-subtitle" id="adminFetchSubtitle">Starting…</p>
+          <div class="fetch-completion" id="adminFetchCompletion" hidden>
+            <p class="fetch-completion-label" id="adminFetchCompletionLabel">Current run</p>
+            <dl class="fetch-completion-grid">
+              <div><dt>Started</dt><dd id="adminFetchCompletionStarted">—</dd></div>
+              <div><dt>Finished</dt><dd id="adminFetchCompletionFinished">—</dd></div>
+              <div><dt>Duration</dt><dd id="adminFetchCompletionDuration">—</dd></div>
+              <div><dt>New roles</dt><dd id="adminFetchCompletionNewJobs">—</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="fetch-panel-actions">
+          <button type="button" class="fetch-cancel-btn" id="adminFetchCancelBtn" hidden>Cancel</button>
+          <button type="button" class="fetch-close-btn" id="adminFetchCloseBtn" aria-label="Close panel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="fetch-panel-body">
+        <div class="fetch-progress-wrap" id="adminFetchProgressWrap" hidden>
+          <div class="fetch-progress-meta">
+            <span id="adminFetchProgressLabel">0 / 0 companies</span>
+            <span id="adminFetchProgressPct">0%</span>
+          </div>
+          <div class="fetch-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="adminFetchProgressTrack">
+            <div class="fetch-progress-bar" id="adminFetchProgressBar"></div>
+          </div>
+          <p class="fetch-current-company" id="adminFetchCurrentCompany"></p>
+        </div>
+        <div class="fetch-activity" id="adminFetchActivity" hidden>
+          <div class="fetch-activity-current">
+            <span class="fetch-activity-pulse" aria-hidden="true"></span>
+            <div class="fetch-activity-copy">
+              <p class="fetch-activity-step" id="adminFetchActivityStep">Starting…</p>
+              <p class="fetch-activity-detail" id="adminFetchActivityDetail" hidden></p>
+            </div>
+          </div>
+          <ol class="fetch-activity-log" id="adminFetchActivityLog"></ol>
+        </div>
+        <pre class="fetch-log" id="adminFetchLog"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/admin.js?v=3"></script>
+</body>
+</html>

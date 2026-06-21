@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "title": "Backend Software Engineer",
+      "shortcode": "ABC123",
+      "location": {
+        "city": "Amsterdam",
+        "region": "North Holland",
+        "country": "Netherlands"
+      }
+    },
+    {
+      "title": "Sales Manager",
+      "shortcode": "XYZ999",
+      "location": {
+        "city": "Amsterdam",
+        "country": "Netherlands"
+      }
+    }
+  ]
+}

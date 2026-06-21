@@ -1,0 +1,22 @@
+{
+  "content": [
+    {
+      "id": "job-001",
+      "name": "Java Backend Engineer",
+      "location": {
+        "city": "Berlin",
+        "country": "Germany",
+        "fullLocation": "Berlin, Germany"
+      }
+    },
+    {
+      "id": "job-002",
+      "name": "Account Executive",
+      "location": {
+        "city": "Berlin",
+        "country": "Germany"
+      }
+    }
+  ],
+  "totalFound": 2
+}

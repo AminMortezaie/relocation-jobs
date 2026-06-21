@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": "1",
+      "type": "jobs",
+      "attributes": {
+        "title": "Senior Software Engineer"
+      },
+      "relationships": {
+        "locations": {
+          "data": [{"id": "loc1", "type": "locations"}]
+        }
+      },
+      "links": {
+        "careersite-job-url": "https://acme.teamtailor.com/jobs/1-backend-engineer"
+      }
+    }
+  ],
+  "included": [
+    {
+      "id": "loc1",
+      "type": "locations",
+      "attributes": {
+        "city": "Berlin",
+        "country": "Germany",
+        "name": "Berlin HQ"
+      }
+    }
+  ],
+  "links": {}
+}

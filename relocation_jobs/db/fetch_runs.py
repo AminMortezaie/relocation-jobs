@@ -148,7 +148,7 @@ def list_all_fetch_runs(
 
 def migrate_tracking_from_json(user_id: int) -> int:
     from relocation_jobs.catalog_db import load_country as load_country_catalog
-    from relocation_jobs.panel_data import COUNTRY_FILES
+    from relocation_jobs.paths import COUNTRY_FILE_NAMES as COUNTRY_FILES
     from relocation_jobs.db.core import _normalize_url, _utc_now
 
     written = 0

@@ -1,10 +1,10 @@
 {
   "source": "https://relocate.me/companies-hiring/germany",
   "fetched": "2026-06-02",
-  "updated": "2026-06-21T16:01:16+00:00",
-  "jobs_fetched": "2026-06-21T16:01:16+00:00",
+  "updated": "2026-06-21T18:21:08+00:00",
+  "jobs_fetched": "2026-06-21T18:21:08+00:00",
   "total": 88,
-  "last_fetch_new_jobs": 2,
+  "last_fetch_new_jobs": 0,
   "companies": [
     {
       "name": "Adesso",
@@ -38,7 +38,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:10+00:00",
+      "updated": "2026-06-21T18:19:51+00:00",
       "sources": [
         "panel"
       ],
@@ -77,7 +77,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:10+00:00",
+      "updated": "2026-06-21T18:20:01+00:00",
       "sources": [
         "panel"
       ],
@@ -107,7 +107,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:03+00:00",
+      "updated": "2026-06-21T18:19:43+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -147,7 +147,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:07+00:00",
+      "updated": "2026-06-21T18:19:50+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -213,7 +213,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:10+00:00",
+      "updated": "2026-06-21T18:19:52+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -233,19 +233,19 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-09",
-      "updated": "2026-06-21T16:00:12+00:00",
+      "updated": "2026-06-21T18:19:53+00:00",
       "sources": [
         "panel"
       ],
       "matching_jobs": [
         {
           "title": "Senior Software Engineer - Backend",
-          "url": "https://job-boards.greenhouse.io/blacklane/jobs/8452187002",
+          "url": "https://job-boards.greenhouse.io/blacklane/jobs/8339892002",
           "fetched": "2026-06-08T23:39:32+00:00",
           "last_seen": "2026-06-08T23:39:32+00:00",
-          "idempotency_key": "695627ba64bec2754dff009acf7d233a60c629a8cadb83102020e6f759357ee9",
+          "idempotency_key": "0b8c7f45c88bf779683b6bfe402cade62a934a8818c93b764749c6c92fdecb24",
           "visa_sponsorship": null,
-          "location": "Berlin"
+          "location": "Barcelona"
         },
         {
           "title": "Senior Software Engineer - Backend",
@@ -258,12 +258,12 @@
         },
         {
           "title": "Senior Software Engineer - Backend",
-          "url": "https://job-boards.greenhouse.io/blacklane/jobs/8339892002",
+          "url": "https://job-boards.greenhouse.io/blacklane/jobs/8452187002",
           "fetched": "2026-06-08T23:39:32+00:00",
           "last_seen": "2026-06-08T23:39:32+00:00",
-          "idempotency_key": "0b8c7f45c88bf779683b6bfe402cade62a934a8818c93b764749c6c92fdecb24",
+          "idempotency_key": "695627ba64bec2754dff009acf7d233a60c629a8cadb83102020e6f759357ee9",
           "visa_sponsorship": null,
-          "location": "Barcelona"
+          "location": "Berlin"
         }
       ]
     },
@@ -291,7 +291,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:15+00:00",
+      "updated": "2026-06-21T18:19:56+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -321,7 +321,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:17+00:00",
+      "updated": "2026-06-21T18:19:57+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -369,7 +369,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:19+00:00",
+      "updated": "2026-06-21T18:19:58+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -417,7 +417,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:20+00:00",
+      "updated": "2026-06-21T18:20:01+00:00",
       "sources": [
         "panel"
       ],
@@ -457,7 +457,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:21+00:00",
+      "updated": "2026-06-21T18:20:02+00:00",
       "sources": [
         "panel"
       ],
@@ -487,7 +487,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:22+00:00",
+      "updated": "2026-06-21T18:20:04+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -503,12 +503,12 @@
         },
         {
           "title": "Fullstack Software Engineer (f/m/d)",
-          "url": "https://job-boards.greenhouse.io/contentful/jobs/7557597",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7553930",
           "fetched": "2026-06-06",
           "last_seen": "2026-06-07T11:00:08+00:00",
-          "idempotency_key": "aae247411598ed998119bbfc46b5556801b01f25a5aa10f569d87134e49ad142",
+          "idempotency_key": "f33269db5a57c1deed69073a43f1a2c61a98ce827de3e66e82887b766be5b787",
           "visa_sponsorship": false,
-          "location": "Berlin, Berlin, Germany"
+          "location": "London, England, United Kingdom"
         },
         {
           "title": "Fullstack Software Engineer (f/m/d)",
@@ -521,12 +521,12 @@
         },
         {
           "title": "Fullstack Software Engineer (f/m/d)",
-          "url": "https://job-boards.greenhouse.io/contentful/jobs/7553930",
+          "url": "https://job-boards.greenhouse.io/contentful/jobs/7557597",
           "fetched": "2026-06-06",
           "last_seen": "2026-06-07T11:00:08+00:00",
-          "idempotency_key": "f33269db5a57c1deed69073a43f1a2c61a98ce827de3e66e82887b766be5b787",
+          "idempotency_key": "aae247411598ed998119bbfc46b5556801b01f25a5aa10f569d87134e49ad142",
           "visa_sponsorship": false,
-          "location": "London, England, United Kingdom"
+          "location": "Berlin, Berlin, Germany"
         },
         {
           "title": "Senior Backend Engineer - AI Platform (f/m/d)",
@@ -617,7 +617,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:23+00:00",
+      "updated": "2026-06-21T18:20:06+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -656,7 +656,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:25+00:00",
+      "updated": "2026-06-21T18:20:07+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -686,7 +686,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:27+00:00",
+      "updated": "2026-06-21T18:20:07+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -716,7 +716,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:28+00:00",
+      "updated": "2026-06-21T18:20:08+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -756,7 +756,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:29+00:00",
+      "updated": "2026-06-21T18:20:09+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -805,7 +805,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:30+00:00",
+      "updated": "2026-06-21T18:20:10+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -835,7 +835,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:49+00:00",
+      "updated": "2026-06-21T18:20:43+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1042,7 +1042,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:33+00:00",
+      "updated": "2026-06-21T18:20:14+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1072,7 +1072,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:34+00:00",
+      "updated": "2026-06-21T18:20:15+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1159,7 +1159,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:35+00:00",
+      "updated": "2026-06-21T18:20:16+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -1198,7 +1198,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:36+00:00",
+      "updated": "2026-06-21T18:20:17+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1247,7 +1247,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:37+00:00",
+      "updated": "2026-06-21T18:20:19+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1277,7 +1277,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:38+00:00",
+      "updated": "2026-06-21T18:20:22+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1307,7 +1307,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:39+00:00",
+      "updated": "2026-06-21T18:20:23+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1482,21 +1482,21 @@
         },
         {
           "title": "Senior Infrastructure Engineer, Intelligent Platforms",
-          "url": "https://careers.hellofresh.com/global/en/job/7731719?gh_jid=7731719",
-          "fetched": "2026-06-04",
-          "last_seen": "2026-06-07T11:00:06+00:00",
-          "idempotency_key": "e92ebe6e0fd088b1aa79d5e7fae913e11d65075860b0119045c99f11ade5072a",
-          "visa_sponsorship": false,
-          "location": "Newark, NJ, United States"
-        },
-        {
-          "title": "Senior Infrastructure Engineer, Intelligent Platforms",
           "url": "https://careers.hellofresh.com/global/en/job/7696242?gh_jid=7696242",
           "fetched": "2026-06-04",
           "last_seen": "2026-06-07T11:00:06+00:00",
           "idempotency_key": "1a65e0539d77b9a6a99a751c61ac52c40bb281c8781afd4de52359ed0480969d",
           "visa_sponsorship": false,
           "location": "Goodyear, AZ, United States; Phoenix, AZ, United States"
+        },
+        {
+          "title": "Senior Infrastructure Engineer, Intelligent Platforms",
+          "url": "https://careers.hellofresh.com/global/en/job/7731719?gh_jid=7731719",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-07T11:00:06+00:00",
+          "idempotency_key": "e92ebe6e0fd088b1aa79d5e7fae913e11d65075860b0119045c99f11ade5072a",
+          "visa_sponsorship": false,
+          "location": "Newark, NJ, United States"
         },
         {
           "title": "Senior Software Engineer",
@@ -1533,7 +1533,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:41+00:00",
+      "updated": "2026-06-21T18:20:25+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -1564,7 +1564,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:42+00:00",
+      "updated": "2026-06-21T18:20:26+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1594,19 +1594,11 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:43+00:00",
+      "updated": "2026-06-21T18:20:27+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
       "matching_jobs": [
-        {
-          "title": "Senior Software Engineer (PHP)",
-          "url": "https://hometogo.jobs.personio.de/job/2537554",
-          "fetched": "2026-06-04",
-          "last_seen": "2026-06-07T11:00:10+00:00",
-          "idempotency_key": "9a1bf55028e47276fc2e31891247d33684605c92c058a8e356cf55bb9661d696",
-          "visa_sponsorship": false
-        },
         {
           "title": "Senior Software Engineer (PHP)",
           "url": "https://hometogo.jobs.personio.de/job/2595767",
@@ -1614,6 +1606,14 @@
           "last_seen": "2026-06-07T11:00:10+00:00",
           "idempotency_key": "83b07330e53561c8d39b9ad6bb5f8fe31a5b00c8f7ea3678e7288edd42f97ca3",
           "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Software Engineer (PHP)",
+          "url": "https://hometogo.jobs.personio.de/job/2537554",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-07T11:00:10+00:00",
+          "idempotency_key": "9a1bf55028e47276fc2e31891247d33684605c92c058a8e356cf55bb9661d696",
+          "visa_sponsorship": false
         },
         {
           "title": "Software Engineer (PHP)",
@@ -1649,7 +1649,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:44+00:00",
+      "updated": "2026-06-21T18:20:28+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1679,7 +1679,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:45+00:00",
+      "updated": "2026-06-21T18:20:29+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1709,7 +1709,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:45+00:00",
+      "updated": "2026-06-21T18:20:29+00:00",
       "sources": [
         "panel"
       ],
@@ -1739,7 +1739,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:47+00:00",
+      "updated": "2026-06-21T18:20:30+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -1769,7 +1769,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:48+00:00",
+      "updated": "2026-06-21T18:20:31+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1799,7 +1799,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:48+00:00",
+      "updated": "2026-06-21T18:20:32+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1846,7 +1846,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:49+00:00",
+      "updated": "2026-06-21T18:20:33+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1877,14 +1877,6 @@
         },
         {
           "title": "Senior Fullstack Engineer - Javascript",
-          "url": "https://jobs.deel.com/klarna/job-details/e8255f92-fc44-4f70-b7b8-68d3305f651c/overview",
-          "fetched": "2026-06-06",
-          "last_seen": "2026-06-07T11:00:09+00:00",
-          "idempotency_key": "508940a87b778e37379ce11cec56a03f7dd055324fbf116c29defb44a7ea9354",
-          "visa_sponsorship": null
-        },
-        {
-          "title": "Senior Fullstack Engineer - Javascript",
           "url": "https://jobs.deel.com/klarna/job-details/f09d7840-4f4c-4cca-800e-9715637f9e19/overview",
           "fetched": "2026-06-06",
           "last_seen": "2026-06-07T11:00:09+00:00",
@@ -1892,11 +1884,11 @@
           "visa_sponsorship": null
         },
         {
-          "title": "Senior Software Engineer - Java",
-          "url": "https://jobs.deel.com/klarna/job-details/4b07845f-40b2-42b8-829b-4bda7d3041a2/overview",
+          "title": "Senior Fullstack Engineer - Javascript",
+          "url": "https://jobs.deel.com/klarna/job-details/e8255f92-fc44-4f70-b7b8-68d3305f651c/overview",
           "fetched": "2026-06-06",
           "last_seen": "2026-06-07T11:00:09+00:00",
-          "idempotency_key": "7bf5cb3cc32603eec705e89bc97ce535a682dad94b1ec1ebfabee220b2143c72",
+          "idempotency_key": "508940a87b778e37379ce11cec56a03f7dd055324fbf116c29defb44a7ea9354",
           "visa_sponsorship": null
         },
         {
@@ -1905,6 +1897,14 @@
           "fetched": "2026-06-06",
           "last_seen": "2026-06-07T11:00:09+00:00",
           "idempotency_key": "b27a8b5f09d48a885a4a8b6d99a6714e70daea87333395c46564c2f7b8d0d2d3",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Senior Software Engineer - Java",
+          "url": "https://jobs.deel.com/klarna/job-details/4b07845f-40b2-42b8-829b-4bda7d3041a2/overview",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-07T11:00:09+00:00",
+          "idempotency_key": "7bf5cb3cc32603eec705e89bc97ce535a682dad94b1ec1ebfabee220b2143c72",
           "visa_sponsorship": null
         },
         {
@@ -1941,7 +1941,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:51+00:00",
+      "updated": "2026-06-21T18:20:34+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -1971,7 +1971,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:51+00:00",
+      "updated": "2026-06-21T18:20:35+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2018,7 +2018,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:52+00:00",
+      "updated": "2026-06-21T18:20:37+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2050,18 +2050,18 @@
         },
         {
           "title": "(Senior) Data Platform Engineer (all genders) - Parental leave cover 12 months",
-          "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4880621101",
-          "fetched": "2026-06-05",
-          "last_seen": "2026-06-07T11:00:09+00:00",
-          "idempotency_key": "2b48fd337ffb70169ad0a2229125c4baeedde6c730138239f4defac556f8a787",
-          "visa_sponsorship": true
-        },
-        {
-          "title": "(Senior) Data Platform Engineer (all genders) - Parental leave cover 12 months",
           "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4880620101",
           "fetched": "2026-06-05",
           "last_seen": "2026-06-07T11:00:09+00:00",
           "idempotency_key": "983ecc155268e06956523727840e89b5b7a36f4476347c2c78fcc1ef48ccd038",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "(Senior) Data Platform Engineer (all genders) - Parental leave cover 12 months",
+          "url": "https://job-boards.eu.greenhouse.io/moia/jobs/4880621101",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-07T11:00:09+00:00",
+          "idempotency_key": "2b48fd337ffb70169ad0a2229125c4baeedde6c730138239f4defac556f8a787",
           "visa_sponsorship": true
         },
         {
@@ -2115,7 +2115,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:54+00:00",
+      "updated": "2026-06-21T18:20:39+00:00",
       "sources": [
         "panel"
       ],
@@ -2145,7 +2145,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:54+00:00",
+      "updated": "2026-06-21T18:20:40+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2191,7 +2191,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:55+00:00",
+      "updated": "2026-06-21T18:20:42+00:00",
       "sources": [
         "panel"
       ],
@@ -2231,7 +2231,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:56+00:00",
+      "updated": "2026-06-21T18:20:45+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2261,7 +2261,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:57+00:00",
+      "updated": "2026-06-21T18:20:46+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2317,18 +2317,18 @@
         },
         {
           "title": "Data Engineer - Platform Engineering",
-          "url": "https://n26.com/en-eu/careers/positions/7857802?gh_jid=7857802",
-          "fetched": "2026-06-09T10:09:19+00:00",
-          "last_seen": "2026-06-09T10:09:19+00:00",
-          "idempotency_key": "46e2ecc1a85c405a35f9f5a66c1ecdbc1756233185526c14d0e0b277e9a7da22",
-          "visa_sponsorship": null
-        },
-        {
-          "title": "Data Engineer - Platform Engineering",
           "url": "https://n26.com/en-eu/careers/positions/7883078?gh_jid=7883078",
           "fetched": "2026-06-09T10:09:19+00:00",
           "last_seen": "2026-06-09T10:09:19+00:00",
           "idempotency_key": "e34f24f6407da3cd09ef42655eaabaa7fc036e7b2d754807fca2fc8e759ceddc",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Data Engineer - Platform Engineering",
+          "url": "https://n26.com/en-eu/careers/positions/7857802?gh_jid=7857802",
+          "fetched": "2026-06-09T10:09:19+00:00",
+          "last_seen": "2026-06-09T10:09:19+00:00",
+          "idempotency_key": "46e2ecc1a85c405a35f9f5a66c1ecdbc1756233185526c14d0e0b277e9a7da22",
           "visa_sponsorship": null
         },
         {
@@ -2409,7 +2409,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:00+00:00",
+      "updated": "2026-06-21T18:20:48+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -2475,7 +2475,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-18",
-      "updated": "2026-06-21T16:01:01+00:00",
+      "updated": "2026-06-21T18:20:49+00:00",
       "sources": [
         "panel"
       ],
@@ -2527,21 +2527,21 @@
         },
         {
           "title": "Senior Software Engineer",
-          "url": "https://navan.com/careers/openings?gh_jid=7874424",
-          "fetched": "2026-06-18T17:11:49+00:00",
-          "last_seen": "2026-06-18T17:11:49+00:00",
-          "idempotency_key": "5f004e37055b597c13a711a5bdecedc7216517ac975f4e4e36de928674507b6c",
-          "visa_sponsorship": null,
-          "location": "New York, NY"
-        },
-        {
-          "title": "Senior Software Engineer",
           "url": "https://navan.com/careers/openings?gh_jid=7896395",
           "fetched": "2026-06-18T17:11:49+00:00",
           "last_seen": "2026-06-18T17:11:49+00:00",
           "idempotency_key": "0ce6a98986b634ed001f5105188af698c286a0317243909766c3376084d3c01f",
           "visa_sponsorship": null,
           "location": "Tel-Aviv, Israel"
+        },
+        {
+          "title": "Senior Software Engineer",
+          "url": "https://navan.com/careers/openings?gh_jid=7874424",
+          "fetched": "2026-06-18T17:11:49+00:00",
+          "last_seen": "2026-06-18T17:11:49+00:00",
+          "idempotency_key": "5f004e37055b597c13a711a5bdecedc7216517ac975f4e4e36de928674507b6c",
+          "visa_sponsorship": null,
+          "location": "New York, NY"
         },
         {
           "title": "Senior Software Engineer (Full-Stack)",
@@ -2604,7 +2604,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:01:03+00:00",
+      "updated": "2026-06-21T18:20:51+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -2634,7 +2634,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:03+00:00",
+      "updated": "2026-06-21T18:20:52+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2664,7 +2664,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:04+00:00",
+      "updated": "2026-06-21T18:20:53+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -2672,18 +2672,18 @@
       "matching_jobs": [
         {
           "title": "Solutions Engineer",
-          "url": "https://jobs.ashbyhq.com/payrails/618d48b9-a9bd-498e-8a85-98e6de701d95",
-          "fetched": "2026-06-06",
-          "last_seen": "2026-06-07T11:00:10+00:00",
-          "idempotency_key": "445f36597cccdbc615d1e9efee4658e7236d964fa4ae087e0ab1638f100967b4",
-          "visa_sponsorship": null
-        },
-        {
-          "title": "Solutions Engineer",
           "url": "https://jobs.ashbyhq.com/payrails/602ffaca-f57d-48c4-ab4b-d1f56d5ccf14",
           "fetched": "2026-06-06",
           "last_seen": "2026-06-07T11:00:10+00:00",
           "idempotency_key": "15f1150deed8f3b869b5432a747a0eba9f8ccb3fe114fc9595b9f3cc8d9cb177",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Solutions Engineer",
+          "url": "https://jobs.ashbyhq.com/payrails/618d48b9-a9bd-498e-8a85-98e6de701d95",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-07T11:00:10+00:00",
+          "idempotency_key": "445f36597cccdbc615d1e9efee4658e7236d964fa4ae087e0ab1638f100967b4",
           "visa_sponsorship": null
         },
         {
@@ -2747,7 +2747,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:05+00:00",
+      "updated": "2026-06-21T18:20:54+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2882,7 +2882,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:07+00:00",
+      "updated": "2026-06-21T18:20:55+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2922,7 +2922,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:08+00:00",
+      "updated": "2026-06-21T18:20:56+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -2977,7 +2977,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:01:09+00:00",
+      "updated": "2026-06-21T18:20:57+00:00",
       "sources": [
         "panel"
       ],
@@ -3035,7 +3035,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:01:11+00:00",
+      "updated": "2026-06-21T18:20:58+00:00",
       "sources": [
         "panel"
       ],
@@ -3090,7 +3090,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:12+00:00",
+      "updated": "2026-06-21T18:21:00+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3141,15 +3141,6 @@
         },
         {
           "title": "(Senior) Rust Software Engineer - Banking Platform (m/f/x)",
-          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000130725855",
-          "fetched": "2026-06-08T12:51:34+00:00",
-          "last_seen": "2026-06-08T12:51:34+00:00",
-          "idempotency_key": "799946894d97f0f7c4aaf76f3c6b5ec39ec3ee6340de12cb43ffc549d4515064",
-          "visa_sponsorship": null,
-          "location": "München, BY, Germany"
-        },
-        {
-          "title": "(Senior) Rust Software Engineer - Banking Platform (m/f/x)",
           "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000130724875",
           "fetched": "2026-06-08T12:51:34+00:00",
           "last_seen": "2026-06-08T12:51:34+00:00",
@@ -3158,12 +3149,12 @@
           "location": "Berlin, BE, Germany"
         },
         {
-          "title": "(Senior) Fullstack Engineer (TypeScript / Java-Kotlin) - Marketing Growth (m/f/x)",
-          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000123931773",
-          "fetched": "2026-06-05",
-          "last_seen": "2026-06-07T11:00:10+00:00",
-          "idempotency_key": "7008b689607f04b65bdbb5671438322465a68adea8f0e7e8c6980714f1878950",
-          "visa_sponsorship": true,
+          "title": "(Senior) Rust Software Engineer - Banking Platform (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000130725855",
+          "fetched": "2026-06-08T12:51:34+00:00",
+          "last_seen": "2026-06-08T12:51:34+00:00",
+          "idempotency_key": "799946894d97f0f7c4aaf76f3c6b5ec39ec3ee6340de12cb43ffc549d4515064",
+          "visa_sponsorship": null,
           "location": "München, BY, Germany"
         },
         {
@@ -3174,6 +3165,15 @@
           "idempotency_key": "87be4436a8dbed76381a612f69893833bf22ff866cf752a4230e7ac46b6a58eb",
           "visa_sponsorship": true,
           "location": "Berlin, BE, Germany"
+        },
+        {
+          "title": "(Senior) Fullstack Engineer (TypeScript / Java-Kotlin) - Marketing Growth (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000123931773",
+          "fetched": "2026-06-05",
+          "last_seen": "2026-06-07T11:00:10+00:00",
+          "idempotency_key": "7008b689607f04b65bdbb5671438322465a68adea8f0e7e8c6980714f1878950",
+          "visa_sponsorship": true,
+          "location": "München, BY, Germany"
         },
         {
           "title": "(Senior) Kotlin / Java Software Engineer - Broker (m/f/x)",
@@ -3227,15 +3227,6 @@
         },
         {
           "title": "AI Software Engineer – Python (m/f/x)",
-          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000128882599",
-          "fetched": "2026-06-04",
-          "last_seen": "2026-06-07T11:00:10+00:00",
-          "idempotency_key": "004580ff08533697b726bdf300961392bb174a69aea2f0aaf102e1056b5bdc09",
-          "visa_sponsorship": true,
-          "location": "München, BY, Germany"
-        },
-        {
-          "title": "AI Software Engineer – Python (m/f/x)",
           "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000128882669",
           "fetched": "2026-06-04",
           "last_seen": "2026-06-07T11:00:10+00:00",
@@ -3244,12 +3235,13 @@
           "location": "Berlin, BE, Germany"
         },
         {
-          "title": "Senior Kotlin / Java Software Engineer - Client Technology (m/f/x)",
-          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129669586",
+          "title": "AI Software Engineer – Python (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000128882599",
           "fetched": "2026-06-04",
           "last_seen": "2026-06-07T11:00:10+00:00",
-          "idempotency_key": "c4e53d1a20b391000207c1ae672b8a97935dc1868f591bfcf52ebfd222e823b2",
-          "visa_sponsorship": true
+          "idempotency_key": "004580ff08533697b726bdf300961392bb174a69aea2f0aaf102e1056b5bdc09",
+          "visa_sponsorship": true,
+          "location": "München, BY, Germany"
         },
         {
           "title": "Senior Kotlin / Java Software Engineer - Client Technology (m/f/x)",
@@ -3257,6 +3249,14 @@
           "fetched": "2026-06-04",
           "last_seen": "2026-06-07T11:00:10+00:00",
           "idempotency_key": "b0e2222778a7ca9121498e5f92711e5c3fe57ac1fb17ce3e831ec49fbaa849d0",
+          "visa_sponsorship": true
+        },
+        {
+          "title": "Senior Kotlin / Java Software Engineer - Client Technology (m/f/x)",
+          "url": "https://jobs.smartrecruiters.com/ScalableGmbH/744000129669586",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-07T11:00:10+00:00",
+          "idempotency_key": "c4e53d1a20b391000207c1ae672b8a97935dc1868f591bfcf52ebfd222e823b2",
           "visa_sponsorship": true
         }
       ]
@@ -3285,7 +3285,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:14+00:00",
+      "updated": "2026-06-21T18:21:03+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -3333,7 +3333,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:15+00:00",
+      "updated": "2026-06-21T18:21:04+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3363,7 +3363,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:16+00:00",
+      "updated": "2026-06-21T18:21:05+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -3403,7 +3403,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:16+00:00",
+      "updated": "2026-06-21T18:21:06+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -3434,7 +3434,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:21+00:00",
+      "updated": "2026-06-21T18:21:06+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -3464,7 +3464,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:22+00:00",
+      "updated": "2026-06-21T18:21:07+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -3558,7 +3558,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:22+00:00",
+      "updated": "2026-06-21T18:21:08+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3606,7 +3606,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:23+00:00",
+      "updated": "2026-06-21T18:20:14+00:00",
       "sources": [
         "panel"
       ],
@@ -3646,7 +3646,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-21",
-      "updated": "2026-06-21T16:00:23+00:00",
+      "updated": "2026-06-21T18:20:15+00:00",
       "sources": [
         "panel"
       ],
@@ -3680,21 +3680,21 @@
         },
         {
           "title": "Software Engineer (Java) f/m/d",
-          "url": "https://jobs.smartrecruiters.com/StepStoneGroup/744000129961390",
-          "fetched": "2026-06-20T20:43:42+00:00",
-          "last_seen": "2026-06-20T20:43:42+00:00",
-          "idempotency_key": "174dfe44d71cd7c4e3baf3dcc30970e921e4adaacb3609c9b057820d3badc15a",
-          "visa_sponsorship": null,
-          "location": "Berlin, BE, Germany"
-        },
-        {
-          "title": "Software Engineer (Java) f/m/d",
           "url": "https://jobs.smartrecruiters.com/StepStoneGroup/744000132382134",
           "fetched": "2026-06-20T20:43:42+00:00",
           "last_seen": "2026-06-20T20:43:42+00:00",
           "idempotency_key": "24c931cf7434177505bc1b88138d60f843a59da9506d154b22e70befbdd24e44",
           "visa_sponsorship": null,
           "location": "Düsseldorf, NRW, Germany"
+        },
+        {
+          "title": "Software Engineer (Java) f/m/d",
+          "url": "https://jobs.smartrecruiters.com/StepStoneGroup/744000129961390",
+          "fetched": "2026-06-20T20:43:42+00:00",
+          "last_seen": "2026-06-20T20:43:42+00:00",
+          "idempotency_key": "174dfe44d71cd7c4e3baf3dcc30970e921e4adaacb3609c9b057820d3badc15a",
+          "visa_sponsorship": null,
+          "location": "Berlin, BE, Germany"
         }
       ]
     },
@@ -3722,7 +3722,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:25+00:00",
+      "updated": "2026-06-21T18:20:22+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3752,7 +3752,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:32+00:00",
+      "updated": "2026-06-21T18:20:17+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3782,7 +3782,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:29+00:00",
+      "updated": "2026-06-21T18:20:17+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3839,7 +3839,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:32+00:00",
+      "updated": "2026-06-21T18:20:17+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3915,7 +3915,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:32+00:00",
+      "updated": "2026-06-21T18:20:21+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -3935,7 +3935,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-05",
-      "updated": "2026-06-21T16:00:32+00:00",
+      "updated": "2026-06-21T18:20:22+00:00",
       "sources": [
         "panel"
       ],
@@ -3974,7 +3974,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:32+00:00",
+      "updated": "2026-06-21T18:20:23+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4004,7 +4004,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:31+00:00",
+      "updated": "2026-06-21T18:20:22+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4034,7 +4034,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:44+00:00",
+      "updated": "2026-06-21T18:20:36+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4113,7 +4113,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:33+00:00",
+      "updated": "2026-06-21T18:20:24+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -4143,7 +4143,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:33+00:00",
+      "updated": "2026-06-21T18:20:32+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -4200,7 +4200,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:38+00:00",
+      "updated": "2026-06-21T18:20:25+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4239,7 +4239,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:46+00:00",
+      "updated": "2026-06-21T18:20:41+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4278,7 +4278,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:38+00:00",
+      "updated": "2026-06-21T18:20:32+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -4318,7 +4318,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:16+00:00",
+      "updated": "2026-06-21T18:21:08+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4348,7 +4348,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:38+00:00",
+      "updated": "2026-06-21T18:20:33+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4397,7 +4397,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:39+00:00",
+      "updated": "2026-06-21T18:20:33+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4446,7 +4446,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:39+00:00",
+      "updated": "2026-06-21T18:20:33+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -4476,7 +4476,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:40+00:00",
+      "updated": "2026-06-21T18:20:33+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4516,7 +4516,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:40+00:00",
+      "updated": "2026-06-21T18:20:33+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4546,7 +4546,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:00:40+00:00",
+      "updated": "2026-06-21T18:20:33+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4595,7 +4595,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:38+00:00",
+      "updated": "2026-06-21T18:20:32+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -4625,7 +4625,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-28",
-      "updated": "2026-06-21T16:01:01+00:00",
+      "updated": "2026-06-21T18:20:56+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -4672,7 +4672,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T16:00:42+00:00",
+      "updated": "2026-06-21T18:20:36+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],

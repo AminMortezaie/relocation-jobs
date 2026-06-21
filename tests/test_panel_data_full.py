@@ -663,7 +663,7 @@ def test_fetch_relocate_metadata_mocked(monkeypatch):
         status_code = 200
         text = html
 
-    monkeypatch.setattr("relocation_jobs.panel_data.requests.get", lambda *a, **k: FakeResp())
+    monkeypatch.setattr("relocation_jobs.services.company_service.requests.get", lambda *a, **k: FakeResp())
     meta = fetch_relocate_metadata("Acme Backend Ltd")
     assert meta.get("city") == "London"
     assert meta.get("country") == "uk"
@@ -676,7 +676,7 @@ def test_fetch_relocate_metadata_failures(monkeypatch):
     def boom(*a, **k):
         raise requests.RequestException("network")
 
-    monkeypatch.setattr("relocation_jobs.panel_data.requests.get", boom)
+    monkeypatch.setattr("relocation_jobs.services.company_service.requests.get", boom)
     assert fetch_relocate_metadata("Unknown Co") == {}
 
 

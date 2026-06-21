@@ -1,9 +1,9 @@
 {
   "source": "test-fixture",
   "fetched": "2025-06-01",
-  "updated": "2025-06-01",
+  "updated": "2026-06-21",
   "jobs_fetched": "2025-06-01",
-  "total": 1,
+  "total": 5,
   "last_fetch_new_jobs": 1,
   "companies": [
     {
@@ -39,7 +39,7 @@
           "fetched": "2025-06-01",
           "last_seen": "2025-06-01",
           "idempotency_key": "9387d13b9a92100fb02e54bb0839be249c7d1726d3ceed4b4497d8dfd0e09cec",
-          "visa_sponsorship": null
+          "visa_sponsorship": true
         },
         {
           "title": "Staff Software Engineer",
@@ -47,9 +47,113 @@
           "fetched": "2025-06-01",
           "last_seen": "2025-06-01",
           "idempotency_key": "a8958530584ceff61c0c71d33949f047b6952dd5e95b5b2151ad6cf84d48c4fc",
-          "visa_sponsorship": null
+          "visa_sponsorship": false
         }
       ]
+    },
+    {
+      "name": "Dup Target",
+      "city": "",
+      "cities": [],
+      "locations": [],
+      "size": "",
+      "careers_url": "https://boards.greenhouse.io/dup",
+      "ats_type": "greenhouse",
+      "ats_url": "https://boards.greenhouse.io/dup",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2026-06-21",
+      "updated": "2026-06-21",
+      "sources": [
+        "panel"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Empty Corp",
+      "city": "Manchester (United Kingdom)",
+      "cities": [
+        "Manchester"
+      ],
+      "locations": [
+        {
+          "country": "uk",
+          "city": "Manchester",
+          "country_label": "United Kingdom",
+          "key": "uk:manchester",
+          "label": "Manchester (United Kingdom)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://example.co.uk/empty",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2025-06-01",
+      "updated": "2025-06-01",
+      "sources": [],
+      "matching_jobs": []
+    },
+    {
+      "name": "Fetch OK Ltd",
+      "city": "London (United Kingdom)",
+      "cities": [
+        "London"
+      ],
+      "locations": [
+        {
+          "country": "uk",
+          "city": "London",
+          "country_label": "United Kingdom",
+          "key": "uk:london",
+          "label": "London (United Kingdom)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://example.co.uk/ok",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2025-06-01",
+      "added": "2025-06-01",
+      "updated": "2025-06-01",
+      "sources": [],
+      "matching_jobs": []
+    },
+    {
+      "name": "Fetch Problem Inc",
+      "city": "London (United Kingdom)",
+      "cities": [
+        "London"
+      ],
+      "locations": [
+        {
+          "country": "uk",
+          "city": "London",
+          "country_label": "United Kingdom",
+          "key": "uk:london",
+          "label": "London (United Kingdom)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://example.co.uk/problem",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": true,
+      "fetch_problem_date": "2025-06-01",
+      "fetch_ok": false,
+      "fetch_ok_date": "",
+      "added": "2025-06-01",
+      "updated": "2025-06-01",
+      "sources": [],
+      "matching_jobs": []
     }
   ]
 }

@@ -11,12 +11,12 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def _reset_db_connections() -> None:
-    import relocation_jobs.db as db_module
+    import relocation_jobs.db.core as core
 
-    if db_module._pg_conn is not None and not db_module._pg_conn.closed:
-        db_module._pg_conn.close()
-    db_module._pg_conn = None
-    db_module.reset_db_initialized()
+    if core._pg_conn is not None and not core._pg_conn.closed:
+        core._pg_conn.close()
+    core._pg_conn = None
+    core.reset_db_initialized()
 
 
 @pytest.fixture(autouse=True)

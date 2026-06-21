@@ -465,7 +465,7 @@ def test_catalog_postgres_migrate_paths(pg_db, sample_country_data):
 
 @pytest.mark.integration
 def test_db_postgres_connect_postgres(monkeypatch):
-    import relocation_jobs.db as db_module
+    import relocation_jobs.db.core as core
 
     class FakePsycopg:
         @staticmethod
@@ -479,5 +479,5 @@ def test_db_postgres_connect_postgres(monkeypatch):
     monkeypatch.setitem(sys.modules, "psycopg", fake_module)
     monkeypatch.setitem(sys.modules, "psycopg.rows", fake_rows)
     monkeypatch.setenv("DATABASE_URL", "postgresql://x:y@localhost/db")
-    conn = db_module._connect_postgres()
+    conn = core._connect_postgres()
     assert conn is not None

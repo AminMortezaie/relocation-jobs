@@ -19,7 +19,7 @@ def fixed_day_bounds(monkeypatch):
     """Pin 'today' to 2026-06-21 UTC for deterministic bounds."""
     start = "2026-06-21T00:00:00+00:00"
     end = "2026-06-22T00:00:00+00:00"
-    monkeypatch.setattr("relocation_jobs.db._local_day_utc_bounds", lambda tz: (start, end))
+    monkeypatch.setattr("relocation_jobs.db.events._local_day_utc_bounds", lambda tz: (start, end))
     return start, end
 
 
@@ -160,7 +160,7 @@ def test_apply_outside_local_day_not_counted(test_user, monkeypatch):
     uid = test_user["id"]
     start = "2026-06-21T00:00:00+00:00"
     end = "2026-06-22T00:00:00+00:00"
-    monkeypatch.setattr("relocation_jobs.db._local_day_utc_bounds", lambda _tz: (start, end))
+    monkeypatch.setattr("relocation_jobs.db.events._local_day_utc_bounds", lambda _tz: (start, end))
 
     _insert_apply_event(
         uid,

@@ -125,16 +125,16 @@ class FakePgConnection:
 
 def install_postgres_mock(monkeypatch, *, database_url: str = "postgresql://test:test@localhost/test") -> FakePgConnection:
     """Monkeypatch db layer to use in-memory fake Postgres connection."""
-    import relocation_jobs.db as db_module
+    import relocation_jobs.db.core as core
 
     fake = FakePgConnection()
     monkeypatch.setenv("DATABASE_URL", database_url)
-    db_module._pg_conn = None
+    core._pg_conn = None
 
     def _connect():
         nonlocal fake
         fake = FakePgConnection()
         return fake
 
-    monkeypatch.setattr(db_module, "_connect_postgres", _connect)
+    monkeypatch.setattr(core, "_connect_postgres", _connect)
     return fake

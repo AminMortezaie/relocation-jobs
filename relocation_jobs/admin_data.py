@@ -6,47 +6,8 @@ import os
 
 from relocation_jobs.catalog_db import COUNTRY_LABELS, catalog_has_data
 from relocation_jobs.db import admin_tracking_totals, db_read, get_connection, user_count
-from relocation_jobs.db_backend import use_postgres
 from relocation_jobs.location_tags import SUGGESTED_CITIES, load_custom_cities
 from relocation_jobs.paths import COMPANIES_DIR, data_dir
-
-
-def _row_dict(row) -> dict:
-    if row is None:
-        return {}
-    if isinstance(row, dict):
-        return row
-    return dict(row)
-
-
-def _table_has_column(conn, table: str, column: str) -> bool:
-    """Return whether ``table.column`` exists (SQLite or Postgres)."""
-    if use_postgres():
-        try:
-            conn.execute(f"SELECT {column} FROM {table} LIMIT 0")
-            return True
-        except Exception:
-            return False
-
-    try:
-        rows = conn.execute(f"PRAGMA table_info({table})").fetchall()
-    except Exception:
-        return False
-    for row in rows:
-        if isinstance(row, dict):
-            name = row.get("name")
-        else:
-            try:
-                name = row[1]
-            except (IndexError, KeyError, TypeError):
-                name = None
-        if name == column:
-            return True
-    return False
-
-
-def _companies_have_column(conn, column: str) -> bool:
-    return _table_has_column(conn, "companies", column)
 
 
 def _normalize_ts_for_sort(ts: str) -> str:
@@ -78,9 +39,8 @@ def _country_latest_job_fetches(conn) -> dict[str, str]:
     ).fetchall()
     out: dict[str, str] = {}
     for row in rows:
-        data = _row_dict(row)
-        country = data.get("country")
-        latest = (data.get("latest_job_fetch") or "").strip()
+        country = (row or {}).get("country")
+        latest = ((row or {}).get("latest_job_fetch") or "").strip()
         if country and latest:
             out[country] = latest
     return out
@@ -142,19 +102,14 @@ def get_catalog_overview() -> dict:
         }
 
     with db_read() as conn:
-        has_locations_json = _companies_have_column(conn, "locations_json")
-        missing_locations_expr = (
-            """
-                SUM(
-                    CASE
-                        WHEN locations_json IS NULL OR locations_json IN ('', '[]')
-                        THEN 1 ELSE 0
-                    END
-                ) AS missing_locations
-            """
-            if has_locations_json
-            else "0 AS missing_locations"
-        )
+        missing_locations_expr = """
+            SUM(
+                CASE
+                    WHEN locations_json IS NULL OR locations_json IN ('', '[]')
+                    THEN 1 ELSE 0
+                END
+            ) AS missing_locations
+        """
         company_rows = conn.execute(
             f"""
             SELECT
@@ -223,15 +178,15 @@ def get_catalog_overview() -> dict:
         latest_job_by_country = _country_latest_job_fetches(conn)
 
     jobs_by_country = {
-        _row_dict(row)["country"]: {
-            "stored_jobs": int(_row_dict(row).get("jobs") or 0),
-            "stored_visa_jobs": int(_row_dict(row).get("visa_jobs") or 0),
+        row["country"]: {
+            "stored_jobs": int(row.get("jobs") or 0),
+            "stored_visa_jobs": int(row.get("visa_jobs") or 0),
         }
         for row in job_rows
     }
     visible_by_country = _visible_job_counts_by_country(jobs_by_country)
 
-    empty_companies = int(_row_dict(empty_row).get("n") or 0)
+    empty_companies = int((empty_row or {}).get("n") or 0)
 
     totals = {
         "companies": 0,
@@ -246,12 +201,11 @@ def get_catalog_overview() -> dict:
     }
     countries: list[dict] = []
     for row in company_rows:
-        data = _row_dict(row)
-        country = data["country"]
-        companies = int(data.get("companies") or 0)
-        fetch_problems = int(data.get("fetch_problems") or 0)
-        fetch_ok = int(data.get("fetch_ok") or 0)
-        missing_locations = int(data.get("missing_locations") or 0)
+        country = row["country"]
+        companies = int(row.get("companies") or 0)
+        fetch_problems = int(row.get("fetch_problems") or 0)
+        fetch_ok = int(row.get("fetch_ok") or 0)
+        missing_locations = int(row.get("missing_locations") or 0)
         stored_info = jobs_by_country.get(
             country,
             {"stored_jobs": 0, "stored_visa_jobs": 0},
@@ -282,19 +236,19 @@ def get_catalog_overview() -> dict:
 
     by_ats = [
         {
-            "ats_type": _row_dict(row).get("ats_type"),
-            "companies": int(_row_dict(row).get("companies") or 0),
+            "ats_type": row.get("ats_type"),
+            "companies": int(row.get("companies") or 0),
         }
         for row in ats_rows
     ]
 
     fetch_problem_companies = [
         {
-            "country": _row_dict(row).get("country"),
-            "name": _row_dict(row).get("name"),
-            "fetch_problem_date": _row_dict(row).get("fetch_problem_date"),
-            "careers_url": _row_dict(row).get("careers_url"),
-            "ats_type": _row_dict(row).get("ats_type"),
+            "country": row.get("country"),
+            "name": row.get("name"),
+            "fetch_problem_date": row.get("fetch_problem_date"),
+            "careers_url": row.get("careers_url"),
+            "ats_type": row.get("ats_type"),
         }
         for row in problem_rows
     ]
@@ -302,10 +256,9 @@ def get_catalog_overview() -> dict:
     companies_by_country = {c["country"]: c["companies"] for c in countries}
     meta_by_country: dict[str, dict] = {}
     for row in meta_rows:
-        data = _row_dict(row)
-        country = data.get("country", "")
+        country = row.get("country", "")
         last_fetch = _max_timestamp(
-            data.get("jobs_fetched"),
+            row.get("jobs_fetched"),
             latest_job_by_country.get(country),
         )
         meta_by_country[country] = {
@@ -314,13 +267,13 @@ def get_catalog_overview() -> dict:
                 country,
                 (country or "").title(),
             ),
-            "source": data.get("source"),
-            "catalog_imported": data.get("fetched"),
+            "source": row.get("source"),
+            "catalog_imported": row.get("fetched"),
             "last_fetch": last_fetch,
-            "updated": data.get("updated"),
-            "jobs_fetched": data.get("jobs_fetched"),
-            "total": companies_by_country.get(country, int(data.get("total") or 0)),
-            "last_fetch_new_jobs": int(data.get("last_fetch_new_jobs") or 0),
+            "updated": row.get("updated"),
+            "jobs_fetched": row.get("jobs_fetched"),
+            "total": companies_by_country.get(country, int(row.get("total") or 0)),
+            "last_fetch_new_jobs": int(row.get("last_fetch_new_jobs") or 0),
         }
 
     for country_row in countries:
@@ -362,7 +315,7 @@ def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
     custom = load_custom_cities()
     archives = sorted(p.name for p in COMPANIES_DIR.glob("*_companies.json"))
     return {
-        "database": "postgres" if use_postgres() else "sqlite",
+        "database": "postgres",
         "data_dir": str(data_dir()),
         "scrape_enabled": scrape_enabled,
         "allow_register": os.environ.get("PANEL_ALLOW_REGISTER", "").lower()

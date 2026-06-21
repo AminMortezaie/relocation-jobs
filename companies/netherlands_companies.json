@@ -346,78 +346,6 @@
       ]
     },
     {
-      "name": "bol",
-      "city": "Utrecht (Netherlands)",
-      "cities": [
-        "Utrecht"
-      ],
-      "locations": [
-        {
-          "country": "netherlands",
-          "city": "Utrecht",
-          "country_label": "Netherlands",
-          "key": "netherlands:utrecht",
-          "label": "Utrecht (Netherlands)"
-        }
-      ],
-      "size": "1,001-5,000",
-      "careers_url": "https://careers.bol.com/en/jobs/?doelgroep[]=12124747002",
-      "ats_type": "bol",
-      "ats_url": "https://careers.bol.com/wp-json/wp/v2/hggns/multilanguage_vacature_search",
-      "fetch_problem": false,
-      "fetch_problem_date": "",
-      "fetch_ok": true,
-      "fetch_ok_date": "2026-06-21",
-      "added": "2026-05-28",
-      "updated": "2026-06-21T01:19:32+00:00",
-      "sources": [
-        "relocate.me",
-        "tech-jobs-with-relocation"
-      ],
-      "matching_jobs": [
-        {
-          "title": "Platform Engineer: Observability and Insights",
-          "url": "https://careers.bol.com/en/job/platform-engineer-oai-devex",
-          "fetched": "2026-06-09T17:54:05+00:00",
-          "last_seen": "2026-06-09T17:54:05+00:00",
-          "idempotency_key": "c2fc0392ef1071dce8212467dba69fd0c95ebec313e1752d6ba7c49c53c53922",
-          "visa_sponsorship": null
-        },
-        {
-          "title": "Expert Software Engineer",
-          "url": "https://careers.bol.com/en/job/expert-software-engineer",
-          "fetched": "2026-06-06",
-          "last_seen": "2026-06-06T22:16:12+00:00",
-          "idempotency_key": "b562df379764e96d4ac4ab05ed1f6a7c5fe284dac6f960f39560d4129825619e",
-          "visa_sponsorship": null
-        },
-        {
-          "title": "Full-stack Engineer– Marketing and Advertisement",
-          "url": "https://careers.bol.com/en/job/full-stack-engineer-marketing-and-advertisement",
-          "fetched": "2026-06-06",
-          "last_seen": "2026-06-06T22:16:12+00:00",
-          "idempotency_key": "990c4ca2dcb1a6d6454a35e56ec88ac9dc88455ffe0ff42e6f6e54c5168f0e5e",
-          "visa_sponsorship": null
-        },
-        {
-          "title": "Platform Engineer - Cloud Compute",
-          "url": "https://careers.bol.com/en/job/platform-engineer-cloud-compute",
-          "fetched": "2026-06-06",
-          "last_seen": "2026-06-06T22:16:12+00:00",
-          "idempotency_key": "468862c5511c62edc3db8587bc0d78c32e1b5dbcb0710f037db5c04ca5751fb3",
-          "visa_sponsorship": null
-        },
-        {
-          "title": "Software engineer – Data Platform",
-          "url": "https://careers.bol.com/en/job/software-engineer-data-platform",
-          "fetched": "2026-06-06",
-          "last_seen": "2026-06-06T22:16:12+00:00",
-          "idempotency_key": "0ebf1352187429e45a50a95092b7ee246fc31feb416b36145000984e2c1533e3",
-          "visa_sponsorship": null
-        }
-      ]
-    },
-    {
       "name": "Booking.com",
       "city": "Amsterdam (Netherlands)",
       "cities": [
@@ -678,36 +606,6 @@
       ]
     },
     {
-      "name": "Elements",
-      "city": "Almere (Netherlands)",
-      "cities": [
-        "Almere"
-      ],
-      "locations": [
-        {
-          "country": "netherlands",
-          "city": "Almere",
-          "country_label": "Netherlands",
-          "key": "netherlands:almere",
-          "label": "Almere (Netherlands)"
-        }
-      ],
-      "size": "",
-      "careers_url": "https://www.elements.nl/en/careers",
-      "ats_type": "workable",
-      "ats_url": "https://apply.workable.com/elements/",
-      "fetch_problem": false,
-      "fetch_problem_date": "",
-      "fetch_ok": true,
-      "fetch_ok_date": "2026-06-21",
-      "added": "2026-06-02",
-      "updated": "2026-06-21T01:19:30+00:00",
-      "sources": [
-        "tech-jobs-with-relocation"
-      ],
-      "matching_jobs": []
-    },
-    {
       "name": "EPAM",
       "city": "Amsterdam (Netherlands)",
       "cities": [
@@ -765,6 +663,36 @@
       "careers_url": "https://evbox.com/en/about/careers",
       "ats_type": "rss",
       "ats_url": "https://evbox.com/en/about/careers/feed/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-06-02",
+      "updated": "2026-06-21T01:19:30+00:00",
+      "sources": [
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": []
+    },
+    {
+      "name": "Elements",
+      "city": "Almere (Netherlands)",
+      "cities": [
+        "Almere"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Almere",
+          "country_label": "Netherlands",
+          "key": "netherlands:almere",
+          "label": "Almere (Netherlands)"
+        }
+      ],
+      "size": "",
+      "careers_url": "https://www.elements.nl/en/careers",
+      "ats_type": "workable",
+      "ats_url": "https://apply.workable.com/elements/",
       "fetch_problem": false,
       "fetch_problem_date": "",
       "fetch_ok": true,
@@ -1264,6 +1192,46 @@
       ]
     },
     {
+      "name": "LINKIT",
+      "city": "Veenendaal (Netherlands)",
+      "cities": [
+        "Veenendaal"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Veenendaal",
+          "country_label": "Netherlands",
+          "key": "netherlands:veenendaal",
+          "label": "Veenendaal (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://careers.linkit.nl",
+      "ats_type": "recruitee",
+      "ats_url": "https://linkit.recruitee.com/",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:42+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Platform Engineer",
+          "url": "https://careers.linkit.nl/o/platform-engineer",
+          "fetched": "2026-06-04",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "56c3a8048ba29bfdfeda6cdcab0090c31ac638828e341d09259eae287faad6d2",
+          "visa_sponsorship": false,
+          "location": "De Meern, Utrecht, Nederland"
+        }
+      ]
+    },
+    {
       "name": "LeaseWeb",
       "city": "Amsterdam (Netherlands)",
       "cities": [
@@ -1339,46 +1307,6 @@
         "tech-jobs-with-relocation"
       ],
       "matching_jobs": []
-    },
-    {
-      "name": "LINKIT",
-      "city": "Veenendaal (Netherlands)",
-      "cities": [
-        "Veenendaal"
-      ],
-      "locations": [
-        {
-          "country": "netherlands",
-          "city": "Veenendaal",
-          "country_label": "Netherlands",
-          "key": "netherlands:veenendaal",
-          "label": "Veenendaal (Netherlands)"
-        }
-      ],
-      "size": "51-200",
-      "careers_url": "https://careers.linkit.nl",
-      "ats_type": "recruitee",
-      "ats_url": "https://linkit.recruitee.com/",
-      "fetch_problem": false,
-      "fetch_problem_date": "",
-      "fetch_ok": true,
-      "fetch_ok_date": "2026-06-21",
-      "added": "2026-05-28",
-      "updated": "2026-06-21T01:19:42+00:00",
-      "sources": [
-        "relocate.me"
-      ],
-      "matching_jobs": [
-        {
-          "title": "Platform Engineer",
-          "url": "https://careers.linkit.nl/o/platform-engineer",
-          "fetched": "2026-06-04",
-          "last_seen": "2026-06-06T22:16:12+00:00",
-          "idempotency_key": "56c3a8048ba29bfdfeda6cdcab0090c31ac638828e341d09259eae287faad6d2",
-          "visa_sponsorship": false,
-          "location": "De Meern, Utrecht, Nederland"
-        }
-      ]
     },
     {
       "name": "Mollie",
@@ -2076,6 +2004,36 @@
       "matching_jobs": []
     },
     {
+      "name": "TOPIC Embedded Systems",
+      "city": "Eindhoven (Netherlands)",
+      "cities": [
+        "Eindhoven"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Eindhoven",
+          "country_label": "Netherlands",
+          "key": "netherlands:eindhoven",
+          "label": "Eindhoven (Netherlands)"
+        }
+      ],
+      "size": "51-200",
+      "careers_url": "https://werkenbijtopic.nl/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:22:16+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
+    },
+    {
       "name": "Textkernel",
       "city": "Amsterdam (Netherlands)",
       "cities": [
@@ -2219,36 +2177,6 @@
       ]
     },
     {
-      "name": "TOPIC Embedded Systems",
-      "city": "Eindhoven (Netherlands)",
-      "cities": [
-        "Eindhoven"
-      ],
-      "locations": [
-        {
-          "country": "netherlands",
-          "city": "Eindhoven",
-          "country_label": "Netherlands",
-          "key": "netherlands:eindhoven",
-          "label": "Eindhoven (Netherlands)"
-        }
-      ],
-      "size": "51-200",
-      "careers_url": "https://werkenbijtopic.nl/",
-      "ats_type": "",
-      "ats_url": "",
-      "fetch_problem": false,
-      "fetch_problem_date": "",
-      "fetch_ok": true,
-      "fetch_ok_date": "2026-06-21",
-      "added": "2026-05-28",
-      "updated": "2026-06-21T01:22:16+00:00",
-      "sources": [
-        "relocate.me"
-      ],
-      "matching_jobs": []
-    },
-    {
       "name": "Topic Software Development",
       "city": "Eindhoven (Netherlands)",
       "cities": [
@@ -2346,6 +2274,78 @@
         "relocate.me"
       ],
       "matching_jobs": []
+    },
+    {
+      "name": "bol",
+      "city": "Utrecht (Netherlands)",
+      "cities": [
+        "Utrecht"
+      ],
+      "locations": [
+        {
+          "country": "netherlands",
+          "city": "Utrecht",
+          "country_label": "Netherlands",
+          "key": "netherlands:utrecht",
+          "label": "Utrecht (Netherlands)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "https://careers.bol.com/en/jobs/?doelgroep[]=12124747002",
+      "ats_type": "bol",
+      "ats_url": "https://careers.bol.com/wp-json/wp/v2/hggns/multilanguage_vacature_search",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-28",
+      "updated": "2026-06-21T01:19:32+00:00",
+      "sources": [
+        "relocate.me",
+        "tech-jobs-with-relocation"
+      ],
+      "matching_jobs": [
+        {
+          "title": "Platform Engineer: Observability and Insights",
+          "url": "https://careers.bol.com/en/job/platform-engineer-oai-devex",
+          "fetched": "2026-06-09T17:54:05+00:00",
+          "last_seen": "2026-06-09T17:54:05+00:00",
+          "idempotency_key": "c2fc0392ef1071dce8212467dba69fd0c95ebec313e1752d6ba7c49c53c53922",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Expert Software Engineer",
+          "url": "https://careers.bol.com/en/job/expert-software-engineer",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "b562df379764e96d4ac4ab05ed1f6a7c5fe284dac6f960f39560d4129825619e",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Full-stack Engineer– Marketing and Advertisement",
+          "url": "https://careers.bol.com/en/job/full-stack-engineer-marketing-and-advertisement",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "990c4ca2dcb1a6d6454a35e56ec88ac9dc88455ffe0ff42e6f6e54c5168f0e5e",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Platform Engineer - Cloud Compute",
+          "url": "https://careers.bol.com/en/job/platform-engineer-cloud-compute",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "468862c5511c62edc3db8587bc0d78c32e1b5dbcb0710f037db5c04ca5751fb3",
+          "visa_sponsorship": null
+        },
+        {
+          "title": "Software engineer – Data Platform",
+          "url": "https://careers.bol.com/en/job/software-engineer-data-platform",
+          "fetched": "2026-06-06",
+          "last_seen": "2026-06-06T22:16:12+00:00",
+          "idempotency_key": "0ebf1352187429e45a50a95092b7ee246fc31feb416b36145000984e2c1533e3",
+          "visa_sponsorship": null
+        }
+      ]
     }
   ]
 }

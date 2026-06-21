@@ -114,7 +114,7 @@ def test_admin_config(auth_client):
     resp = auth_client.get("/api/admin/config")
     assert resp.status_code == 200
     body = resp.get_json()
-    assert body["database"] == "sqlite"
+    assert body["database"] == "postgres"
     assert isinstance(body["include_keywords"], list)
     assert isinstance(body["exclude_keywords"], list)
     assert body["known_ats_count"] > 0

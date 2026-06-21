@@ -469,7 +469,7 @@ def test_db_postgres_connect_postgres(monkeypatch):
 
     class FakePsycopg:
         @staticmethod
-        def connect(url, row_factory=None):
+        def connect(url, row_factory=None, **kwargs):
             return FakePgConnection()
 
     fake_module = type(sys)("psycopg")

@@ -2,7 +2,7 @@
 
 import { setOnUnauthorized } from "./state.js";
 import { showLogin, refreshAuth, setLoginMode } from "./auth.js";
-import { loadConfig, loadCountries, loadCities, loadJobs } from "./data.js";
+import { loadConfig, loadCountries, loadCities, loadJobs, showJobsLoading } from "./data.js";
 import { bindDialogEvents } from "./dialogs.js";
 import { bindEvents } from "./events.js";
 import { bindFilterBar, refreshFilterBar } from "./filters.js";
@@ -34,6 +34,7 @@ async function init() {
   const ok = await refreshAuth();
   if (!ok) return;
 
+  showJobsLoading();
   await loadConfig();
   refreshFilterBar();
   await loadCountries();

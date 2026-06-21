@@ -319,20 +319,26 @@ def country_from_path(path: str) -> str:
     return m.group(1) if m else "unknown"
 
 
-def _load_country_data(country_key: str) -> dict:
+def _load_country_data(country_key: str, *, cache: dict[str, dict] | None = None) -> dict:
+    if cache is not None and country_key in cache:
+        return cache[country_key]
     data = load_country_catalog(country_key)
     if data is not None:
         for company in data.get("companies") or []:
             sync_company_location_fields(company, catalog_country=country_key)
-        return data
-    return {
-        "source": "",
-        "fetched": "",
-        "updated": "",
-        "jobs_fetched": "",
-        "total": 0,
-        "companies": [],
-    }
+        result = data
+    else:
+        result = {
+            "source": "",
+            "fetched": "",
+            "updated": "",
+            "jobs_fetched": "",
+            "total": 0,
+            "companies": [],
+        }
+    if cache is not None:
+        cache[country_key] = result
+    return result
 
 
 def _save_country_data(country_key: str, data: dict) -> None:
@@ -742,13 +748,14 @@ def flatten_companies(
     company_keys = list(COUNTRY_FILES)
 
     location_filter = (location or city or "").strip() or None
+    country_cache: dict[str, dict] = {}
 
     for key in keys:
         filename = COUNTRY_FILES.get(key)
         if not filename:
             continue
 
-        data = _load_country_data(key)
+        data = _load_country_data(key, cache=country_cache)
         if not data.get("companies") and not data.get("source"):
             continue
 
@@ -770,7 +777,7 @@ def flatten_companies(
         if not filename:
             continue
 
-        data = _load_country_data(key)
+        data = _load_country_data(key, cache=country_cache)
         if not data.get("companies") and not data.get("source"):
             continue
 
@@ -1394,19 +1401,17 @@ def reconcile_wrong_location_hides(
 ) -> int:
     """Restore jobs hidden as wrong_location when they now match office tags."""
     from relocation_jobs.db import get_connection
-    from relocation_jobs.db_backend import use_postgres
 
-    ph = "%s" if use_postgres() else "?"
-    query = f"""
+    query = """
         SELECT country, company_name, job_url
         FROM job_tracking
-        WHERE user_id = {ph}
+        WHERE user_id = %s
           AND not_for_me = 1
           AND not_for_me_reason = 'wrong_location'
     """
     params: list = [user_id]
     if country_key:
-        query += f" AND country = {ph}"
+        query += " AND country = %s"
         params.append(country_key)
 
     rows = get_connection().execute(query, params).fetchall()
@@ -1414,12 +1419,9 @@ def reconcile_wrong_location_hides(
     restored = 0
 
     for row in rows:
-        if isinstance(row, dict):
-            country = row["country"]
-            company_name = row["company_name"]
-            job_url = row["job_url"]
-        else:
-            country, company_name, job_url = row[0], row[1], row[2]
+        country = row["country"]
+        company_name = row["company_name"]
+        job_url = row["job_url"]
 
         data = _load_country_data(country)
         if not data:

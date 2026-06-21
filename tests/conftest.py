@@ -1,4 +1,4 @@
-"""Shared fixtures: isolated SQLite DB, catalog seed data, Flask test client."""
+"""Shared fixtures: in-memory Postgres mock, catalog seed data, Flask test client."""
 
 from __future__ import annotations
 
@@ -13,10 +13,10 @@ FIXTURES = Path(__file__).parent / "fixtures"
 def _reset_db_connections() -> None:
     import relocation_jobs.db as db_module
 
-    if db_module._sqlite_conn is not None:
-        db_module._sqlite_conn.close()
-    db_module._sqlite_conn = None
+    if db_module._pg_conn is not None and not db_module._pg_conn.closed:
+        db_module._pg_conn.close()
     db_module._pg_conn = None
+    db_module.reset_db_initialized()
 
 
 @pytest.fixture(autouse=True)
@@ -31,21 +31,21 @@ def reset_custom_cities_cache():
 
 @pytest.fixture
 def tmp_data_dir(tmp_path, monkeypatch):
-    """Point panel storage at a temp directory and use SQLite (never Neon in tests)."""
-    monkeypatch.delenv("DATABASE_URL", raising=False)
+    """Point panel storage at a temp directory; use in-memory Postgres mock."""
     data_dir = tmp_path / "data"
     data_dir.mkdir()
     monkeypatch.setenv("PANEL_DATA_DIR", str(data_dir))
-    monkeypatch.setenv("PANEL_DB_PATH", str(data_dir / "panel.db"))
     _reset_db_connections()
     yield data_dir
     _reset_db_connections()
 
 
 @pytest.fixture
-def db(tmp_data_dir):
+def db(tmp_data_dir, monkeypatch):
+    from tests.helpers.postgres_mock import install_postgres_mock
     from relocation_jobs.db import init_db
 
+    install_postgres_mock(monkeypatch)
     init_db()
     yield
     _reset_db_connections()
@@ -93,6 +93,12 @@ def app_client(db, monkeypatch):
 
 
 @pytest.fixture
+def pg_db(db):
+    """Alias for db — all tests now use the Postgres mock."""
+    yield
+
+
+@pytest.fixture
 def auth_client(app_client):
     resp = app_client.post(
         "/api/auth/login",
@@ -100,18 +106,3 @@ def auth_client(app_client):
     )
     assert resp.status_code == 200
     return app_client
-
-
-@pytest.fixture
-def pg_db(tmp_data_dir, monkeypatch):
-    from tests.helpers.postgres_mock import install_postgres_mock
-    from relocation_jobs.db import init_db
-
-    install_postgres_mock(monkeypatch)
-    init_db()
-    yield
-    import relocation_jobs.db as db_module
-
-    if db_module._pg_conn is not None and not db_module._pg_conn.closed:
-        db_module._pg_conn.close()
-    db_module._pg_conn = None

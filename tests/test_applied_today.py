@@ -10,7 +10,6 @@ from relocation_jobs.db import (
     list_jobs_applied_today_db,
     set_job_applied_db,
     set_job_seen_db,
-    use_postgres,
 )
 from relocation_jobs.panel_data import compute_stats
 
@@ -34,15 +33,14 @@ def _insert_apply_event(
     event_date: str,
     job_title: str = "Engineer",
 ) -> None:
-    ph = "%s" if use_postgres() else "?"
     with db_transaction() as conn:
         conn.execute(
-            f"""
+            """
             INSERT INTO job_tracking (
                 user_id, country, company_name, job_url, job_title,
                 applied, applied_date, not_for_me, not_for_me_date,
                 looking_to_apply, looking_to_apply_date, updated_at
-            ) VALUES ({ph}, {ph}, {ph}, {ph}, {ph}, 1, {ph}, 0, NULL, 0, NULL, {ph})
+            ) VALUES (%s, %s, %s, %s, %s, 1, %s, 0, NULL, 0, NULL, %s)
             ON CONFLICT(user_id, country, company_name, job_url) DO UPDATE SET
                 applied = 1,
                 applied_date = excluded.applied_date,
@@ -52,11 +50,11 @@ def _insert_apply_event(
             (user_id, country, company, url, job_title, event_date, created_at),
         )
         conn.execute(
-            f"""
+            """
             INSERT INTO job_status_events (
                 user_id, country, company_name, job_url,
                 event_type, event_date, created_at
-            ) VALUES ({ph}, {ph}, {ph}, {ph}, 'applied', {ph}, {ph})
+            ) VALUES (%s, %s, %s, %s, 'applied', %s, %s)
             """,
             (user_id, country, company, url, event_date, created_at),
         )
@@ -142,13 +140,12 @@ def test_duplicate_apply_events_same_day_count_once(test_user, fixed_day_bounds)
         event_date="2026-06-21",
     )
     with db_transaction() as conn:
-        ph = "%s" if use_postgres() else "?"
         conn.execute(
-            f"""
+            """
             INSERT INTO job_status_events (
                 user_id, country, company_name, job_url,
                 event_type, event_date, created_at
-            ) VALUES ({ph}, {ph}, {ph}, {ph}, 'applied', {ph}, {ph})
+            ) VALUES (%s, %s, %s, %s, 'applied', %s, %s)
             """,
             (uid, "uk", "Dup Co", url, "2026-06-21", "2026-06-21T18:00:00+00:00"),
         )
@@ -184,14 +181,13 @@ def test_set_job_applied_now_counts_via_event(test_user, fixed_day_bounds):
     result = set_job_applied_db(uid, "netherlands", "Live Co", url, True, job_title="Platform Engineer")
     assert result["applied"] is True
 
-    ph = "%s" if use_postgres() else "?"
     with db_transaction() as conn:
         conn.execute(
-            f"""
+            """
             UPDATE job_status_events
-            SET created_at = {ph}, event_date = {ph}
-            WHERE user_id = {ph} AND country = {ph} AND company_name = {ph}
-              AND job_url = {ph} AND event_type = 'applied'
+            SET created_at = %s, event_date = %s
+            WHERE user_id = %s AND country = %s AND company_name = %s
+              AND job_url = %s AND event_type = 'applied'
             """,
             ("2026-06-21T12:30:00+00:00", "2026-06-21", uid, "netherlands", "Live Co", url),
         )
@@ -244,14 +240,13 @@ def test_invalid_timezone_falls_back_to_utc(test_user, fixed_day_bounds):
 @pytest.mark.integration
 def test_rows_without_url_are_skipped(test_user, fixed_day_bounds):
     uid = test_user["id"]
-    ph = "?" if not use_postgres() else "%s"
     with db_transaction() as conn:
         conn.execute(
-            f"""
+            """
             INSERT INTO job_status_events (
                 user_id, country, company_name, job_url,
                 event_type, event_date, created_at
-            ) VALUES ({ph}, {ph}, {ph}, {ph}, 'applied', {ph}, {ph})
+            ) VALUES (%s, %s, %s, %s, 'applied', %s, %s)
             """,
             (uid, "uk", "Bad Co", "", "2026-06-21", "2026-06-21T10:00:00+00:00"),
         )

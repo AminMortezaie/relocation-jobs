@@ -245,7 +245,7 @@ def test_system_config_shape(db, monkeypatch):
     monkeypatch.setenv("PANEL_ALLOW_REGISTER", "1")
     config = get_system_config(scrape_enabled=False, httpx_available=True)
 
-    assert config["database"] == "sqlite"
+    assert config["database"] == "postgres"
     assert config["scrape_enabled"] is False
     assert config["allow_register"] is True
     assert config["httpx_available"] is True

@@ -2,7 +2,7 @@
 
 import { state } from "./state.js";
 import { $ } from "./utils.js";
-import { loadConfig, loadCountries, loadCities, loadJobs } from "./data.js";
+import { loadConfig, loadCountries, loadCities, loadJobs, showJobsLoading } from "./data.js";
 
 export function showLogin(message = "") {
   $("mainContent").classList.add("hidden");
@@ -82,6 +82,7 @@ export async function submitAuth(e) {
     $("loginPassword").value = "";
     $("loginError").textContent = "";
     showApp();
+    showJobsLoading();
     await loadConfig();
     await loadCountries();
     await loadCities();

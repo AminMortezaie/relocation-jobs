@@ -1,9 +1,10 @@
-"""SQLite/Postgres catalog for companies and matching jobs (replaces editable JSON)."""
+"""Postgres catalog for companies and matching jobs."""
 
 from __future__ import annotations
 
 import json
 import re
+from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
@@ -13,7 +14,6 @@ from relocation_jobs.location_tags import (
     sync_company_location_fields,
 )
 from relocation_jobs.db import db_read, db_transaction, get_connection
-from relocation_jobs.db_backend import use_postgres
 from relocation_jobs.job_identity import job_idempotency_key, stamp_job_identity
 from relocation_jobs.paths import (
     COUNTRY_FILE_NAMES,
@@ -55,198 +55,84 @@ def _visa_from_db(value) -> bool | None:
 
 def init_catalog_schema() -> None:
     with db_transaction() as conn:
-        if use_postgres():
-            conn.execute(
-                """
-                CREATE TABLE IF NOT EXISTS country_meta (
-                    country TEXT PRIMARY KEY,
-                    source TEXT NOT NULL DEFAULT '',
-                    fetched TEXT NOT NULL DEFAULT '',
-                    updated TEXT NOT NULL DEFAULT '',
-                    jobs_fetched TEXT NOT NULL DEFAULT '',
-                    total INTEGER NOT NULL DEFAULT 0
-                );
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS country_meta (
+                country TEXT PRIMARY KEY,
+                source TEXT NOT NULL DEFAULT '',
+                fetched TEXT NOT NULL DEFAULT '',
+                updated TEXT NOT NULL DEFAULT '',
+                jobs_fetched TEXT NOT NULL DEFAULT '',
+                total INTEGER NOT NULL DEFAULT 0
+            );
 
-                CREATE TABLE IF NOT EXISTS companies (
-                    id SERIAL PRIMARY KEY,
-                    country TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    city TEXT NOT NULL DEFAULT '',
-                    size TEXT NOT NULL DEFAULT '',
-                    careers_url TEXT NOT NULL DEFAULT '',
-                    ats_type TEXT NOT NULL DEFAULT '',
-                    ats_url TEXT NOT NULL DEFAULT '',
-                    fetch_problem INTEGER NOT NULL DEFAULT 0,
-                    fetch_problem_date TEXT,
-                    added TEXT NOT NULL DEFAULT '',
-                    updated TEXT NOT NULL DEFAULT '',
-                    sources_json TEXT NOT NULL DEFAULT '[]',
-                    UNIQUE(country, name)
-                );
+            CREATE TABLE IF NOT EXISTS companies (
+                id SERIAL PRIMARY KEY,
+                country TEXT NOT NULL,
+                name TEXT NOT NULL,
+                city TEXT NOT NULL DEFAULT '',
+                size TEXT NOT NULL DEFAULT '',
+                careers_url TEXT NOT NULL DEFAULT '',
+                ats_type TEXT NOT NULL DEFAULT '',
+                ats_url TEXT NOT NULL DEFAULT '',
+                fetch_problem INTEGER NOT NULL DEFAULT 0,
+                fetch_problem_date TEXT,
+                added TEXT NOT NULL DEFAULT '',
+                updated TEXT NOT NULL DEFAULT '',
+                sources_json TEXT NOT NULL DEFAULT '[]',
+                UNIQUE(country, name)
+            );
 
-                CREATE TABLE IF NOT EXISTS matching_jobs (
-                    id SERIAL PRIMARY KEY,
-                    company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-                    idempotency_key TEXT NOT NULL,
-                    title TEXT NOT NULL DEFAULT '',
-                    url TEXT NOT NULL DEFAULT '',
-                    fetched TEXT NOT NULL DEFAULT '',
-                    last_seen TEXT NOT NULL DEFAULT '',
-                    visa_sponsorship INTEGER,
-                    UNIQUE(company_id, idempotency_key)
-                );
+            CREATE TABLE IF NOT EXISTS matching_jobs (
+                id SERIAL PRIMARY KEY,
+                company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+                idempotency_key TEXT NOT NULL,
+                title TEXT NOT NULL DEFAULT '',
+                url TEXT NOT NULL DEFAULT '',
+                fetched TEXT NOT NULL DEFAULT '',
+                last_seen TEXT NOT NULL DEFAULT '',
+                visa_sponsorship INTEGER,
+                UNIQUE(company_id, idempotency_key)
+            );
 
-                CREATE INDEX IF NOT EXISTS idx_companies_country ON companies(country);
-                CREATE INDEX IF NOT EXISTS idx_jobs_company ON matching_jobs(company_id);
-                CREATE INDEX IF NOT EXISTS idx_jobs_idempotency ON matching_jobs(idempotency_key);
-                """
-            )
-        else:
-            conn.executescript(
-                """
-                CREATE TABLE IF NOT EXISTS country_meta (
-                    country TEXT PRIMARY KEY,
-                    source TEXT NOT NULL DEFAULT '',
-                    fetched TEXT NOT NULL DEFAULT '',
-                    updated TEXT NOT NULL DEFAULT '',
-                    jobs_fetched TEXT NOT NULL DEFAULT '',
-                    total INTEGER NOT NULL DEFAULT 0
-                );
-
-                CREATE TABLE IF NOT EXISTS companies (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    country TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    city TEXT NOT NULL DEFAULT '',
-                    size TEXT NOT NULL DEFAULT '',
-                    careers_url TEXT NOT NULL DEFAULT '',
-                    ats_type TEXT NOT NULL DEFAULT '',
-                    ats_url TEXT NOT NULL DEFAULT '',
-                    fetch_problem INTEGER NOT NULL DEFAULT 0,
-                    fetch_problem_date TEXT,
-                    added TEXT NOT NULL DEFAULT '',
-                    updated TEXT NOT NULL DEFAULT '',
-                    sources_json TEXT NOT NULL DEFAULT '[]',
-                    UNIQUE(country, name)
-                );
-
-                CREATE TABLE IF NOT EXISTS matching_jobs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    company_id INTEGER NOT NULL,
-                    idempotency_key TEXT NOT NULL,
-                    title TEXT NOT NULL DEFAULT '',
-                    url TEXT NOT NULL DEFAULT '',
-                    fetched TEXT NOT NULL DEFAULT '',
-                    last_seen TEXT NOT NULL DEFAULT '',
-                    visa_sponsorship INTEGER,
-                    UNIQUE(company_id, idempotency_key),
-                    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-                );
-
-                CREATE INDEX IF NOT EXISTS idx_companies_country ON companies(country);
-                CREATE INDEX IF NOT EXISTS idx_jobs_company ON matching_jobs(company_id);
-                CREATE INDEX IF NOT EXISTS idx_jobs_idempotency ON matching_jobs(idempotency_key);
-                """
-            )
+            CREATE INDEX IF NOT EXISTS idx_companies_country ON companies(country);
+            CREATE INDEX IF NOT EXISTS idx_jobs_company ON matching_jobs(company_id);
+            CREATE INDEX IF NOT EXISTS idx_jobs_idempotency ON matching_jobs(idempotency_key);
+            """
+        )
         _ensure_company_columns(conn)
         _ensure_job_columns(conn)
         _ensure_country_meta_columns(conn)
 
 
 def _ensure_country_meta_columns(conn) -> None:
-    if use_postgres():
-        conn.execute(
-            "ALTER TABLE country_meta ADD COLUMN IF NOT EXISTS last_fetch_new_jobs INTEGER NOT NULL DEFAULT 0"
-        )
-        return
-
-    cols = {
-        row[1] if not isinstance(row, dict) else row.get("name")
-        for row in conn.execute("PRAGMA table_info(country_meta)").fetchall()
-    }
-    if "last_fetch_new_jobs" not in cols:
-        conn.execute(
-            "ALTER TABLE country_meta ADD COLUMN last_fetch_new_jobs INTEGER NOT NULL DEFAULT 0"
-        )
+    conn.execute(
+        "ALTER TABLE country_meta ADD COLUMN IF NOT EXISTS last_fetch_new_jobs INTEGER NOT NULL DEFAULT 0"
+    )
 
 
 def _ensure_company_columns(conn) -> None:
-    if use_postgres():
-        conn.execute(
-            "ALTER TABLE companies ADD COLUMN IF NOT EXISTS fetch_ok INTEGER NOT NULL DEFAULT 0"
-        )
-        conn.execute(
-            "ALTER TABLE companies ADD COLUMN IF NOT EXISTS fetch_ok_date TEXT"
-        )
-        conn.execute(
-            "ALTER TABLE companies ADD COLUMN IF NOT EXISTS cities_json TEXT NOT NULL DEFAULT '[]'"
-        )
-        conn.execute(
-            "ALTER TABLE companies ADD COLUMN IF NOT EXISTS locations_json TEXT NOT NULL DEFAULT '[]'"
-        )
-        return
-
-    cols = {
-        row[1] if not isinstance(row, dict) else row.get("name")
-        for row in conn.execute("PRAGMA table_info(companies)").fetchall()
-    }
-    if "fetch_ok" not in cols:
-        conn.execute(
-            "ALTER TABLE companies ADD COLUMN fetch_ok INTEGER NOT NULL DEFAULT 0"
-        )
-    if "fetch_ok_date" not in cols:
-        conn.execute("ALTER TABLE companies ADD COLUMN fetch_ok_date TEXT")
-    if "cities_json" not in cols:
-        conn.execute(
-            "ALTER TABLE companies ADD COLUMN cities_json TEXT NOT NULL DEFAULT '[]'"
-        )
-        conn.execute(
-            """
-            UPDATE companies
-            SET cities_json = json_array(city)
-            WHERE city != '' AND (cities_json IS NULL OR cities_json = '[]')
-            """
-        )
-    if "locations_json" not in cols:
-        conn.execute(
-            "ALTER TABLE companies ADD COLUMN locations_json TEXT NOT NULL DEFAULT '[]'"
-        )
-        conn.execute(
-            """
-            UPDATE companies
-            SET locations_json = (
-                SELECT json_group_array(json_object('country', country, 'city', value))
-                FROM json_each(cities_json)
-            )
-            WHERE cities_json != '[]'
-              AND cities_json IS NOT NULL
-              AND (locations_json IS NULL OR locations_json = '[]')
-            """
-        )
+    conn.execute(
+        "ALTER TABLE companies ADD COLUMN IF NOT EXISTS fetch_ok INTEGER NOT NULL DEFAULT 0"
+    )
+    conn.execute(
+        "ALTER TABLE companies ADD COLUMN IF NOT EXISTS fetch_ok_date TEXT"
+    )
+    conn.execute(
+        "ALTER TABLE companies ADD COLUMN IF NOT EXISTS cities_json TEXT NOT NULL DEFAULT '[]'"
+    )
+    conn.execute(
+        "ALTER TABLE companies ADD COLUMN IF NOT EXISTS locations_json TEXT NOT NULL DEFAULT '[]'"
+    )
 
 
 def _ensure_job_columns(conn) -> None:
-    if use_postgres():
-        conn.execute(
-            "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS location TEXT NOT NULL DEFAULT ''"
-        )
-        conn.execute(
-            "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS locations_json TEXT NOT NULL DEFAULT '[]'"
-        )
-        return
-
-    cols = {
-        row[1] if not isinstance(row, dict) else row.get("name")
-        for row in conn.execute("PRAGMA table_info(matching_jobs)").fetchall()
-    }
-    if "location" not in cols:
-        conn.execute(
-            "ALTER TABLE matching_jobs ADD COLUMN location TEXT NOT NULL DEFAULT ''"
-        )
-    if "locations_json" not in cols:
-        conn.execute(
-            "ALTER TABLE matching_jobs ADD COLUMN locations_json TEXT NOT NULL DEFAULT '[]'"
-        )
+    conn.execute(
+        "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS location TEXT NOT NULL DEFAULT ''"
+    )
+    conn.execute(
+        "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS locations_json TEXT NOT NULL DEFAULT '[]'"
+    )
 
 
 def _job_locations_json(job: dict) -> str:
@@ -399,11 +285,7 @@ def _company_row_to_dict(row, jobs: list[dict]) -> dict:
 def _row_dict(row) -> dict:
     if row is None:
         return {}
-    if isinstance(row, dict):
-        return row
-    if hasattr(row, "keys"):
-        return {key: row[key] for key in row.keys()}
-    return dict(row)
+    return row if isinstance(row, dict) else dict(row)
 
 
 def _job_row_to_dict(row) -> dict:
@@ -426,10 +308,9 @@ def _job_row_to_dict(row) -> dict:
 
 
 def load_country(country_key: str) -> dict | None:
-    ph = "%s" if use_postgres() else "?"
     with db_read() as conn:
         meta_row = conn.execute(
-            f"SELECT * FROM country_meta WHERE country = {ph}",
+            "SELECT * FROM country_meta WHERE country = %s",
             (country_key,),
         ).fetchone()
         if meta_row is None:
@@ -438,20 +319,30 @@ def load_country(country_key: str) -> dict | None:
         meta = _row_dict(meta_row)
 
         companies_rows = conn.execute(
-            f"SELECT * FROM companies WHERE country = {ph} ORDER BY name COLLATE NOCASE",
+            "SELECT * FROM companies WHERE country = %s ORDER BY name",
             (country_key,),
         ).fetchall()
+
+        company_ids = [_row_dict(crow)["id"] for crow in companies_rows]
+        jobs_by_company: dict[int, list[dict]] = defaultdict(list)
+        if company_ids:
+            job_rows = conn.execute(
+                """
+                SELECT * FROM matching_jobs
+                WHERE company_id = ANY(%s)
+                ORDER BY company_id, fetched DESC, title
+                """,
+                (company_ids,),
+            ).fetchall()
+            for job_row in job_rows:
+                jdata = _row_dict(job_row)
+                jobs_by_company[int(jdata["company_id"])].append(_job_row_to_dict(job_row))
 
         companies: list[dict] = []
         for crow in companies_rows:
             cdata = _row_dict(crow)
-            company_id = cdata["id"]
-            job_rows = conn.execute(
-                f"SELECT * FROM matching_jobs WHERE company_id = {ph} ORDER BY fetched DESC, title",
-                (company_id,),
-            ).fetchall()
-            jobs = [_job_row_to_dict(j) for j in job_rows]
-            companies.append(_company_row_to_dict(cdata, jobs))
+            company_id = int(cdata["id"])
+            companies.append(_company_row_to_dict(cdata, jobs_by_company[company_id]))
 
     return {
         "source": meta.get("source") or "",
@@ -465,56 +356,30 @@ def load_country(country_key: str) -> dict | None:
 
 
 def _upsert_country_meta(conn, country_key: str, meta: dict) -> None:
-    if use_postgres():
-        conn.execute(
-            """
-            INSERT INTO country_meta (
-                country, source, fetched, updated, jobs_fetched, total, last_fetch_new_jobs
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (country) DO UPDATE SET
-                source = EXCLUDED.source,
-                fetched = EXCLUDED.fetched,
-                updated = EXCLUDED.updated,
-                jobs_fetched = EXCLUDED.jobs_fetched,
-                total = EXCLUDED.total,
-                last_fetch_new_jobs = EXCLUDED.last_fetch_new_jobs
-            """,
-            (
-                country_key,
-                meta.get("source") or "",
-                meta.get("fetched") or "",
-                meta.get("updated") or _today(),
-                meta.get("jobs_fetched") or "",
-                meta.get("total") or 0,
-                int(meta.get("last_fetch_new_jobs") or 0),
-            ),
+    conn.execute(
+        """
+        INSERT INTO country_meta (
+            country, source, fetched, updated, jobs_fetched, total, last_fetch_new_jobs
         )
-    else:
-        conn.execute(
-            """
-            INSERT INTO country_meta (
-                country, source, fetched, updated, jobs_fetched, total, last_fetch_new_jobs
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(country) DO UPDATE SET
-                source = excluded.source,
-                fetched = excluded.fetched,
-                updated = excluded.updated,
-                jobs_fetched = excluded.jobs_fetched,
-                total = excluded.total,
-                last_fetch_new_jobs = excluded.last_fetch_new_jobs
-            """,
-            (
-                country_key,
-                meta.get("source") or "",
-                meta.get("fetched") or "",
-                meta.get("updated") or _today(),
-                meta.get("jobs_fetched") or "",
-                meta.get("total") or 0,
-                int(meta.get("last_fetch_new_jobs") or 0),
-            ),
-        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (country) DO UPDATE SET
+            source = EXCLUDED.source,
+            fetched = EXCLUDED.fetched,
+            updated = EXCLUDED.updated,
+            jobs_fetched = EXCLUDED.jobs_fetched,
+            total = EXCLUDED.total,
+            last_fetch_new_jobs = EXCLUDED.last_fetch_new_jobs
+        """,
+        (
+            country_key,
+            meta.get("source") or "",
+            meta.get("fetched") or "",
+            meta.get("updated") or _today(),
+            meta.get("jobs_fetched") or "",
+            meta.get("total") or 0,
+            int(meta.get("last_fetch_new_jobs") or 0),
+        ),
+    )
 
 
 def _upsert_company_and_jobs(
@@ -525,7 +390,6 @@ def _upsert_company_and_jobs(
     updated: str,
 ) -> None:
     """Upsert one company row and sync its matching_jobs (no full-country rewrite)."""
-    ph = "%s" if use_postgres() else "?"
     name = (company.get("name") or "").strip()
     if not name:
         return
@@ -555,66 +419,35 @@ def _upsert_company_and_jobs(
         _json_sources(company),
     )
 
-    if use_postgres():
-        cur = conn.execute(
-            """
-            INSERT INTO companies (
-                country, name, city, cities_json, locations_json, size, careers_url, ats_type, ats_url,
-                fetch_problem, fetch_problem_date, fetch_ok, fetch_ok_date,
-                added, updated, sources_json
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (country, name) DO UPDATE SET
-                city = EXCLUDED.city,
-                cities_json = EXCLUDED.cities_json,
-                locations_json = EXCLUDED.locations_json,
-                size = EXCLUDED.size,
-                careers_url = EXCLUDED.careers_url,
-                ats_type = EXCLUDED.ats_type,
-                ats_url = EXCLUDED.ats_url,
-                fetch_problem = EXCLUDED.fetch_problem,
-                fetch_problem_date = EXCLUDED.fetch_problem_date,
-                fetch_ok = EXCLUDED.fetch_ok,
-                fetch_ok_date = EXCLUDED.fetch_ok_date,
-                updated = EXCLUDED.updated,
-                sources_json = EXCLUDED.sources_json
-            RETURNING id
-            """,
-            params,
-        )
-        row = cur.fetchone()
-        if row is None:
-            raise RuntimeError(f"Failed to upsert company {name!r}")
-        company_id = row["id"] if isinstance(row, dict) else row[0]
-    else:
-        conn.execute(
-            """
-            INSERT INTO companies (
-                country, name, city, cities_json, locations_json, size, careers_url, ats_type, ats_url,
-                fetch_problem, fetch_problem_date, fetch_ok, fetch_ok_date,
-                added, updated, sources_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(country, name) DO UPDATE SET
-                city = excluded.city,
-                cities_json = excluded.cities_json,
-                locations_json = excluded.locations_json,
-                size = excluded.size,
-                careers_url = excluded.careers_url,
-                ats_type = excluded.ats_type,
-                ats_url = excluded.ats_url,
-                fetch_problem = excluded.fetch_problem,
-                fetch_problem_date = excluded.fetch_problem_date,
-                fetch_ok = excluded.fetch_ok,
-                fetch_ok_date = excluded.fetch_ok_date,
-                updated = excluded.updated,
-                sources_json = excluded.sources_json
-            """,
-            params,
-        )
-        row = conn.execute(
-            f"SELECT id FROM companies WHERE country = {ph} AND name = {ph}",
-            (country_key, name),
-        ).fetchone()
-        company_id = _row_dict(row)["id"]
+    cur = conn.execute(
+        """
+        INSERT INTO companies (
+            country, name, city, cities_json, locations_json, size, careers_url, ats_type, ats_url,
+            fetch_problem, fetch_problem_date, fetch_ok, fetch_ok_date,
+            added, updated, sources_json
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (country, name) DO UPDATE SET
+            city = EXCLUDED.city,
+            cities_json = EXCLUDED.cities_json,
+            locations_json = EXCLUDED.locations_json,
+            size = EXCLUDED.size,
+            careers_url = EXCLUDED.careers_url,
+            ats_type = EXCLUDED.ats_type,
+            ats_url = EXCLUDED.ats_url,
+            fetch_problem = EXCLUDED.fetch_problem,
+            fetch_problem_date = EXCLUDED.fetch_problem_date,
+            fetch_ok = EXCLUDED.fetch_ok,
+            fetch_ok_date = EXCLUDED.fetch_ok_date,
+            updated = EXCLUDED.updated,
+            sources_json = EXCLUDED.sources_json
+        RETURNING id
+        """,
+        params,
+    )
+    row = cur.fetchone()
+    if row is None:
+        raise RuntimeError(f"Failed to upsert company {name!r}")
+    company_id = row["id"] if isinstance(row, dict) else row[0]
 
     jobs = company.get("matching_jobs") or []
     keys: list[str] = []
@@ -637,66 +470,42 @@ def _upsert_company_and_jobs(
             _job_locations_json(job),
         ))
 
-    if use_postgres():
-        for row in job_rows:
-            conn.execute(
-                """
-                INSERT INTO matching_jobs (
-                    company_id, idempotency_key, title, url, fetched, last_seen,
-                    visa_sponsorship, location, locations_json
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (company_id, idempotency_key) DO UPDATE SET
-                    title = EXCLUDED.title,
-                    url = EXCLUDED.url,
-                    fetched = EXCLUDED.fetched,
-                    last_seen = EXCLUDED.last_seen,
-                    visa_sponsorship = EXCLUDED.visa_sponsorship,
-                    location = COALESCE(NULLIF(EXCLUDED.location, ''), matching_jobs.location),
-                    locations_json = CASE
-                        WHEN EXCLUDED.locations_json IS NOT NULL
-                             AND EXCLUDED.locations_json != '[]'
-                        THEN EXCLUDED.locations_json
-                        ELSE matching_jobs.locations_json
-                    END
-                """,
-                row,
-            )
-    else:
-        conn.executemany(
+    for row in job_rows:
+        conn.execute(
             """
             INSERT INTO matching_jobs (
                 company_id, idempotency_key, title, url, fetched, last_seen,
                 visa_sponsorship, location, locations_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(company_id, idempotency_key) DO UPDATE SET
-                title = excluded.title,
-                url = excluded.url,
-                fetched = excluded.fetched,
-                last_seen = excluded.last_seen,
-                visa_sponsorship = excluded.visa_sponsorship,
-                location = COALESCE(NULLIF(excluded.location, ''), matching_jobs.location),
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (company_id, idempotency_key) DO UPDATE SET
+                title = EXCLUDED.title,
+                url = EXCLUDED.url,
+                fetched = EXCLUDED.fetched,
+                last_seen = EXCLUDED.last_seen,
+                visa_sponsorship = EXCLUDED.visa_sponsorship,
+                location = COALESCE(NULLIF(EXCLUDED.location, ''), matching_jobs.location),
                 locations_json = CASE
-                    WHEN excluded.locations_json IS NOT NULL
-                         AND excluded.locations_json != '[]'
-                    THEN excluded.locations_json
+                    WHEN EXCLUDED.locations_json IS NOT NULL
+                         AND EXCLUDED.locations_json != '[]'
+                    THEN EXCLUDED.locations_json
                     ELSE matching_jobs.locations_json
                 END
             """,
-            job_rows,
+            row,
         )
 
     if keys:
-        placeholders = ", ".join([ph] * len(keys))
+        placeholders = ", ".join(["%s"] * len(keys))
         conn.execute(
             f"""
             DELETE FROM matching_jobs
-            WHERE company_id = {ph} AND idempotency_key NOT IN ({placeholders})
+            WHERE company_id = %s AND idempotency_key NOT IN ({placeholders})
             """,
             (company_id, *keys),
         )
     else:
         conn.execute(
-            f"DELETE FROM matching_jobs WHERE company_id = {ph}",
+            "DELETE FROM matching_jobs WHERE company_id = %s",
             (company_id,),
         )
 
@@ -708,10 +517,9 @@ def touch_country_meta(country_key: str, **fields) -> None:
     if not updates:
         return
 
-    ph = "%s" if use_postgres() else "?"
     with db_transaction() as conn:
         row = conn.execute(
-            f"SELECT * FROM country_meta WHERE country = {ph}",
+            "SELECT * FROM country_meta WHERE country = %s",
             (country_key,),
         ).fetchone()
         if row is None:
@@ -755,7 +563,7 @@ def upsert_companies(
             _upsert_company_and_jobs(conn, country_key, company, updated=ts)
         if touch_meta:
             count_row = conn.execute(
-                f"SELECT COUNT(*) AS n FROM companies WHERE country = {'%s' if use_postgres() else '?'}",
+                "SELECT COUNT(*) AS n FROM companies WHERE country = %s",
                 (country_key,),
             ).fetchone()
             total = int(_row_dict(count_row).get("n", len(companies)))
@@ -780,24 +588,22 @@ def save_country(country_key: str, data: dict, *, export_archive: bool = True) -
     names = [(company.get("name") or "").strip() for company in companies]
     names = [n for n in names if n]
 
-    ph = "%s" if use_postgres() else "?"
-
     with db_transaction() as conn:
         _upsert_country_meta(conn, country_key, meta)
         for company in companies:
             _upsert_company_and_jobs(conn, country_key, company, updated=meta["updated"])
 
         if names:
-            placeholders = ", ".join([ph] * len(names))
+            placeholders = ", ".join(["%s"] * len(names))
             conn.execute(
                 f"""
                 DELETE FROM companies
-                WHERE country = {ph} AND name NOT IN ({placeholders})
+                WHERE country = %s AND name NOT IN ({placeholders})
                 """,
                 (country_key, *names),
             )
         else:
-            conn.execute(f"DELETE FROM companies WHERE country = {ph}", (country_key,))
+            conn.execute("DELETE FROM companies WHERE country = %s", (country_key,))
 
     if export_archive:
         export_country_archive(country_key)

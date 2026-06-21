@@ -13,7 +13,6 @@ from relocation_jobs.db import (
     count_jobs_applied_db,
     count_jobs_applied_today_db,
     create_user,
-    db_path,
     get_user_by_id,
     get_user_by_username,
     init_db,
@@ -243,20 +242,13 @@ def test_migrate_tracking_from_json(db, tmp_data_dir, sample_country_data, monke
 
 
 @pytest.mark.integration
-def test_db_path_and_transaction_rollback(tmp_data_dir, monkeypatch):
-    monkeypatch.setenv("PANEL_DB_PATH", str(tmp_data_dir / "custom.db"))
-    _reset = __import__("tests.conftest", fromlist=["_reset_db_connections"])._reset_db_connections
-    _reset()
-    init_db()
-    assert db_path() == tmp_data_dir / "custom.db"
-
+def test_transaction_rollback(db):
     from relocation_jobs.db import db_transaction
 
     with pytest.raises(RuntimeError):
         with db_transaction() as conn:
             conn.execute("SELECT 1")
             raise RuntimeError("rollback test")
-    _reset()
 
 
 @pytest.mark.integration

@@ -125,36 +125,6 @@
       ]
     },
     {
-      "name": "eDreams ODIGEO",
-      "city": "Porto (Portugal)",
-      "cities": [
-        "Porto"
-      ],
-      "locations": [
-        {
-          "country": "portugal",
-          "city": "Porto",
-          "country_label": "Portugal",
-          "key": "portugal:porto",
-          "label": "Porto (Portugal)"
-        }
-      ],
-      "size": "1,001-5,000",
-      "careers_url": "http://www.edreamsodigeocareers.com/",
-      "ats_type": "",
-      "ats_url": "",
-      "fetch_problem": false,
-      "fetch_problem_date": "",
-      "fetch_ok": true,
-      "fetch_ok_date": "2026-06-21",
-      "added": "2026-05-30",
-      "updated": "2026-06-21T01:15:28+00:00",
-      "sources": [
-        "relocate.me"
-      ],
-      "matching_jobs": []
-    },
-    {
       "name": "EXADS",
       "city": "Porto (Portugal)",
       "cities": [
@@ -522,6 +492,36 @@
           "location": "Lisbon"
         }
       ]
+    },
+    {
+      "name": "eDreams ODIGEO",
+      "city": "Porto (Portugal)",
+      "cities": [
+        "Porto"
+      ],
+      "locations": [
+        {
+          "country": "portugal",
+          "city": "Porto",
+          "country_label": "Portugal",
+          "key": "portugal:porto",
+          "label": "Porto (Portugal)"
+        }
+      ],
+      "size": "1,001-5,000",
+      "careers_url": "http://www.edreamsodigeocareers.com/",
+      "ats_type": "",
+      "ats_url": "",
+      "fetch_problem": false,
+      "fetch_problem_date": "",
+      "fetch_ok": true,
+      "fetch_ok_date": "2026-06-21",
+      "added": "2026-05-30",
+      "updated": "2026-06-21T01:15:28+00:00",
+      "sources": [
+        "relocate.me"
+      ],
+      "matching_jobs": []
     }
   ]
 }

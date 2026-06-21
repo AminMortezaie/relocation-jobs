@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import sqlite3
+from contextlib import contextmanager
 from typing import Any
 
 
@@ -18,6 +19,10 @@ class _PgShimCursor:
     def __init__(self, cur: sqlite3.Cursor, lastrowid: int | None = None):
         self._cur = cur
         self._lastrowid = lastrowid
+
+    @property
+    def rowcount(self) -> int:
+        return self._cur.rowcount
 
     def fetchone(self) -> _PgRow | None:
         row = self._cur.fetchone()
@@ -38,6 +43,16 @@ class FakePgConnection:
         self._conn = sqlite3.connect(":memory:", check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self.closed = False
+        self.autocommit = True
+
+    @contextmanager
+    def transaction(self):
+        try:
+            yield self
+            self.commit()
+        except Exception:
+            self.rollback()
+            raise
 
     def execute(self, sql: str, params: tuple | list = ()) -> _PgShimCursor:
         adapted, returning = self._adapt(sql)
@@ -55,6 +70,7 @@ class FakePgConnection:
         return _PgShimCursor(cur, cur.lastrowid if returning else None)
 
     def _run(self, sql: str, params: tuple | list) -> sqlite3.Cursor:
+        sql, params = self._adapt_any(sql, params)
         try:
             return self._conn.execute(sql, params)
         except sqlite3.OperationalError as exc:
@@ -62,6 +78,20 @@ class FakePgConnection:
             if "duplicate column name" in msg or "already exists" in msg:
                 return self._conn.execute("SELECT 1 AS ok")
             raise
+
+    def _adapt_any(self, sql: str, params: tuple | list) -> tuple[str, tuple]:
+        """Translate PostgreSQL ``= ANY(?)`` with a list param to ``IN (?, ?, ...)``."""
+        if "= ANY(?)" not in sql:
+            return sql, params
+        params = list(params)
+        parts = sql.split("= ANY(?)")
+        if len(parts) != 2:
+            return sql, tuple(params)
+        list_param = params.pop(params.index(next(p for p in params if isinstance(p, (list, tuple)))))
+        in_clause = ", ".join("?" for _ in list_param)
+        sql = f"{parts[0]}IN ({in_clause}){parts[1]}"
+        params.extend(list_param)
+        return sql, tuple(params)
 
     def executemany(self, sql: str, params_seq: list[tuple]) -> None:
         self._conn.executemany(self._adapt(sql)[0], params_seq)
@@ -94,14 +124,11 @@ class FakePgConnection:
 
 
 def install_postgres_mock(monkeypatch, *, database_url: str = "postgresql://test:test@localhost/test") -> FakePgConnection:
-    """Monkeypatch db layer to use fake postgres connection."""
+    """Monkeypatch db layer to use in-memory fake Postgres connection."""
     import relocation_jobs.db as db_module
 
     fake = FakePgConnection()
     monkeypatch.setenv("DATABASE_URL", database_url)
-    monkeypatch.setattr("relocation_jobs.db_backend.use_postgres", lambda: True)
-    monkeypatch.setattr("relocation_jobs.catalog_db.use_postgres", lambda: True)
-    db_module._sqlite_conn = None
     db_module._pg_conn = None
 
     def _connect():

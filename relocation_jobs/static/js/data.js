@@ -5,6 +5,13 @@ import { $, escapeAttr, escapeHtml } from "./utils.js";
 import { fetchConfig, fetchCountries, fetchLocations, fetchJobs } from "./api.js";
 import { renderStats, renderCompanies } from "./render.js";
 
+export function showJobsLoading(message = "Loading companies…") {
+  const list = $("jobs");
+  if (list) {
+    list.innerHTML = `<div class="empty">${escapeHtml(message)}</div>`;
+  }
+}
+
 export async function loadConfig() {
   state.scrapeConfig = await fetchConfig();
 }
@@ -49,6 +56,7 @@ export async function loadJobs(options = {}) {
   if ($("location")) {
     localStorage.setItem("panel_location", $("location").value);
   }
+  showJobsLoading();
   const data = await fetchJobs(options);
   state.allCompanies = data.companies || [];
   if (data.stats) renderStats(data.stats);

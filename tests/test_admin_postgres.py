@@ -37,3 +37,15 @@ def test_admin_overview_on_postgres(isolated_catalog_pg, sample_country_data):
 def test_list_users_on_postgres(pg_db):
     users = list_users_with_stats()
     assert isinstance(users, list)
+
+
+def test_postgres_ad_hoc_reads_then_write(pg_db):
+    """Reads via get_connection() must not block later db_transaction() writes."""
+    from relocation_jobs.db import db_transaction, get_user_by_id, user_count
+
+    user_count()
+    assert get_user_by_id(999_999) is None
+
+    with db_transaction() as conn:
+        row = conn.execute("SELECT COUNT(*) AS n FROM users").fetchone()
+    assert row is not None

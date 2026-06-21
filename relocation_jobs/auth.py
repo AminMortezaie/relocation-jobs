@@ -53,9 +53,6 @@ def current_username() -> str | None:
 
 
 def auth_status() -> dict:
-    from relocation_jobs.db import init_db
-
-    init_db()
     uid = current_user_id()
     if not uid:
         return {"authenticated": False, "allow_register": allow_register()}
@@ -92,9 +89,6 @@ def admin_required(view):
     @wraps(view)
     @login_required
     def wrapped(*args, **kwargs):
-        from relocation_jobs.db import init_db
-
-        init_db()
         if not is_user_admin(g.user_id):
             return jsonify({"error": "Admin access required"}), 403
         return view(*args, **kwargs)

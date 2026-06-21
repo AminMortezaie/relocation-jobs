@@ -37,6 +37,7 @@ from relocation_jobs.db.users import (
 
 from relocation_jobs.db.tracking import (
     load_job_tracking,
+    load_wrong_location_hides_db,
     reapply_job_db,
     set_job_applied_db,
     set_job_ats_score_db,
@@ -88,6 +89,7 @@ __all__ = [
     "user_count",
     # tracking
     "load_job_tracking",
+    "load_wrong_location_hides_db",
     "reapply_job_db",
     "set_job_applied_db",
     "set_job_ats_score_db",

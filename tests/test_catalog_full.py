@@ -36,7 +36,7 @@ def test_migrate_from_json_files(tmp_data_dir, db, sample_country_data, monkeypa
     from relocation_jobs.db import db_transaction
 
     monkeypatch.setattr(
-        "relocation_jobs.catalog_db.COUNTRY_FILE_NAMES",
+        "relocation_jobs.services.catalog_service.COUNTRY_FILE_NAMES",
         {"uk": "uk_companies.json"},
     )
 

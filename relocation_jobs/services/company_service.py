@@ -366,7 +366,7 @@ def enrich_new_company(
 # ---------------------------------------------------------------------------
 
 def touch_company_fetch_time(country_key: str, company_name: str) -> str:
-    from relocation_jobs.panel_data import now_iso
+    from relocation_jobs.services.catalog_service import now_iso
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")

@@ -9,6 +9,7 @@ from datetime import date
 from pathlib import Path
 
 from relocation_jobs.location_tags import (
+    COUNTRY_LABELS,
     format_location_display,
     normalize_locations,
     sync_company_location_fields,
@@ -21,13 +22,6 @@ from relocation_jobs.paths import (
     PROJECT_ROOT,
     data_dir,
 )
-
-COUNTRY_LABELS: dict[str, str] = {
-    "germany": "Germany",
-    "netherlands": "Netherlands",
-    "uk": "United Kingdom",
-    "portugal": "Portugal",
-}
 
 
 def _today() -> str:
@@ -610,74 +604,23 @@ def save_country(country_key: str, data: dict, *, export_archive: bool = True) -
 
 
 def export_country_archive(country_key: str) -> Path | None:
-    """Write read-only JSON snapshot to companies/ for git archive."""
-    filename = COUNTRY_FILE_NAMES.get(country_key)
-    if not filename:
-        return None
-    data = load_country(country_key)
-    if data is None:
-        return None
-    COMPANIES_DIR.mkdir(parents=True, exist_ok=True)
-    path = COMPANIES_DIR / filename
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-        f.write("\n")
-    return path
+    from relocation_jobs.services.catalog_service import export_country_archive as _f
+    return _f(country_key)
 
 
 def export_all_archives() -> list[Path]:
-    paths: list[Path] = []
-    for country_key in COUNTRY_FILE_NAMES:
-        p = export_country_archive(country_key)
-        if p:
-            paths.append(p)
-    return paths
-
-
-def _load_json_file(path: Path) -> dict | None:
-    if not path.is_file():
-        return None
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
+    from relocation_jobs.services.catalog_service import export_all_archives as _f
+    return _f()
 
 
 def migrate_from_json_files() -> int:
-    """Import JSON into catalog when DB is empty. Returns companies imported."""
-    if catalog_has_data():
-        return 0
-
-    imported = 0
-    for country_key, filename in COUNTRY_FILE_NAMES.items():
-        candidates = [
-            data_dir() / filename,
-            COMPANIES_DIR / filename,
-            PROJECT_ROOT / filename,
-        ]
-        data = None
-        for path in candidates:
-            data = _load_json_file(path)
-            if data is not None:
-                break
-        if data is None:
-            continue
-        save_country(country_key, data, export_archive=True)
-        imported += len(data.get("companies") or [])
-
-    return imported
+    from relocation_jobs.services.catalog_service import migrate_from_json_files as _f
+    return _f()
 
 
 def load_country_for_path(path: str | Path) -> tuple[str | None, dict]:
-    """Load country dict from DB when path is a known country file, else from JSON."""
-    country_key = country_key_from_filename(str(path))
-    if country_key:
-        data = load_country(country_key)
-        if data is not None:
-            return country_key, data
-    p = Path(path)
-    if p.is_file():
-        with open(p, encoding="utf-8") as f:
-            return country_key, json.load(f)
-    return country_key, {"companies": [], "total": 0}
+    from relocation_jobs.services.catalog_service import load_country_for_path as _f
+    return _f(path)
 
 
 def save_country_for_path(
@@ -687,15 +630,8 @@ def save_country_for_path(
     *,
     export_archive: bool = True,
 ) -> None:
-    key = country_key or country_key_from_filename(str(path))
-    if key:
-        save_country(key, data, export_archive=export_archive)
-        return
-    p = Path(path)
-    p.parent.mkdir(parents=True, exist_ok=True)
-    with open(p, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-        f.write("\n")
+    from relocation_jobs.services.catalog_service import save_country_for_path as _f
+    return _f(path, data, country_key, export_archive=export_archive)
 
 
 # ---------------------------------------------------------------------------
@@ -791,6 +727,20 @@ def query_country_meta(conn) -> list[dict]:
         """
     ).fetchall()
     return [_row_dict(r) for r in rows]
+
+
+def load_catalog_stats() -> dict:
+    """Run all 7 catalog aggregation queries in a single connection; return dict of results."""
+    with db_read() as conn:
+        return {
+            "company_rows": query_company_stats_by_country(conn),
+            "job_rows": query_job_counts_by_country(conn),
+            "empty_companies": query_empty_company_count(conn),
+            "ats_rows": query_ats_distribution(conn),
+            "problem_rows": query_fetch_problem_companies(conn),
+            "meta_rows": query_country_meta(conn),
+            "latest_job_by_country": query_latest_job_fetches_by_country(conn),
+        }
 
 
 def query_latest_job_fetches_by_country(conn) -> dict[str, str]:

@@ -9,18 +9,11 @@ from __future__ import annotations
 import os
 
 from relocation_jobs.catalog_db import (
-    COUNTRY_LABELS,
     catalog_has_data,
-    query_ats_distribution,
-    query_company_stats_by_country,
-    query_country_meta,
-    query_empty_company_count,
-    query_fetch_problem_companies,
-    query_job_counts_by_country,
-    query_latest_job_fetches_by_country,
+    load_catalog_stats,
 )
-from relocation_jobs.db import admin_tracking_totals, db_read, user_count
-from relocation_jobs.location_tags import SUGGESTED_CITIES, load_custom_cities
+from relocation_jobs.db import admin_tracking_totals, user_count
+from relocation_jobs.location_tags import COUNTRY_LABELS, SUGGESTED_CITIES, load_custom_cities
 from relocation_jobs.paths import COMPANIES_DIR, data_dir
 
 
@@ -94,14 +87,14 @@ def get_catalog_overview() -> dict:
             "country_meta": [],
         }
 
-    with db_read() as conn:
-        company_rows = query_company_stats_by_country(conn)
-        job_rows = query_job_counts_by_country(conn)
-        empty_companies = query_empty_company_count(conn)
-        ats_rows = query_ats_distribution(conn)
-        problem_rows = query_fetch_problem_companies(conn)
-        meta_rows = query_country_meta(conn)
-        latest_job_by_country = query_latest_job_fetches_by_country(conn)
+    stats = load_catalog_stats()
+    company_rows = stats["company_rows"]
+    job_rows = stats["job_rows"]
+    empty_companies = stats["empty_companies"]
+    ats_rows = stats["ats_rows"]
+    problem_rows = stats["problem_rows"]
+    meta_rows = stats["meta_rows"]
+    latest_job_by_country = stats["latest_job_by_country"]
 
     jobs_by_country = {
         row["country"]: {

@@ -525,3 +525,23 @@ def set_job_ats_score_db(
         "url": job_url,
         "country": country,
     }
+
+
+def load_wrong_location_hides_db(
+    user_id: int,
+    country_key: str | None = None,
+) -> list[dict]:
+    """Return job_tracking rows hidden with not_for_me_reason='wrong_location'."""
+    query = """
+        SELECT country, company_name, job_url
+        FROM job_tracking
+        WHERE user_id = %s
+          AND not_for_me = 1
+          AND not_for_me_reason = 'wrong_location'
+    """
+    params: list = [user_id]
+    if country_key:
+        query += " AND country = %s"
+        params.append(country_key)
+    rows = get_connection().execute(query, params).fetchall()
+    return [dict(r) for r in rows]

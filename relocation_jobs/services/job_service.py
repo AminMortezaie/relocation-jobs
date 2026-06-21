@@ -9,6 +9,7 @@ from __future__ import annotations
 from urllib.parse import urlparse
 
 from relocation_jobs.db import (
+    load_wrong_location_hides_db,
     reapply_job_db,
     set_company_awaiting_response_db,
     set_job_applied_db,
@@ -240,24 +241,11 @@ def reconcile_wrong_location_hides(
     country_key: str | None = None,
     city_label: str | None = None,
 ) -> int:
-    from relocation_jobs.db import get_connection
     from relocation_jobs.location_tags import city_match_keys, company_expected_locations, job_matches_expected_locations
     from relocation_jobs.services.catalog_service import _load_country_data
     from relocation_jobs.services.company_service import find_company_in_data, find_job_in_data
 
-    query = """
-        SELECT country, company_name, job_url
-        FROM job_tracking
-        WHERE user_id = %s
-          AND not_for_me = 1
-          AND not_for_me_reason = 'wrong_location'
-    """
-    params: list = [user_id]
-    if country_key:
-        query += " AND country = %s"
-        params.append(country_key)
-
-    rows = get_connection().execute(query, params).fetchall()
+    rows = load_wrong_location_hides_db(user_id, country_key)
     target_city_keys = city_match_keys(city_label) if city_label else set()
     restored = 0
 

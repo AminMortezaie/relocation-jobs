@@ -81,7 +81,8 @@ def init_db(*, migrate_json: bool = True, force: bool = False) -> None:
         return
 
     # Lazy imports to break the core → migrations → events → core cycle.
-    from relocation_jobs.catalog_db import init_catalog_schema, migrate_from_json_files
+    from relocation_jobs.catalog_db import init_catalog_schema
+    from relocation_jobs.services.catalog_service import migrate_from_json_files
     from relocation_jobs.db.migrations import _migrate_schema
 
     init_catalog_schema()

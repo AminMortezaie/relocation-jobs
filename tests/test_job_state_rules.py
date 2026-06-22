@@ -27,7 +27,7 @@ from relocation_jobs.scrape_jobs import merge_matching_jobs
 @pytest.fixture
 def state_catalog(seeded_catalog, sample_country_data):
     data = copy.deepcopy(sample_country_data)
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     return data
 
 
@@ -177,7 +177,7 @@ class TestOrphanTrackedJobs:
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data, export_archive=False)
+        save_country("uk", data)
 
         acme = _acme(_flatten(uid))
         tracked = next(j for j in acme["jobs"] if normalize_job_url(j["url"]) == normalize_job_url(url))
@@ -195,7 +195,7 @@ class TestOrphanTrackedJobs:
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data, export_archive=False)
+        save_country("uk", data)
 
         acme = _acme(_flatten(uid))
         assert normalize_job_url(url) in {
@@ -272,7 +272,7 @@ class TestScrapeMergeVsDbOverlay:
         ]
         merged, _, _, _ = merge_matching_jobs(existing, scraped)
         company_blob["matching_jobs"] = merged
-        save_country("uk", data, export_archive=False)
+        save_country("uk", data)
 
         acme = _acme(_flatten(uid))
         job = next(j for j in acme["jobs"] if j["url"] == url)

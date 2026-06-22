@@ -9,6 +9,11 @@ from datetime import datetime, timezone
 
 from relocation_jobs.job_identity import normalize_job_url
 
+try:
+    from psycopg import OperationalError as _PgOperationalError
+except ImportError:  # pragma: no cover
+    _PgOperationalError = Exception  # type: ignore[misc,assignment]
+
 _db_lock = threading.RLock()
 _pg_conn = None
 _db_initialized = False
@@ -28,7 +33,7 @@ def _normalize_url(url: str) -> str:
 
 
 def _connect_postgres():
-    import psycopg
+    import psycopg  # local import so tests can monkeypatch sys.modules["psycopg"]
     from psycopg.rows import dict_row
 
     return psycopg.connect(
@@ -59,7 +64,13 @@ def get_connection():
 def db_read():
     """Serialize catalog reads with writes on the shared DB connection."""
     with _db_lock:
-        yield get_connection()
+        try:
+            yield get_connection()
+        except _PgOperationalError:
+            # Connection was dropped by the server (e.g. Neon idle timeout, SSL drop).
+            # Reset so the next get_connection() creates a fresh connection.
+            _reset_pg_connection()
+            raise
 
 
 @contextmanager
@@ -69,20 +80,22 @@ def db_transaction():
         try:
             with conn.transaction():
                 yield conn
+        except _PgOperationalError:
+            _reset_pg_connection()
+            raise
         except Exception:
             if conn.closed:
                 _reset_pg_connection()
             raise
 
 
-def init_db(*, migrate_json: bool = True, force: bool = False) -> None:
+def init_db(*, force: bool = False) -> None:
     global _db_initialized
     if _db_initialized and not force:
         return
 
     # Lazy imports to break the core → migrations → events → core cycle.
     from relocation_jobs.catalog_db import init_catalog_schema
-    from relocation_jobs.services.catalog_service import migrate_from_json_files
     from relocation_jobs.db.migrations import _migrate_schema
 
     init_catalog_schema()
@@ -147,6 +160,4 @@ def init_db(*, migrate_json: bool = True, force: bool = False) -> None:
             """
         )
         _migrate_schema(conn)
-    if migrate_json:
-        migrate_from_json_files()
     _db_initialized = True

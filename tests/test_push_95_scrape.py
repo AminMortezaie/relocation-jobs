@@ -204,7 +204,7 @@ async def test_get_jobs_async_playwright_fallback(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_run_file_async_paths(monkeypatch, capsys, tmp_path):
+async def test_run_file_async_paths(monkeypatch, capsys):
     data = {
         "companies": [
             {
@@ -215,16 +215,12 @@ async def test_run_file_async_paths(monkeypatch, capsys, tmp_path):
             }
         ]
     }
-    path = tmp_path / "test.json"
-    path.write_text(json.dumps(data), encoding="utf-8")
     monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(sj, "resolve_json_path", lambda p: str(path))
-    monkeypatch.setattr(sj, "load_country_for_path", lambda p: ("test", data))
+    monkeypatch.setattr(sj, "load_country", lambda k: data)
     monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
     monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
-    monkeypatch.setattr(sj, "export_country_archive", lambda *a, **k: None)
     monkeypatch.setattr(sj, "get_jobs_async", AsyncMock(return_value=[]))
-    await sj.run_file_async(str(path), skip_filled=False, concurrency=1)
+    await sj.run_file_async("test", skip_filled=False, concurrency=1)
 
 
 def test_progress_and_cancel_reporters():

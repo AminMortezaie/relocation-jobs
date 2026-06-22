@@ -16,12 +16,7 @@ from relocation_jobs.location_tags import (
 )
 from relocation_jobs.db import db_read, db_transaction, get_connection
 from relocation_jobs.job_identity import job_idempotency_key, stamp_job_identity
-from relocation_jobs.paths import (
-    COUNTRY_FILE_NAMES,
-    COMPANIES_DIR,
-    PROJECT_ROOT,
-    data_dir,
-)
+from relocation_jobs.paths import COUNTRY_FILE_NAMES
 
 
 def _today() -> str:
@@ -568,7 +563,7 @@ def upsert_companies(
             })
 
 
-def save_country(country_key: str, data: dict, *, export_archive: bool = True) -> None:
+def save_country(country_key: str, data: dict) -> None:
     """Sync country catalog: upsert all companies, remove ones absent from data."""
     companies = data.get("companies") or []
     meta = {
@@ -598,40 +593,6 @@ def save_country(country_key: str, data: dict, *, export_archive: bool = True) -
             )
         else:
             conn.execute("DELETE FROM companies WHERE country = %s", (country_key,))
-
-    if export_archive:
-        export_country_archive(country_key)
-
-
-def export_country_archive(country_key: str) -> Path | None:
-    from relocation_jobs.services.catalog_service import export_country_archive as _f
-    return _f(country_key)
-
-
-def export_all_archives() -> list[Path]:
-    from relocation_jobs.services.catalog_service import export_all_archives as _f
-    return _f()
-
-
-def migrate_from_json_files() -> int:
-    from relocation_jobs.services.catalog_service import migrate_from_json_files as _f
-    return _f()
-
-
-def load_country_for_path(path: str | Path) -> tuple[str | None, dict]:
-    from relocation_jobs.services.catalog_service import load_country_for_path as _f
-    return _f(path)
-
-
-def save_country_for_path(
-    path: str | Path,
-    data: dict,
-    country_key: str | None = None,
-    *,
-    export_archive: bool = True,
-) -> None:
-    from relocation_jobs.services.catalog_service import save_country_for_path as _f
-    return _f(path, data, country_key, export_archive=export_archive)
 
 
 # ---------------------------------------------------------------------------

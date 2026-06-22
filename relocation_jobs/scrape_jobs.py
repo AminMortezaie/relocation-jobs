@@ -71,14 +71,9 @@ HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 
-from relocation_jobs.paths import (
-    COUNTRY_JSON_FILENAMES,
-    COMPANIES_DIR,
-    resolve_json_path,
-)
+from relocation_jobs.paths import COUNTRY_FILE_NAMES
 from relocation_jobs.catalog_db import (
-    export_country_archive,
-    load_country_for_path,
+    load_country,
     touch_country_meta,
     upsert_company,
 )
@@ -88,8 +83,6 @@ from relocation_jobs.location_tags import (
     filter_jobs_by_expected_locations,
     job_matches_expected_locations,
 )
-
-COUNTRY_FILES = COUNTRY_JSON_FILENAMES
 
 # Concurrent in-flight tasks (asyncio), not OS threads or processes
 DEFAULT_CONCURRENCY = 16
@@ -3946,7 +3939,7 @@ async def _process_company_async(
 
 
 async def run_file_async(
-    json_path: str,
+    country_key: str,
     *,
     target: str | None = None,
     skip_filled: bool = False,
@@ -3957,18 +3950,11 @@ async def run_file_async(
     if not HTTPX_AVAILABLE:
         raise SystemExit("httpx is required for async scraping: pip install httpx")
 
-    resolved = resolve_json_path(json_path)
-    json_path = str(resolved)
-    country_key, data = load_country_for_path(resolved)
-    if not data.get("companies"):
-        data.setdefault("companies", [])
+    data = load_country(country_key) or {"companies": []}
 
     file_lock = threading.Lock()
 
     def checkpoint_company(company: dict) -> None:
-        """Incremental DB write for one company (safe during concurrent scrape)."""
-        if not country_key:
-            return
         with file_lock:
             upsert_company(
                 country_key,
@@ -3976,10 +3962,7 @@ async def run_file_async(
                 updated=company.get("updated") or now_iso(),
             )
 
-    def finalize_catalog(*, export_archive: bool = True) -> None:
-        """Update country meta and optionally export JSON archive."""
-        if not country_key:
-            return
+    def finalize_catalog() -> None:
         _report_progress(current=work_total, total=work_total, status="saving")
         with file_lock:
             ts = now_iso()
@@ -3989,15 +3972,13 @@ async def run_file_async(
                 jobs_fetched=ts,
                 total=len(data.get("companies") or []),
             )
-            if export_archive:
-                export_country_archive(country_key)
         _report_progress(current=work_total, total=work_total, status="done")
 
     companies = data["companies"]
     if target:
         companies = [c for c in companies if c["name"].lower() == target.lower()]
         if not companies:
-            msg = f"Company '{target}' not found in {json_path}"
+            msg = f"Company '{target}' not found in {country_key}"
             print(msg)
             raise LookupError(msg)
 
@@ -4012,12 +3993,11 @@ async def run_file_async(
             continue
         work.append((company, i))
 
-    file_label = Path(json_path).name
     if target:
         print(f"\n=== {target} ===")
     else:
         print(
-            f"\n=== {file_label} ({len(work)} to process, "
+            f"\n=== {country_key} ({len(work)} to process, "
             f"{concurrency} concurrent, asyncio) ==="
         )
 
@@ -4035,7 +4015,7 @@ async def run_file_async(
         else:
             total_jobs = sum(len(c.get("matching_jobs", [])) for c in data["companies"])
             print(
-                f"Done {file_label} — {total_jobs} matching jobs "
+                f"Done {country_key} — {total_jobs} matching jobs "
                 f"across {len(data['companies'])} companies."
             )
         return
@@ -4112,7 +4092,7 @@ async def run_file_async(
             for item in work:
                 if is_cancel_requested():
                     _safe_print("Cancelled — saved progress for completed companies")
-                    finalize_catalog(export_archive=False)
+                    finalize_catalog()
                     return
                 await bounded(item)
         else:
@@ -4141,10 +4121,10 @@ async def run_file_async(
                     await watcher
             if is_cancel_requested():
                 _safe_print("Cancelled — saved progress for completed companies")
-                finalize_catalog(export_archive=False)
+                finalize_catalog()
                 return
 
-    finalize_catalog(export_archive=True)
+    finalize_catalog()
     if target:
         company = work[0][0]
         jobs = company.get("matching_jobs") or []
@@ -4156,13 +4136,13 @@ async def run_file_async(
     else:
         total_jobs = sum(len(c.get("matching_jobs", [])) for c in data["companies"])
         print(
-            f"Done {file_label} — {total_jobs} matching jobs "
+            f"Done {country_key} — {total_jobs} matching jobs "
             f"across {len(data['companies'])} companies."
         )
 
 
-def run_file(
-    json_path: str,
+def run_country(
+    country_key: str,
     *,
     target: str | None = None,
     skip_filled: bool = False,
@@ -4172,7 +4152,7 @@ def run_file(
 ) -> None:
     asyncio.run(
         run_file_async(
-            json_path,
+            country_key,
             target=target,
             skip_filled=skip_filled,
             enrich_only=enrich_only,
@@ -4183,7 +4163,7 @@ def run_file(
 
 
 def main():
-    json_paths = [str(COMPANIES_DIR / "germany_companies.json")]
+    country_keys = ["germany"]
     target = None
     skip_filled = False
     enrich_only = False
@@ -4212,24 +4192,24 @@ def main():
             workers = max(1, int(args[i]))
         elif arg.startswith("--workers="):
             workers = max(1, int(arg.split("=", 1)[1]))
-        elif arg == "--file":
+        elif arg == "--country":
             i += 1
             if i >= len(args):
-                print("--file requires a path")
+                print("--country requires a country key (e.g. uk, germany)")
                 return
-            json_paths = [args[i]]
-        elif arg.startswith("--file="):
-            json_paths = [arg.split("=", 1)[1]]
+            country_keys = [args[i]]
+        elif arg.startswith("--country="):
+            country_keys = [arg.split("=", 1)[1]]
         else:
             target = arg
         i += 1
 
     if run_all:
-        json_paths = [str(COMPANIES_DIR / name) for name in COUNTRY_JSON_FILENAMES]
+        country_keys = list(COUNTRY_FILE_NAMES.keys())
 
-    for json_path in json_paths:
-        run_file(
-            json_path,
+    for country_key in country_keys:
+        run_country(
+            country_key,
             target=target,
             skip_filled=skip_filled,
             enrich_only=enrich_only,
@@ -4237,8 +4217,8 @@ def main():
             workers=workers,
         )
 
-    if len(json_paths) > 1:
-        print(f"\nAll done — processed {len(json_paths)} country files.")
+    if len(country_keys) > 1:
+        print(f"\nAll done — processed {len(country_keys)} countries.")
 
 
 if __name__ == "__main__":

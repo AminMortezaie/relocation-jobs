@@ -45,7 +45,7 @@ def rich_catalog(seeded_catalog, sample_country_data):
             "matching_jobs": [],
         }
     )
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     return data
 
 
@@ -120,7 +120,7 @@ class TestRule03TrackingSurvivesRescrape:
             [{"title": "Renamed", "url": url}],
         )
         blob["matching_jobs"] = merged
-        save_country("uk", data, export_archive=False)
+        save_country("uk", data)
 
         acme = _acme(_flatten(uid))
         assert url in _urls(acme["rejected_jobs"])
@@ -204,7 +204,7 @@ class TestRule08NotForMe:
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data, export_archive=False)
+        save_country("uk", data)
 
         acme = _acme(_flatten(uid))
         assert url not in _urls(acme["jobs"])
@@ -267,7 +267,7 @@ class TestRule11OrphanReinjection:
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data, export_archive=False)
+        save_country("uk", data)
 
         acme = _acme(_flatten(uid))
         orphan = next(
@@ -287,7 +287,7 @@ class TestRule12CompanyApplied:
         set_job_applied("uk", company, url, True, user_id=uid)
         data = copy.deepcopy(load_country("uk"))
         data["companies"][0]["matching_jobs"] = []
-        save_country("uk", data, export_archive=False)
+        save_country("uk", data)
 
         acme = _acme(_flatten(uid))
         assert acme["company_applied"] is True
@@ -410,7 +410,7 @@ class TestRule16LocationGate:
             {"title": "Ok", "url": "https://x/ok", "location": "London, UK"},
             {"title": "Far", "url": "https://x/far", "location": "Paris, France"},
         ]
-        save_country("uk", sample_country_data, export_archive=False)
+        save_country("uk", sample_country_data)
 
         companies, _, _ = flatten_companies("uk")
         acme = companies[0]

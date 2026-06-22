@@ -61,7 +61,7 @@ def sample_country_data():
 def seeded_catalog(db, sample_country_data):
     from relocation_jobs.catalog_db import save_country
 
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     return sample_country_data
 
 

@@ -122,7 +122,7 @@ def test_location_backfill_persists_through_catalog(db, sample_country_data):
 
     backfill_listing_locations(merged, title_matched)
     company["matching_jobs"] = merged
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
 
     loaded = load_country("uk")
     stored = loaded["companies"][0]["matching_jobs"][0]
@@ -168,7 +168,7 @@ def test_wrong_location_jobs_hidden_after_catalog_save(db, sample_country_data):
         {"title": "Local", "url": "https://example.com/local", "location": "London, UK"},
         {"title": "Far", "url": "https://example.com/far", "location": "Tokyo, Japan"},
     ]
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
 
     companies, _, _ = flatten_companies("uk")
     acme = companies[0]

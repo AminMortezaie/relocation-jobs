@@ -354,7 +354,7 @@ def load_country(country: str) -> tuple[str, dict, str]:
 
 def save_country(country_key: str, data: dict) -> None:
     data["companies"] = sort_companies(data["companies"])
-    save_country_catalog(country_key, data, export_archive=True)
+    save_country_catalog(country_key, data)
 
 
 def main() -> None:

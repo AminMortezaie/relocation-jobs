@@ -17,8 +17,11 @@ except ImportError:
 
 from relocation_jobs.build_companies import slug_from_name, sort_companies
 from relocation_jobs.catalog_db import (
+    load_country,
+    save_country,
     upsert_company as upsert_company_catalog,
 )
+from relocation_jobs.paths import COUNTRY_FILE_NAMES
 from relocation_jobs.db import (
     clear_company_tracking,
     rename_company_tracking,
@@ -32,24 +35,19 @@ from relocation_jobs.job_identity import (
     stamp_job_identity,
 )
 from relocation_jobs.location_tags import (
+    COUNTRY_LABELS,
     normalize_location,
     sync_company_location_fields,
 )
+from relocation_jobs.services.catalog_service import now_iso, today
 
-try:
-    from relocation_jobs.scrape_jobs import (
-        ATS_TYPE_CHOICES,
-        KNOWN_ATS,
-        detect_ats_for_hint,
-        detect_ats_static,
-        detect_ats_via_playwright,
-    )
-except ImportError:
-    ATS_TYPE_CHOICES = ()
-    KNOWN_ATS = {}
-    detect_ats_for_hint = None  # type: ignore
-    detect_ats_static = None  # type: ignore
-    detect_ats_via_playwright = None  # type: ignore
+from relocation_jobs.scrape_jobs import (
+    ATS_TYPE_CHOICES,
+    KNOWN_ATS,
+    detect_ats_for_hint,
+    detect_ats_static,
+    detect_ats_via_playwright,
+)
 
 _file_lock = threading.Lock()
 
@@ -88,29 +86,7 @@ _URL_COUNTRY_HINTS: list[tuple[str, re.Pattern[str]]] = [
 # Helpers (internal)
 # ---------------------------------------------------------------------------
 
-def _load_country(country_key: str) -> dict:
-    from relocation_jobs.services.catalog_service import _load_country_data
-    return _load_country_data(country_key) or {}
 
-
-def _save_country(country_key: str, data: dict) -> None:
-    from relocation_jobs.services.catalog_service import _save_country_data
-    _save_country_data(country_key, data)
-
-
-def _country_files() -> dict[str, str]:
-    from relocation_jobs.services.catalog_service import COUNTRY_FILES
-    return COUNTRY_FILES
-
-
-def _country_labels() -> dict[str, str]:
-    from relocation_jobs.location_tags import COUNTRY_LABELS
-    return COUNTRY_LABELS
-
-
-def _today() -> str:
-    from relocation_jobs.services.catalog_service import today
-    return today()
 
 
 def _clean_city(raw: str, country_key: str) -> str:
@@ -174,7 +150,7 @@ def find_job_in_data(data: dict, company_name: str, job_url: str) -> dict | None
 
 
 def resolve_company_name(country_key: str, company_name: str) -> str:
-    data = _load_country(country_key)
+    data = load_country(country_key) or {}
     company = find_company_in_data(data, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
@@ -311,9 +287,8 @@ def resolve_country_key(
     *,
     hint: str | None = None,
 ) -> tuple[str, dict]:
-    country_files = _country_files()
     hint = (hint or "").strip().lower()
-    if hint and hint not in ("auto", "all") and hint in country_files:
+    if hint and hint not in ("auto", "all") and hint in COUNTRY_FILE_NAMES:
         return hint, {}
 
     meta = fetch_relocate_metadata(name)
@@ -344,7 +319,7 @@ def enrich_new_company(
     careers_url = normalize_careers_url(careers_url)
     meta = fetch_relocate_metadata(name, country_key)
     ats_type, ats_url = detect_ats_for_company(name, careers_url, ats_hint=ats_hint)
-    now = _today()
+    now = today()
     company: dict = {
         "name": name.strip(),
         "city": meta.get("city", ""),
@@ -366,15 +341,14 @@ def enrich_new_company(
 # ---------------------------------------------------------------------------
 
 def touch_company_fetch_time(country_key: str, company_name: str) -> str:
-    from relocation_jobs.services.catalog_service import now_iso
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    if country_key not in _country_files():
+    if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
     with _file_lock:
-        data = _load_country(country_key)
+        data = load_country(country_key) or {}
         company = find_company_in_data(data, company_name)
         if company is None:
             raise LookupError(f"Company not found: {company_name}")
@@ -393,8 +367,7 @@ def add_company(
     ats_hint: str | None = None,
     locations: list[dict] | None = None,
 ) -> dict:
-    country_files = _country_files()
-    country_labels = _country_labels()
+    country_labels = COUNTRY_LABELS
     name = (name or "").strip()
     if not name:
         raise ValueError("Company name is required")
@@ -405,7 +378,7 @@ def add_company(
         cleaned_keys = [
             key.strip().lower()
             for key in country_keys
-            if (key or "").strip().lower() in country_files
+            if (key or "").strip().lower() in COUNTRY_FILE_NAMES
         ]
         hint = cleaned_keys[0] if cleaned_keys else None
     elif country_key and country_key not in ("auto", "all", ""):
@@ -413,8 +386,7 @@ def add_company(
 
     resolved_country, _meta = resolve_country_key(name, careers_url, hint=hint)
 
-    filename = country_files.get(resolved_country)
-    if not filename:
+    if resolved_country not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {resolved_country}")
 
     company = enrich_new_company(name, careers_url, resolved_country, ats_hint=ats_hint)
@@ -435,26 +407,24 @@ def add_company(
         sync_company_location_fields(company, catalog_country=resolved_country)
 
     with _file_lock:
-        data = _load_country(resolved_country)
+        data = load_country(resolved_country) or {}
         for existing in data.get("companies", []):
             if existing.get("name", "").lower() == name.lower():
                 raise LookupError(f"Company already exists: {name}")
         data.setdefault("companies", []).append(company)
         data["companies"] = sort_companies(data["companies"])
-        data["updated"] = _today()
-        _save_country(resolved_country, data)
+        data["updated"] = today()
+        save_country(resolved_country, data)
 
     return {
         "country": resolved_country,
         "country_label": country_labels.get(resolved_country, resolved_country),
-        "file": filename,
         **company,
     }
 
 
 def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
-    country_files = _country_files()
-    country_labels = _country_labels()
+    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     new_name = (new_name or "").strip()
     if not company_name:
@@ -463,13 +433,11 @@ def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
         raise ValueError("New company name is required")
     if company_name.casefold() == new_name.casefold():
         raise ValueError("New name must be different from the current name")
-
-    filename = country_files.get(country_key)
-    if not filename:
+    if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
     with _file_lock:
-        data = _load_country(country_key)
+        data = load_country(country_key) or {}
         company = find_company_in_data(data, company_name)
         if company is None:
             raise LookupError(f"Company not found: {company_name}")
@@ -482,17 +450,16 @@ def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
                 raise LookupError(f"Company already exists: {new_name}")
 
         company["name"] = new_name
-        company["updated"] = _today()
+        company["updated"] = today()
         data["companies"] = sort_companies(data.get("companies") or [])
-        data["updated"] = _today()
-        _save_country(country_key, data)
+        data["updated"] = today()
+        save_country(country_key, data)
 
     rename_company_tracking(country_key, canonical_old, new_name)
 
     return {
         "country": country_key,
         "country_label": country_labels.get(country_key, country_key),
-        "file": filename,
         "company": new_name,
         "previous_name": canonical_old,
     }
@@ -505,19 +472,17 @@ def update_company_careers(
     *,
     redetect_ats: bool = True,
 ) -> dict:
-    country_files = _country_files()
-    country_labels = _country_labels()
+    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    filename = country_files.get(country_key)
-    if not filename:
+    if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
     careers_url = normalize_careers_url(careers_url)
 
     with _file_lock:
-        data = _load_country(country_key)
+        data = load_country(country_key) or {}
         company = find_company_in_data(data, company_name)
         if company is None:
             raise LookupError(f"Company not found: {company_name}")
@@ -528,9 +493,9 @@ def update_company_careers(
             ats_type, ats_url = detect_ats_for_company(canonical_name, careers_url)
             company["ats_type"] = ats_type
             company["ats_url"] = ats_url
-        company["updated"] = _today()
-        data["updated"] = _today()
-        _save_country(country_key, data)
+        company["updated"] = today()
+        data["updated"] = today()
+        save_country(country_key, data)
 
     return {
         "country": country_key,
@@ -550,13 +515,11 @@ def update_company_city(
     *,
     locations: list[dict] | None = None,
 ) -> dict:
-    country_files = _country_files()
-    country_labels = _country_labels()
+    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    filename = country_files.get(country_key)
-    if not filename:
+    if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
     cleaned: list[dict] = []
@@ -591,7 +554,7 @@ def update_company_city(
         cleaned.sort(key=lambda loc: (loc["country_label"], loc["city"].casefold()))
 
     with _file_lock:
-        data = _load_country(country_key)
+        data = load_country(country_key) or {}
         company = find_company_in_data(data, company_name)
         if company is None:
             raise LookupError(f"Company not found: {company_name}")
@@ -599,9 +562,9 @@ def update_company_city(
         canonical_name = company.get("name", company_name)
         company["locations"] = cleaned
         sync_company_location_fields(company, catalog_country=country_key)
-        company["updated"] = _today()
-        data["updated"] = _today()
-        _save_country(country_key, data)
+        company["updated"] = today()
+        data["updated"] = today()
+        save_country(country_key, data)
 
     return {
         "country": country_key,
@@ -614,16 +577,14 @@ def update_company_city(
 
 
 def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> dict:
-    country_files = _country_files()
-    country_labels = _country_labels()
+    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    filename = country_files.get(country_key)
-    if not filename:
+    if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
-    ts = _today()
+    ts = today()
     to_add: list[dict] = []
     for job in jobs:
         title = (job.get("title") or "").strip()
@@ -636,7 +597,7 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
         raise ValueError("No valid jobs to add")
 
     with _file_lock:
-        data = _load_country(country_key)
+        data = load_country(country_key) or {}
         company = find_company_in_data(data, company_name)
         if company is None:
             raise LookupError(f"Company not found: {company_name}")
@@ -661,7 +622,7 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
         company["matching_jobs"] = merged
         company["updated"] = ts
         data["updated"] = ts
-        _save_country(country_key, data)
+        save_country(country_key, data)
 
     return {
         "country": country_key,
@@ -679,17 +640,15 @@ def set_company_fetch_problem(
     *,
     mark_fetch_ok: bool = False,
 ) -> dict:
-    country_files = _country_files()
-    country_labels = _country_labels()
+    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    filename = country_files.get(country_key)
-    if not filename:
+    if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
     with _file_lock:
-        data = _load_country(country_key)
+        data = load_country(country_key) or {}
         company = find_company_in_data(data, company_name)
         if company is None:
             raise LookupError(f"Company not found: {company_name}")
@@ -697,7 +656,7 @@ def set_company_fetch_problem(
         canonical_name = company.get("name", company_name)
         if fetch_problem:
             company["fetch_problem"] = True
-            company["fetch_problem_date"] = _today()
+            company["fetch_problem_date"] = today()
             company.pop("fetch_ok", None)
             company.pop("fetch_ok_date", None)
         else:
@@ -705,8 +664,8 @@ def set_company_fetch_problem(
             company.pop("fetch_problem_date", None)
             if mark_fetch_ok:
                 company["fetch_ok"] = True
-                company["fetch_ok_date"] = _today()
-        _save_country(country_key, data)
+                company["fetch_ok_date"] = today()
+        save_country(country_key, data)
 
     return {
         "country": country_key,
@@ -724,19 +683,17 @@ def set_company_fetch_ok(country_key: str, company_name: str) -> dict:
 
 
 def remove_company(country_key: str, company_name: str) -> dict:
-    country_files = _country_files()
-    country_labels = _country_labels()
+    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    filename = country_files.get(country_key)
-    if not filename:
+    if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
     target = company_name.lower()
 
     with _file_lock:
-        data = _load_country(country_key)
+        data = load_country(country_key) or {}
         companies = data.get("companies", [])
         removed: dict | None = None
         kept: list[dict] = []
@@ -753,15 +710,14 @@ def remove_company(country_key: str, company_name: str) -> dict:
 
         canonical_name = removed.get("name", company_name)
         data["companies"] = kept
-        data["updated"] = _today()
-        _save_country(country_key, data)
+        data["updated"] = today()
+        save_country(country_key, data)
 
     clear_company_tracking(country_key, canonical_name)
 
     return {
         "country": country_key,
         "country_label": country_labels.get(country_key, country_key),
-        "file": filename,
         "company": canonical_name,
         "removed_jobs": len(removed.get("matching_jobs") or []),
     }
@@ -778,7 +734,7 @@ def set_company_applied(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
+    data = load_country(country_key) or {}
     company = find_company_in_data(data, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
@@ -792,7 +748,7 @@ def set_company_awaiting_response(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
+    data = load_country(country_key) or {}
     company = find_company_in_data(data, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")

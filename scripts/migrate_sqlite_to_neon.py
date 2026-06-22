@@ -150,7 +150,7 @@ def migrate(*, sqlite_path: Path, force: bool) -> dict[str, int]:
 
     from relocation_jobs.db import init_db, get_connection
 
-    init_db(migrate_json=False)
+    init_db()
     pg = get_connection()
 
     if _pg_has_data(pg):

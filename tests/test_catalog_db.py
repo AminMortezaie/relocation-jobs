@@ -22,7 +22,7 @@ def test_save_and_load_country(seeded_catalog, sample_country_data):
 
 @pytest.mark.integration
 def test_save_country_updates_meta_total(db, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     loaded = load_country("uk")
     assert loaded["total"] == 1
 
@@ -33,7 +33,7 @@ def test_save_country_updates_meta_total(db, sample_country_data):
             "matching_jobs": [],
         }
     )
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     loaded = load_country("uk")
     assert len(loaded["companies"]) == 2
 
@@ -45,7 +45,7 @@ def test_matching_job_location_round_trips_through_catalog(db, sample_country_da
     job["location"] = "Berlin, Germany"
     job["locations"] = [{"city": "Berlin", "country": "Germany"}]
 
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     loaded = load_country("uk")
     stored = loaded["companies"][0]["matching_jobs"][0]
 
@@ -54,7 +54,7 @@ def test_matching_job_location_round_trips_through_catalog(db, sample_country_da
 
     job["location"] = ""
     job.pop("locations", None)
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     reloaded = load_country("uk")
     preserved = reloaded["companies"][0]["matching_jobs"][0]
     assert preserved["location"] == "Berlin, Germany"

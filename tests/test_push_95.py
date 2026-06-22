@@ -276,7 +276,7 @@ def test_build_companies_main_module_entry(monkeypatch, db, sample_country_data)
 def test_build_companies_resolve_country_alias(monkeypatch, db, sample_country_data):
     from relocation_jobs.build_companies import load_country
 
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     _, _, key = load_country("england")
     assert key == "uk"
 
@@ -290,7 +290,7 @@ def test_build_companies_resolve_country_alias(monkeypatch, db, sample_country_d
 def test_postgres_init_and_tracking(pg_db, sample_country_data):
     user = create_user("pguser", generate_password_hash("pass123456"))
     uid = user["id"]
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
 
     set_job_applied_db(uid, "uk", "Acme Backend Ltd", "https://example.com/j/1", True, job_title="Dev")
     set_job_rejected_db(uid, "uk", "Acme Backend Ltd", "https://example.com/j/2", True)
@@ -320,7 +320,7 @@ def test_postgres_init_and_tracking(pg_db, sample_country_data):
 
 @pytest.mark.integration
 def test_postgres_catalog_upsert(pg_db, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     upsert_company(
         "uk",
         {
@@ -356,26 +356,13 @@ def test_postgres_reconnect_when_closed(tmp_data_dir, monkeypatch):
 
 
 @pytest.mark.integration
-def test_panel_data_linkedin_and_import_fallback(monkeypatch):
+def test_panel_data_linkedin_url_normalization():
     from relocation_jobs import panel_data as pd
 
     assert pd._normalize_linkedin_url("linkedin.com/in/foo").startswith("https://")
     assert pd._normalize_linkedin_url("") == ""
     with pytest.raises(ValueError, match="LinkedIn"):
         pd._normalize_linkedin_url("https://example.com/in/foo")
-
-    real_import = __import__
-
-    def block_scrape(name, *args, **kwargs):
-        if name == "relocation_jobs.scrape_jobs":
-            raise ImportError("blocked")
-        return real_import(name, *args, **kwargs)
-
-    with patch("builtins.__import__", side_effect=block_scrape):
-        mod = importlib.reload(importlib.import_module("relocation_jobs.panel_data"))
-        assert mod.ATS_TYPE_CHOICES == ()
-        assert mod.detect_ats_static is None
-    importlib.reload(importlib.import_module("relocation_jobs.panel_data"))
 
 
 @pytest.mark.integration
@@ -429,25 +416,25 @@ def test_panel_data_enrich_and_detect(db, monkeypatch):
     )
 
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.fetch_relocate_metadata",
+        "relocation_jobs.services.company_service.fetch_relocate_metadata",
         lambda name, country_key=None: {"city": "London", "size": "51-200", "country": "uk"},
     )
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.detect_ats_for_company",
+        "relocation_jobs.services.company_service.detect_ats_for_company",
         lambda *a, **k: ("greenhouse", "https://boards.greenhouse.io/newco"),
     )
     company = enrich_new_company("New Co", "https://boards.greenhouse.io/newco", "uk", ats_hint="greenhouse")
     assert company["name"] == "New Co"
     assert list_ats_types()
 
-    save_country("uk", {"source": "t", "companies": [company], "total": 1}, export_archive=False)
+    save_country("uk", {"source": "t", "companies": [company], "total": 1})
     update_company_city("uk", "New Co", locations=[{"country": "uk", "city": "Manchester"}])
     add_manual_jobs("uk", "New Co", [{"title": "Role", "url": "https://example.com/manual/1"}])
     set_company_fetch_problem("uk", "New Co", True)
     rename_company("uk", "New Co", "Renamed Co")
 
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.detect_ats_for_hint",
+        "relocation_jobs.services.company_service.detect_ats_for_hint",
         lambda *a: ("lever", "https://jobs.lever.co/x"),
     )
     ats_type, ats_url = detect_ats_for_company("Co", "https://example.com", ats_hint="lever")
@@ -464,7 +451,7 @@ def test_panel_data_fetch_relocate_metadata(monkeypatch):
     <div>51 - 200 employees</div>
     """
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.requests.get",
+        "relocation_jobs.services.company_service.requests.get",
         lambda *a, **k: type("R", (), {"status_code": 200, "text": html})(),
     )
     meta = fetch_relocate_metadata("Acme", country_key="uk")
@@ -479,7 +466,6 @@ def test_panel_data_helpers(seeded_catalog):
         _company_activity_ts,
         _tracking_bool,
         _load_country_data,
-        load_country_file,
     )
 
     assert _ats_score_value("85") == 85
@@ -492,9 +478,6 @@ def test_panel_data_helpers(seeded_catalog):
     company = seeded_catalog["companies"][0]
     assert _company_activity_ts(company, company.get("matching_jobs") or [])
     assert _load_country_data("uk")["companies"]
-
-    path = Path(__file__).parent / "fixtures" / "country_uk_minimal.json"
-    assert load_country_file(path)["companies"]
 
 
 # ---------------------------------------------------------------------------
@@ -601,7 +584,7 @@ def test_panel_server_import_error_fallback(monkeypatch):
     with patch("builtins.__import__", side_effect=block):
         mod = importlib.reload(importlib.import_module("relocation_jobs.panel_server"))
         assert mod.HTTPX_AVAILABLE is False
-        assert mod.run_file is None
+        assert mod.run_country is None
     importlib.reload(importlib.import_module("relocation_jobs.panel_server"))
 
 
@@ -723,5 +706,5 @@ def test_panel_companies_rename_conflict(auth_client, rich_catalog):
 @pytest.fixture
 def rich_catalog(seeded_catalog, sample_country_data):
     data = copy.deepcopy(sample_country_data)
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     return data

@@ -20,7 +20,6 @@ from relocation_jobs.panel_data import (
     _tracking_bool,
     add_company,
     flatten_companies,
-    load_country_file,
     remove_company,
     rename_company,
     set_job_not_for_me,
@@ -69,7 +68,7 @@ def test_tracking_bool_and_status_history_merge(db, seeded_catalog, test_user):
 def test_flatten_without_user_not_for_me_in_json(seeded_catalog, sample_country_data):
     data = copy.deepcopy(sample_country_data)
     data["companies"][0]["matching_jobs"][0]["not_for_me"] = True
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     companies, _, _ = flatten_companies("uk", hide_applied=True, hide_empty=True, not_applied_only=True)
     assert isinstance(companies, list)
 
@@ -84,11 +83,11 @@ def test_flatten_all_countries_and_location_filter(seeded_catalog, test_user):
 @pytest.mark.integration
 def test_company_crud_edge_cases(db, sample_country_data, monkeypatch):
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.fetch_relocate_metadata",
+        "relocation_jobs.services.company_service.fetch_relocate_metadata",
         lambda *a, **k: {"city": "London", "size": "51-200", "country": "uk"},
     )
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.detect_ats_for_company",
+        "relocation_jobs.services.company_service.detect_ats_for_company",
         lambda *a, **k: ("greenhouse", "https://boards.greenhouse.io/x"),
     )
     add_company("Edge Co", "https://boards.greenhouse.io/x", "uk")
@@ -103,14 +102,6 @@ def test_set_job_not_for_me_panel(db, seeded_catalog, test_user):
     url = seeded_catalog["companies"][0]["matching_jobs"][0]["url"]
     result = set_job_not_for_me("uk", company, url, user_id=test_user["id"], not_for_me=True, reason="pay")
     assert result["not_for_me"] is True
-
-
-@pytest.mark.integration
-def test_load_country_file_fallback(tmp_path, sample_country_data):
-    orphan = tmp_path / "orphan.json"
-    orphan.write_text('{"companies": [], "total": 0}', encoding="utf-8")
-    data = load_country_file(orphan)
-    assert data["companies"] == []
 
 
 @pytest.mark.network
@@ -140,10 +131,10 @@ def test_get_jobs_bad_slug_known_correction(monkeypatch):
 def test_main_workers_flag(monkeypatch):
     called = []
 
-    def fake_run_file(*args, **kwargs):
+    def fake_run_country(*args, **kwargs):
         called.append(kwargs)
 
-    monkeypatch.setattr(sj, "run_file", fake_run_file)
+    monkeypatch.setattr(sj, "run_country", fake_run_country)
     monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--workers", "6"])
     sj.main()
     assert called[0]["workers"] == 6
@@ -280,14 +271,14 @@ def test_apply_known_ats_override_with_save(monkeypatch):
     assert company["ats_type"] == sj.KNOWN_ATS["HelloFresh"][0]
 
 
-def test_main_missing_workers_and_file_args(monkeypatch, capsys):
-    monkeypatch.setattr(sj, "run_file", lambda *a, **k: None)
+def test_main_missing_workers_and_country_args(monkeypatch, capsys):
+    monkeypatch.setattr(sj, "run_country", lambda *a, **k: None)
     monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--workers"])
     sj.main()
     assert "--workers requires" in capsys.readouterr().out
-    monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--file"])
+    monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--country"])
     sj.main()
-    assert "--file requires" in capsys.readouterr().out
+    assert "--country requires" in capsys.readouterr().out
 
 
 def test_review_entry_junk_title():
@@ -319,7 +310,7 @@ def test_panel_data_fetch_relocate_errors(monkeypatch):
     def boom(*a, **k):
         raise requests.RequestException("network")
 
-    monkeypatch.setattr("relocation_jobs.panel_data.requests.get", boom)
+    monkeypatch.setattr("relocation_jobs.services.company_service.requests.get", boom)
     assert fetch_relocate_metadata("Missing Co", country_key="uk") == {}
 
 
@@ -359,13 +350,10 @@ async def test_run_file_cancel_concurrent(monkeypatch):
             for i in range(4)
         ]
     }
-    json_path = "/tmp/fake.json"
     monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(sj, "resolve_json_path", lambda p: json_path)
-    monkeypatch.setattr(sj, "load_country_for_path", lambda p: ("test", data))
+    monkeypatch.setattr(sj, "load_country", lambda k: data)
     monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
     monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
-    monkeypatch.setattr(sj, "export_country_archive", lambda *a, **k: None)
 
     call_count = {"n": 0}
 
@@ -379,7 +367,7 @@ async def test_run_file_cancel_concurrent(monkeypatch):
     monkeypatch.setattr(sj, "get_jobs_async", slow_get_jobs)
     monkeypatch.setattr(sj, "enrich_jobs_async_with_client", AsyncMock(side_effect=lambda c, j, co, **kw: j))
     try:
-        await sj.run_file_async(json_path, concurrency=2)
+        await sj.run_file_async("test", concurrency=2)
     finally:
         sj.clear_cancel_checker()
 
@@ -444,23 +432,6 @@ def test_scrape_movingimage_detail_failures(monkeypatch):
     )
     jobs = sj.scrape_movingimage("https://www.movingimage.com/careers", relevant_only=False)
     assert jobs
-
-
-@pytest.mark.integration
-def test_catalog_postgres_migrate_paths(pg_db, sample_country_data):
-    from relocation_jobs.catalog_db import export_country_archive, load_country_for_path, migrate_from_json_files
-    from relocation_jobs.paths import data_dir
-    import json
-
-    save_country("uk", sample_country_data, export_archive=False)
-    path = export_country_archive("uk")
-    assert path is not None
-    key, data = load_country_for_path("uk_companies.json")
-    assert key == "uk"
-
-    json_path = data_dir() / "uk_companies.json"
-    json_path.write_text(json.dumps(sample_country_data), encoding="utf-8")
-    migrate_from_json_files()
 
 
 @pytest.mark.integration

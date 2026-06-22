@@ -6,13 +6,10 @@ catalog data load/save helpers. No raw SQL — all DB access through db/.
 
 from __future__ import annotations
 
-import json
 from datetime import date, datetime, timezone
-from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from relocation_jobs.catalog_db import (
-    catalog_has_data,
     country_key_from_filename,
     load_country as load_country_catalog,
     save_country as save_country_catalog,
@@ -44,12 +41,9 @@ from relocation_jobs.location_tags import (
     picker_cities_for_country,
     sync_company_location_fields,
 )
-from relocation_jobs.paths import COMPANIES_DIR, COUNTRY_FILE_NAMES, PROJECT_ROOT, data_dir
+from relocation_jobs.paths import COUNTRY_FILE_NAMES
 
-try:
-    from relocation_jobs.scrape_jobs import ATS_TYPE_CHOICES
-except ImportError:
-    ATS_TYPE_CHOICES = ()
+from relocation_jobs.scrape_jobs import ATS_TYPE_CHOICES
 
 COUNTRY_FILES: dict[str, str] = dict(COUNTRY_FILE_NAMES)
 
@@ -113,25 +107,6 @@ def _load_country_data(country_key: str, *, cache: dict[str, dict] | None = None
     if cache is not None:
         cache[country_key] = result
     return result
-
-
-def _save_country_data(country_key: str, data: dict) -> None:
-    data["total"] = len(data.get("companies") or [])
-    save_country_catalog(country_key, data)
-
-
-def load_country_file(path: Path) -> dict:
-    country_key, data = load_country_for_path(path)
-    if country_key and data.get("companies") is not None:
-        return data
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def country_from_path(path: str) -> str:
-    import re
-    m = re.match(r"(\w+)_companies\.json", Path(path).name)
-    return m.group(1) if m else "unknown"
 
 
 # ---------------------------------------------------------------------------
@@ -1005,93 +980,3 @@ def parse_company_cities(company: dict, *, catalog_country: str = "") -> list[st
     sync_company_location_fields(company, catalog_country=catalog_country)
     return company.get("cities") or []
 
-
-# ---------------------------------------------------------------------------
-# File I/O + catalog orchestration (was in catalog_db.py — wrong layer)
-# ---------------------------------------------------------------------------
-
-def _load_json_file(path: Path) -> dict | None:
-    if not path.is_file():
-        return None
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def export_country_archive(country_key: str) -> Path | None:
-    """Write read-only JSON snapshot to companies/ for git archive."""
-    filename = COUNTRY_FILE_NAMES.get(country_key)
-    if not filename:
-        return None
-    data = load_country_catalog(country_key)
-    if data is None:
-        return None
-    COMPANIES_DIR.mkdir(parents=True, exist_ok=True)
-    path = COMPANIES_DIR / filename
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-        f.write("\n")
-    return path
-
-
-def export_all_archives() -> list[Path]:
-    paths: list[Path] = []
-    for country_key in COUNTRY_FILE_NAMES:
-        p = export_country_archive(country_key)
-        if p:
-            paths.append(p)
-    return paths
-
-
-def migrate_from_json_files() -> int:
-    """Import JSON files into catalog when DB is empty. Returns companies imported."""
-    if catalog_has_data():
-        return 0
-    imported = 0
-    for country_key, filename in COUNTRY_FILE_NAMES.items():
-        candidates = [
-            data_dir() / filename,
-            COMPANIES_DIR / filename,
-            PROJECT_ROOT / filename,
-        ]
-        data = None
-        for path in candidates:
-            data = _load_json_file(path)
-            if data is not None:
-                break
-        if data is None:
-            continue
-        save_country_catalog(country_key, data, export_archive=True)
-        imported += len(data.get("companies") or [])
-    return imported
-
-
-def load_country_for_path(path: str | Path) -> tuple[str | None, dict]:
-    """Load country dict from DB when path is a known country file, else from JSON."""
-    country_key = country_key_from_filename(str(path))
-    if country_key:
-        data = load_country_catalog(country_key)
-        if data is not None:
-            return country_key, data
-    p = Path(path)
-    if p.is_file():
-        with open(p, encoding="utf-8") as f:
-            return country_key, json.load(f)
-    return country_key, {"companies": [], "total": 0}
-
-
-def save_country_for_path(
-    path: str | Path,
-    data: dict,
-    country_key: str | None = None,
-    *,
-    export_archive: bool = True,
-) -> None:
-    key = country_key or country_key_from_filename(str(path))
-    if key:
-        save_country_catalog(key, data, export_archive=export_archive)
-        return
-    p = Path(path)
-    p.parent.mkdir(parents=True, exist_ok=True)
-    with open(p, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-        f.write("\n")

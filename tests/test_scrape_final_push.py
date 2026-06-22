@@ -212,13 +212,14 @@ class TestMainAllCountries:
     def test_main_all_countries(self, monkeypatch):
         calls = []
 
-        def fake_run_file(path, **kwargs):
-            calls.append(path)
+        def fake_run_country(key, **kwargs):
+            calls.append(key)
 
-        monkeypatch.setattr(sj, "run_file", fake_run_file)
+        monkeypatch.setattr(sj, "run_country", fake_run_country)
         monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--all"])
         sj.main()
-        assert len(calls) == len(sj.COUNTRY_JSON_FILENAMES)
+        from relocation_jobs.paths import COUNTRY_FILE_NAMES
+        assert len(calls) == len(COUNTRY_FILE_NAMES)
 
 
 class TestRunFileNoHttpx:
@@ -226,7 +227,7 @@ class TestRunFileNoHttpx:
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", False)
         with pytest.raises(SystemExit):
             import asyncio
-            asyncio.run(sj.run_file_async("test.json"))
+            asyncio.run(sj.run_file_async("test"))
 
 
 class TestWorkableBadSlug:
@@ -448,10 +449,10 @@ def test_get_jobs_bad_slug_known_correction(monkeypatch):
 def test_main_workers_flag(monkeypatch):
     called = []
 
-    def fake_run_file(*args, **kwargs):
+    def fake_run_country(*args, **kwargs):
         called.append(kwargs)
 
-    monkeypatch.setattr(sj, "run_file", fake_run_file)
+    monkeypatch.setattr(sj, "run_country", fake_run_country)
     monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--workers", "6"])
     sj.main()
     assert called[0]["workers"] == 6

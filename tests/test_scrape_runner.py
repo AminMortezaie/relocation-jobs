@@ -127,7 +127,7 @@ class TestDetectAtsForHint:
 
 
 class TestRunFile:
-    def test_run_file_async_single_company(self, monkeypatch, tmp_path):
+    def test_run_file_async_single_company(self, monkeypatch):
         country_data = {
             "companies": [
                 {
@@ -138,15 +138,11 @@ class TestRunFile:
                 }
             ]
         }
-        json_path = tmp_path / "test.json"
-        json_path.write_text("{}", encoding="utf-8")
 
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "resolve_json_path", lambda p: json_path)
-        monkeypatch.setattr(sj, "load_country_for_path", lambda p: ("test", country_data))
+        monkeypatch.setattr(sj, "load_country", lambda k: country_data)
         monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
         monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
-        monkeypatch.setattr(sj, "export_country_archive", lambda *a, **k: None)
 
         async def fake_get_jobs(client, company, **kwargs):
             return [{"title": "Backend Engineer", "url": "https://example.com/j/1"}]
@@ -161,12 +157,12 @@ class TestRunFile:
         monkeypatch.setattr(sj, "enrich_jobs_async_with_client", fake_enrich)
 
         asyncio.run(
-            sj.run_file_async(str(json_path), target="Acme", concurrency=1)
+            sj.run_file_async("test", target="Acme", concurrency=1)
         )
         assert country_data["companies"][0].get("fetch_ok") is True
         assert len(country_data["companies"][0]["matching_jobs"]) >= 1
 
-    def test_run_file_async_enrich_only(self, monkeypatch, tmp_path):
+    def test_run_file_async_enrich_only(self, monkeypatch):
         country_data = {
             "companies": [
                 {
@@ -179,14 +175,11 @@ class TestRunFile:
                 }
             ]
         }
-        json_path = tmp_path / "test.json"
 
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "resolve_json_path", lambda p: json_path)
-        monkeypatch.setattr(sj, "load_country_for_path", lambda p: ("test", country_data))
+        monkeypatch.setattr(sj, "load_country", lambda k: country_data)
         monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
         monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
-        monkeypatch.setattr(sj, "export_country_archive", lambda *a, **k: None)
 
         async def fake_enrich(client, jobs, company, **kwargs):
             for j in jobs:
@@ -198,12 +191,12 @@ class TestRunFile:
         monkeypatch.setattr(sj, "get_jobs_async", get_jobs_mock)
 
         asyncio.run(
-            sj.run_file_async(str(json_path), target="Acme", enrich_only=True, concurrency=1)
+            sj.run_file_async("test", target="Acme", enrich_only=True, concurrency=1)
         )
         get_jobs_mock.assert_not_called()
         assert country_data["companies"][0]["matching_jobs"][0]["visa_sponsorship"] is True
 
-    def test_run_file_wrapper(self, monkeypatch):
+    def test_run_country_wrapper(self, monkeypatch):
         called = {}
 
         async def fake_run_file_async(*args, **kwargs):
@@ -211,20 +204,14 @@ class TestRunFile:
             called["kwargs"] = kwargs
 
         monkeypatch.setattr(sj, "run_file_async", fake_run_file_async)
-        sj.run_file("test.json", target="Acme", workers=4)
+        sj.run_country("uk", target="Acme", workers=4)
         assert called["kwargs"]["concurrency"] == 4
 
-    def test_run_file_missing_company_raises(self, monkeypatch, tmp_path):
-        json_path = tmp_path / "test.json"
+    def test_run_file_missing_company_raises(self, monkeypatch):
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "resolve_json_path", lambda p: json_path)
-        monkeypatch.setattr(
-            sj,
-            "load_country_for_path",
-            lambda p: ("test", {"companies": []}),
-        )
+        monkeypatch.setattr(sj, "load_country", lambda k: {"companies": []})
         with pytest.raises(LookupError):
-            asyncio.run(sj.run_file_async(str(json_path), target="MissingCo"))
+            asyncio.run(sj.run_file_async("test", target="MissingCo"))
 
 
 class TestProcessCompanyAsync:

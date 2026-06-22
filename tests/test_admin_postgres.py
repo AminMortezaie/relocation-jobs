@@ -23,13 +23,13 @@ def isolated_catalog_pg(pg_db):
 
 
 def test_catalog_overview_on_postgres(isolated_catalog_pg, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     overview = get_catalog_overview()
     assert overview["totals"]["companies"] == 1
 
 
 def test_admin_overview_on_postgres(isolated_catalog_pg, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     data = get_admin_overview(fetch_state={"running": False})
     assert data["catalog"]["companies"] == 1
 

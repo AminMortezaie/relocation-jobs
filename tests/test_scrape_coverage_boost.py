@@ -98,14 +98,11 @@ async def test_run_file_target_skip_message(monkeypatch, capsys):
             }
         ]
     }
-    json_path = "/tmp/fake.json"
     monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(sj, "resolve_json_path", lambda p: json_path)
-    monkeypatch.setattr(sj, "load_country_for_path", lambda p: ("test", data))
+    monkeypatch.setattr(sj, "load_country", lambda k: data)
     monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
     monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
-    monkeypatch.setattr(sj, "export_country_archive", lambda *a, **k: None)
-    await sj.run_file_async(json_path, target="SkippedCo", skip_filled=True)
+    await sj.run_file_async("test", target="SkippedCo", skip_filled=True)
     assert "skipped" in capsys.readouterr().out.lower()
 
 
@@ -218,14 +215,14 @@ def test_enrich_one_job_only_missing_with_visa():
 def test_main_enrich_flags(monkeypatch):
     called = []
 
-    def fake_run_file(*args, **kwargs):
+    def fake_run_country(*args, **kwargs):
         called.append(kwargs)
 
-    monkeypatch.setattr(sj, "run_file", fake_run_file)
+    monkeypatch.setattr(sj, "run_country", fake_run_country)
     monkeypatch.setattr(
         sj.sys,
         "argv",
-        ["scrape_jobs.py", "--enrich-only", "--skip-enriched", "--file=uk.json"],
+        ["scrape_jobs.py", "--enrich-only", "--skip-enriched", "--country=uk"],
     )
     sj.main()
     assert called[0]["enrich_only"] is True
@@ -432,13 +429,10 @@ async def test_run_file_cancel_concurrent(monkeypatch):
             for i in range(4)
         ]
     }
-    json_path = "/tmp/fake.json"
     monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(sj, "resolve_json_path", lambda p: json_path)
-    monkeypatch.setattr(sj, "load_country_for_path", lambda p: ("test", data))
+    monkeypatch.setattr(sj, "load_country", lambda k: data)
     monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
     monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
-    monkeypatch.setattr(sj, "export_country_archive", lambda *a, **k: None)
 
     call_count = {"n": 0}
 
@@ -455,7 +449,7 @@ async def test_run_file_cancel_concurrent(monkeypatch):
     monkeypatch.setattr(sj, "get_jobs_async", slow_get_jobs)
     monkeypatch.setattr(sj, "enrich_jobs_async_with_client", fake_enrich)
     try:
-        await sj.run_file_async(json_path, concurrency=2)
+        await sj.run_file_async("test", concurrency=2)
     finally:
         sj.clear_cancel_checker()
 
@@ -581,10 +575,10 @@ def test_scrape_join_api_pagination(monkeypatch):
 def test_main_workers_equals_form(monkeypatch):
     called = []
 
-    def fake_run_file(*args, **kwargs):
+    def fake_run_country(*args, **kwargs):
         called.append(kwargs)
 
-    monkeypatch.setattr(sj, "run_file", fake_run_file)
+    monkeypatch.setattr(sj, "run_country", fake_run_country)
     monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--workers=12"])
     sj.main()
     assert called[0]["workers"] == 12

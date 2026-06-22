@@ -77,7 +77,6 @@ from relocation_jobs.db import (
     record_fetch_run,
 )
 from relocation_jobs.paths import (
-    COMPANIES_DIR,
     PROJECT_ROOT,
     STATIC_DIR,
 )
@@ -89,7 +88,7 @@ try:
         clear_cancel_checker,
         clear_progress_reporter,
         clear_review_reporter,
-        run_file,
+        run_country,
         set_cancel_checker,
         set_progress_reporter,
         set_review_reporter,
@@ -97,7 +96,7 @@ try:
 except ImportError:
     DEFAULT_CONCURRENCY = 16
     HTTPX_AVAILABLE = False
-    run_file = None  # type: ignore
+    run_country = None  # type: ignore
     set_cancel_checker = None  # type: ignore
     clear_cancel_checker = None  # type: ignore
     set_progress_reporter = None  # type: ignore
@@ -424,16 +423,14 @@ def _build_scrape_cmd(
     *,
     company: str | None = None,
 ) -> list[str]:
-    filename = COUNTRY_FILES.get(country)
-    if not filename:
+    if country not in COUNTRY_FILES:
         raise LookupError(f"Unknown country: {country}")
-    json_path = COMPANIES_DIR / filename
     cmd = [
         sys.executable,
         "-m",
         "relocation_jobs.scrape_jobs",
-        "--file",
-        str(json_path),
+        "--country",
+        country,
     ]
     if skip_filled and not company:
         cmd.append("--skip-filled")

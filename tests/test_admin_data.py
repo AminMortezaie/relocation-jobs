@@ -8,11 +8,11 @@ import pytest
 from werkzeug.security import generate_password_hash
 
 from relocation_jobs.admin_data import (
-    _max_timestamp,
     get_admin_overview,
     get_catalog_overview,
     get_system_config,
 )
+from relocation_jobs.services.admin_service import _max_timestamp
 from relocation_jobs.catalog_db import save_country, touch_country_meta
 from relocation_jobs.db import (
     admin_tracking_totals,
@@ -57,7 +57,7 @@ def location_gated_catalog(isolated_catalog, sample_country_data):
             "location": "Berlin, Germany",
         }
     )
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     return data
 
 
@@ -86,7 +86,7 @@ def rich_catalog(isolated_catalog, sample_country_data):
             "matching_jobs": [],
         }
     )
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     return data
 
 
@@ -108,7 +108,7 @@ def test_max_timestamp_ignores_catalog_import_date():
 
 @pytest.mark.integration
 def test_catalog_last_fetch_not_catalog_import_date(isolated_catalog, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     touch_country_meta(
         "uk",
         fetched="2026-06-02",
@@ -122,7 +122,7 @@ def test_catalog_last_fetch_not_catalog_import_date(isolated_catalog, sample_cou
 
 @pytest.mark.integration
 def test_catalog_last_fetch_ignores_catalog_updated_field(isolated_catalog, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     touch_country_meta("uk", jobs_fetched="", updated="2026-06-21")
     meta = next(m for m in get_catalog_overview()["country_meta"] if m["country"] == "uk")
     assert meta["last_fetch"] == "2025-06-01"
@@ -176,7 +176,7 @@ def test_catalog_country_meta_total_uses_live_company_count(isolated_catalog, ri
 
 @pytest.mark.integration
 def test_catalog_country_meta_includes_countries_without_meta_row(isolated_catalog, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     from relocation_jobs.db import get_connection
 
     get_connection().execute("DELETE FROM country_meta WHERE country = 'uk'")
@@ -188,7 +188,7 @@ def test_catalog_country_meta_includes_countries_without_meta_row(isolated_catal
 
 @pytest.mark.integration
 def test_catalog_by_ats_counts(isolated_catalog, sample_country_data):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     overview = get_catalog_overview()
     greenhouse = next(row for row in overview["by_ats"] if row["ats_type"] == "greenhouse")
     assert greenhouse["companies"] == 1
@@ -258,7 +258,7 @@ def test_system_config_shape(db, monkeypatch):
 def test_catalog_visible_counts_fallback_on_load_error(
     isolated_catalog, sample_country_data, monkeypatch,
 ):
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
 
     def _boom(_key, user_id=None):
         raise IndexError("tuple index out of range")

@@ -12,7 +12,6 @@ from relocation_jobs.panel_data import (
     add_company,
     add_manual_jobs,
     compute_stats,
-    country_from_path,
     detect_ats_for_company,
     detect_country_from_url,
     enrich_new_company,
@@ -24,7 +23,6 @@ from relocation_jobs.panel_data import (
     list_ats_types,
     list_company_cities,
     list_company_locations,
-    load_country_file,
     normalize_careers_url,
     normalize_company_size,
     now_iso,
@@ -93,7 +91,7 @@ def rich_catalog(seeded_catalog, sample_country_data):
             "matching_jobs": [],
         }
     )
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     return data
 
 
@@ -128,12 +126,6 @@ def mock_external(monkeypatch):
 def test_today_now_iso():
     assert len(today()) == 10
     assert "T" in now_iso()
-
-
-@pytest.mark.integration
-def test_country_from_path():
-    assert country_from_path("/data/uk_companies.json") == "uk"
-    assert country_from_path("other.json") == "unknown"
 
 
 @pytest.mark.integration
@@ -176,16 +168,6 @@ def test_list_ats_types():
 # ---------------------------------------------------------------------------
 # Load / find
 # ---------------------------------------------------------------------------
-
-
-@pytest.mark.integration
-def test_load_country_file(db, tmp_data_dir, sample_country_data):
-    path = tmp_data_dir / "uk_companies.json"
-    import json
-
-    path.write_text(json.dumps(sample_country_data), encoding="utf-8")
-    data = load_country_file(path)
-    assert data["companies"][0]["name"] == "Acme Backend Ltd"
 
 
 @pytest.mark.integration
@@ -265,7 +247,7 @@ def test_flatten_hides_jobs_outside_office_tags(db, sample_country_data):
             "fetched": "2025-06-01",
         },
     ]
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
 
     companies, _, _ = flatten_companies("uk")
     acme = companies[0]
@@ -296,7 +278,7 @@ def test_flatten_keeps_unknown_location_on_main_board(db, sample_country_data):
             "fetched": "2025-06-01",
         },
     ]
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
 
     companies, _, _ = flatten_companies("uk")
     acme = companies[0]
@@ -320,7 +302,7 @@ def test_reconcile_wrong_location_restores_matching_job(db, sample_country_data,
         "fetched": "2025-06-01",
     }
     company["matching_jobs"] = [job]
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
 
     set_job_not_for_me(
         "uk",
@@ -708,20 +690,6 @@ def test_flatten_without_user_id(rich_catalog):
     companies, _, _ = flatten_companies("uk")
     assert companies
     assert companies[0]["jobs"]
-
-
-@pytest.mark.integration
-def test_load_country_file_raw_json(db, tmp_data_dir, sample_country_data):
-    """Fallback path when catalog DB has no row for the file."""
-    from unittest.mock import patch
-
-    path = tmp_data_dir / "zz_companies.json"
-    import json
-
-    path.write_text(json.dumps(sample_country_data), encoding="utf-8")
-    with patch("relocation_jobs.catalog_db.load_country_for_path", return_value=(None, {})):
-        data = load_country_file(path)
-    assert data["companies"][0]["name"] == "Acme Backend Ltd"
 
 
 @pytest.mark.integration

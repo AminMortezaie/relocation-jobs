@@ -50,6 +50,7 @@ def _reset_fetch_state() -> None:
         ps._fetch_state["country"] = None
         ps._fetch_state["fetch_run_recorded"] = False
         ps._fetch_state["last_fetch_run"] = None
+        ps._fetch_state["new_jobs_total"] = 0
         ps._fetch_state["log"].clear()
         ps._fetch_state["activity_log"].clear()
     ps._fetch_thread = None
@@ -118,7 +119,7 @@ def rich_catalog(seeded_catalog, sample_country_data):
             "matching_jobs": [],
         }
     )
-    save_country("uk", data, export_archive=False)
+    save_country("uk", data)
     return data
 
 

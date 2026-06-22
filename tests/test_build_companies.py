@@ -168,7 +168,7 @@ def test_discover_careers_url_prefers_relocate(monkeypatch):
 def test_load_country_wrapper(db, sample_country_data):
     from relocation_jobs.catalog_db import save_country
 
-    save_country("uk", sample_country_data, export_archive=False)
+    save_country("uk", sample_country_data)
     filename, data, key = load_country("uk")
     assert filename == "uk_companies.json"
     assert key == "uk"
@@ -346,7 +346,7 @@ def test_save_country_wrapper(db, sample_country_data, monkeypatch):
     monkeypatch.setattr(
         build_companies,
         "save_country_catalog",
-        lambda key, data, export_archive=True: saved.update({"key": key, "data": data}),
+        lambda key, data: saved.update({"key": key, "data": data}),
     )
     build_companies.save_country("uk", sample_country_data)
     assert saved["key"] == "uk"

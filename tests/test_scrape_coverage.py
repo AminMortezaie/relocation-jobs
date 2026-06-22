@@ -213,13 +213,10 @@ class TestGetJobsAsyncBranches:
 
 class TestRunFileAsyncPaths:
     async def _run_with_data(self, monkeypatch, country_data, **kwargs):
-        json_path = "/tmp/fake.json"
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "resolve_json_path", lambda p: json_path)
-        monkeypatch.setattr(sj, "load_country_for_path", lambda p: ("test", country_data))
+        monkeypatch.setattr(sj, "load_country", lambda k: country_data)
         monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
         monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
-        monkeypatch.setattr(sj, "export_country_archive", lambda *a, **k: None)
 
         async def fake_get_jobs(client, company, **kw):
             return [{"title": "Backend Engineer", "url": "https://example.com/j/1"}]
@@ -230,7 +227,7 @@ class TestRunFileAsyncPaths:
         monkeypatch.setattr(sj, "get_jobs_async", fake_get_jobs)
         monkeypatch.setattr(sj, "enrich_jobs_async_with_client", fake_enrich)
         concurrency = kwargs.pop("concurrency", 1)
-        await sj.run_file_async(json_path, concurrency=concurrency, **kwargs)
+        await sj.run_file_async("test", concurrency=concurrency, **kwargs)
 
     @pytest.mark.asyncio
     async def test_skip_filled(self, monkeypatch, capsys):
@@ -312,10 +309,10 @@ class TestMain:
     def test_main_skip_filled(self, monkeypatch):
         called = []
 
-        def fake_run_file(*args, **kwargs):
+        def fake_run_country(*args, **kwargs):
             called.append(kwargs)
 
-        monkeypatch.setattr(sj, "run_file", fake_run_file)
+        monkeypatch.setattr(sj, "run_country", fake_run_country)
         monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--skip-filled"])
         sj.main()
         assert called[0]["skip_filled"] is True
@@ -323,10 +320,10 @@ class TestMain:
     def test_main_with_target(self, monkeypatch):
         called = []
 
-        def fake_run_file(*args, **kwargs):
+        def fake_run_country(*args, **kwargs):
             called.append(kwargs)
 
-        monkeypatch.setattr(sj, "run_file", fake_run_file)
+        monkeypatch.setattr(sj, "run_country", fake_run_country)
         monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "Acme Corp"])
         sj.main()
         assert called[0]["target"] == "Acme Corp"
@@ -523,25 +520,25 @@ class TestMainExtended:
     def test_main_all_and_workers(self, monkeypatch):
         called = []
 
-        def fake_run_file(*args, **kwargs):
+        def fake_run_country(*args, **kwargs):
             called.append(kwargs)
 
-        monkeypatch.setattr(sj, "run_file", fake_run_file)
+        monkeypatch.setattr(sj, "run_country", fake_run_country)
         monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--all", "--workers=8", "--serial"])
         sj.main()
         assert called[0]["workers"] == 1  # --serial overrides
         assert len(called) >= 1
 
-    def test_main_file_arg(self, monkeypatch):
+    def test_main_country_arg(self, monkeypatch):
         called = []
 
-        def fake_run_file(path, **kwargs):
-            called.append(path)
+        def fake_run_country(key, **kwargs):
+            called.append(key)
 
-        monkeypatch.setattr(sj, "run_file", fake_run_file)
-        monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--file", "custom.json"])
+        monkeypatch.setattr(sj, "run_country", fake_run_country)
+        monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--country", "uk"])
         sj.main()
-        assert called[0] == "custom.json"
+        assert called[0] == "uk"
 
 
 class TestBolPayload:

@@ -1,8 +1,8 @@
 {
   "source": "https://relocate.me/companies-hiring/portugal",
   "fetched": "2026-06-02",
-  "updated": "2026-06-21T01:15:52+00:00",
-  "jobs_fetched": "2026-06-21T01:15:52+00:00",
+  "updated": "2026-06-21T22:51:28+00:00",
+  "jobs_fetched": "2026-06-21T22:51:28+00:00",
   "total": 10,
   "last_fetch_new_jobs": 0,
   "companies": [
@@ -30,7 +30,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-30",
-      "updated": "2026-06-21T01:15:37+00:00",
+      "updated": "2026-06-21T01:28:54+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -69,7 +69,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-30",
-      "updated": "2026-06-21T01:15:09+00:00",
+      "updated": "2026-06-21T01:28:44+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -99,7 +99,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-30",
-      "updated": "2026-06-21T01:15:20+00:00",
+      "updated": "2026-06-21T01:28:45+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -148,7 +148,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-30",
-      "updated": "2026-06-21T01:15:43+00:00",
+      "updated": "2026-06-21T01:28:54+00:00",
       "sources": [
         "relocate.me"
       ],
@@ -178,7 +178,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-30",
-      "updated": "2026-06-21T01:15:12+00:00",
+      "updated": "2026-06-21T01:28:57+00:00",
       "sources": [
         "relocate.me",
         "tech-jobs-with-relocation"
@@ -219,19 +219,19 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-06-02",
-      "updated": "2026-06-21T01:15:12+00:00",
+      "updated": "2026-06-21T01:28:57+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
       "matching_jobs": [
         {
           "title": "Full Stack Developer",
-          "url": "https://jobs.ashbyhq.com/reaktor/0b3c4d59-67f8-48f3-a573-5d62b89620c4",
+          "url": "https://jobs.ashbyhq.com/reaktor/f83f80d7-9e44-4578-816e-8ace0db6bb8a",
           "fetched": "2026-06-02",
           "last_seen": "2026-06-02",
-          "idempotency_key": "da18bf116c09637fb6fc6f079bc7c75c3cd678abdfe31466dc0608d4533f6613",
+          "idempotency_key": "697bad503b1b96055e244d965ad07d369cbee4c0b1367b5b983f0deec778d308",
           "visa_sponsorship": false,
-          "location": "Helsinki"
+          "location": "Turku"
         },
         {
           "title": "Full Stack Developer",
@@ -244,12 +244,12 @@
         },
         {
           "title": "Full Stack Developer",
-          "url": "https://jobs.ashbyhq.com/reaktor/f83f80d7-9e44-4578-816e-8ace0db6bb8a",
+          "url": "https://jobs.ashbyhq.com/reaktor/0b3c4d59-67f8-48f3-a573-5d62b89620c4",
           "fetched": "2026-06-02",
           "last_seen": "2026-06-02",
-          "idempotency_key": "697bad503b1b96055e244d965ad07d369cbee4c0b1367b5b983f0deec778d308",
+          "idempotency_key": "da18bf116c09637fb6fc6f079bc7c75c3cd678abdfe31466dc0608d4533f6613",
           "visa_sponsorship": false,
-          "location": "Turku"
+          "location": "Helsinki"
         },
         {
           "title": "Full-Stack Developer (Lisbon)",
@@ -379,9 +379,9 @@
       "fetch_problem": false,
       "fetch_problem_date": "",
       "fetch_ok": true,
-      "fetch_ok_date": "2026-06-21",
+      "fetch_ok_date": "2026-06-22",
       "added": "2026-06-02",
-      "updated": "2026-06-21T01:15:13+00:00",
+      "updated": "2026-06-21T22:51:24+00:00",
       "sources": [
         "tech-jobs-with-relocation"
       ],
@@ -517,7 +517,7 @@
       "fetch_ok": true,
       "fetch_ok_date": "2026-06-21",
       "added": "2026-05-30",
-      "updated": "2026-06-21T01:15:28+00:00",
+      "updated": "2026-06-21T01:28:57+00:00",
       "sources": [
         "relocate.me"
       ],

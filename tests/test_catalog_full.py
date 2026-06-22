@@ -13,7 +13,7 @@ from relocation_jobs.catalog_db import (
     upsert_companies,
     upsert_company,
 )
-from relocation_jobs.paths import data_dir
+from relocation_jobs.core.paths import data_dir
 
 
 def test_country_key_from_filename():

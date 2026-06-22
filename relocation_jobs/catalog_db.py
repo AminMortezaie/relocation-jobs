@@ -13,15 +13,15 @@ from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
-from relocation_jobs.location_tags import (
+from relocation_jobs.core.location_tags import (
     COUNTRY_LABELS,
     format_location_display,
     normalize_locations,
     sync_company_location_fields,
 )
 from relocation_jobs.db import db_read, db_transaction, get_connection
-from relocation_jobs.job_identity import job_idempotency_key, stamp_job_identity
-from relocation_jobs.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.job_identity import job_idempotency_key, stamp_job_identity
+from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 from relocation_jobs.schemas import (
     Company,
     CompanyInDB,

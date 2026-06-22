@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from relocation_jobs.paths import (
+from relocation_jobs.core.paths import (
     COUNTRY_FILE_NAMES,
     PROJECT_ROOT,
     data_dir,

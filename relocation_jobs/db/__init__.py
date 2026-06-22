@@ -7,7 +7,7 @@ re-exported here, so all existing call sites continue to work unchanged:
     from relocation_jobs.db import set_job_applied_db, get_connection, ...
 """
 
-from relocation_jobs.db.core import (
+from relocation_jobs.core.db import (
     db_read,
     db_transaction,
     get_connection,

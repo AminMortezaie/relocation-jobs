@@ -23,12 +23,12 @@ from relocation_jobs.db import (
     load_job_status_history,
     load_job_tracking,
 )
-from relocation_jobs.job_identity import (
+from relocation_jobs.core.job_identity import (
     job_idempotency_key,
     job_idempotency_key_for_job,
     normalize_job_url,
 )
-from relocation_jobs.location_tags import (
+from relocation_jobs.core.location_tags import (
     COUNTRY_LABELS,
     SUGGESTED_CITIES,
     company_matches_location_filter,
@@ -41,7 +41,7 @@ from relocation_jobs.location_tags import (
     picker_cities_for_country,
     sync_company_location_fields,
 )
-from relocation_jobs.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 
 from relocation_jobs.scrape_jobs import ATS_TYPE_CHOICES
 
@@ -136,7 +136,7 @@ def _resolve_track(
     company_name: str,
     job: dict,
 ) -> dict:
-    from relocation_jobs.job_identity import job_idempotency_key_for_job
+    from relocation_jobs.core.job_identity import job_idempotency_key_for_job
     direct_key = _tracking_key(country, company_name, job.get("url", ""))
     direct = job_tracking.get(direct_key)
     job_key = job_idempotency_key_for_job(job)
@@ -187,7 +187,7 @@ def _resolve_status_history(
     company_name: str,
     job: dict,
 ) -> dict[str, list]:
-    from relocation_jobs.job_identity import job_idempotency_key_for_job
+    from relocation_jobs.core.job_identity import job_idempotency_key_for_job
     empty: dict[str, list] = {
         "applied": [], "rejected": [], "applied_events": [], "rejected_events": []
     }

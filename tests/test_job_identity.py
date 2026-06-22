@@ -1,6 +1,6 @@
 """Stable job URL identity — merge keys must survive tracking params and host variants."""
 
-from relocation_jobs.job_identity import (
+from relocation_jobs.core.job_identity import (
     backfill_job_identities,
     is_idempotency_hash,
     job_idempotency_key,

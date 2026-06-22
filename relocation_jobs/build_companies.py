@@ -32,7 +32,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from relocation_jobs.catalog_db import load_country as load_country_catalog, save_country as save_country_catalog
-from relocation_jobs.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 
 try:
     from playwright.sync_api import sync_playwright

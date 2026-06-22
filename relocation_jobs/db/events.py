@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from relocation_jobs.db.core import _normalize_url, _utc_now, db_transaction, get_connection
+from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction, get_connection
 
 
 def _resolve_timezone(name: str | None) -> ZoneInfo:

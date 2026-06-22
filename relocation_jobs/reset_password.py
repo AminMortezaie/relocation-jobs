@@ -9,7 +9,7 @@ import sys
 
 from werkzeug.security import generate_password_hash
 
-from relocation_jobs.paths import PROJECT_ROOT
+from relocation_jobs.core.paths import PROJECT_ROOT
 
 
 def _load_env() -> None:

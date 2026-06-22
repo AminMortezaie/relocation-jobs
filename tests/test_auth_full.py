@@ -8,7 +8,7 @@ import pytest
 from flask import Flask, g, jsonify, session
 from werkzeug.security import generate_password_hash
 
-from relocation_jobs.auth import (
+from relocation_jobs.core.auth import (
     allow_register,
     auth_status,
     authenticate,

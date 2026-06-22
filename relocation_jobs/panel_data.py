@@ -6,7 +6,7 @@ All business logic has moved to:
   services/job_service.py      — job mutations and tracking
 """
 
-from relocation_jobs.location_tags import COUNTRY_LABELS  # noqa: F401
+from relocation_jobs.core.location_tags import COUNTRY_LABELS  # noqa: F401
 from relocation_jobs.services.catalog_service import (  # noqa: F401
     COUNTRY_FILES,
     _ats_score_value,

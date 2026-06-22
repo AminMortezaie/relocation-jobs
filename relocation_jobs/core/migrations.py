@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from relocation_jobs.db.core import _normalize_url, _utc_now, db_transaction
+from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction
 
 
 def _migrate_schema(conn) -> None:

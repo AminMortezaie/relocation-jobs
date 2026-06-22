@@ -36,7 +36,7 @@ from relocation_jobs.db import (
     update_user_password,
     user_count,
 )
-from relocation_jobs.job_identity import normalize_job_url
+from relocation_jobs.core.job_identity import normalize_job_url
 
 
 @pytest.mark.integration

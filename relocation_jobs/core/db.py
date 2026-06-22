@@ -7,7 +7,7 @@ import threading
 from contextlib import contextmanager
 from datetime import datetime, timezone
 
-from relocation_jobs.job_identity import normalize_job_url
+from relocation_jobs.core.job_identity import normalize_job_url
 
 try:
     from psycopg import OperationalError as _PgOperationalError
@@ -96,7 +96,7 @@ def init_db(*, force: bool = False) -> None:
 
     # Lazy imports to break the core → migrations → events → core cycle.
     from relocation_jobs.catalog_db import init_catalog_schema
-    from relocation_jobs.db.migrations import _migrate_schema
+    from relocation_jobs.core.migrations import _migrate_schema
 
     init_catalog_schema()
     with db_transaction() as conn:

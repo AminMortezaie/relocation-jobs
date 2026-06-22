@@ -1,6 +1,6 @@
 """Location normalization and job/company filter matching."""
 
-from relocation_jobs.location_tags import (
+from relocation_jobs.core.location_tags import (
     company_matches_location_filter,
     format_location_display,
     job_matches_expected_locations,

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import os
 
-from relocation_jobs.db.core import _utc_now, db_transaction, get_connection
-from relocation_jobs.db.migrations import _ensure_users_admin_column
+from relocation_jobs.core.db import _utc_now, db_transaction, get_connection
+from relocation_jobs.core.migrations import _ensure_users_admin_column
 
 
 def user_count() -> int:

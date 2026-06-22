@@ -71,14 +71,14 @@ HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 
-from relocation_jobs.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 from relocation_jobs.catalog_db import (
     load_country,
     touch_country_meta,
     upsert_company,
 )
-from relocation_jobs.job_identity import job_idempotency_key, job_idempotency_key_for_job, stamp_job_identity
-from relocation_jobs.location_tags import (
+from relocation_jobs.core.job_identity import job_idempotency_key, job_idempotency_key_for_job, stamp_job_identity
+from relocation_jobs.core.location_tags import (
     company_expected_locations,
     filter_jobs_by_expected_locations,
     job_matches_expected_locations,
@@ -2491,7 +2491,7 @@ def fetch_job_description(url: str, ats_type: str | None = None) -> str:
 
 def _normalize_job_url(url: str) -> str:
     """Backward-compatible alias — prefer job_identity.normalize_job_url."""
-    from relocation_jobs.job_identity import normalize_job_url
+    from relocation_jobs.core.job_identity import normalize_job_url
     return normalize_job_url(url)
 
 

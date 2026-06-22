@@ -75,7 +75,7 @@ def test_reset_password_load_env_import_error(monkeypatch):
 
 
 def test_location_tags_short_country_token():
-    from relocation_jobs.location_tags import (
+    from relocation_jobs.core.location_tags import (
         _unsupported_country_key_from_text,
         job_matches_expected_locations,
     )
@@ -88,7 +88,7 @@ def test_location_tags_short_country_token():
 
 
 def test_location_tags_format_location_list_and_numeric():
-    from relocation_jobs.location_tags import _format_location_piece, job_listing_location_texts
+    from relocation_jobs.core.location_tags import _format_location_piece, job_listing_location_texts
 
     assert _format_location_piece(["Paris", {"city": "Lyon"}]) == "Paris | Lyon"
     assert _format_location_piece(42) == "42"
@@ -97,7 +97,7 @@ def test_location_tags_format_location_list_and_numeric():
 
 
 def test_location_tags_city_only_match_and_remote_only():
-    from relocation_jobs.location_tags import job_matches_expected_locations
+    from relocation_jobs.core.location_tags import job_matches_expected_locations
 
     expected = [{"country": "uk", "city": "London"}]
     ok, _ = job_matches_expected_locations({"location": "London"}, expected)
@@ -109,7 +109,7 @@ def test_location_tags_city_only_match_and_remote_only():
 
 
 def test_location_tags_unsupported_country_key():
-    from relocation_jobs.location_tags import job_matches_expected_locations
+    from relocation_jobs.core.location_tags import job_matches_expected_locations
 
     expected = [{"country": "uk", "city": "London"}]
     ok, reason = job_matches_expected_locations({"location": "Toronto, Canada"}, expected)
@@ -118,7 +118,7 @@ def test_location_tags_unsupported_country_key():
 
 
 def test_location_tags_city_mismatch_explicit():
-    from relocation_jobs.location_tags import job_matches_expected_locations
+    from relocation_jobs.core.location_tags import job_matches_expected_locations
 
     expected = [{"country": "uk", "city": "London"}]
     ok, reason = job_matches_expected_locations({"location": "Birmingham, UK"}, expected)
@@ -127,7 +127,7 @@ def test_location_tags_city_mismatch_explicit():
 
 
 def test_location_tags_location_mismatch_fallback():
-    from relocation_jobs.location_tags import job_matches_expected_locations
+    from relocation_jobs.core.location_tags import job_matches_expected_locations
 
     expected = [{"country": "uk", "city": "London"}]
     ok, reason = job_matches_expected_locations({"location": "xyz ambiguous place"}, expected)

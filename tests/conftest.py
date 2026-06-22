@@ -11,7 +11,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def _reset_db_connections() -> None:
-    import relocation_jobs.db.core as core
+    import relocation_jobs.core.db as core
 
     if core._pg_conn is not None and not core._pg_conn.closed:
         core._pg_conn.close()
@@ -22,7 +22,7 @@ def _reset_db_connections() -> None:
 @pytest.fixture(autouse=True)
 def reset_custom_cities_cache():
     """Custom city loader caches by path; clear between tests."""
-    from relocation_jobs.location_tags import _invalidate_custom_cities_cache
+    from relocation_jobs.core.location_tags import _invalidate_custom_cities_cache
 
     _invalidate_custom_cities_cache()
     yield

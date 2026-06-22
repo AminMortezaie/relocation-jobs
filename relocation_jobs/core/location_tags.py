@@ -10,7 +10,7 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
-from relocation_jobs.paths import data_dir, ensure_data_dir
+from relocation_jobs.core.paths import data_dir, ensure_data_dir
 
 COUNTRY_LABELS: dict[str, str] = {
     "germany": "Germany",

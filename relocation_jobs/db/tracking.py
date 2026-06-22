@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from relocation_jobs.job_identity import job_idempotency_key
-from relocation_jobs.db.core import _normalize_url, _utc_now, db_transaction, get_connection
+from relocation_jobs.core.job_identity import job_idempotency_key
+from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction, get_connection
 from relocation_jobs.db.events import (
     _append_job_status_event,
     _load_status_history_for_job,

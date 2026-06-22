@@ -12,7 +12,7 @@ import copy
 import pytest
 
 from relocation_jobs.catalog_db import load_country, save_country
-from relocation_jobs.job_identity import job_idempotency_key, normalize_job_url
+from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
 from relocation_jobs.panel_data import (
     flatten_companies,
     set_job_applied,

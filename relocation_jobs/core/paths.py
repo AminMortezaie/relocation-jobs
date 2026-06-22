@@ -5,8 +5,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-PACKAGE_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PACKAGE_DIR = PROJECT_ROOT / "relocation_jobs"
 COMPANIES_DIR = PROJECT_ROOT / "companies"
 STATIC_DIR = PACKAGE_DIR / "static"
 

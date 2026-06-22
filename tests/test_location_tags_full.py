@@ -2,7 +2,7 @@
 
 import pytest
 
-from relocation_jobs.location_tags import (
+from relocation_jobs.core.location_tags import (
     city_matches,
     company_expected_locations,
     company_matches_location_filter,
@@ -168,7 +168,7 @@ def test_format_location_display_empty_city():
 
 
 def test_format_job_location_label_from_listing():
-    from relocation_jobs.location_tags import format_job_location_label, job_location_fields
+    from relocation_jobs.core.location_tags import format_job_location_label, job_location_fields
 
     assert format_job_location_label({"location": "Berlin, Germany"}) == "Berlin"
     assert format_job_location_label({
@@ -187,7 +187,7 @@ def test_normalize_location_invalid_country():
 
 
 def test_custom_cities_persist(tmp_data_dir):
-    from relocation_jobs.location_tags import (
+    from relocation_jobs.core.location_tags import (
         add_custom_city,
         custom_cities_path,
         load_custom_cities,
@@ -212,7 +212,7 @@ def test_custom_cities_persist(tmp_data_dir):
 
 
 def test_add_custom_city_rejects_invalid_input(tmp_data_dir):
-    from relocation_jobs.location_tags import add_custom_city, custom_cities_path
+    from relocation_jobs.core.location_tags import add_custom_city, custom_cities_path
 
     with pytest.raises(ValueError, match="Invalid country or city"):
         add_custom_city("usa", "New York")
@@ -222,7 +222,7 @@ def test_add_custom_city_rejects_invalid_input(tmp_data_dir):
 
 
 def test_add_custom_city_does_not_persist_builtin_suggested(tmp_data_dir):
-    from relocation_jobs.location_tags import (
+    from relocation_jobs.core.location_tags import (
         SUGGESTED_CITIES,
         add_custom_city,
         custom_cities_path,
@@ -237,7 +237,7 @@ def test_add_custom_city_does_not_persist_builtin_suggested(tmp_data_dir):
 
 
 def test_picker_cities_for_country_merges_builtin_then_custom(tmp_data_dir):
-    from relocation_jobs.location_tags import add_custom_city, picker_cities_for_country
+    from relocation_jobs.core.location_tags import add_custom_city, picker_cities_for_country
 
     add_custom_city("germany", "Freiburg")
     merged = picker_cities_for_country("germany")
@@ -247,7 +247,7 @@ def test_picker_cities_for_country_merges_builtin_then_custom(tmp_data_dir):
 
 
 def test_tag_wrong_location_jobs():
-    from relocation_jobs.location_tags import tag_wrong_location_jobs
+    from relocation_jobs.core.location_tags import tag_wrong_location_jobs
 
     company = {"locations": [{"country": "germany", "city": "Berlin"}]}
     jobs = [
@@ -285,7 +285,7 @@ def test_frankfurt_am_main_matches_frankfurt_office_tag():
 
 
 def test_add_custom_city_treats_frankfurt_aliases_as_same(tmp_data_dir):
-    from relocation_jobs.location_tags import add_custom_city, picker_cities_for_country
+    from relocation_jobs.core.location_tags import add_custom_city, picker_cities_for_country
 
     loc = add_custom_city("germany", "Frankfurt am Main")
     assert loc["city"] in ("Frankfurt", "Frankfurt am Main")

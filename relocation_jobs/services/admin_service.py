@@ -13,8 +13,8 @@ from relocation_jobs.catalog_db import (
     load_catalog_stats,
 )
 from relocation_jobs.db import admin_tracking_totals, user_count
-from relocation_jobs.location_tags import COUNTRY_LABELS, SUGGESTED_CITIES, load_custom_cities
-from relocation_jobs.paths import COMPANIES_DIR, data_dir
+from relocation_jobs.core.location_tags import COUNTRY_LABELS, SUGGESTED_CITIES, load_custom_cities
+from relocation_jobs.core.paths import COMPANIES_DIR, data_dir
 
 
 def _normalize_ts_for_sort(ts: str) -> str:

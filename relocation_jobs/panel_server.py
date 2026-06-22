@@ -21,7 +21,7 @@ from pathlib import Path
 
 from flask import Flask, g, jsonify, request, send_from_directory
 
-from relocation_jobs.auth import (
+from relocation_jobs.core.auth import (
     admin_required,
     auth_status,
     authenticate,
@@ -32,7 +32,7 @@ from relocation_jobs.auth import (
     register_user,
 )
 
-from relocation_jobs.location_tags import add_custom_city
+from relocation_jobs.core.location_tags import add_custom_city
 from relocation_jobs.panel_data import (
     COUNTRY_FILES,
     COUNTRY_LABELS,
@@ -76,7 +76,7 @@ from relocation_jobs.db import (
     list_users_with_stats,
     record_fetch_run,
 )
-from relocation_jobs.paths import (
+from relocation_jobs.core.paths import (
     PROJECT_ROOT,
     STATIC_DIR,
 )

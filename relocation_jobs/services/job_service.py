@@ -25,7 +25,7 @@ from relocation_jobs.db import (
     set_job_waiting_referral_db,
     sync_company_applied_from_jobs_db,
 )
-from relocation_jobs.location_tags import (
+from relocation_jobs.core.location_tags import (
     city_match_keys,
     company_expected_locations,
     job_matches_expected_locations,

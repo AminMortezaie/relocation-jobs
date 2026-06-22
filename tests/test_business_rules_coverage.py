@@ -13,8 +13,8 @@ from werkzeug.security import generate_password_hash
 
 from relocation_jobs.catalog_db import load_country, save_country
 from relocation_jobs.db import create_user, load_job_status_history
-from relocation_jobs.job_identity import job_idempotency_key, normalize_job_url
-from relocation_jobs.location_tags import filter_jobs_by_expected_locations
+from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
+from relocation_jobs.core.location_tags import filter_jobs_by_expected_locations
 from relocation_jobs.panel_data import (
     flatten_companies,
     set_company_applied,

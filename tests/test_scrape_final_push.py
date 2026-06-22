@@ -218,7 +218,7 @@ class TestMainAllCountries:
         monkeypatch.setattr(sj, "run_country", fake_run_country)
         monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--all"])
         sj.main()
-        from relocation_jobs.paths import COUNTRY_FILE_NAMES
+        from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
         assert len(calls) == len(COUNTRY_FILE_NAMES)
 
 

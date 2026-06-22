@@ -26,19 +26,19 @@ from relocation_jobs.catalog_db import (
     update_company_location,
     upsert_company as upsert_company_catalog,
 )
-from relocation_jobs.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 from relocation_jobs.db import (
     clear_company_tracking,
     rename_company_tracking,
     set_company_applied_db,
     set_company_awaiting_response_db,
 )
-from relocation_jobs.job_identity import (
+from relocation_jobs.core.job_identity import (
     job_idempotency_key,
     job_idempotency_key_for_job,
     normalize_job_url,
 )
-from relocation_jobs.location_tags import (
+from relocation_jobs.core.location_tags import (
     COUNTRY_LABELS,
     normalize_location,
     sync_company_location_fields,

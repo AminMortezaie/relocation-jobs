@@ -436,7 +436,7 @@ def test_scrape_movingimage_detail_failures(monkeypatch):
 
 @pytest.mark.integration
 def test_db_postgres_connect_postgres(monkeypatch):
-    import relocation_jobs.db.core as core
+    import relocation_jobs.core.db as core
 
     class FakePsycopg:
         @staticmethod

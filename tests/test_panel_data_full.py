@@ -400,7 +400,7 @@ def test_list_locations_and_cities(rich_catalog):
 
 @pytest.mark.integration
 def test_list_company_locations_picker_includes_custom_cities(rich_catalog, tmp_data_dir):
-    from relocation_jobs.location_tags import add_custom_city
+    from relocation_jobs.core.location_tags import add_custom_city
     from relocation_jobs.panel_data import list_company_locations
 
     add_custom_city("uk", "Reading")

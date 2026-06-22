@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from relocation_jobs.db.core import _utc_now, db_transaction, get_connection
+from relocation_jobs.core.db import _utc_now, db_transaction, get_connection
 
 
 def load_company_tracking(user_id: int) -> dict[tuple[str, str], dict]:

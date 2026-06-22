@@ -1,13 +1,17 @@
 """Job tracking business logic.
 
-Coordinates the catalog (find_job_in_data) with the job repository (db/tracking.py).
-No raw SQL here — all DB access goes through db/.
+Coordinates the catalog (get_job_by_url, get_company) with the job repository (db/tracking.py).
+No raw SQL here — all DB access goes through catalog_db or db/.
+Service layer: uses Pydantic schemas for response validation.
+All public functions return dicts complying with JobStatusUpdate schema.
+See SCHEMAS.md for full schema definitions.
 """
 
 from __future__ import annotations
 
 from urllib.parse import urlparse
 
+from relocation_jobs.catalog_db import get_company, get_job_by_url
 from relocation_jobs.db import (
     load_wrong_location_hides_db,
     reapply_job_db,
@@ -21,21 +25,13 @@ from relocation_jobs.db import (
     set_job_waiting_referral_db,
     sync_company_applied_from_jobs_db,
 )
-
-
-def _load_country(country_key: str) -> dict:
-    from relocation_jobs.services.catalog_service import _load_country_data
-    return _load_country_data(country_key) or {}
-
-
-def _find_job(data: dict, company_name: str, job_url: str):
-    from relocation_jobs.services.company_service import find_job_in_data
-    return find_job_in_data(data, company_name, job_url)
-
-
-def _find_company(data: dict, company_name: str):
-    from relocation_jobs.services.company_service import find_company_in_data
-    return find_company_in_data(data, company_name)
+from relocation_jobs.location_tags import (
+    city_match_keys,
+    company_expected_locations,
+    job_matches_expected_locations,
+)
+from relocation_jobs.schemas import JobStatusUpdate
+from relocation_jobs.services.company_service import find_job_in_data
 
 
 def _normalize_linkedin_url(url: str) -> str:
@@ -62,27 +58,21 @@ def set_job_applied(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
-    job = _find_job(data, company_name, job_url)
+    """Mark/unmark job as applied.
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    job = get_job_by_url(job_url)
     if job is None:
         raise LookupError(f"Job not found: {company_name} — {job_url[:80]}")
     result = set_job_applied_db(
-        user_id,
-        country_key,
-        company_name,
-        job_url,
-        applied,
+        user_id, country_key, company_name, job_url, applied,
         job_title=job.get("title", ""),
     )
     sync_company_applied_from_jobs_db(user_id, country_key, company_name)
     if applied:
-        set_company_awaiting_response_db(
-            user_id,
-            country_key,
-            company_name,
-            True,
-            preserve_date=True,
-        )
+        set_company_awaiting_response_db(user_id, country_key, company_name, True, preserve_date=True)
+    JobStatusUpdate(**result)
     return result
 
 
@@ -94,18 +84,19 @@ def set_job_rejected(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
-    job = _find_job(data, company_name, job_url)
+    """Mark/unmark job as rejected.
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    job = get_job_by_url(job_url)
     if job is None:
         raise LookupError(f"Job not found: {company_name} — {job_url[:80]}")
-    return set_job_rejected_db(
-        user_id,
-        country_key,
-        company_name,
-        job_url,
-        rejected,
+    result = set_job_rejected_db(
+        user_id, country_key, company_name, job_url, rejected,
         job_title=job.get("title", ""),
     )
+    JobStatusUpdate(**result)
+    return result
 
 
 def set_job_reapply(
@@ -115,11 +106,16 @@ def set_job_reapply(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
-    job = _find_job(data, company_name, job_url)
+    """Reapply to a previously rejected job.
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    job = get_job_by_url(job_url)
     if job is None:
         raise LookupError(f"Job not found: {company_name} — {job_url[:80]}")
-    return reapply_job_db(user_id, country_key, company_name, job_url)
+    result = reapply_job_db(user_id, country_key, company_name, job_url)
+    JobStatusUpdate(**result)
+    return result
 
 
 def set_job_waiting_referral(
@@ -131,20 +127,21 @@ def set_job_waiting_referral(
     user_id: int,
     linkedin_url: str = "",
 ) -> dict:
-    data = _load_country(country_key)
-    job = _find_job(data, company_name, job_url)
+    """Mark/unmark job as waiting for referral with LinkedIn URL.
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    job = get_job_by_url(job_url)
     if job is None:
         raise LookupError(f"Job not found: {company_name} — {job_url[:80]}")
     normalized_linkedin = _normalize_linkedin(linkedin_url) if waiting_referral else ""
-    return set_job_waiting_referral_db(
-        user_id,
-        country_key,
-        company_name,
-        job_url,
-        waiting_referral,
+    result = set_job_waiting_referral_db(
+        user_id, country_key, company_name, job_url, waiting_referral,
         linkedin_url=normalized_linkedin,
         job_title=job.get("title", ""),
     )
+    JobStatusUpdate(**result)
+    return result
 
 
 def set_job_ats_score(
@@ -155,19 +152,20 @@ def set_job_ats_score(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
-    if _find_company(data, company_name) is None:
+    """Set ATS score for job (0-100 or None to clear).
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    company = get_company(country_key, company_name)
+    if company is None:
         raise LookupError(f"Company not found: {company_name}")
-    job = _find_job(data, company_name, job_url)
-    title = job.get("title", "") if job else ""
-    return set_job_ats_score_db(
-        user_id,
-        country_key,
-        company_name,
-        job_url,
-        ats_score,
-        job_title=title,
+    job = get_job_by_url(job_url)
+    result = set_job_ats_score_db(
+        user_id, country_key, company_name, job_url, ats_score,
+        job_title=job.get("title", "") if job else "",
     )
+    JobStatusUpdate(**result)
+    return result
 
 
 def set_job_looking_to_apply(
@@ -178,18 +176,19 @@ def set_job_looking_to_apply(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
-    job = _find_job(data, company_name, job_url)
+    """Mark/unmark job as looking-to-apply.
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    job = get_job_by_url(job_url)
     if job is None:
         raise LookupError(f"Job not found: {company_name} — {job_url[:80]}")
-    return set_job_looking_to_apply_db(
-        user_id,
-        country_key,
-        company_name,
-        job_url,
-        looking_to_apply,
+    result = set_job_looking_to_apply_db(
+        user_id, country_key, company_name, job_url, looking_to_apply,
         job_title=job.get("title", ""),
     )
+    JobStatusUpdate(**result)
+    return result
 
 
 def set_job_seen(
@@ -200,16 +199,17 @@ def set_job_seen(
     *,
     user_id: int,
 ) -> dict:
-    data = _load_country(country_key)
-    job = _find_job(data, company_name, job_url)
-    return set_job_seen_db(
-        user_id,
-        country_key,
-        company_name,
-        job_url,
-        seen,
+    """Mark/unmark job as seen.
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    job = get_job_by_url(job_url)
+    result = set_job_seen_db(
+        user_id, country_key, company_name, job_url, seen,
         job_title=job.get("title", "") if job else "",
     )
+    JobStatusUpdate(**result)
+    return result
 
 
 def set_job_not_for_me(
@@ -221,18 +221,19 @@ def set_job_not_for_me(
     not_for_me: bool = True,
     reason: str | None = None,
 ) -> dict:
-    data = _load_country(country_key)
-    job = _find_job(data, company_name, job_url)
+    """Mark/unmark job as not-for-me with optional reason.
+
+    Returns dict complying with JobStatusUpdate schema.
+    """
+    job = get_job_by_url(job_url)
     if job is None:
         raise LookupError(f"Job not found: {company_name} — {job_url[:80]}")
-    return set_job_not_for_me_db(
-        user_id,
-        country_key,
-        company_name,
-        job_url,
-        not_for_me=not_for_me,
-        reason=reason,
+    result = set_job_not_for_me_db(
+        user_id, country_key, company_name, job_url,
+        not_for_me=not_for_me, reason=reason,
     )
+    JobStatusUpdate(**result)
+    return result
 
 
 def reconcile_wrong_location_hides(
@@ -241,10 +242,6 @@ def reconcile_wrong_location_hides(
     country_key: str | None = None,
     city_label: str | None = None,
 ) -> int:
-    from relocation_jobs.location_tags import city_match_keys, company_expected_locations, job_matches_expected_locations
-    from relocation_jobs.services.catalog_service import _load_country_data
-    from relocation_jobs.services.company_service import find_company_in_data, find_job_in_data
-
     rows = load_wrong_location_hides_db(user_id, country_key)
     target_city_keys = city_match_keys(city_label) if city_label else set()
     restored = 0
@@ -254,13 +251,10 @@ def reconcile_wrong_location_hides(
         company_name = row["company_name"]
         job_url = row["job_url"]
 
-        data = _load_country_data(country)
-        if not data:
-            continue
-        company = find_company_in_data(data, company_name)
+        company = get_company(country, company_name)
         if company is None:
             continue
-        job = find_job_in_data(data, company_name, job_url)
+        job = find_job_in_data({"companies": [company]}, company_name, job_url)
         if job is None:
             continue
 

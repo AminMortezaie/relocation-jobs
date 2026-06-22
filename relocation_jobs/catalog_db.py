@@ -1,4 +1,9 @@
-"""Postgres catalog for companies and matching jobs."""
+"""Postgres catalog for companies and matching jobs.
+
+Data layer: handles persistence of company/job catalog in Neon Postgres.
+All JSON columns use Pydantic schemas for type-safe serialization/deserialization.
+See SCHEMAS.md for the schema architecture.
+"""
 
 from __future__ import annotations
 
@@ -17,10 +22,39 @@ from relocation_jobs.location_tags import (
 from relocation_jobs.db import db_read, db_transaction, get_connection
 from relocation_jobs.job_identity import job_idempotency_key, stamp_job_identity
 from relocation_jobs.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.schemas import (
+    Company,
+    CompanyInDB,
+    CountryCatalog,
+    Location,
+    MatchingJob,
+)
 
 
 def _today() -> str:
     return date.today().isoformat()
+
+
+def _convert_text_to_jsonb(conn, table: str, column: str) -> None:
+    """Safely convert TEXT JSON column to JSONB if not already done."""
+    try:
+        conn.execute(
+            f"ALTER TABLE {table} ALTER COLUMN {column} TYPE jsonb USING COALESCE({column}::jsonb, '[]'::jsonb)"
+        )
+    except Exception:
+        pass
+
+
+def _migrate_columns_to_jsonb() -> None:
+    """Migrate TEXT JSON columns to JSONB in a separate transaction."""
+    try:
+        with db_transaction() as conn:
+            _convert_text_to_jsonb(conn, "companies", "sources_json")
+            _convert_text_to_jsonb(conn, "companies", "cities_json")
+            _convert_text_to_jsonb(conn, "companies", "locations_json")
+            _convert_text_to_jsonb(conn, "matching_jobs", "locations_json")
+    except Exception:
+        pass
 
 
 def country_key_from_filename(name: str) -> str | None:
@@ -92,6 +126,7 @@ def init_catalog_schema() -> None:
         _ensure_company_columns(conn)
         _ensure_job_columns(conn)
         _ensure_country_meta_columns(conn)
+    _migrate_columns_to_jsonb()
 
 
 def _ensure_country_meta_columns(conn) -> None:
@@ -125,20 +160,30 @@ def _ensure_job_columns(conn) -> None:
 
 
 def _job_locations_json(job: dict) -> str:
+    """Serialize job locations to JSONB-compatible string."""
     locations = job.get("locations")
     if isinstance(locations, list) and locations:
-        return json.dumps(locations)
+        try:
+            return json.dumps([Location(**loc).model_dump() if isinstance(loc, dict) else loc for loc in locations])
+        except Exception:
+            pass
     return "[]"
 
 
-def _parse_job_locations_json(raw: str | None) -> list | None:
+def _parse_job_locations_json(raw: str | None) -> list[Location] | None:
+    """Parse JSONB locations string to Location objects."""
     if not raw or raw == "[]":
         return None
     try:
-        val = json.loads(raw)
+        val = json.loads(raw) if isinstance(raw, str) else raw
     except json.JSONDecodeError:
         return None
-    return val if isinstance(val, list) and val else None
+    if not isinstance(val, list) or not val:
+        return None
+    try:
+        return [Location(**item) for item in val if isinstance(item, dict)]
+    except Exception:
+        return None
 
 
 def catalog_has_data() -> bool:
@@ -149,23 +194,28 @@ def catalog_has_data() -> bool:
 
 
 def _json_sources(company: dict) -> str:
+    """Serialize sources to JSONB-compatible string."""
     sources = company.get("sources")
     if isinstance(sources, list):
         return json.dumps(sources)
     return "[]"
 
 
-def _parse_sources(raw: str) -> list:
+def _parse_sources(raw: str | None) -> list[str]:
+    """Parse JSONB sources string to list of source names."""
     try:
-        val = json.loads(raw or "[]")
-        return val if isinstance(val, list) else []
-    except json.JSONDecodeError:
+        val = json.loads(raw or "[]") if isinstance(raw, str) else (raw or [])
+        if not isinstance(val, list):
+            return []
+        return [str(item) for item in val if item]
+    except Exception:
         return []
 
 
 def _parse_cities_json(raw: str | None) -> list[str]:
+    """Parse JSONB cities string to list of city strings."""
     try:
-        val = json.loads(raw or "[]")
+        val = json.loads(raw or "[]") if isinstance(raw, str) else (raw or [])
     except json.JSONDecodeError:
         return []
     if not isinstance(val, list):
@@ -193,6 +243,7 @@ def _company_cities_from_row(data: dict) -> list[str]:
 
 
 def _cities_json_from_company(company: dict) -> str:
+    """Serialize cities list from company dict to JSONB string."""
     raw = company.get("cities")
     if isinstance(raw, list):
         cleaned = [(item or "").strip() for item in raw if (item or "").strip()]
@@ -211,30 +262,35 @@ def _cities_json_from_company(company: dict) -> str:
     return json.dumps(unique)
 
 
-def _parse_locations_json(raw: str | None, *, catalog_country: str = "") -> list[dict]:
+def _parse_locations_json(raw: str | None, *, catalog_country: str = "") -> list[Location]:
+    """Parse JSONB locations string to Location objects."""
     if raw:
         try:
-            val = json.loads(raw)
+            val = json.loads(raw) if isinstance(raw, str) else raw
         except json.JSONDecodeError:
             val = []
         if isinstance(val, list) and val and isinstance(val[0], dict):
-            return normalize_locations(val, catalog_country=catalog_country)
+            normalized = normalize_locations(val, catalog_country=catalog_country)
+            return [Location(**loc) for loc in normalized if isinstance(loc, dict)]
     cities = _parse_cities_json(raw=None)
     if raw is None:
         cities = []
-    return normalize_locations(None, catalog_country=catalog_country, legacy_cities=cities)
+    normalized = normalize_locations(None, catalog_country=catalog_country, legacy_cities=cities)
+    return [Location(**loc) for loc in normalized if isinstance(loc, dict)]
 
 
 def _locations_json_from_company(company: dict, *, catalog_country: str = "") -> str:
+    """Serialize locations list from company dict to JSONB string."""
     sync_company_location_fields(company, catalog_country=catalog_country)
     payload = [
-        {"country": loc["country"], "city": loc["city"]}
+        Location(country=loc["country"], city=loc["city"]).model_dump()
         for loc in company.get("locations") or []
     ]
     return json.dumps(payload)
 
 
 def _company_row_to_dict(row, jobs: list[dict]) -> dict:
+    """Convert database row to company dict using Pydantic schemas."""
     data = _row_dict(row)
     catalog_country = data.get("country") or ""
     locations = _parse_locations_json(
@@ -242,19 +298,22 @@ def _company_row_to_dict(row, jobs: list[dict]) -> dict:
         catalog_country=catalog_country,
     )
     if not locations:
-        locations = normalize_locations(
+        normalized = normalize_locations(
             None,
             catalog_country=catalog_country,
             legacy_cities=_parse_cities_json(data.get("cities_json")),
             legacy_city=data.get("city") or "",
         )
+        locations = [Location(**loc) for loc in normalized if isinstance(loc, dict)]
+
+    sources = _parse_sources(data.get("sources_json"))
     company = {
         "name": data["name"],
         "city": " · ".join(
-            format_location_display(loc["country"], loc["city"]) for loc in locations
+            format_location_display(loc.country, loc.city) for loc in locations
         ),
-        "cities": [loc["city"] for loc in locations],
-        "locations": locations,
+        "cities": [loc.city for loc in locations],
+        "locations": [loc.model_dump() for loc in locations],
         "size": data.get("size") or "",
         "careers_url": data.get("careers_url") or "",
         "ats_type": data.get("ats_type") or "",
@@ -265,7 +324,7 @@ def _company_row_to_dict(row, jobs: list[dict]) -> dict:
         "fetch_ok_date": data.get("fetch_ok_date") or "",
         "added": data.get("added") or "",
         "updated": data.get("updated") or "",
-        "sources": _parse_sources(data.get("sources_json") or "[]"),
+        "sources": sources,
         "matching_jobs": jobs,
     }
     return company
@@ -278,6 +337,7 @@ def _row_dict(row) -> dict:
 
 
 def _job_row_to_dict(row) -> dict:
+    """Convert database job row to dict using Pydantic schemas."""
     data = _row_dict(row)
     job = {
         "title": data.get("title") or "",
@@ -292,7 +352,7 @@ def _job_row_to_dict(row) -> dict:
         job["location"] = location
     locations = _parse_job_locations_json(data.get("locations_json"))
     if locations:
-        job["locations"] = locations
+        job["locations"] = [loc.model_dump() for loc in locations]
     return job
 
 
@@ -593,6 +653,152 @@ def save_country(country_key: str, data: dict) -> None:
             )
         else:
             conn.execute("DELETE FROM companies WHERE country = %s", (country_key,))
+
+
+# ---------------------------------------------------------------------------
+# Targeted single-row operations — used by company_service / job_service
+# ---------------------------------------------------------------------------
+
+def get_company(country_key: str, company_name: str) -> dict | None:
+    """Fetch one company with its jobs; None if not found."""
+    with db_read() as conn:
+        row = conn.execute(
+            "SELECT * FROM companies WHERE country = %s AND lower(name) = lower(%s)",
+            (country_key, company_name),
+        ).fetchone()
+        if row is None:
+            return None
+        cdata = _row_dict(row)
+        job_rows = conn.execute(
+            "SELECT * FROM matching_jobs WHERE company_id = %s ORDER BY fetched DESC, title",
+            (cdata["id"],),
+        ).fetchall()
+        jobs = [_job_row_to_dict(r) for r in job_rows]
+    return _company_row_to_dict(cdata, jobs)
+
+
+def get_job_by_url(job_url: str) -> dict | None:
+    """Fetch one job row by URL idempotency key; returns title, url, company_name, country."""
+    key = job_idempotency_key(job_url)
+    if not key:
+        return None
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
+            FROM matching_jobs j
+            JOIN companies c ON c.id = j.company_id
+            WHERE j.idempotency_key = %s
+            """,
+            (key,),
+        ).fetchone()
+    if row is None:
+        return None
+    return _row_dict(row)
+
+
+def rename_company_in_catalog(country_key: str, old_name: str, new_name: str) -> None:
+    with db_transaction() as conn:
+        conn.execute(
+            "UPDATE companies SET name = %s, updated = %s WHERE country = %s AND lower(name) = lower(%s)",
+            (new_name, _today(), country_key, old_name),
+        )
+
+
+def update_company_fields(country_key: str, company_name: str, **fields) -> None:
+    """Patch arbitrary scalar columns for one company row."""
+    allowed = {
+        "careers_url", "ats_type", "ats_url",
+        "city", "cities_json", "locations_json",
+        "fetch_problem", "fetch_problem_date",
+        "fetch_ok", "fetch_ok_date",
+        "updated", "size",
+    }
+    updates = {k: v for k, v in fields.items() if k in allowed}
+    if not updates:
+        return
+    cols = ", ".join(f"{k} = %s" for k in updates)
+    vals = list(updates.values())
+    with db_transaction() as conn:
+        conn.execute(
+            f"UPDATE companies SET {cols} WHERE country = %s AND lower(name) = lower(%s)",
+            (*vals, country_key, company_name),
+        )
+
+
+def update_company_location(
+    country_key: str,
+    company_name: str,
+    locations: list[dict],
+) -> None:
+    """Recompute and persist all location-derived columns for one company."""
+    temp: dict = {"locations": locations}
+    sync_company_location_fields(temp, catalog_country=country_key)
+    cities_json = _cities_json_from_company(temp)
+    locations_json = _locations_json_from_company(temp, catalog_country=country_key)
+    city = temp.get("city") or ""
+    with db_transaction() as conn:
+        conn.execute(
+            """
+            UPDATE companies
+            SET city = %s, cities_json = %s, locations_json = %s, updated = %s
+            WHERE country = %s AND lower(name) = lower(%s)
+            """,
+            (city, cities_json, locations_json, _today(), country_key, company_name),
+        )
+
+
+def delete_company(country_key: str, company_name: str) -> bool:
+    """Delete a company and its jobs (ON DELETE CASCADE). Returns True if found."""
+    with db_transaction() as conn:
+        cur = conn.execute(
+            "DELETE FROM companies WHERE country = %s AND lower(name) = lower(%s) RETURNING id",
+            (country_key, company_name),
+        )
+        return cur.fetchone() is not None
+
+
+def insert_jobs(country_key: str, company_name: str, jobs: list[dict]) -> int:
+    """Insert new jobs for a company, skipping duplicates. Returns count of new rows."""
+    if not jobs:
+        return 0
+    with db_transaction() as conn:
+        row = conn.execute(
+            "SELECT id FROM companies WHERE country = %s AND lower(name) = lower(%s)",
+            (country_key, company_name),
+        ).fetchone()
+        if row is None:
+            return 0
+        company_id = _row_dict(row)["id"]
+        inserted = 0
+        for job in jobs:
+            stamp_job_identity(job)
+            key = job.get("idempotency_key") or job_idempotency_key(job.get("url", ""))
+            if not key:
+                continue
+            cur = conn.execute(
+                """
+                INSERT INTO matching_jobs (
+                    company_id, idempotency_key, title, url, fetched, last_seen,
+                    visa_sponsorship, location, locations_json
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT DO NOTHING
+                RETURNING id
+                """,
+                (
+                    company_id, key,
+                    job.get("title") or "",
+                    job.get("url") or "",
+                    job.get("fetched") or _today(),
+                    job.get("last_seen") or job.get("fetched") or _today(),
+                    _visa_to_db(job.get("visa_sponsorship")),
+                    (job.get("location") or "").strip(),
+                    _job_locations_json(job),
+                ),
+            )
+            if cur.fetchone() is not None:
+                inserted += 1
+    return inserted
 
 
 # ---------------------------------------------------------------------------

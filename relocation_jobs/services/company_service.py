@@ -1,13 +1,14 @@
 """Company catalog and tracking business logic.
 
-Coordinates catalog reads/writes with the company repository (db/companies.py).
-No raw SQL here — all DB access goes through db/.
+No raw SQL here — all DB access goes through catalog_db or db/.
+Service layer: uses Pydantic schemas for input validation and response validation.
+All public functions return dicts complying with the schemas documented in their docstrings.
+See SCHEMAS.md for full schema definitions.
 """
 
 from __future__ import annotations
 
 import re
-import threading
 from urllib.parse import urlparse
 
 try:
@@ -15,10 +16,14 @@ try:
 except ImportError:
     requests = None  # type: ignore[assignment]
 
-from relocation_jobs.build_companies import slug_from_name, sort_companies
+from relocation_jobs.build_companies import slug_from_name
 from relocation_jobs.catalog_db import (
-    load_country,
-    save_country,
+    delete_company,
+    get_company,
+    insert_jobs,
+    rename_company_in_catalog,
+    update_company_fields,
+    update_company_location,
     upsert_company as upsert_company_catalog,
 )
 from relocation_jobs.paths import COUNTRY_FILE_NAMES
@@ -32,7 +37,6 @@ from relocation_jobs.job_identity import (
     job_idempotency_key,
     job_idempotency_key_for_job,
     normalize_job_url,
-    stamp_job_identity,
 )
 from relocation_jobs.location_tags import (
     COUNTRY_LABELS,
@@ -40,6 +44,7 @@ from relocation_jobs.location_tags import (
     sync_company_location_fields,
 )
 from relocation_jobs.services.catalog_service import now_iso, today
+from relocation_jobs.schemas import CompanyCreateInput, CompanyResponse
 
 from relocation_jobs.scrape_jobs import (
     ATS_TYPE_CHOICES,
@@ -48,8 +53,6 @@ from relocation_jobs.scrape_jobs import (
     detect_ats_static,
     detect_ats_via_playwright,
 )
-
-_file_lock = threading.Lock()
 
 _FETCH_HEADERS = {
     "User-Agent": (
@@ -83,46 +86,7 @@ _URL_COUNTRY_HINTS: list[tuple[str, re.Pattern[str]]] = [
 
 
 # ---------------------------------------------------------------------------
-# Helpers (internal)
-# ---------------------------------------------------------------------------
-
-
-
-
-def _clean_city(raw: str, country_key: str) -> str:
-    city = raw.strip()
-    pat = _CITY_SUFFIX.get(country_key)
-    if pat:
-        city = pat.sub("", city).strip()
-    return city.split(",")[0].strip() if city else ""
-
-
-def parse_country_from_location(raw: str) -> str | None:
-    text = (raw or "").strip()
-    if not text:
-        return None
-    for key, pattern in _COUNTRY_FROM_LOCATION:
-        if pattern.search(text):
-            return key
-    if "," in text:
-        suffix = text.rsplit(",", 1)[-1].strip()
-        for key, pattern in _COUNTRY_FROM_LOCATION:
-            if pattern.search(suffix):
-                return key
-    return None
-
-
-def detect_country_from_url(url: str) -> str | None:
-    host = urlparse(url).netloc.lower()
-    full = url.lower()
-    for key, pattern in _URL_COUNTRY_HINTS:
-        if pattern.search(host) or pattern.search(full):
-            return key
-    return None
-
-
-# ---------------------------------------------------------------------------
-# Catalog lookup helpers (used by routes)
+# Pure in-memory search helpers (operate on any dict, no DB calls)
 # ---------------------------------------------------------------------------
 
 def find_company_in_data(data: dict, company_name: str) -> dict | None:
@@ -149,12 +113,78 @@ def find_job_in_data(data: dict, company_name: str, job_url: str) -> dict | None
     return None
 
 
-def resolve_company_name(country_key: str, company_name: str) -> str:
-    data = load_country(country_key) or {}
-    company = find_company_in_data(data, company_name)
-    if company is None:
-        raise LookupError(f"Company not found: {company_name}")
-    return company["name"]
+# ---------------------------------------------------------------------------
+# Internal helpers
+# ---------------------------------------------------------------------------
+
+def _clean_city(raw: str, country_key: str) -> str:
+    city = raw.strip()
+    pat = _CITY_SUFFIX.get(country_key)
+    if pat:
+        city = pat.sub("", city).strip()
+    return city.split(",")[0].strip() if city else ""
+
+
+def _build_locations(
+    country_key: str,
+    cities: list[str] | str | None,
+    locations: list[dict] | None,
+) -> list[dict]:
+    """Normalise and deduplicate location inputs into a canonical list."""
+    seen: set[str] = set()
+    cleaned: list[dict] = []
+
+    if locations is not None:
+        for item in locations:
+            if not isinstance(item, dict):
+                continue
+            loc = normalize_location(item.get("country", ""), item.get("city", ""))
+            if not loc or loc["key"] in seen:
+                continue
+            seen.add(loc["key"])
+            cleaned.append(loc)
+    elif isinstance(cities, str):
+        loc = normalize_location(country_key, (cities or "").strip())
+        if loc:
+            cleaned = [loc]
+    elif isinstance(cities, list):
+        for item in cities:
+            loc = normalize_location(country_key, (item or "").strip())
+            if not loc or loc["key"] in seen:
+                continue
+            seen.add(loc["key"])
+            cleaned.append(loc)
+
+    cleaned.sort(key=lambda x: (x["country_label"], x["city"].casefold()))
+    return cleaned
+
+
+# ---------------------------------------------------------------------------
+# URL / string normalization
+# ---------------------------------------------------------------------------
+
+def parse_country_from_location(raw: str) -> str | None:
+    text = (raw or "").strip()
+    if not text:
+        return None
+    for key, pattern in _COUNTRY_FROM_LOCATION:
+        if pattern.search(text):
+            return key
+    if "," in text:
+        suffix = text.rsplit(",", 1)[-1].strip()
+        for key, pattern in _COUNTRY_FROM_LOCATION:
+            if pattern.search(suffix):
+                return key
+    return None
+
+
+def detect_country_from_url(url: str) -> str | None:
+    host = urlparse(url).netloc.lower()
+    full = url.lower()
+    for key, pattern in _URL_COUNTRY_HINTS:
+        if pattern.search(host) or pattern.search(full):
+            return key
+    return None
 
 
 def normalize_careers_url(url: str) -> str:
@@ -227,7 +257,7 @@ def detect_ats_for_company(
 
 
 # ---------------------------------------------------------------------------
-# Country detection
+# Country / metadata resolution
 # ---------------------------------------------------------------------------
 
 def fetch_relocate_metadata(name: str, country_key: str | None = None) -> dict:
@@ -316,6 +346,10 @@ def enrich_new_company(
     *,
     ats_hint: str | None = None,
 ) -> dict:
+    """Create enriched company dict with ATS detection and metadata.
+
+    Returns dict complying with CompanyCreateInput schema.
+    """
     careers_url = normalize_careers_url(careers_url)
     meta = fetch_relocate_metadata(name, country_key)
     ats_type, ats_url = detect_ats_for_company(name, careers_url, ats_hint=ats_hint)
@@ -333,30 +367,46 @@ def enrich_new_company(
         "updated": now,
     }
     sync_company_location_fields(company, catalog_country=country_key)
+    CompanyCreateInput(**company)
     return company
 
 
 # ---------------------------------------------------------------------------
-# Company CRUD
+# Company lookup helpers
 # ---------------------------------------------------------------------------
 
+def resolve_company_name(country_key: str, company_name: str) -> str:
+    """Get canonical company name (case-insensitive lookup).
+
+    Raises LookupError if company not found.
+    """
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
+    return company["name"]
+
+
 def touch_company_fetch_time(country_key: str, company_name: str) -> str:
+    """Update company's last-updated timestamp.
+
+    Returns ISO date string of update time.
+    """
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
     if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
+    ts = now_iso()
+    update_company_fields(country_key, company["name"], updated=ts)
+    return ts
 
-    with _file_lock:
-        data = load_country(country_key) or {}
-        company = find_company_in_data(data, company_name)
-        if company is None:
-            raise LookupError(f"Company not found: {company_name}")
-        ts = now_iso()
-        company["updated"] = ts
-        upsert_company_catalog(country_key, company, updated=ts)
-        return ts
 
+# ---------------------------------------------------------------------------
+# Company CRUD
+# ---------------------------------------------------------------------------
 
 def add_company(
     name: str,
@@ -367,64 +417,51 @@ def add_company(
     ats_hint: str | None = None,
     locations: list[dict] | None = None,
 ) -> dict:
-    country_labels = COUNTRY_LABELS
+    """Add a new company to the catalog with validation.
+
+    Returns dict complying with CompanyResponse schema.
+    """
     name = (name or "").strip()
     if not name:
         raise ValueError("Company name is required")
 
+    CompanyCreateInput(name=name, careers_url=careers_url)
+
     careers_url = normalize_careers_url(careers_url)
     hint = None
     if country_keys:
-        cleaned_keys = [
-            key.strip().lower()
-            for key in country_keys
-            if (key or "").strip().lower() in COUNTRY_FILE_NAMES
-        ]
+        cleaned_keys = [k.strip().lower() for k in country_keys if k.strip().lower() in COUNTRY_FILE_NAMES]
         hint = cleaned_keys[0] if cleaned_keys else None
     elif country_key and country_key not in ("auto", "all", ""):
         hint = country_key.strip().lower()
 
     resolved_country, _meta = resolve_country_key(name, careers_url, hint=hint)
-
     if resolved_country not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {resolved_country}")
+
+    if get_company(resolved_country, name) is not None:
+        raise LookupError(f"Company already exists: {name}")
 
     company = enrich_new_company(name, careers_url, resolved_country, ats_hint=ats_hint)
 
     if locations is not None:
-        cleaned: list[dict] = []
-        seen: set[str] = set()
-        for item in locations:
-            if not isinstance(item, dict):
-                continue
-            loc = normalize_location(item.get("country", ""), item.get("city", ""))
-            if not loc or loc["key"] in seen:
-                continue
-            seen.add(loc["key"])
-            cleaned.append(loc)
-        cleaned.sort(key=lambda loc: (loc["country_label"], loc["city"].casefold()))
-        company["locations"] = cleaned
+        company["locations"] = _build_locations(resolved_country, None, locations)
         sync_company_location_fields(company, catalog_country=resolved_country)
 
-    with _file_lock:
-        data = load_country(resolved_country) or {}
-        for existing in data.get("companies", []):
-            if existing.get("name", "").lower() == name.lower():
-                raise LookupError(f"Company already exists: {name}")
-        data.setdefault("companies", []).append(company)
-        data["companies"] = sort_companies(data["companies"])
-        data["updated"] = today()
-        save_country(resolved_country, data)
+    upsert_company_catalog(resolved_country, company)
 
     return {
         "country": resolved_country,
-        "country_label": country_labels.get(resolved_country, resolved_country),
+        "country_label": COUNTRY_LABELS.get(resolved_country, resolved_country),
         **company,
     }
 
 
 def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
-    country_labels = COUNTRY_LABELS
+    """Rename a company in catalog and user tracking.
+
+    Returns dict with rename confirmation and company details.
+    """
     company_name = (company_name or "").strip()
     new_name = (new_name or "").strip()
     if not company_name:
@@ -436,30 +473,19 @@ def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
     if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
-    with _file_lock:
-        data = load_country(country_key) or {}
-        company = find_company_in_data(data, company_name)
-        if company is None:
-            raise LookupError(f"Company not found: {company_name}")
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
+    if get_company(country_key, new_name) is not None:
+        raise LookupError(f"Company already exists: {new_name}")
 
-        canonical_old = company.get("name", company_name)
-        for existing in data.get("companies") or []:
-            if existing is company:
-                continue
-            if existing.get("name", "").strip().casefold() == new_name.casefold():
-                raise LookupError(f"Company already exists: {new_name}")
-
-        company["name"] = new_name
-        company["updated"] = today()
-        data["companies"] = sort_companies(data.get("companies") or [])
-        data["updated"] = today()
-        save_country(country_key, data)
-
+    canonical_old = company["name"]
+    rename_company_in_catalog(country_key, canonical_old, new_name)
     rename_company_tracking(country_key, canonical_old, new_name)
 
     return {
         "country": country_key,
-        "country_label": country_labels.get(country_key, country_key),
+        "country_label": COUNTRY_LABELS.get(country_key, country_key),
         "company": new_name,
         "previous_name": canonical_old,
     }
@@ -472,7 +498,6 @@ def update_company_careers(
     *,
     redetect_ats: bool = True,
 ) -> dict:
-    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
@@ -480,30 +505,25 @@ def update_company_careers(
         raise ValueError(f"Unknown country: {country_key}")
 
     careers_url = normalize_careers_url(careers_url)
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
 
-    with _file_lock:
-        data = load_country(country_key) or {}
-        company = find_company_in_data(data, company_name)
-        if company is None:
-            raise LookupError(f"Company not found: {company_name}")
+    canonical_name = company["name"]
+    fields: dict = {"careers_url": careers_url, "updated": today()}
+    if redetect_ats:
+        ats_type, ats_url = detect_ats_for_company(canonical_name, careers_url)
+        fields.update(ats_type=ats_type, ats_url=ats_url)
 
-        canonical_name = company.get("name", company_name)
-        company["careers_url"] = careers_url
-        if redetect_ats:
-            ats_type, ats_url = detect_ats_for_company(canonical_name, careers_url)
-            company["ats_type"] = ats_type
-            company["ats_url"] = ats_url
-        company["updated"] = today()
-        data["updated"] = today()
-        save_country(country_key, data)
+    update_company_fields(country_key, canonical_name, **fields)
 
     return {
         "country": country_key,
-        "country_label": country_labels.get(country_key, country_key),
+        "country_label": COUNTRY_LABELS.get(country_key, country_key),
         "company": canonical_name,
         "careers_url": careers_url,
-        "ats_type": company.get("ats_type", ""),
-        "ats_url": company.get("ats_url", ""),
+        "ats_type": fields.get("ats_type", company.get("ats_type", "")),
+        "ats_url": fields.get("ats_url", company.get("ats_url", "")),
         "redetect_ats": redetect_ats,
     }
 
@@ -515,69 +535,33 @@ def update_company_city(
     *,
     locations: list[dict] | None = None,
 ) -> dict:
-    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
     if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
-    cleaned: list[dict] = []
-    if locations is not None:
-        seen: set[str] = set()
-        for item in locations:
-            if not isinstance(item, dict):
-                continue
-            loc = normalize_location(item.get("country", ""), item.get("city", ""))
-            if not loc or loc["key"] in seen:
-                continue
-            seen.add(loc["key"])
-            cleaned.append(loc)
-        cleaned.sort(key=lambda loc: (loc["country_label"], loc["city"].casefold()))
-    elif isinstance(cities, str):
-        city = (cities or "").strip()
-        if city:
-            loc = normalize_location(country_key, city)
-            if loc:
-                cleaned = [loc]
-    elif isinstance(cities, list):
-        seen = set()
-        for item in cities:
-            label = (item or "").strip()
-            if not label:
-                continue
-            loc = normalize_location(country_key, label)
-            if not loc or loc["key"] in seen:
-                continue
-            seen.add(loc["key"])
-            cleaned.append(loc)
-        cleaned.sort(key=lambda loc: (loc["country_label"], loc["city"].casefold()))
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
 
-    with _file_lock:
-        data = load_country(country_key) or {}
-        company = find_company_in_data(data, company_name)
-        if company is None:
-            raise LookupError(f"Company not found: {company_name}")
+    cleaned = _build_locations(country_key, cities, locations)
+    update_company_location(country_key, company["name"], cleaned)
 
-        canonical_name = company.get("name", company_name)
-        company["locations"] = cleaned
-        sync_company_location_fields(company, catalog_country=country_key)
-        company["updated"] = today()
-        data["updated"] = today()
-        save_country(country_key, data)
+    temp = {"locations": cleaned}
+    sync_company_location_fields(temp, catalog_country=country_key)
 
     return {
         "country": country_key,
-        "country_label": country_labels.get(country_key, country_key),
-        "company": canonical_name,
-        "city": company["city"],
-        "cities": company.get("cities") or [],
+        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "company": company["name"],
+        "city": temp.get("city") or "",
+        "cities": temp.get("cities") or [],
         "locations": cleaned,
     }
 
 
 def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> dict:
-    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
@@ -585,51 +569,27 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
         raise ValueError(f"Unknown country: {country_key}")
 
     ts = today()
-    to_add: list[dict] = []
-    for job in jobs:
-        title = (job.get("title") or "").strip()
-        url = normalize_job_url(job.get("url") or "")
-        if not title or not url:
-            continue
-        to_add.append({"title": title, "url": url, "fetched": ts, "last_seen": ts})
-
+    to_add = [
+        {"title": (j.get("title") or "").strip(), "url": normalize_job_url(j.get("url") or ""), "fetched": ts, "last_seen": ts}
+        for j in jobs
+        if (j.get("title") or "").strip() and normalize_job_url(j.get("url") or "")
+    ]
     if not to_add:
         raise ValueError("No valid jobs to add")
 
-    with _file_lock:
-        data = load_country(country_key) or {}
-        company = find_company_in_data(data, company_name)
-        if company is None:
-            raise LookupError(f"Company not found: {company_name}")
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
 
-        canonical_name = company.get("name", company_name)
-        merged = list(company.get("matching_jobs") or [])
-        existing_keys = {
-            job_idempotency_key_for_job(j)
-            for j in merged
-            if job_idempotency_key_for_job(j)
-        }
-        new_count = 0
-        for job in to_add:
-            key = job_idempotency_key(job.get("url", ""))
-            if not key or key in existing_keys:
-                continue
-            stamp_job_identity(job)
-            merged.append(job)
-            existing_keys.add(key)
-            new_count += 1
-
-        company["matching_jobs"] = merged
-        company["updated"] = ts
-        data["updated"] = ts
-        save_country(country_key, data)
+    existing_total = len(company.get("matching_jobs") or [])
+    new_count = insert_jobs(country_key, company["name"], to_add)
 
     return {
         "country": country_key,
-        "country_label": country_labels.get(country_key, country_key),
-        "company": canonical_name,
+        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "company": company["name"],
         "added": new_count,
-        "total": len(merged),
+        "total": existing_total + new_count,
     }
 
 
@@ -640,41 +600,46 @@ def set_company_fetch_problem(
     *,
     mark_fetch_ok: bool = False,
 ) -> dict:
-    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
     if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
-    with _file_lock:
-        data = load_country(country_key) or {}
-        company = find_company_in_data(data, company_name)
-        if company is None:
-            raise LookupError(f"Company not found: {company_name}")
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
 
-        canonical_name = company.get("name", company_name)
-        if fetch_problem:
-            company["fetch_problem"] = True
-            company["fetch_problem_date"] = today()
-            company.pop("fetch_ok", None)
-            company.pop("fetch_ok_date", None)
+    ts = today()
+    canonical_name = company["name"]
+
+    if fetch_problem:
+        update_company_fields(
+            country_key, canonical_name,
+            fetch_problem=1, fetch_problem_date=ts,
+            fetch_ok=0, fetch_ok_date=None, updated=ts,
+        )
+        result_fp, result_fpd = True, ts
+        result_fo, result_fod = False, ""
+    else:
+        fields: dict = {"fetch_problem": 0, "fetch_problem_date": None, "updated": ts}
+        if mark_fetch_ok:
+            fields.update(fetch_ok=1, fetch_ok_date=ts)
+            result_fo, result_fod = True, ts
         else:
-            company.pop("fetch_problem", None)
-            company.pop("fetch_problem_date", None)
-            if mark_fetch_ok:
-                company["fetch_ok"] = True
-                company["fetch_ok_date"] = today()
-        save_country(country_key, data)
+            result_fo = bool(company.get("fetch_ok"))
+            result_fod = company.get("fetch_ok_date") or ""
+        update_company_fields(country_key, canonical_name, **fields)
+        result_fp, result_fpd = False, ""
 
     return {
         "country": country_key,
-        "country_label": country_labels.get(country_key, country_key),
+        "country_label": COUNTRY_LABELS.get(country_key, country_key),
         "company": canonical_name,
-        "fetch_problem": fetch_problem,
-        "fetch_problem_date": company.get("fetch_problem_date", ""),
-        "fetch_ok": bool(company.get("fetch_ok")),
-        "fetch_ok_date": company.get("fetch_ok_date", ""),
+        "fetch_problem": result_fp,
+        "fetch_problem_date": result_fpd,
+        "fetch_ok": result_fo,
+        "fetch_ok_date": result_fod,
     }
 
 
@@ -683,43 +648,26 @@ def set_company_fetch_ok(country_key: str, company_name: str) -> dict:
 
 
 def remove_company(country_key: str, company_name: str) -> dict:
-    country_labels = COUNTRY_LABELS
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
     if country_key not in COUNTRY_FILE_NAMES:
         raise ValueError(f"Unknown country: {country_key}")
 
-    target = company_name.lower()
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
 
-    with _file_lock:
-        data = load_country(country_key) or {}
-        companies = data.get("companies", [])
-        removed: dict | None = None
-        kept: list[dict] = []
-        for company in companies:
-            if company.get("name", "").strip().lower() == target:
-                if removed is not None:
-                    raise LookupError(f"Duplicate company name: {company_name}")
-                removed = company
-            else:
-                kept.append(company)
-
-        if removed is None:
-            raise LookupError(f"Company not found: {company_name}")
-
-        canonical_name = removed.get("name", company_name)
-        data["companies"] = kept
-        data["updated"] = today()
-        save_country(country_key, data)
-
+    canonical_name = company["name"]
+    removed_jobs = len(company.get("matching_jobs") or [])
+    delete_company(country_key, canonical_name)
     clear_company_tracking(country_key, canonical_name)
 
     return {
         "country": country_key,
-        "country_label": country_labels.get(country_key, country_key),
+        "country_label": COUNTRY_LABELS.get(country_key, country_key),
         "company": canonical_name,
-        "removed_jobs": len(removed.get("matching_jobs") or []),
+        "removed_jobs": removed_jobs,
     }
 
 
@@ -734,11 +682,10 @@ def set_company_applied(
     *,
     user_id: int,
 ) -> dict:
-    data = load_country(country_key) or {}
-    company = find_company_in_data(data, company_name)
+    company = get_company(country_key, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
-    return set_company_applied_db(user_id, country_key, company_name, applied)
+    return set_company_applied_db(user_id, country_key, company["name"], applied)
 
 
 def set_company_awaiting_response(
@@ -748,8 +695,7 @@ def set_company_awaiting_response(
     *,
     user_id: int,
 ) -> dict:
-    data = load_country(country_key) or {}
-    company = find_company_in_data(data, company_name)
+    company = get_company(country_key, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
-    return set_company_awaiting_response_db(user_id, country_key, company_name, awaiting)
+    return set_company_awaiting_response_db(user_id, country_key, company["name"], awaiting)

@@ -77,6 +77,8 @@ class FakePgConnection:
             msg = str(exc).lower()
             if "duplicate column name" in msg or "already exists" in msg:
                 return self._conn.execute("SELECT 1 AS ok")
+            if "cannot add a column" in msg and "alter table" in msg.lower():
+                return self._conn.execute("SELECT 1 AS ok")
             raise
 
     def _adapt_any(self, sql: str, params: tuple | list) -> tuple[str, tuple]:
@@ -120,6 +122,8 @@ class FakePgConnection:
             out,
             flags=re.I,
         )
+        out = re.sub(r"\bJSONB\b", "TEXT", out, flags=re.I)
+        out = re.sub(r"'::(jsonb|text)", "'", out, flags=re.I)
         return out, returning
 
 

@@ -60,7 +60,7 @@ def _reset_fetch_state() -> None:
     fetch_state._fetch_thread = None
 
 
-def _fake_run_scrape(country, skip_filled, concurrency, *, company=None):
+def _fake_run_scrape(country, skip_filled, concurrency, *, company=None, ats_type=None):
     import relocation_jobs.panel_server as ps
     from datetime import datetime, timezone
 
@@ -78,14 +78,14 @@ def _fake_run_scrape(country, skip_filled, concurrency, *, company=None):
     ps._persist_fetch_run()
 
 
-def _fake_start_scrape_thread(country, skip_filled, concurrency, *, company=None):
+def _fake_start_scrape_thread(country, skip_filled, concurrency, *, company=None, ats_type=None):
     from relocation_jobs.web import fetch_state
     import relocation_jobs.panel_server as ps
 
     fetch_state._fetch_thread = threading.Thread(
         target=_fake_run_scrape,
         args=(country, skip_filled, concurrency),
-        kwargs={"company": company},
+        kwargs={"company": company, "ats_type": ats_type},
         daemon=True,
     )
     fetch_state._fetch_thread.start()
@@ -640,11 +640,11 @@ def test_fetch_cancel(scrape_enabled, auth_client, rich_catalog, monkeypatch):
     def slow_scrape(*args, **kwargs):
         time.sleep(2)
 
-    def slow_start(country, skip_filled, concurrency, *, company=None):
+    def slow_start(country, skip_filled, concurrency, *, company=None, ats_type=None):
         fetch_state._fetch_thread = threading.Thread(
             target=slow_scrape,
             args=(country, skip_filled, concurrency),
-            kwargs={"company": company},
+            kwargs={"company": company, "ats_type": ats_type},
             daemon=True,
         )
         fetch_state._fetch_thread.start()

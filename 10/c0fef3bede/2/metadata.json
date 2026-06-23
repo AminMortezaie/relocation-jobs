@@ -1,0 +1,116 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "10c0fef3bede",
+  "session_id": "61d80c0c-3ed3-4baa-aada-9780666988a1",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T18:49:27.475436Z",
+  "branch": "main",
+  "checkpoints_count": 5,
+  "save_step_count": 5,
+  "files_touched": [
+    "relocation_jobs/scrape/__init__.py",
+    "relocation_jobs/scrape/ashby.py",
+    "relocation_jobs/scrape/bol.py",
+    "relocation_jobs/scrape/deel.py",
+    "relocation_jobs/scrape/descriptions.py",
+    "relocation_jobs/scrape/generic.py",
+    "relocation_jobs/scrape/greenhouse.py",
+    "relocation_jobs/scrape/http.py",
+    "relocation_jobs/scrape/ipc.py",
+    "relocation_jobs/scrape/job_shop.py",
+    "relocation_jobs/scrape/join.py",
+    "relocation_jobs/scrape/lever.py",
+    "relocation_jobs/scrape/listing.py",
+    "relocation_jobs/scrape/merge.py",
+    "relocation_jobs/scrape/misc.py",
+    "relocation_jobs/scrape/personio.py",
+    "relocation_jobs/scrape/playwright.py",
+    "relocation_jobs/scrape/recruitee.py",
+    "relocation_jobs/scrape/relevance.py",
+    "relocation_jobs/scrape/smartrecruiters.py",
+    "relocation_jobs/scrape/teamtailor.py",
+    "relocation_jobs/scrape/workable.py",
+    "relocation_jobs/scrape/workday.py",
+    "relocation_jobs/scrape_jobs.py",
+    "tests/helpers/http_mock.py",
+    "tests/helpers/playwright_mock.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "5ee9aa353e7e",
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T18:49:27.470899Z",
+    "agent_lines": 2761,
+    "agent_removed": 3257,
+    "human_added": 1354,
+    "human_modified": 4,
+    "human_removed": 0,
+    "total_committed": 4119,
+    "total_lines_changed": 7398,
+    "agent_percentage": 81.34630981346311,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 48,
+      "user_lines_removed": 100,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/catalog/reads.py": 40,
+        "relocation_jobs/catalog/serialize.py": 2,
+        "relocation_jobs/catalog/stats.py": 1,
+        "relocation_jobs/catalog/writes.py": 1,
+        "tests/test_integration.py": 4
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/catalog/reads.py": 2,
+        "relocation_jobs/catalog/schema.py": 34,
+        "relocation_jobs/catalog/serialize.py": 15,
+        "relocation_jobs/catalog/stats.py": 1,
+        "relocation_jobs/catalog/writes.py": 44,
+        "tests/test_integration.py": 4
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1119,
+      "agent_lines_removed": 806
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 8,
+      "user_lines_removed": 4,
+      "agent_lines_added": 2713,
+      "agent_lines_removed": 2037,
+      "user_added_per_file": {
+        "relocation_jobs/scrape/ashby.py": 6,
+        "relocation_jobs/scrape/listing.py": 2
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/scrape/ashby.py": 3,
+        "relocation_jobs/scrape/listing.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2782,
+      "agent_lines_removed": 2034
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2782,
+      "agent_lines_removed": 2034
+    }
+  ]
+}

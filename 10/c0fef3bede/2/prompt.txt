@@ -1,0 +1,21 @@
+Read .claude/REFACTOR_HANDOFF.md. Phase C panel + catalog splits are done (334 business tests pass). Start splitting scrape_jobs.py: extract merge_matching_jobs / is_relevant first, then per-ATS modules under jobs/ (or scrape/), keeping scrape_jobs.py as a thin shim. Run pytest and pytest -m scrape after each logical block. Do not commit unless I ask.
+
+---
+
+Read .claude/REFACTOR_HANDOFF.md. Phase C panel + catalog splits are done (334 business tests pass). Start splitting scrape_jobs.py: extract merge_matching_jobs / is_relevant first, then per-ATS modules under jobs/ (or scrape/), keeping scrape_jobs.py as a thin shim. Run pytest and pytest -m scrape after each logical block. Do not commit unless I ask.
+
+---
+
+continue plz
+
+---
+
+write down to handoff to another agent.
+
+---
+
+write down to handoff to another agent.
+
+---
+
+what should i say to the agent to do?

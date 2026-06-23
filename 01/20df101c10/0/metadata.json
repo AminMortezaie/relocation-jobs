@@ -1,0 +1,53 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "0120df101c10",
+  "session_id": "2122ff17-92fd-4f3f-9d67-fe03fefd74e6",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T18:58:34.121211Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/companies/__init__.py",
+    "relocation_jobs/companies/repo.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/db/companies.py",
+    "relocation_jobs/services/company_service.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "720d67698cd9",
+  "checkpoint_transcript_start": 12,
+  "transcript_lines_at_start": 12,
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T18:58:34.116687Z",
+    "agent_lines": 919,
+    "agent_removed": 889,
+    "human_added": 5,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 924,
+    "total_lines_changed": 1818,
+    "agent_percentage": 99.44994499449945,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 919,
+      "agent_lines_removed": 889
+    }
+  ]
+}

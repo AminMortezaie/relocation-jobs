@@ -1,0 +1,1 @@
+i just setup cron-job.org to still awake the render server but the jitter is about 25 seconds, is this normal?

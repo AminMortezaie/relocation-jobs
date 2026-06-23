@@ -1,0 +1,5 @@
+Read .claude/REFACTOR_HANDOFF.md, restructure-plan, and project-state skills. Phase C is done (334 business + 403 scrape tests pass; scrape_jobs.py is a ~231 LOC shim over scrape/). Start Phase D: audit the import graph and propose a move sequence for companies/ first — ask me before creating domain folders. Keep compatibility shims like catalog_db.py. Run python3 -m pytest and python3 -m pytest -m scrape after each block. Do not commit unless I ask.
+
+---
+
+Read .claude/REFACTOR_HANDOFF.md, restructure-plan, and project-state skills. Phase C is done (334 business + 403 scrape tests pass; scrape_jobs.py is a ~231 LOC shim over scrape/). Start Phase D: audit the import graph and propose a move sequence for companies/ first — ask me before creating domain folders. Keep compatibility shims like catalog_db.py. Run python3 -m pytest and python3 -m pytest -m scrape after each block. Do not commit unless I ask.

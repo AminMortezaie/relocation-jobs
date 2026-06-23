@@ -1,0 +1,75 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "b6dc06d11034",
+  "session_id": "d755974d-8606-4c59-afd2-a6c8cc28f46e",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T19:11:49.104362Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/scrape/runner.py",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/admin-scrape.js",
+    "relocation_jobs/static/js/auth.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/main.js",
+    "relocation_jobs/static/js/scrape.js",
+    "tests/test_admin_api.py",
+    "tests/test_panel_api_full.py",
+    "tests/test_scrape_runner.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "2c0e27852779",
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T19:11:49.102397Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 12,
+    "total_committed": 0,
+    "total_lines_changed": 12,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 229,
+      "user_lines_removed": 12,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/scrape/runner.py": 3,
+        "relocation_jobs/static/index.html": 6,
+        "relocation_jobs/static/js/admin-scrape.js": 2,
+        "relocation_jobs/static/js/auth.js": 6,
+        "relocation_jobs/static/js/events.js": 4,
+        "relocation_jobs/static/js/main.js": 2,
+        "relocation_jobs/static/js/scrape.js": 95,
+        "tests/test_admin_api.py": 43,
+        "tests/test_panel_api_full.py": 3,
+        "tests/test_scrape_runner.py": 65
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/js/admin-scrape.js": 1,
+        "relocation_jobs/static/js/auth.js": 1,
+        "relocation_jobs/static/js/events.js": 1,
+        "relocation_jobs/static/js/main.js": 1,
+        "relocation_jobs/static/js/scrape.js": 8
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 229,
+      "agent_lines_removed": 12
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 /** DOM event listeners for the jobs panel. */
 
 import { state, companyKey } from "./state.js";
-import { $, toast, atsScoreTone } from "./utils.js";
+import { $, toast, atsScoreTone, isNarrowViewport } from "./utils.js";
 import {
   removeCompany,
   toggleFetchProblem,
@@ -31,7 +31,7 @@ import {
   notForMeReasonMeta,
 } from "./render.js";
 import { saveShowRejectedCompanies } from "./storage.js";
-import { fetchOneCompany, cancelFetch, startCountryFetch } from "./scrape.js";
+import { fetchOneCompany, cancelFetch, handleFetchCountryClick, openFetchProgress, ensureFetchPolling } from "./scrape.js";
 import { openEditCareersDialog, openEditCompanyNameDialog, openEditCityDialog } from "./dialogs.js";
 import { saveCollapsedCompanies } from "./storage.js";
 import { logout, submitAuth, setLoginMode } from "./auth.js";
@@ -98,7 +98,7 @@ function unmountAtsPopover(wrap) {
 function resetAtsPopover(wrap) {
   const popover = getAtsPopover(wrap);
   if (!popover) return;
-  popover.classList.remove("is-floating");
+  popover.classList.remove("is-floating", "is-sheet");
   popover.style.top = "";
   popover.style.left = "";
 }
@@ -126,6 +126,15 @@ function positionAtsPopover(wrap) {
 
   popover.classList.add("is-floating");
   popover.hidden = false;
+
+  if (isNarrowViewport()) {
+    popover.classList.add("is-sheet");
+    popover.style.top = "";
+    popover.style.left = "";
+    return;
+  }
+
+  popover.classList.remove("is-sheet");
 
   requestAnimationFrame(() => {
     const tr = trigger.getBoundingClientRect();
@@ -224,7 +233,7 @@ function unmountHideReasonPopover(wrap) {
 function resetHideReasonPopover(wrap) {
   const popover = getHideReasonPopover(wrap);
   if (!popover) return;
-  popover.classList.remove("is-floating");
+  popover.classList.remove("is-floating", "is-sheet");
   popover.style.top = "";
   popover.style.left = "";
   popover.style.minWidth = "";
@@ -244,7 +253,7 @@ function closeHideReasonPopovers(exceptWrap = null) {
   document.body.querySelectorAll(".hide-reason-popover").forEach((popover) => {
     if (exceptWrapId && popover.dataset.hideWrapId === exceptWrapId) return;
     popover.hidden = true;
-    popover.classList.remove("is-floating");
+    popover.classList.remove("is-floating", "is-sheet");
     popover.style.top = "";
     popover.style.left = "";
     popover.style.minWidth = "";
@@ -262,6 +271,16 @@ function positionHideReasonPopover(wrap) {
 
   popover.classList.add("is-floating");
   popover.hidden = false;
+
+  if (isNarrowViewport()) {
+    popover.classList.add("is-sheet");
+    popover.style.top = "";
+    popover.style.left = "";
+    popover.style.minWidth = "";
+    return;
+  }
+
+  popover.classList.remove("is-sheet");
 
   requestAnimationFrame(() => {
     const tr = trigger.getBoundingClientRect();
@@ -420,7 +439,7 @@ function closeAtsPopovers(exceptWrap = null) {
   document.body.querySelectorAll(".ats-score-popover").forEach((popover) => {
     if (exceptWrapId && popover.dataset.atsWrapId === exceptWrapId) return;
     popover.hidden = true;
-    popover.classList.remove("is-floating");
+    popover.classList.remove("is-floating", "is-sheet");
     popover.style.top = "";
     popover.style.left = "";
   });
@@ -885,7 +904,10 @@ function bindToolbarEvents() {
   $("ats")?.addEventListener("change", loadJobs);
   $("location")?.addEventListener("change", loadJobs);
   $("fetchCountryBtn")?.addEventListener("click", () => {
-    startCountryFetch();
+    handleFetchCountryClick();
+  });
+  $("fetchProgressChip")?.addEventListener("click", () => {
+    openFetchProgress();
   });
   $("search").addEventListener("input", () => renderCompanies());
   $("fetchCancelBtn").addEventListener("click", () => {
@@ -893,6 +915,7 @@ function bindToolbarEvents() {
   });
   $("fetchCloseBtn").addEventListener("click", () => {
     hideFetchPanel();
+    ensureFetchPolling();
   });
   async function handleFetchReviewFeedback(btn, action) {
     const { country, company } = btn.dataset;
@@ -967,11 +990,17 @@ function bindToolbarEvents() {
     hideFetchPanel();
   });
   $("fetchPanelBackdrop").addEventListener("click", (e) => {
-    if (e.target === $("fetchPanelBackdrop")) hideFetchPanel();
+    if (e.target === $("fetchPanelBackdrop")) {
+      hideFetchPanel();
+      ensureFetchPolling();
+    }
   });
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
-    if ($("fetchPanelBackdrop").classList.contains("open")) hideFetchPanel();
+    if ($("fetchPanelBackdrop").classList.contains("open")) {
+      hideFetchPanel();
+      ensureFetchPolling();
+    }
     closeReferralPopovers();
     closeHideReasonPopovers();
     closeAtsPopovers();

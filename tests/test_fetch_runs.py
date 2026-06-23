@@ -6,7 +6,14 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from relocation_jobs.db import init_db, list_fetch_runs, record_fetch_run
+from relocation_jobs.db import (
+    create_fetch_run,
+    init_db,
+    is_fetch_run_cancel_requested,
+    list_fetch_runs,
+    record_fetch_run,
+    update_fetch_run_live,
+)
 
 
 @pytest.mark.integration
@@ -56,6 +63,24 @@ def test_record_and_list_fetch_runs(test_user):
     all_runs = list_fetch_runs(user_id, limit=10)
     assert len(all_runs) >= 2
     assert all_runs[0]["country"] in {"uk", "germany"}
+
+
+@pytest.mark.integration
+def test_is_fetch_run_cancel_requested(db, test_user):
+    del db
+    started = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    row = create_fetch_run(
+        user_id=test_user["id"],
+        country="uk",
+        company_name=None,
+        file_name="uk.json",
+        concurrency=4,
+        started_at=started,
+    )
+    run_id = row["id"]
+    assert is_fetch_run_cancel_requested(run_id) is False
+    update_fetch_run_live(run_id, cancel_requested=True)
+    assert is_fetch_run_cancel_requested(run_id) is True
 
 
 @pytest.mark.integration

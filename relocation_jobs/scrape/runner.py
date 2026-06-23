@@ -305,7 +305,7 @@ async def run_file_async(
                 if is_cancel_requested():
                     safe_print("Cancelled — saved progress for completed companies")
                     finalize_catalog()
-                    return
+                    raise SystemExit(130)
                 await bounded(item)
         else:
             queue: asyncio.Queue[tuple[dict, int]] = asyncio.Queue()
@@ -334,7 +334,7 @@ async def run_file_async(
             if is_cancel_requested():
                 safe_print("Cancelled — saved progress for completed companies")
                 finalize_catalog()
-                return
+                raise SystemExit(130)
 
     finalize_catalog()
     if target:

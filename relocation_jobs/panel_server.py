@@ -32,7 +32,10 @@ from relocation_jobs.web.scrape_runner import (
     _run_scrape,
     _should_cancel_fetch,
     _start_scrape_thread,
+    _sync_fetch_run,
     _terminate_scrape_process,
+    build_fetch_status_payload,
+    fetch_is_running,
 )
 
 # Re-export for tests that monkeypatch relocation_jobs.panel_server.*

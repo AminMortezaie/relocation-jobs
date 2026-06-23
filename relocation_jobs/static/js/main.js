@@ -1,13 +1,13 @@
 /** Application entry point. */
 
-import { setOnUnauthorized } from "./state.js";
+import { setOnUnauthorized, state } from "./state.js";
 import { showLogin, refreshAuth, setLoginMode, setAdminNavVisible } from "./auth.js";
 import { loadConfig, loadCountries, loadAtsTypes, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
 import { bindDialogEvents } from "./dialogs.js";
 import { bindEvents } from "./events.js";
 import { bindFilterBar, refreshFilterBar } from "./filters.js";
 import { bindHeaderBar } from "./header.js";
-import { resumeFetchIfRunning } from "./scrape.js";
+import { resumeFetchIfRunning, syncFetchStateFromServer } from "./scrape.js";
 import {
   loadCollapsedCompanies,
   loadShowNotForMeCompanies,
@@ -43,6 +43,7 @@ async function init() {
   await Promise.all([loadCities(), loadJobs()]);
   finishLoadingProgress();
   await resumeFetchIfRunning();
+  await syncFetchStateFromServer();
 }
 
 init();

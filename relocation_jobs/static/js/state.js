@@ -16,6 +16,15 @@ export const state = {
   fetchPanelSingle: false,
   fetchReviewFeedback: null,
   boardStats: null,
+  fetchBusy: false,
+  countryFetchActive: false,
+  fetchingCompanyKey: null,
+  fetchJobSummary: null,
+  serverFetchRunning: false,
+  fetchPollFailures: 0,
+  lastFetchStatus: null,
+  fetchControlsEnabled: false,
+  frozenCompanyOrder: null,
 };
 
 /** Called by api.js on 401 — wired in main.js to avoid circular imports. */

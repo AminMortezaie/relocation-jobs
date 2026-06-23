@@ -7,7 +7,7 @@ import os
 from flask import request
 
 from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
-from relocation_jobs.web.fetch_state import _fetch_lock, _fetch_state
+from relocation_jobs.web.scrape_runner import build_fetch_status_payload
 
 
 def scrape_enabled() -> bool:
@@ -19,18 +19,18 @@ def scrape_enabled() -> bool:
 
 
 def admin_fetch_snapshot() -> dict:
-    with _fetch_lock:
-        running = bool(_fetch_state.get("running"))
-        progress = _fetch_state.get("progress") or {}
-        return {
-            "running": running,
-            "country": _fetch_state.get("country"),
-            "company": _fetch_state.get("company"),
-            "ats_type": _fetch_state.get("ats_type"),
-            "scope": "company" if _fetch_state.get("company") else "country",
-            "progress": dict(progress) if isinstance(progress, dict) else {},
-            "started_at": _fetch_state.get("started_at"),
-        }
+    status = build_fetch_status_payload()
+    progress = status.get("progress") or {}
+    return {
+        "running": bool(status.get("running")),
+        "country": status.get("country"),
+        "company": status.get("company"),
+        "ats_type": status.get("ats_type"),
+        "scope": "company" if status.get("company") else "country",
+        "progress": dict(progress) if isinstance(progress, dict) else {},
+        "started_at": status.get("started_at"),
+        "run_id": status.get("run_id"),
+    }
 
 
 def query_bool(name: str) -> bool:

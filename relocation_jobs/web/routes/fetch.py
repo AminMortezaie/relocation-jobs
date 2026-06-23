@@ -18,29 +18,7 @@ def register(app):
     @app.get("/api/fetch/status")
     @login_required
     def api_fetch_status():
-        scrape_runner._reap_zombie_fetch()
-        with _fetch_lock:
-            return jsonify({
-                "running": _fetch_state["running"],
-                "country": _fetch_state["country"],
-                "company": _fetch_state.get("company"),
-                "ats_type": _fetch_state.get("ats_type"),
-                "file": _fetch_state["file"],
-                "started_at": _fetch_state["started_at"],
-                "finished_at": _fetch_state["finished_at"],
-                "exit_code": _fetch_state["exit_code"],
-                "concurrency": _fetch_state.get("concurrency"),
-                "result_line": _fetch_state.get("result_line"),
-                "cancel_requested": _fetch_state.get("cancel_requested", False),
-                "cancelled": _fetch_state.get("cancelled", False),
-                "progress": dict(_fetch_state.get("progress") or {}),
-                "activity": dict(_fetch_state.get("activity") or {}),
-                "activity_log": list(_fetch_state.get("activity_log") or []),
-                "log": list(_fetch_state["log"]),
-                "review_jobs": _fetch_state.get("review_jobs"),
-                "new_jobs_total": int(_fetch_state.get("new_jobs_total") or 0),
-                "last_fetch_run": _fetch_state.get("last_fetch_run"),
-            })
+        return jsonify(scrape_runner.build_fetch_status_payload())
 
 
     @app.get("/api/fetch/history")
@@ -61,15 +39,14 @@ def register(app):
     @app.post("/api/fetch/cancel")
     @login_required
     def api_fetch_cancel():
-        proc = None
-        with _fetch_lock:
-            if not _fetch_state["running"]:
-                return jsonify({"error": "No fetch is running"}), 400
-            if not _fetch_state.get("company") and not is_user_admin(g.user_id):
-                return jsonify({"error": "Admin access required"}), 403
-            _fetch_state["cancel_requested"] = True
-            proc = _fetch_state.get("process")
-        scrape_runner._terminate_scrape_process(proc)
+        status = scrape_runner.build_fetch_status_payload()
+        if not status.get("running"):
+            return jsonify({"error": "No fetch is running"}), 400
+        if not status.get("company") and not is_user_admin(g.user_id):
+            return jsonify({"error": "Admin access required"}), 403
+        ok, err = scrape_runner.request_fetch_cancel()
+        if not ok:
+            return jsonify({"error": err or "No fetch is running"}), 400
         return jsonify({"ok": True})
 
 
@@ -104,7 +81,7 @@ def register(app):
 
         with _fetch_lock:
             scrape_runner._reap_zombie_fetch()
-            if _fetch_state["running"]:
+            if scrape_runner.fetch_is_running():
                 return jsonify({"error": "A fetch is already running"}), 409
 
             scrape_runner._reset_fetch_run_state(
@@ -114,6 +91,7 @@ def register(app):
                 concurrency=1,
                 user_id=g.user_id,
             )
+            run_id = _fetch_state.get("run_id")
 
         try:
             deps.touch_company_fetch_time(country, company)
@@ -124,6 +102,7 @@ def register(app):
 
         return jsonify({
             "ok": True,
+            "run_id": run_id,
             "country": country,
             "company": company,
             "file": COUNTRY_ARCHIVE_FILENAMES[country],
@@ -162,7 +141,7 @@ def register(app):
 
         with _fetch_lock:
             scrape_runner._reap_zombie_fetch()
-            if _fetch_state["running"]:
+            if scrape_runner.fetch_is_running():
                 return jsonify({"error": "A fetch is already running"}), 409
 
             workers = max(1, min(concurrency, 64))
@@ -174,6 +153,7 @@ def register(app):
                 user_id=g.user_id,
                 ats_type=ats_type,
             )
+            run_id = _fetch_state.get("run_id")
 
         scrape_runner._start_scrape_thread(country, skip_filled, workers, ats_type=ats_type)
 
@@ -184,6 +164,7 @@ def register(app):
         scope = f"{ats_label} companies in " if ats_type else ""
         return jsonify({
             "ok": True,
+            "run_id": run_id,
             "country": country,
             "ats_type": ats_type,
             "file": COUNTRY_ARCHIVE_FILENAMES[country],

@@ -135,3 +135,25 @@ export function finishLoadingProgress() {
   fill.style.width = "100%";
   setTimeout(() => bar.classList.add("done"), 380);
 }
+
+const NARROW_VIEWPORT = window.matchMedia("(max-width: 720px)");
+
+export function isNarrowViewport() {
+  return NARROW_VIEWPORT.matches;
+}
+
+let bodyScrollLockCount = 0;
+
+export function lockBodyScroll() {
+  bodyScrollLockCount += 1;
+  if (bodyScrollLockCount === 1) {
+    document.body.classList.add("scroll-locked");
+  }
+}
+
+export function unlockBodyScroll() {
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+  if (bodyScrollLockCount === 0) {
+    document.body.classList.remove("scroll-locked");
+  }
+}

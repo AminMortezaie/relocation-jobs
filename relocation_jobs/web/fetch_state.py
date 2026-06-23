@@ -30,7 +30,7 @@ _fetch_state: dict = {
     "log": deque(maxlen=200),
     "process": None,
     "user_id": None,
-    "fetch_run_recorded": False,
+    "run_id": None,
     "last_fetch_run": None,
 }
 

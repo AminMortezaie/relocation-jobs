@@ -1,8 +1,8 @@
 /** Filter bar UI: popover, chips, sort sync. */
 
-import { $ } from "./utils.js";
+import { $, isNarrowViewport, lockBodyScroll, unlockBodyScroll } from "./utils.js";
 import { saveFilterPreferences, saveSortPreference } from "./storage.js";
-import { renderCompanies } from "./render.js";
+import { renderCompanies, releaseCompanyOrder } from "./render.js";
 import { loadJobs } from "./data.js";
 
 const FILTER_DEFS = [
@@ -60,16 +60,47 @@ export function updateFilterUI() {
   `).join("");
 }
 
+function showFilterBackdrop() {
+  const backdrop = $("filterBackdrop");
+  if (!backdrop || !isNarrowViewport()) return;
+  backdrop.hidden = false;
+  backdrop.setAttribute("aria-hidden", "false");
+  lockBodyScroll();
+}
+
+function hideFilterBackdrop() {
+  const backdrop = $("filterBackdrop");
+  if (backdrop) {
+    backdrop.hidden = true;
+    backdrop.setAttribute("aria-hidden", "true");
+  }
+  unlockBodyScroll();
+}
+
 function closeFilterPopover() {
-  $("filterPopover").hidden = true;
+  const popover = $("filterPopover");
+  popover.hidden = true;
+  popover.classList.remove("is-sheet");
   $("filterBtn").setAttribute("aria-expanded", "false");
+  hideFilterBackdrop();
 }
 
 function toggleFilterPopover() {
   const popover = $("filterPopover");
   const open = popover.hidden;
-  popover.hidden = !open;
-  $("filterBtn").setAttribute("aria-expanded", open ? "true" : "false");
+  if (open) {
+    popover.hidden = false;
+    if (isNarrowViewport()) {
+      popover.classList.add("is-sheet");
+      showFilterBackdrop();
+    } else {
+      popover.classList.remove("is-sheet");
+      hideFilterBackdrop();
+    }
+    $("filterBtn").setAttribute("aria-expanded", "true");
+    return;
+  }
+  closeFilterPopover();
 }
 
 async function applyFilterChange(def, checked) {
@@ -90,6 +121,7 @@ export function bindFilterBar() {
   $("sortSelect").addEventListener("change", () => {
     syncSortFromSelect();
     saveSortPreference();
+    releaseCompanyOrder();
     renderCompanies();
   });
 
@@ -97,6 +129,8 @@ export function bindFilterBar() {
     e.stopPropagation();
     toggleFilterPopover();
   });
+
+  $("filterBackdrop")?.addEventListener("click", closeFilterPopover);
 
   $("clearFilters").addEventListener("click", async () => {
     let needsReload = false;

@@ -1,7 +1,7 @@
 /** Admin dashboard — catalog ops, users, fetch history, system config. */
 
 import { initAdminFetch } from "./admin-scrape.js";
-import { $, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
+import { $, escapeHtml, escapeAttr, setLoadingProgress, finishLoadingProgress } from "./utils.js";
 
 function skeletonRows(n = 4) {
   return Array(n).fill(0).map(() =>
@@ -61,6 +61,10 @@ function statCard(value, label, { accent = false, muted = false } = {}) {
     .filter(Boolean)
     .join(" ");
   return `<div class="${classes}"><div class="value">${value}</div><div class="label">${escapeHtml(label)}</div></div>`;
+}
+
+function adminCell(value, label) {
+  return `<td data-label="${escapeAttr(label)}">${value}</td>`;
 }
 
 async function apiGet(path) {
@@ -139,12 +143,12 @@ function renderCatalog(data) {
     .map(
       (row) => `
       <tr>
-        <td>${escapeHtml(row.label)}</td>
-        <td>${row.companies}</td>
-        <td>${row.jobs}</td>
-        <td>${row.visa_jobs}</td>
-        <td>${row.fetch_problems}</td>
-        <td>${row.missing_locations}</td>
+        ${adminCell(escapeHtml(row.label), "Country")}
+        ${adminCell(row.companies, "Companies")}
+        ${adminCell(row.jobs, "Jobs")}
+        ${adminCell(row.visa_jobs, "Visa")}
+        ${adminCell(row.fetch_problems, "Fetch issues")}
+        ${adminCell(row.missing_locations, "No locations")}
       </tr>
     `
     )
@@ -154,10 +158,10 @@ function renderCatalog(data) {
     .map(
       (row) => `
       <tr>
-        <td>${escapeHtml(row.label)}</td>
-        <td>${escapeHtml(formatTs(row.last_fetch))}</td>
-        <td>${row.last_fetch_new_jobs}</td>
-        <td>${row.total}</td>
+        ${adminCell(escapeHtml(row.label), "Country")}
+        ${adminCell(escapeHtml(formatTs(row.last_fetch)), "Last fetch")}
+        ${adminCell(row.last_fetch_new_jobs, "New jobs")}
+        ${adminCell(row.total, "Total co.")}
       </tr>
     `
     )
@@ -168,8 +172,8 @@ function renderCatalog(data) {
     .map(
       (row) => `
       <tr>
-        <td><code>${escapeHtml(row.ats_type)}</code></td>
-        <td>${row.companies}</td>
+        ${adminCell(`<code>${escapeHtml(row.ats_type)}</code>`, "ATS")}
+        ${adminCell(row.companies, "Companies")}
       </tr>
     `
     )
@@ -179,7 +183,7 @@ function renderCatalog(data) {
     <section class="admin-panel">
       <h2 class="admin-panel-title">Catalog by country</h2>
       <div class="admin-table-wrap">
-        <table class="admin-table">
+        <table class="admin-table admin-table--responsive">
           <thead>
             <tr>
               <th>Country</th><th>Companies</th><th>Jobs</th><th>Visa</th><th>Fetch issues</th><th>No locations</th>
@@ -192,7 +196,7 @@ function renderCatalog(data) {
         <div>
           <h3 class="admin-subheading">Last fetch meta</h3>
           <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table admin-table--responsive">
               <thead><tr><th>Country</th><th>Last fetch</th><th>New jobs</th><th>Total co.</th></tr></thead>
               <tbody>${metaRows || '<tr><td colspan="4">No meta</td></tr>'}</tbody>
             </table>
@@ -201,7 +205,7 @@ function renderCatalog(data) {
         <div>
           <h3 class="admin-subheading">ATS breakdown</h3>
           <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table admin-table--responsive">
               <thead><tr><th>ATS</th><th>Companies</th></tr></thead>
               <tbody>${atsRows || '<tr><td colspan="2">No ATS data</td></tr>'}</tbody>
             </table>
@@ -222,7 +226,7 @@ function renderCatalog(data) {
     <section class="admin-panel">
       <h2 class="admin-panel-title">Fetch problems (${problems.length})</h2>
       <div class="admin-table-wrap">
-        <table class="admin-table">
+        <table class="admin-table admin-table--responsive">
           <thead>
             <tr><th>Country</th><th>Company</th><th>ATS</th><th>Since</th><th>Careers URL</th></tr>
           </thead>
@@ -231,11 +235,11 @@ function renderCatalog(data) {
               .map(
                 (row) => `
               <tr>
-                <td>${escapeHtml(row.country)}</td>
-                <td>${escapeHtml(row.name)}</td>
-                <td><code>${escapeHtml(row.ats_type || "—")}</code></td>
-                <td>${escapeHtml(row.fetch_problem_date || "—")}</td>
-                <td class="admin-url">${escapeHtml(row.careers_url || "—")}</td>
+                ${adminCell(escapeHtml(row.country), "Country")}
+                ${adminCell(escapeHtml(row.name), "Company")}
+                ${adminCell(`<code>${escapeHtml(row.ats_type || "—")}</code>`, "ATS")}
+                ${adminCell(escapeHtml(row.fetch_problem_date || "—"), "Since")}
+                ${adminCell(`<span class="admin-url">${escapeHtml(row.careers_url || "—")}</span>`, "Careers URL")}
               </tr>
             `
               )
@@ -253,13 +257,13 @@ function renderUsers(data) {
     .map(
       (user) => `
       <tr>
-        <td>${escapeHtml(user.username)}${user.is_admin ? ' <span class="admin-badge">admin</span>' : ""}</td>
-        <td>${formatTs(user.created_at)}</td>
-        <td>${user.tracking_rows}</td>
-        <td>${user.applied_positions}</td>
-        <td>${user.rejected_positions}</td>
-        <td>${user.not_for_me_positions}</td>
-        <td>${user.fetch_runs}</td>
+        ${adminCell(`${escapeHtml(user.username)}${user.is_admin ? ' <span class="admin-badge">admin</span>' : ""}`, "Username")}
+        ${adminCell(formatTs(user.created_at), "Created")}
+        ${adminCell(user.tracking_rows, "Tracking")}
+        ${adminCell(user.applied_positions, "Applied")}
+        ${adminCell(user.rejected_positions, "Rejected")}
+        ${adminCell(user.not_for_me_positions, "Hidden")}
+        ${adminCell(user.fetch_runs, "Fetches")}
       </tr>
     `
     )
@@ -269,7 +273,7 @@ function renderUsers(data) {
     <section class="admin-panel">
       <h2 class="admin-panel-title">Users</h2>
       <div class="admin-table-wrap">
-        <table class="admin-table">
+        <table class="admin-table admin-table--responsive">
           <thead>
             <tr>
               <th>Username</th><th>Created</th><th>Tracking</th><th>Applied</th><th>Rejected</th><th>Hidden</th><th>Fetches</th>
@@ -298,13 +302,13 @@ function renderFetchRuns(data) {
             : `exit ${run.exit_code}`;
       return `
         <tr>
-          <td>${formatTs(run.started_at)}</td>
-          <td>${escapeHtml(run.username || "?")}</td>
-          <td>${escapeHtml(target)}</td>
-          <td>${run.new_jobs ?? 0}</td>
-          <td>${run.duration_seconds != null ? `${Math.round(run.duration_seconds)}s` : "—"}</td>
-          <td>${escapeHtml(status)}</td>
-          <td class="admin-url">${escapeHtml(run.result_line || "—")}</td>
+          ${adminCell(formatTs(run.started_at), "Started")}
+          ${adminCell(escapeHtml(run.username || "?"), "User")}
+          ${adminCell(escapeHtml(target), "Target")}
+          ${adminCell(run.new_jobs ?? 0, "New")}
+          ${adminCell(run.duration_seconds != null ? `${Math.round(run.duration_seconds)}s` : "—", "Duration")}
+          ${adminCell(escapeHtml(status), "Status")}
+          ${adminCell(`<span class="admin-url">${escapeHtml(run.result_line || "—")}</span>`, "Result")}
         </tr>
       `;
     })
@@ -314,7 +318,7 @@ function renderFetchRuns(data) {
     <section class="admin-panel">
       <h2 class="admin-panel-title">Fetch runs (all users)</h2>
       <div class="admin-table-wrap">
-        <table class="admin-table">
+        <table class="admin-table admin-table--responsive">
           <thead>
             <tr><th>Started</th><th>User</th><th>Target</th><th>New</th><th>Duration</th><th>Status</th><th>Result</th></tr>
           </thead>

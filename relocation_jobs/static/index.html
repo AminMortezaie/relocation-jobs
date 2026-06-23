@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Relocation Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=23" />
+  <link rel="stylesheet" href="/static/styles.css?v=35" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
@@ -29,47 +29,72 @@
 
     <div id="mainContent" class="main-content hidden">
     <header class="app-header">
-      <h1 class="app-title">Relocation Jobs</h1>
+      <div class="app-header-brand">
+        <h1 class="app-title">Relocation Jobs</h1>
+        <div class="user-menu">
+          <button type="button" class="user-avatar-btn" id="userMenuBtn" aria-expanded="false" aria-controls="userMenuPopover" aria-label="Account menu">
+            <span id="userAvatar">?</span>
+          </button>
+          <div class="user-dropdown" id="userMenuPopover" hidden>
+            <p class="user-dropdown-name" id="userName">Account</p>
+            <a href="/admin" class="user-dropdown-admin" id="adminLink" hidden>Admin panel</a>
+            <button type="button" class="user-dropdown-signout" id="logoutBtn">Sign out</button>
+          </div>
+        </div>
+      </div>
 
       <div class="app-header-main">
-        <div class="header-field country-field">
-          <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>
-          </svg>
-          <label class="visually-hidden" for="country">Country</label>
-          <select id="country" class="header-select" aria-label="Country"></select>
-        </div>
+        <div class="header-filters">
+          <div class="header-field country-field">
+            <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>
+            </svg>
+            <label class="visually-hidden" for="country">Country</label>
+            <select id="country" class="header-select" aria-label="Country"></select>
+          </div>
 
-        <div class="header-field ats-field">
-          <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-          </svg>
-          <label class="visually-hidden" for="ats">ATS</label>
-          <select id="ats" class="header-select" aria-label="ATS">
-            <option value="all">All ATS</option>
-          </select>
-        </div>
+          <div class="header-field ats-field">
+            <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            <label class="visually-hidden" for="ats">ATS</label>
+            <select id="ats" class="header-select" aria-label="ATS">
+              <option value="all">All ATS</option>
+            </select>
+          </div>
 
-        <div class="header-field location-field">
-          <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>
-          </svg>
-          <label class="visually-hidden" for="location">Location</label>
-          <select id="location" class="header-select" aria-label="Location">
-            <option value="all">All locations</option>
-          </select>
-        </div>
+          <div class="header-field location-field">
+            <svg class="header-field-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>
+            </svg>
+            <label class="visually-hidden" for="location">Location</label>
+            <select id="location" class="header-select" aria-label="Location">
+              <option value="all">All locations</option>
+            </select>
+          </div>
 
-        <div class="header-menu scrape-settings" id="scrapeSettingsWrap" hidden></div>
+          <div class="header-menu scrape-settings" id="scrapeSettingsWrap" hidden></div>
+        </div>
 
         <div class="header-action-group">
-          <button type="button" class="header-secondary-btn" id="fetchCountryBtn" hidden title="Fetch companies for the selected country and ATS">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>
-            </svg>
-            <span class="header-btn-text">Fetch</span>
-          </button>
+          <div class="header-fetch-slot">
+            <button type="button" class="header-secondary-btn" id="fetchCountryBtn" hidden title="Fetch jobs for the selected country and ATS filter">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>
+              </svg>
+              <span class="header-btn-text">Fetch</span>
+            </button>
+            <button type="button" class="header-secondary-btn fetch-progress-chip" id="fetchProgressChip" hidden title="View fetch progress">
+              <span class="fetch-progress-chip-meter" aria-hidden="true">
+                <span class="fetch-progress-chip-fill" id="fetchProgressChipFill"></span>
+              </span>
+              <span class="header-btn-text" id="fetchProgressChipMeta">Fetching…</span>
+              <svg class="fetch-progress-chip-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
           <a href="/admin" class="header-secondary-btn admin-header-btn" id="adminPanelBtn" hidden>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -83,17 +108,6 @@
             </svg>
             <span class="header-btn-text">Add company</span>
           </button>
-        </div>
-      </div>
-
-      <div class="user-menu">
-        <button type="button" class="user-avatar-btn" id="userMenuBtn" aria-expanded="false" aria-controls="userMenuPopover" aria-label="Account menu">
-          <span id="userAvatar">?</span>
-        </button>
-        <div class="user-dropdown" id="userMenuPopover" hidden>
-          <p class="user-dropdown-name" id="userName">Account</p>
-          <a href="/admin" class="user-dropdown-admin" id="adminLink" hidden>Admin panel</a>
-          <button type="button" class="user-dropdown-signout" id="logoutBtn">Sign out</button>
         </div>
       </div>
     </header>
@@ -230,6 +244,7 @@
     </div>
   </div>
 
+  <div class="mobile-sheet-backdrop" id="filterBackdrop" hidden aria-hidden="true"></div>
   <div class="ats-score-backdrop" id="atsScoreBackdrop" hidden aria-hidden="true"></div>
   <div class="referral-backdrop" id="referralBackdrop" hidden aria-hidden="true"></div>
   <div class="toast" id="toast"></div>
@@ -645,6 +660,6 @@
     </form>
   </div>
 
-  <script type="module" src="/static/js/main.js?v=73"></script>
+  <script type="module" src="/static/js/main.js?v=77"></script>
 </body>
 </html>

@@ -156,13 +156,16 @@ def test_country_fetch_requires_admin(app_client, db, seeded_catalog, monkeypatc
 
 def test_admin_country_fetch(auth_client, seeded_catalog, monkeypatch):
     import relocation_jobs.panel_server as ps
+    from relocation_jobs.db import clear_running_fetch_runs_for_tests
 
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
     monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", lambda *a, **k: None)
 
+    clear_running_fetch_runs_for_tests()
     with ps._fetch_lock:
         ps._fetch_state["running"] = False
+        ps._fetch_state["run_id"] = None
 
     resp = auth_client.post("/api/fetch", json={"country": "uk", "concurrency": 2})
     assert resp.status_code == 200
@@ -174,6 +177,7 @@ def test_admin_country_fetch(auth_client, seeded_catalog, monkeypatch):
 
 def test_admin_country_fetch_by_ats(auth_client, seeded_catalog, monkeypatch):
     import relocation_jobs.panel_server as ps
+    from relocation_jobs.db import clear_running_fetch_runs_for_tests
 
     captured: dict = {}
 
@@ -188,8 +192,10 @@ def test_admin_country_fetch_by_ats(auth_client, seeded_catalog, monkeypatch):
     monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", fake_start)
 
+    clear_running_fetch_runs_for_tests()
     with ps._fetch_lock:
         ps._fetch_state["running"] = False
+        ps._fetch_state["run_id"] = None
 
     resp = auth_client.post(
         "/api/fetch",

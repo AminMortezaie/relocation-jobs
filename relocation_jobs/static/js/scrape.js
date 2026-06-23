@@ -25,7 +25,11 @@ import {
   setFetchLogMode,
   showFetchReviewFeedback,
   normalizeTsForSort,
+  syncFetchJobSummary,
+  openFetchPanel,
 } from "./render.js";
+
+const FETCH_POLL_FAILURE_LIMIT = 3;
 
 function countryLabel(countryId) {
   const opt = [...$("country").options].find((o) => o.value === countryId);
@@ -46,8 +50,58 @@ function fetchScopeSubtitle(country, atsType, concurrency) {
   return parts.join(" · ");
 }
 
-function applyFetchStatus(st) {
-  appendFetchLog((st.log || []).join("\n") || "(waiting…)");
+export function clearFetchActivity({ toast: showToast = false, message } = {}) {
+  if (state.pollTimer) {
+    clearInterval(state.pollTimer);
+    state.pollTimer = null;
+  }
+  state.fetchPollFailures = 0;
+  setFetchBusy(false);
+  if (showToast) toast(message || "Fetch status cleared");
+}
+
+export async function syncFetchStateFromServer({ toastOnClear = false } = {}) {
+  let st;
+  try {
+    st = await getFetchStatus();
+    state.fetchPollFailures = 0;
+  } catch {
+    state.fetchPollFailures = (state.fetchPollFailures || 0) + 1;
+    const clientThinksActive = state.countryFetchActive || state.fetchBusy || state.serverFetchRunning;
+    if (clientThinksActive && state.fetchPollFailures >= FETCH_POLL_FAILURE_LIMIT) {
+      clearFetchActivity({
+        toast: toastOnClear,
+        message: "Server unreachable — cleared stale fetch status",
+      });
+    }
+    return null;
+  }
+
+  syncFetchJobSummary(st);
+
+  const clientThinksActive = state.countryFetchActive || state.fetchBusy || state.serverFetchRunning;
+  if (st.running) {
+    markFetchActiveFromStatus(st);
+    ensureFetchPolling();
+    return st;
+  }
+  if (clientThinksActive) {
+    clearFetchActivity({
+      toast: toastOnClear,
+      message: "Fetch is no longer running",
+    });
+  }
+
+  return st;
+}
+
+function applyFetchStatus(st, { replaceLog = false } = {}) {
+  const logText = (st.log || []).join("\n") || "(waiting…)";
+  if (replaceLog) {
+    $("fetchLog").textContent = `${logText}\n`;
+  } else {
+    appendFetchLog(logText);
+  }
   updateFetchActivity(st);
   if (st.running) {
     updateFetchRunMeta(st, { running: true });
@@ -104,6 +158,7 @@ function applyFetchStatus(st) {
       $("fetchCancelBtn").disabled = true;
       $("fetchCancelBtn").textContent = "Cancelling…";
     }
+    syncFetchJobSummary(st);
     return { done: false };
   }
 
@@ -167,14 +222,133 @@ function applyFetchStatus(st) {
     clearFetchReview();
     state.lastFetchReview = null;
   }
+  syncFetchJobSummary(st);
   return { done: true, st };
+}
+
+function showFetchPanelForStatus(st, { reopen = false } = {}) {
+  if (st.company) {
+    showFetchPanel({
+      title: `Fetching ${st.company}`,
+      subtitle: countryLabel(st.country),
+      singleCompany: true,
+      country: st.country,
+      company: st.company,
+      reopen,
+    });
+    return;
+  }
+  showFetchPanel({
+    title: st.ats_type ? `Fetching ${atsLabel(st.ats_type)} companies` : "Fetching companies",
+    subtitle: fetchScopeSubtitle(st.country, st.ats_type, st.concurrency),
+    singleCompany: false,
+    country: st.country,
+    reopen,
+  });
+}
+
+function markFetchActiveFromStatus(st) {
+  if (st.company) {
+    const key = `${st.country}:${st.company}`;
+    if (!state.fetchBusy || state.fetchingCompanyKey !== key) {
+      setFetchBusy(true, key);
+    }
+  } else if (!state.countryFetchActive) {
+    setFetchBusy(true, null, { countryScope: true });
+  }
+  syncFetchJobSummary(st);
+  state.fetchPanelSingle = Boolean(st.company);
+}
+
+export function ensureFetchPolling() {
+  if (!state.pollTimer && (state.serverFetchRunning || state.countryFetchActive || state.fetchBusy)) {
+    pollFetchStatus();
+  }
+}
+
+export async function openFetchProgress() {
+  let st;
+  try {
+    st = await getFetchStatus();
+    state.fetchPollFailures = 0;
+  } catch {
+    if (state.lastFetchStatus?.running) {
+      st = state.lastFetchStatus;
+    } else {
+      toast("Could not load fetch status");
+      return;
+    }
+  }
+
+  if (!st?.running) {
+    if (state.countryFetchActive || state.fetchBusy || state.serverFetchRunning) {
+      clearFetchActivity({ toast: true, message: "Fetch is no longer running" });
+    }
+    return;
+  }
+
+  syncFetchJobSummary(st);
+  markFetchActiveFromStatus(st);
+  showFetchPanelForStatus(st, { reopen: true });
+  applyFetchStatus(st, { replaceLog: true });
+  ensureFetchPolling();
+}
+
+export async function reopenFetchProgress() {
+  await openFetchProgress();
+}
+
+export async function handleFetchCountryClick() {
+  let st;
+  try {
+    st = await getFetchStatus();
+    state.fetchPollFailures = 0;
+  } catch {
+    toast("Could not reach server");
+    return;
+  }
+
+  if (st.running) {
+    toast("A fetch is already running — use the progress chip to view it");
+    syncFetchJobSummary(st);
+    markFetchActiveFromStatus(st);
+    ensureFetchPolling();
+    return;
+  }
+
+  if (state.countryFetchActive || state.fetchBusy || state.serverFetchRunning) {
+    clearFetchActivity();
+  }
+  await startCountryFetch();
 }
 
 export function pollFetchStatus() {
   if (state.pollTimer) clearInterval(state.pollTimer);
 
   async function tick() {
-    const st = await getFetchStatus();
+    let st;
+    try {
+      st = await getFetchStatus();
+      state.fetchPollFailures = 0;
+    } catch {
+      state.fetchPollFailures = (state.fetchPollFailures || 0) + 1;
+      if (state.fetchPollFailures >= FETCH_POLL_FAILURE_LIMIT) {
+        clearFetchActivity({
+          toast: true,
+          message: "Lost connection to server — fetch status cleared",
+        });
+        return;
+      }
+      return;
+    }
+
+    if (!st.running && (state.countryFetchActive || state.fetchBusy || state.serverFetchRunning)) {
+      syncFetchJobSummary(st);
+      applyFetchStatus(st);
+      clearFetchActivity();
+      return;
+    }
+
     const result = applyFetchStatus(st);
     if (!result.done) return;
 
@@ -229,14 +403,28 @@ export function pollFetchStatus() {
 }
 
 export async function cancelFetch() {
-  if (!state.fetchBusy) return;
+  let active = state.fetchBusy || state.countryFetchActive || state.serverFetchRunning;
+  if (!active) {
+    try {
+      const st = await getFetchStatus();
+      if (!st?.running) return;
+      markFetchActiveFromStatus(st);
+      active = true;
+    } catch {
+      return;
+    }
+  }
+  if (!active) return;
+
   $("fetchCancelBtn").disabled = true;
   $("fetchCancelBtn").textContent = "Cancelling…";
   const ok = await cancelFetchRequest();
   if (!ok) {
     $("fetchCancelBtn").disabled = false;
     $("fetchCancelBtn").textContent = "Cancel";
+    return;
   }
+  ensureFetchPolling();
 }
 
 export async function startCountryFetch() {
@@ -244,10 +432,6 @@ export async function startCountryFetch() {
   const atsType = $("ats")?.value || "all";
   if (!country || country === "all") {
     toast("Select a single country to fetch (not All countries).");
-    return;
-  }
-  if (state.fetchBusy) {
-    toast("A fetch is already running.");
     return;
   }
   if (state.scrapeConfig?.scrape_enabled === false) {
@@ -265,7 +449,7 @@ export async function startCountryFetch() {
     ),
   );
 
-  setFetchBusy(true);
+  setFetchBusy(true, null, { countryScope: true });
   state.lastFetchReview = null;
   state.fetchPanelSingle = false;
   showFetchPanel({
@@ -283,6 +467,14 @@ export async function startCountryFetch() {
       concurrency,
     });
     if (!data) {
+      const st = await getFetchStatus().catch(() => null);
+      if (st?.running) {
+        markFetchActiveFromStatus(st);
+        showFetchPanelForStatus(st, { reopen: true });
+        applyFetchStatus(st, { replaceLog: true });
+        ensureFetchPolling();
+        return;
+      }
       setFetchBusy(false);
       hideFetchPanelOnFailure();
       return;
@@ -296,10 +488,15 @@ export async function startCountryFetch() {
 }
 
 export async function fetchOneCompany(country, company) {
-  if (state.fetchBusy) {
+  const st = await syncFetchStateFromServer();
+  if (st?.running) {
     toast("A fetch is already running.");
     return;
   }
+  if (state.fetchBusy || state.countryFetchActive) {
+    clearFetchActivity();
+  }
+
   setFetchBusy(true, `${country}:${company}`);
   state.lastFetchReview = null;
   showFetchPanel({
@@ -332,29 +529,13 @@ function hideFetchPanelOnFailure() {
 }
 
 export async function resumeFetchIfRunning() {
-  const st = await getFetchStatus();
-  if (!st.running) return;
-
-  if (st.company) {
-    setFetchBusy(true, `${st.country}:${st.company}`);
-    showFetchPanel({
-      title: `Fetching ${st.company}`,
-      subtitle: countryLabel(st.country),
-      singleCompany: true,
-      country: st.country,
-      company: st.company,
-    });
-    pollFetchStatus();
+  const st = await syncFetchStateFromServer();
+  if (!st?.running) {
+    clearFetchActivity();
     return;
   }
 
-  setFetchBusy(true);
-  state.fetchPanelSingle = false;
-  showFetchPanel({
-    title: st.ats_type ? `Fetching ${atsLabel(st.ats_type)} companies` : "Fetching companies",
-    subtitle: fetchScopeSubtitle(st.country, st.ats_type),
-    singleCompany: false,
-    country: st.country,
-  });
-  pollFetchStatus();
+  markFetchActiveFromStatus(st);
+  syncFetchJobSummary(st);
+  ensureFetchPolling();
 }

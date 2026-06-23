@@ -371,14 +371,28 @@ async function startCountryFetch() {
 }
 
 async function cancelCountryFetch() {
-  if (!fetchBusy) return;
+  let active = fetchBusy;
+  if (!active) {
+    try {
+      const st = await getFetchStatus();
+      if (!st?.running || st.company) return;
+      active = true;
+      fetchBusy = true;
+    } catch {
+      return;
+    }
+  }
+  if (!active) return;
+
   $("adminFetchCancelBtn").disabled = true;
   $("adminFetchCancelBtn").textContent = "Cancelling…";
-  const res = await cancelFetchRequest();
-  if (!res) {
+  const ok = await cancelFetchRequest();
+  if (!ok) {
     $("adminFetchCancelBtn").disabled = false;
     $("adminFetchCancelBtn").textContent = "Cancel";
+    return;
   }
+  pollFetchStatus();
 }
 
 export async function initAdminFetch() {

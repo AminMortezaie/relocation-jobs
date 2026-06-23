@@ -3,7 +3,7 @@
 import { state } from "./state.js";
 import { $, escapeAttr, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
 import { fetchConfig, fetchCountries, fetchAtsTypes, fetchLocations, fetchJobs } from "./api.js";
-import { renderStats, renderCompanies } from "./render.js";
+import { renderStats, renderCompanies, releaseCompanyOrder } from "./render.js";
 
 function skeletonCard() {
   return `
@@ -87,6 +87,9 @@ export async function loadCities() {
 }
 
 export async function loadJobs(options = {}) {
+  // User-initiated reloads (filters, country/ATS/location, manual refresh) should
+  // re-sort the board; the silent post-fetch reload keeps the frozen order.
+  if (!options.silent) releaseCompanyOrder();
   const country = $("country").value;
   localStorage.setItem("panel_country", country);
   if ($("ats")) {

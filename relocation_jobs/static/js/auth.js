@@ -3,6 +3,7 @@
 import { state } from "./state.js";
 import { $ } from "./utils.js";
 import { loadConfig, loadCountries, loadAtsTypes, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
+import { updateFetchHeaderUI } from "./render.js";
 
 export function showLogin(message = "") {
   $("mainContent").classList.add("hidden");
@@ -14,12 +15,10 @@ export function showLogin(message = "") {
 export function setAdminNavVisible(visible) {
   const adminLink = $("adminLink");
   const adminPanelBtn = $("adminPanelBtn");
-  const fetchCountryBtn = $("fetchCountryBtn");
+  state.fetchControlsEnabled = Boolean(visible) && state.scrapeConfig?.scrape_enabled !== false;
   if (adminLink) adminLink.hidden = !visible;
   if (adminPanelBtn) adminPanelBtn.hidden = !visible;
-  if (fetchCountryBtn) {
-    fetchCountryBtn.hidden = !visible || state.scrapeConfig?.scrape_enabled === false;
-  }
+  updateFetchHeaderUI();
 }
 
 export function showApp() {

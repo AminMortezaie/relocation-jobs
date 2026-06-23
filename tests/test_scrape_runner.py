@@ -61,6 +61,29 @@ class TestCancelAndProgress:
         out = capsys.readouterr().out
         assert "@@ACTIVITY@@" in out
 
+    def test_panel_child_cancel_wiring(self, monkeypatch, db, test_user):
+        from relocation_jobs.db import create_fetch_run, update_fetch_run_live
+
+        started = "2026-06-24T12:00:00+00:00"
+        row = create_fetch_run(
+            user_id=test_user["id"],
+            country="uk",
+            company_name=None,
+            file_name="uk.json",
+            concurrency=4,
+            started_at=started,
+        )
+        run_id = row["id"]
+        monkeypatch.setenv("PANEL_SCRAPE_CHILD", "1")
+        monkeypatch.setenv("PANEL_FETCH_RUN_ID", str(run_id))
+        sj._wire_panel_child_cancel()
+        try:
+            assert sj.is_cancel_requested() is False
+            update_fetch_run_live(run_id, cancel_requested=True)
+            assert sj.is_cancel_requested() is True
+        finally:
+            sj.clear_cancel_checker()
+
     def test_review_entry_filters_noise(self):
         assert sj._review_entry({"title": "Show 10 more", "url": "https://example.com/jobs/show_more"}) is None
         entry = sj._review_entry({"title": "Backend Engineer", "url": "https://example.com/j/1"})

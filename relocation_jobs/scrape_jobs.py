@@ -8,10 +8,13 @@ Compatibility shim — implementation lives in ``relocation_jobs.scrape``.
 from __future__ import annotations
 
 import asyncio
+import os
 import sys
 
 from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.scrape_cancel import clear_cancel_checker, set_cancel_checker
+from relocation_jobs.db.fetch_runs import is_fetch_run_cancel_requested
 from relocation_jobs.scrape import _compat
 from relocation_jobs.scrape import ipc as _scrape_ipc
 
@@ -147,6 +150,17 @@ def scrape_teamtailor(
     )
 
 
+def _wire_panel_child_cancel() -> None:
+    """Poll Postgres cancel_requested when spawned by panel_server."""
+    if not os.environ.get("PANEL_SCRAPE_CHILD"):
+        return
+    raw = (os.environ.get("PANEL_FETCH_RUN_ID") or "").strip()
+    if not raw.isdigit():
+        return
+    run_id = int(raw)
+    set_cancel_checker(lambda: is_fetch_run_cancel_requested(run_id))
+
+
 def run_country(
     country_key: str,
     *,
@@ -157,17 +171,21 @@ def run_country(
     workers: int = DEFAULT_WORKERS,
     ats_type: str | None = None,
 ) -> None:
-    asyncio.run(
-        run_file_async(
-            country_key,
-            target=target,
-            skip_filled=skip_filled,
-            enrich_only=enrich_only,
-            skip_enriched=skip_enriched,
-            concurrency=workers,
-            ats_type=ats_type,
+    _wire_panel_child_cancel()
+    try:
+        asyncio.run(
+            run_file_async(
+                country_key,
+                target=target,
+                skip_filled=skip_filled,
+                enrich_only=enrich_only,
+                skip_enriched=skip_enriched,
+                concurrency=workers,
+                ats_type=ats_type,
+            )
         )
-    )
+    finally:
+        clear_cancel_checker()
 
 
 def main() -> None:

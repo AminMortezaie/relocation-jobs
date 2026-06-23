@@ -58,10 +58,19 @@ from relocation_jobs.db.companies import (
 )
 
 from relocation_jobs.db.fetch_runs import (
+    clear_running_fetch_runs_for_tests,
+    create_fetch_run,
+    finalize_fetch_run,
+    fetch_status_from_row,
+    get_running_fetch_run,
+    idle_fetch_status,
+    is_fetch_run_cancel_requested,
     list_all_fetch_runs,
     list_fetch_runs,
+    reap_orphan_running_fetch_runs,
     record_fetch_run,
     tracking_is_empty,
+    update_fetch_run_live,
 )
 
 __all__ = [
@@ -105,8 +114,17 @@ __all__ = [
     "set_company_awaiting_response_db",
     "sync_company_applied_from_jobs_db",
     # fetch_runs
+    "clear_running_fetch_runs_for_tests",
+    "create_fetch_run",
+    "finalize_fetch_run",
+    "fetch_status_from_row",
+    "get_running_fetch_run",
+    "idle_fetch_status",
+    "is_fetch_run_cancel_requested",
     "list_all_fetch_runs",
     "list_fetch_runs",
+    "reap_orphan_running_fetch_runs",
     "record_fetch_run",
     "tracking_is_empty",
+    "update_fetch_run_live",
 ]

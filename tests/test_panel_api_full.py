@@ -38,9 +38,11 @@ def _job_ctx(auth_client, country: str = "uk") -> dict:
 
 
 def _reset_fetch_state() -> None:
+    from relocation_jobs.db import clear_running_fetch_runs_for_tests
     from relocation_jobs.web import fetch_state
     import relocation_jobs.panel_server as ps
 
+    clear_running_fetch_runs_for_tests()
     with ps._fetch_lock:
         ps._fetch_state["running"] = False
         ps._fetch_state["cancel_requested"] = False
@@ -52,7 +54,7 @@ def _reset_fetch_state() -> None:
         ps._fetch_state["user_id"] = None
         ps._fetch_state["company"] = None
         ps._fetch_state["country"] = None
-        ps._fetch_state["fetch_run_recorded"] = False
+        ps._fetch_state["run_id"] = None
         ps._fetch_state["last_fetch_run"] = None
         ps._fetch_state["new_jobs_total"] = 0
         ps._fetch_state["log"].clear()
@@ -63,6 +65,7 @@ def _reset_fetch_state() -> None:
 def _fake_run_scrape(country, skip_filled, concurrency, *, company=None, ats_type=None):
     import relocation_jobs.panel_server as ps
     from datetime import datetime, timezone
+    from relocation_jobs.db import create_fetch_run
 
     _log = ps._log
     if company:
@@ -70,6 +73,22 @@ def _fake_run_scrape(country, skip_filled, concurrency, *, company=None, ats_typ
     _log("@@PROGRESS@@" + json.dumps({"current": 1, "total": 1, "company": company or "x", "status": "done", "new_jobs": 2}))
     _log("Done [1/1] Acme — enriched 1 job(s)")
     with ps._fetch_lock:
+        if not ps._fetch_state.get("run_id"):
+            started_at = ps._fetch_state.get("started_at") or datetime.now(timezone.utc).isoformat()
+            row = create_fetch_run(
+                user_id=int(ps._fetch_state.get("user_id") or 1),
+                country=country,
+                company_name=company,
+                file_name=ps._fetch_state.get("file") or f"{country}.json",
+                concurrency=concurrency,
+                ats_type=ats_type,
+                started_at=started_at,
+            )
+            ps._fetch_state["run_id"] = row.get("id")
+            ps._fetch_state["running"] = True
+            ps._fetch_state["country"] = country
+            ps._fetch_state["company"] = company
+            ps._fetch_state["started_at"] = started_at
         ps._fetch_state["exit_code"] = 0
         ps._fetch_state["running"] = False
         ps._fetch_state["finished_at"] = datetime.now(timezone.utc).isoformat()
@@ -716,7 +735,7 @@ def test_panel_server_helpers():
     ps._on_scrape_progress({"current": 1, "total": 5, "company": "X", "status": "fetching"})
     ps._on_scrape_review({"included": [{"title": "A"}], "filtered": []})
 
-    ps._reset_fetch_run_state(country="uk", company="Acme", file_name="uk.json", concurrency=4)
+    ps._reset_fetch_run_state(country="uk", company="Acme", file_name="uk.json", concurrency=4, user_id=1)
     assert ps._fetch_state["running"] is True
 
     ps._handle_scrape_ipc_line(
@@ -940,6 +959,7 @@ def test_terminate_scrape_timeout(monkeypatch):
     import relocation_jobs.panel_server as ps
 
     proc = MagicMock()
+    proc.pid = None
     proc.poll.return_value = None
     proc.wait.side_effect = [
         subprocess.TimeoutExpired(cmd="x", timeout=2.0),
@@ -947,4 +967,26 @@ def test_terminate_scrape_timeout(monkeypatch):
     ]
     ps._terminate_scrape_process(proc)
     proc.kill.assert_called()
+
+
+@pytest.mark.integration
+def test_terminate_scrape_process_group(monkeypatch):
+    import os
+    import signal
+    import relocation_jobs.panel_server as ps
+
+    proc = MagicMock()
+    proc.pid = 4242
+    proc.poll.return_value = None
+    proc.wait.return_value = 0
+    killed = []
+
+    def fake_killpg(pgid, sig):
+        killed.append((pgid, sig))
+
+    monkeypatch.setattr(os, "getpgid", lambda pid: pid + 100)
+    monkeypatch.setattr(os, "killpg", fake_killpg)
+    ps._terminate_scrape_process(proc)
+    assert killed == [(4342, signal.SIGTERM)]
+    proc.wait.assert_called_once()
 

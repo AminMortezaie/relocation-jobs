@@ -466,6 +466,9 @@ export async function fetchCompanyRequest(country, company) {
 
 export async function getFetchStatus() {
   const res = await apiFetch("/api/fetch/status");
+  if (!res.ok) {
+    throw new Error(`Fetch status failed (${res.status})`);
+  }
   return res.json();
 }
 

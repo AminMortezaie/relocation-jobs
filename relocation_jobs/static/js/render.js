@@ -94,27 +94,57 @@ function isFetchingCompany(company) {
   return state.fetchBusy && state.fetchingCompanyKey === companySortKey(company);
 }
 
+function compareCompaniesDefault(a, b) {
+  if ($("sortNewestFetch").checked) {
+    const aFetching = isFetchingCompany(a);
+    const bFetching = isFetchingCompany(b);
+    if (aFetching !== bFetching) return aFetching ? -1 : 1;
+    return compareDateDesc(companyActivityTs(a), companyActivityTs(b));
+  }
+  const byCountry = (a.country_label || a.country || "").localeCompare(
+    b.country_label || b.country || "",
+    undefined,
+    { sensitivity: "base" }
+  );
+  if (byCountry !== 0) return byCountry;
+  return (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
+}
+
 export function sortCompaniesList(companies) {
   const list = [...companies];
-  if ($("sortNewestFetch").checked) {
+  const frozen = state.frozenCompanyOrder;
+  if (frozen) {
+    // While a fetch is active we keep the pre-fetch order so cards don't
+    // reshuffle as their fetch timestamps update. Companies absent from the
+    // frozen snapshot (newly added) sort normally after the frozen ones.
     list.sort((a, b) => {
-      const aFetching = isFetchingCompany(a);
-      const bFetching = isFetchingCompany(b);
-      if (aFetching !== bFetching) return aFetching ? -1 : 1;
-      return compareDateDesc(companyActivityTs(a), companyActivityTs(b));
+      const ai = frozen.get(companySortKey(a));
+      const bi = frozen.get(companySortKey(b));
+      const aKnown = ai !== undefined;
+      const bKnown = bi !== undefined;
+      if (aKnown && bKnown) return ai - bi;
+      if (aKnown !== bKnown) return aKnown ? -1 : 1;
+      return compareCompaniesDefault(a, b);
     });
-  } else {
-    list.sort((a, b) => {
-      const byCountry = (a.country_label || a.country || "").localeCompare(
-        b.country_label || b.country || "",
-        undefined,
-        { sensitivity: "base" }
-      );
-      if (byCountry !== 0) return byCountry;
-      return (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
-    });
+    return list;
   }
+  list.sort(compareCompaniesDefault);
   return list;
+}
+
+/** Snapshot the current display order so an active fetch can't reshuffle it. */
+export function freezeCompanyOrder() {
+  if (state.frozenCompanyOrder) return;
+  const map = new Map();
+  [...state.allCompanies]
+    .sort(compareCompaniesDefault)
+    .forEach((company, index) => map.set(companySortKey(company), index));
+  state.frozenCompanyOrder = map;
+}
+
+/** Release the frozen order so the board re-sorts on the next render. */
+export function releaseCompanyOrder() {
+  state.frozenCompanyOrder = null;
 }
 
 function companyHasNoVisibleJobs(company) {
@@ -670,7 +700,7 @@ export function renderCompanies() {
               ${awaitingResponseBtn}
               ${notForMeBtn}
               ${rejectedBtn}
-              ${state.scrapeConfig.scrape_enabled !== false ? `<button type="button" class="fetch-company-btn" data-country="${escapeAttr(c.country)}" data-company="${escapeAttr(c.name)}" ${state.fetchBusy ? "disabled" : ""}>${isFetching ? "Fetching…" : "Fetch jobs"}</button>` : ""}
+              ${state.scrapeConfig.scrape_enabled !== false ? `<button type="button" class="fetch-company-btn" data-country="${escapeAttr(c.country)}" data-company="${escapeAttr(c.name)}" ${state.serverFetchRunning ? "disabled" : ""}>${isFetching ? "Fetching…" : "Fetch jobs"}</button>` : ""}
               <button type="button" class="remove-company-btn" data-country="${escapeAttr(c.country)}" data-company="${escapeAttr(c.name)}" title="Remove this company from the list">Remove</button>
             </div>
           </div>
@@ -731,16 +761,118 @@ function touchFetchingCompanyTimestamp(companyKey) {
   company.newest_job_fetched = ts;
 }
 
-export function setFetchBusy(busy, companyKey = null) {
+export function setFetchBusy(busy, companyKey = null, { countryScope = false } = {}) {
+  if (!busy) {
+    state.fetchBusy = false;
+    state.countryFetchActive = false;
+    state.fetchingCompanyKey = null;
+    state.fetchJobSummary = null;
+    state.serverFetchRunning = false;
+    $("addCompanyBtn").disabled = false;
+    updateFetchHeaderUI();
+    renderCompanies();
+    return;
+  }
+
+  freezeCompanyOrder();
   if (busy && companyKey) {
     touchFetchingCompanyTimestamp(companyKey);
   }
-  state.fetchBusy = busy;
-  state.fetchingCompanyKey = busy ? companyKey : null;
-  const fetchBtn = $("fetchBtn");
-  if (fetchBtn) fetchBtn.disabled = busy;
-  $("addCompanyBtn").disabled = busy;
+  if (countryScope) {
+    state.countryFetchActive = true;
+    state.fetchBusy = false;
+    state.fetchingCompanyKey = null;
+  } else {
+    state.fetchBusy = true;
+    state.countryFetchActive = false;
+    state.fetchingCompanyKey = companyKey || null;
+  }
+  state.serverFetchRunning = true;
+  $("addCompanyBtn").disabled = !countryScope && state.fetchBusy;
+  updateFetchHeaderUI();
   renderCompanies();
+}
+
+export function updateFetchHeaderUI() {
+  const fetchBtn = $("fetchCountryBtn");
+  const chip = $("fetchProgressChip");
+  const meta = $("fetchProgressChipMeta");
+  const fill = $("fetchProgressChipFill");
+  if (!fetchBtn || !chip) return;
+
+  const controlsEnabled = Boolean(state.fetchControlsEnabled);
+  const active = state.serverFetchRunning || state.countryFetchActive || state.fetchBusy;
+
+  if (!controlsEnabled) {
+    fetchBtn.hidden = true;
+    chip.hidden = true;
+    return;
+  }
+
+  if (!active) {
+    fetchBtn.hidden = false;
+    chip.hidden = true;
+    fetchBtn.title = "Fetch jobs for the selected country and ATS filter";
+    return;
+  }
+
+  fetchBtn.hidden = true;
+  chip.hidden = false;
+
+  const summary = state.fetchJobSummary || {};
+  let metaText = "Fetching…";
+  let pct = 0;
+  let chipTitle = "View fetch progress";
+
+  if (state.fetchBusy && state.fetchingCompanyKey) {
+    const company = state.fetchingCompanyKey.split(":").slice(1).join(":");
+    metaText = company || "Fetching…";
+    chipTitle = `View progress — ${company}`;
+  } else if (summary.total > 0) {
+    pct = Math.min(99, Math.round((summary.current / summary.total) * 100));
+    metaText = `${summary.current}/${summary.total}`;
+    chipTitle = `View progress — ${summary.current} of ${summary.total} companies (${pct}%)`;
+    if (summary.company) {
+      metaText = `${summary.current}/${summary.total} · ${summary.company}`;
+      chipTitle += ` · ${summary.company}`;
+    }
+  } else if (summary.company) {
+    metaText = summary.company;
+    chipTitle = `View progress — ${summary.company}`;
+  } else if (summary.countryLabel) {
+    metaText = summary.countryLabel;
+    chipTitle = `View progress — ${summary.countryLabel}`;
+  }
+
+  if (meta) meta.textContent = metaText;
+  if (fill) fill.style.width = `${Math.max(4, pct)}%`;
+  chip.title = chipTitle;
+  chip.setAttribute("aria-label", chipTitle);
+}
+
+export function syncFetchJobSummary(st) {
+  state.serverFetchRunning = Boolean(st?.running);
+  const progress = st?.progress || {};
+  state.fetchJobSummary = {
+    current: progress.current || 0,
+    total: progress.total || (st?.company ? 1 : 0),
+    company: progress.company || st?.company || null,
+    country: st?.country || null,
+    countryLabel: st?.country ? countryLabelFromId(st.country) : "",
+    activityMessage: (st?.activity?.message || "").trim(),
+    newJobs: Math.max(0, Number(st?.new_jobs_total) || 0),
+  };
+  state.lastFetchStatus = st;
+  // Only refresh the header chip on each poll tick. The board data does not
+  // change during polling (it reloads once at completion), so re-rendering the
+  // whole company list here just replays the card entrance animation and makes
+  // cards visibly jump. The board is re-rendered by setFetchBusy / loadJobs.
+  updateFetchHeaderUI();
+}
+
+function countryLabelFromId(countryId) {
+  const opt = [...($("country")?.options || [])].find((o) => o.value === countryId);
+  return opt?.textContent?.trim() || countryId || "";
 }
 
 function fetchReviewEl(id) {
@@ -1120,11 +1252,24 @@ export function setFetchLogMode(singleCompany) {
   logEl.classList.toggle("fetch-log-active", Boolean(singleCompany));
 }
 
-export function showFetchPanel({ title, subtitle, singleCompany = false, country = null, company = null } = {}) {
+export function openFetchPanel() {
   const backdrop = $("fetchPanelBackdrop");
   backdrop.classList.add("open");
   backdrop.setAttribute("aria-hidden", "false");
   document.body.classList.add("fetch-modal-open");
+}
+
+export function showFetchPanel({ title, subtitle, singleCompany = false, country = null, company = null, reopen = false } = {}) {
+  openFetchPanel();
+
+  if (reopen) {
+    state.fetchPanelSingle = Boolean(singleCompany);
+    $("fetchCancelBtn").hidden = false;
+    $("fetchCancelBtn").disabled = false;
+    $("fetchCancelBtn").textContent = "Cancel";
+    $("fetchCloseBtn").hidden = false;
+    return;
+  }
 
   state.fetchPanelSingle = Boolean(singleCompany);
   clearFetchReviewContent();
@@ -1175,6 +1320,7 @@ export function hideFetchPanel() {
   backdrop.setAttribute("aria-hidden", "true");
   document.body.classList.remove("fetch-modal-open");
   clearFetchReview();
+  updateFetchHeaderUI();
 }
 
 export function updateFetchProgress({

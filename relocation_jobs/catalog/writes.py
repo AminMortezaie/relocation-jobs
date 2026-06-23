@@ -12,9 +12,8 @@ from relocation_jobs.catalog.serialize import (
     job_locations_json,
     json_sources,
     locations_json_from_company,
-    row_dict,
 )
-from relocation_jobs.catalog.util import today, visa_to_db
+from relocation_jobs.catalog.util import row_dict, today, visa_to_db
 
 def upsert_country_meta(conn, country_key: str, meta: dict) -> None:
     conn.execute(
@@ -268,48 +267,6 @@ def save_country_catalog(country_key: str, data: dict) -> None:
         else:
             conn.execute("DELETE FROM companies WHERE country = %s", (country_key,))
     invalidate_country_cache(country_key)
-
-
-# ---------------------------------------------------------------------------
-# Targeted single-row operations — used by company_service / job_service
-# ---------------------------------------------------------------------------
-
-def get_company(country_key: str, company_name: str) -> dict | None:
-    """Fetch one company with its jobs; None if not found."""
-    with db_read() as conn:
-        row = conn.execute(
-            "SELECT * FROM companies WHERE country = %s AND lower(name) = lower(%s)",
-            (country_key, company_name),
-        ).fetchone()
-        if row is None:
-            return None
-        cdata = row_dict(row)
-        job_rows = conn.execute(
-            "SELECT * FROM matching_jobs WHERE company_id = %s ORDER BY fetched DESC, title",
-            (cdata["id"],),
-        ).fetchall()
-        jobs = [_job_row_to_dict(r) for r in job_rows]
-    return _company_row_to_dict(cdata, jobs)
-
-
-def get_job_by_url(job_url: str) -> dict | None:
-    """Fetch one job row by URL idempotency key; returns title, url, company_name, country."""
-    key = job_idempotency_key(job_url)
-    if not key:
-        return None
-    with db_read() as conn:
-        row = conn.execute(
-            """
-            SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
-            FROM matching_jobs j
-            JOIN companies c ON c.id = j.company_id
-            WHERE j.idempotency_key = %s
-            """,
-            (key,),
-        ).fetchone()
-    if row is None:
-        return None
-    return row_dict(row)
 
 
 def rename_company_in_catalog(country_key: str, old_name: str, new_name: str) -> None:

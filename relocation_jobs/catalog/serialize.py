@@ -24,7 +24,7 @@ def job_locations_json(job: dict) -> str:
     return "[]"
 
 
-def _parsejob_locations_json(raw: str | None) -> list[Location] | None:
+def parse_job_locations_json(raw: str | None) -> list[Location] | None:
     """Parse JSONB locations string to Location objects."""
     if not raw or raw == "[]":
         return None
@@ -38,13 +38,6 @@ def _parsejob_locations_json(raw: str | None) -> list[Location] | None:
         return [Location(**item) for item in val if isinstance(item, dict)]
     except Exception:
         return None
-
-
-def catalog_has_data() -> bool:
-    with db_read() as conn:
-        row = conn.execute("SELECT COUNT(*) AS n FROM companies").fetchone()
-    data = row_dict(row)
-    return int(data.get("n") or 0) > 0
 
 
 def json_sources(company: dict) -> str:
@@ -184,12 +177,6 @@ def company_row_to_dict(row, jobs: list[dict]) -> dict:
     return company
 
 
-def row_dict(row) -> dict:
-    if row is None:
-        return {}
-    return row if isinstance(row, dict) else dict(row)
-
-
 def job_row_to_dict(row) -> dict:
     """Convert database job row to dict using Pydantic schemas."""
     data = row_dict(row)
@@ -204,7 +191,7 @@ def job_row_to_dict(row) -> dict:
     location = (data.get("location") or "").strip()
     if location:
         job["location"] = location
-    locations = _parsejob_locations_json(data.get("locations_json"))
+    locations = parse_job_locations_json(data.get("locations_json"))
     if locations:
         job["locations"] = [loc.model_dump() for loc in locations]
     return job

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from relocation_jobs.core.db import db_read
 
-from relocation_jobs.catalog.serialize import row_dict
+from relocation_jobs.catalog.util import row_dict
 
 def query_company_stats_by_country(conn) -> list[dict]:
     rows = conn.execute(

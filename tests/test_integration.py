@@ -423,16 +423,16 @@ def test_load_country_cache_reuses_db_read(tmp_data_dir, monkeypatch, sample_cou
 
     reads = {"n": 0}
     real_load = __import__(
-        "relocation_jobs.catalog_db",
-        fromlist=["_load_country_from_db"],
-    )._load_country_from_db
+        "relocation_jobs.catalog.reads",
+        fromlist=["load_country_from_db"],
+    ).load_country_from_db
 
     def counted_load(country_key: str):
         reads["n"] += 1
         return real_load(country_key)
 
     monkeypatch.setattr(
-        "relocation_jobs.catalog_db._load_country_from_db",
+        "relocation_jobs.catalog.reads.load_country_from_db",
         counted_load,
     )
 

@@ -26,41 +26,7 @@ def migrate_columns_to_jsonb(conn) -> None:
     convert_text_to_jsonb(conn, "matching_jobs", "locations_json")
 
 
-_country_cache: dict[str, dict | None] = {}
-_country_cache_lock = threading.Lock()
-
-
-def invalidate_country_cache(country_key: str | None = None) -> None:
-    """Drop cached catalog reads after writes (country_key=None clears all)."""
-    with _country_cache_lock:
-        if country_key is None:
-            _country_cache.clear()
-        else:
-            _country_cache.pop(country_key, None)
-
-
-def country_key_from_filename(name: str) -> str | None:
-    m = re.match(r"(\w+)_companies\.json", Path(name).name)
-    return m.group(1) if m else None
-
-
-def _visa_to_db(value) -> int | None:
-    if value is True:
-        return 1
-    if value is False:
-        return 0
-    return None
-
-
-def _visa_from_db(value) -> bool | None:
-    if value is None:
-        return None
-    return bool(value)
-
-
 def init_catalog_schema() -> None:
-    from relocation_jobs.core.migrations import run_migration_once
-
     with db_transaction() as conn:
         conn.execute(
             """

@@ -7,12 +7,12 @@ from collections import defaultdict
 from relocation_jobs.core.db import db_read
 from relocation_jobs.core.job_identity import job_idempotency_key
 
-from relocation_jobs.catalog.cache import _country_cache, _country_cache_lock, invalidate_country_cache
+from relocation_jobs.catalog.cache import _country_cache, _country_cache_lock
 from relocation_jobs.catalog.serialize import (
     company_row_to_dict,
     job_row_to_dict,
-    row_dict,
 )
+from relocation_jobs.catalog.util import row_dict
 
 def catalog_has_data() -> bool:
     with db_read() as conn:
@@ -77,4 +77,42 @@ def load_country_catalog(country_key: str) -> dict | None:
     with _country_cache_lock:
         _country_cache[country_key] = data
     return data
+
+
+def get_company(country_key: str, company_name: str) -> dict | None:
+    """Fetch one company with its jobs; None if not found."""
+    with db_read() as conn:
+        row = conn.execute(
+            "SELECT * FROM companies WHERE country = %s AND lower(name) = lower(%s)",
+            (country_key, company_name),
+        ).fetchone()
+        if row is None:
+            return None
+        cdata = row_dict(row)
+        job_rows = conn.execute(
+            "SELECT * FROM matching_jobs WHERE company_id = %s ORDER BY fetched DESC, title",
+            (cdata["id"],),
+        ).fetchall()
+        jobs = [job_row_to_dict(r) for r in job_rows]
+    return company_row_to_dict(cdata, jobs)
+
+
+def get_job_by_url(job_url: str) -> dict | None:
+    """Fetch one job row by URL idempotency key; returns title, url, company_name, country."""
+    key = job_idempotency_key(job_url)
+    if not key:
+        return None
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
+            FROM matching_jobs j
+            JOIN companies c ON c.id = j.company_id
+            WHERE j.idempotency_key = %s
+            """,
+            (key,),
+        ).fetchone()
+    if row is None:
+        return None
+    return row_dict(row)
 

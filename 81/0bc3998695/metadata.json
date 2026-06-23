@@ -3,14 +3,16 @@
   "checkpoint_id": "810bc3998695",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 9,
+  "checkpoints_count": 18,
   "files_touched": [
     "pytest.ini",
     "relocation_jobs/admin_data.py",
     "relocation_jobs/build_companies.py",
+    "relocation_jobs/core/ats_constants.py",
     "relocation_jobs/core/ats_detection.py",
     "relocation_jobs/core/auth.py",
     "relocation_jobs/core/scrape_cancel.py",
+    "relocation_jobs/core/slug.py",
     "relocation_jobs/db/__init__.py",
     "relocation_jobs/db/fetch_runs.py",
     "relocation_jobs/panel_data.py",
@@ -24,6 +26,7 @@
     "tests/BUSINESS_RULES.md",
     "tests/conftest.py",
     "tests/helpers/panel_fixtures.py",
+    "tests/helpers/passwords.py",
     "tests/helpers/playwright_mock.py",
     "tests/helpers/postgres_mock.py",
     "tests/test_admin_api.py",
@@ -68,6 +71,12 @@
       "transcript": "/81/0bc3998695/1/full.jsonl",
       "content_hash": "/81/0bc3998695/1/content_hash.txt",
       "prompt": "/81/0bc3998695/1/prompt.txt"
+    },
+    {
+      "metadata": "/81/0bc3998695/2/metadata.json",
+      "transcript": "/81/0bc3998695/2/full.jsonl",
+      "content_hash": "/81/0bc3998695/2/content_hash.txt",
+      "prompt": "/81/0bc3998695/2/prompt.txt"
     }
   ]
 }

@@ -13,7 +13,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from relocation_jobs.catalog_db import save_country
+from relocation_jobs.catalog_db import save_country_catalog
 
 pytest_plugins = ["tests.helpers.panel_fixtures"]
 
@@ -38,6 +38,7 @@ def _job_ctx(auth_client, country: str = "uk") -> dict:
 
 
 def _reset_fetch_state() -> None:
+    from relocation_jobs.web import fetch_state
     import relocation_jobs.panel_server as ps
 
     with ps._fetch_lock:
@@ -56,7 +57,7 @@ def _reset_fetch_state() -> None:
         ps._fetch_state["new_jobs_total"] = 0
         ps._fetch_state["log"].clear()
         ps._fetch_state["activity_log"].clear()
-    ps._fetch_thread = None
+    fetch_state._fetch_thread = None
 
 
 def _fake_run_scrape(country, skip_filled, concurrency, *, company=None):
@@ -78,15 +79,16 @@ def _fake_run_scrape(country, skip_filled, concurrency, *, company=None):
 
 
 def _fake_start_scrape_thread(country, skip_filled, concurrency, *, company=None):
+    from relocation_jobs.web import fetch_state
     import relocation_jobs.panel_server as ps
 
-    ps._fetch_thread = threading.Thread(
+    fetch_state._fetch_thread = threading.Thread(
         target=_fake_run_scrape,
         args=(country, skip_filled, concurrency),
         kwargs={"company": company},
         daemon=True,
     )
-    ps._fetch_thread.start()
+    fetch_state._fetch_thread.start()
 
 
 @pytest.fixture(autouse=True)
@@ -104,9 +106,9 @@ def scrape_enabled(auth_client, monkeypatch):
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
     import relocation_jobs.panel_server as ps
 
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(ps, "_run_scrape", _fake_run_scrape)
-    monkeypatch.setattr(ps, "_start_scrape_thread", _fake_start_scrape_thread)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.scrape_runner._run_scrape", _fake_run_scrape)
+    monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", _fake_start_scrape_thread)
     _reset_fetch_state()
     yield
     _reset_fetch_state()
@@ -558,7 +560,7 @@ def test_companies_remove_rename_errors(auth_client, rich_catalog):
 def test_fetch_status_and_country(scrape_enabled, auth_client, rich_catalog, monkeypatch):
     import relocation_jobs.panel_server as ps
 
-    monkeypatch.setattr(ps, "_start_scrape_thread", _fake_start_scrape_thread)
+    monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", _fake_start_scrape_thread)
     _reset_fetch_state()
     status = auth_client.get("/api/fetch/status")
     assert status.status_code == 200
@@ -628,6 +630,7 @@ def test_companies_fetch(scrape_enabled, auth_client, rich_catalog):
 
 @pytest.mark.integration
 def test_fetch_cancel(scrape_enabled, auth_client, rich_catalog, monkeypatch):
+    from relocation_jobs.web import fetch_state
     import relocation_jobs.panel_server as ps
 
     _reset_fetch_state()
@@ -636,16 +639,16 @@ def test_fetch_cancel(scrape_enabled, auth_client, rich_catalog, monkeypatch):
         time.sleep(2)
 
     def slow_start(country, skip_filled, concurrency, *, company=None):
-        ps._fetch_thread = threading.Thread(
+        fetch_state._fetch_thread = threading.Thread(
             target=slow_scrape,
             args=(country, skip_filled, concurrency),
             kwargs={"company": company},
             daemon=True,
         )
-        ps._fetch_thread.start()
+        fetch_state._fetch_thread.start()
 
-    monkeypatch.setattr(ps, "_run_scrape", slow_scrape)
-    monkeypatch.setattr(ps, "_start_scrape_thread", slow_start)
+    monkeypatch.setattr("relocation_jobs.web.scrape_runner._run_scrape", slow_scrape)
+    monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", slow_start)
     resp = auth_client.post("/api/fetch", json={"country": "uk"})
     assert resp.status_code == 200
     time.sleep(0.1)
@@ -661,7 +664,7 @@ def test_fetch_errors(auth_client, rich_catalog, monkeypatch):
     assert auth_client.post("/api/fetch/cancel").status_code == 400
 
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     assert auth_client.post("/api/fetch", json={"country": "all"}).status_code == 400
     assert auth_client.post("/api/fetch", json={"country": "nope"}).status_code == 400
 
@@ -669,7 +672,7 @@ def test_fetch_errors(auth_client, rich_catalog, monkeypatch):
     assert auth_client.post("/api/fetch", json={"country": "uk"}).status_code == 503
 
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", False)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", False)
     assert auth_client.post("/api/fetch", json={"country": "uk"}).status_code == 503
 
 
@@ -757,7 +760,7 @@ def test_run_scrape_mocked_subprocess(monkeypatch, tmp_data_dir, db, seeded_cata
     from datetime import datetime, timezone
 
     _reset_fetch_state()
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
 
     lines = [
         "@@PROGRESS@@" + json.dumps({"current": 1, "total": 1, "company": "Acme Backend Ltd", "status": "fetching"}),
@@ -799,7 +802,7 @@ def test_run_scrape_lookup_error(monkeypatch):
     import relocation_jobs.panel_server as ps
 
     _reset_fetch_state()
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     with ps._fetch_lock:
         ps._fetch_state["running"] = True
     ps._run_scrape("invalid_country", skip_filled=False, concurrency=1)
@@ -811,7 +814,7 @@ def test_run_scrape_no_httpx(monkeypatch):
     import relocation_jobs.panel_server as ps
 
     _reset_fetch_state()
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", False)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", False)
     with ps._fetch_lock:
         ps._fetch_state["running"] = True
     ps._run_scrape("uk", skip_filled=False, concurrency=1)
@@ -820,15 +823,16 @@ def test_run_scrape_no_httpx(monkeypatch):
 
 @pytest.mark.integration
 def test_reap_zombie_fetch():
+    from relocation_jobs.web import fetch_state
     import relocation_jobs.panel_server as ps
 
-    ps._fetch_thread = threading.Thread(target=lambda: None, daemon=True)
+    fetch_state._fetch_thread = threading.Thread(target=lambda: None, daemon=True)
     with ps._fetch_lock:
         ps._fetch_state["running"] = True
         ps._fetch_state["exit_code"] = None
         ps._fetch_state["finished_at"] = None
-    ps._fetch_thread.start()
-    ps._fetch_thread.join(timeout=2)
+    fetch_state._fetch_thread.start()
+    fetch_state._fetch_thread.join(timeout=2)
     ps._reap_zombie_fetch()
     assert ps._fetch_state["running"] is False
 
@@ -897,7 +901,7 @@ def test_run_scrape_cancelled(monkeypatch, seeded_catalog, db):
     import relocation_jobs.panel_server as ps
 
     _reset_fetch_state()
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
 
     class FakeProc:
         stdout = iter(["working…"])

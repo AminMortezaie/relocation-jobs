@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from relocation_jobs import scrape_jobs as sj
-from relocation_jobs.catalog_db import load_country, save_country
+from relocation_jobs.catalog_db import load_country_catalog, save_country_catalog
 from relocation_jobs.services.catalog_service import _job_dict
 from relocation_jobs.scrape_jobs import backfill_listing_locations, merge_matching_jobs
 from tests.helpers.http_mock import install_requests_mock, json_response, load_ats_fixture, text_response
@@ -122,9 +122,9 @@ def test_location_backfill_persists_through_catalog(db, sample_country_data):
 
     backfill_listing_locations(merged, title_matched)
     company["matching_jobs"] = merged
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
 
-    loaded = load_country("uk")
+    loaded = load_country_catalog("uk")
     stored = loaded["companies"][0]["matching_jobs"][0]
     assert stored["location"] == "London, UK"
 
@@ -168,7 +168,7 @@ def test_wrong_location_jobs_hidden_after_catalog_save(db, sample_country_data):
         {"title": "Local", "url": "https://example.com/local", "location": "London, UK"},
         {"title": "Far", "url": "https://example.com/far", "location": "Tokyo, Japan"},
     ]
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
 
     companies, _, _ = flatten_companies("uk")
     acme = companies[0]

@@ -10,7 +10,13 @@ PACKAGE_DIR = PROJECT_ROOT / "relocation_jobs"
 COMPANIES_DIR = PROJECT_ROOT / "companies"
 STATIC_DIR = PACKAGE_DIR / "static"
 
-COUNTRY_FILE_NAMES: dict[str, str] = {
+# Country keys supported at runtime (Postgres catalog).
+SUPPORTED_COUNTRIES: frozenset[str] = frozenset(
+    {"germany", "netherlands", "uk", "portugal"}
+)
+
+# Legacy git-archive filenames (companies/*.json) — not read at runtime.
+COUNTRY_ARCHIVE_FILENAMES: dict[str, str] = {
     "germany": "germany_companies.json",
     "netherlands": "netherlands_companies.json",
     "uk": "uk_companies.json",

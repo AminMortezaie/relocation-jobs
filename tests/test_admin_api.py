@@ -139,7 +139,7 @@ def test_country_fetch_requires_admin(app_client, db, seeded_catalog, monkeypatc
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
     import relocation_jobs.panel_server as ps
 
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     create_user("regular", hash_test_password("regularpass12"))
     login = app_client.post(
         "/api/auth/login",
@@ -158,8 +158,8 @@ def test_admin_country_fetch(auth_client, seeded_catalog, monkeypatch):
     import relocation_jobs.panel_server as ps
 
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(ps, "_start_scrape_thread", lambda *a, **k: None)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", lambda *a, **k: None)
 
     resp = auth_client.post("/api/fetch", json={"country": "uk", "concurrency": 2})
     assert resp.status_code == 200

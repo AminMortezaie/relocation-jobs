@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from relocation_jobs.catalog_db import save_country
+from relocation_jobs.catalog_db import save_country_catalog
 
 _FIXTURES = Path(__file__).parent.parent / "fixtures"
 
@@ -68,7 +68,7 @@ def _module_panel(_session_postgres, _session_test_client, _catalog_template):
     from relocation_jobs.core.auth import bootstrap_admin
 
     bootstrap_admin()
-    save_country("uk", copy.deepcopy(_catalog_template))
+    save_country_catalog("uk", copy.deepcopy(_catalog_template))
     with _session_test_client.session_transaction() as sess:
         sess.clear()
     resp = _session_test_client.post(
@@ -86,10 +86,10 @@ def _module_panel_reset(request, _session_postgres, _catalog_template):
     if not uses:
         yield
         return
-    save_country("uk", copy.deepcopy(_catalog_template))
+    save_country_catalog("uk", copy.deepcopy(_catalog_template))
     _session_postgres.clear_tracking()
     yield
-    save_country("uk", copy.deepcopy(_catalog_template))
+    save_country_catalog("uk", copy.deepcopy(_catalog_template))
     _session_postgres.clear_tracking()
 
 

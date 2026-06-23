@@ -1,8 +1,7 @@
 # Render Blueprint — free web tier
 #
 # Free plan has no persistent disk. Use:
-# - DATABASE_URL → free Neon Postgres (auth + tracking survive restarts)
-# - JSON in git → bundled in the Docker image on each deploy
+# - DATABASE_URL → free Neon Postgres (catalog + auth + tracking)
 # - PANEL_SCRAPE_ENABLED=0 → scraping runs locally (512MB RAM limit on free)
 
 services:

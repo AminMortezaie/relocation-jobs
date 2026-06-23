@@ -11,7 +11,7 @@ import copy
 import pytest
 from tests.helpers.passwords import hash_test_password
 
-from relocation_jobs.catalog_db import load_country, save_country
+from relocation_jobs.catalog_db import load_country_catalog, save_country_catalog
 from relocation_jobs.db import create_user, load_job_status_history
 from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
 from relocation_jobs.core.location_tags import filter_jobs_by_expected_locations
@@ -95,14 +95,14 @@ class TestRule03TrackingSurvivesRescrape:
         company, url, _ = _jobs(rich_catalog)
         set_job_rejected("uk", company, url, True, user_id=uid)
 
-        data = copy.deepcopy(load_country("uk"))
+        data = copy.deepcopy(load_country_catalog("uk"))
         blob = data["companies"][0]
         merged, _, _, _ = merge_matching_jobs(
             blob["matching_jobs"],
             [{"title": "Renamed", "url": url}],
         )
         blob["matching_jobs"] = merged
-        save_country("uk", data)
+        save_country_catalog("uk", data)
 
         acme = _acme(_flatten(uid))
         assert url in _urls(acme["rejected_jobs"])
@@ -182,11 +182,11 @@ class TestRule08NotForMe:
 
         set_job_not_for_me("uk", company, url, user_id=uid, not_for_me=True)
 
-        data = copy.deepcopy(load_country("uk"))
+        data = copy.deepcopy(load_country_catalog("uk"))
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data)
+        save_country_catalog("uk", data)
 
         acme = _acme(_flatten(uid))
         assert url not in _urls(acme["jobs"])
@@ -245,11 +245,11 @@ class TestRule11OrphanReinjection:
 
         set_job_looking_to_apply("uk", company, url, True, user_id=uid)
 
-        data = copy.deepcopy(load_country("uk"))
+        data = copy.deepcopy(load_country_catalog("uk"))
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data)
+        save_country_catalog("uk", data)
 
         acme = _acme(_flatten(uid))
         orphan = next(
@@ -267,9 +267,9 @@ class TestRule12CompanyApplied:
         company, url, _ = _jobs(rich_catalog)
 
         set_job_applied("uk", company, url, True, user_id=uid)
-        data = copy.deepcopy(load_country("uk"))
+        data = copy.deepcopy(load_country_catalog("uk"))
         data["companies"][0]["matching_jobs"] = []
-        save_country("uk", data)
+        save_country_catalog("uk", data)
 
         acme = _acme(_flatten(uid))
         assert acme["company_applied"] is True
@@ -383,7 +383,7 @@ class TestRule16LocationGate:
 
     @pytest.mark.integration
     def test_wrong_location_hidden_from_main_job_list(self, db, sample_country_data):
-        from relocation_jobs.catalog_db import save_country
+        from relocation_jobs.catalog_db import save_country_catalog
         from relocation_jobs.services.catalog_service import flatten_companies
 
         company = sample_country_data["companies"][0]
@@ -392,7 +392,7 @@ class TestRule16LocationGate:
             {"title": "Ok", "url": "https://x/ok", "location": "London, UK"},
             {"title": "Far", "url": "https://x/far", "location": "Paris, France"},
         ]
-        save_country("uk", sample_country_data)
+        save_country_catalog("uk", sample_country_data)
 
         companies, _, _ = flatten_companies("uk")
         acme = companies[0]

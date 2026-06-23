@@ -11,7 +11,7 @@ import copy
 
 import pytest
 
-from relocation_jobs.catalog_db import load_country, save_country
+from relocation_jobs.catalog_db import load_country_catalog, save_country_catalog
 from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
 from relocation_jobs.services.catalog_service import flatten_companies
 from relocation_jobs.services.job_service import (
@@ -27,7 +27,7 @@ from relocation_jobs.scrape_jobs import merge_matching_jobs
 @pytest.fixture
 def state_catalog(seeded_catalog, sample_country_data):
     data = copy.deepcopy(sample_country_data)
-    save_country("uk", data)
+    save_country_catalog("uk", data)
     return data
 
 
@@ -173,11 +173,11 @@ class TestOrphanTrackedJobs:
 
         set_job_applied("uk", company, url, True, user_id=uid)
 
-        data = copy.deepcopy(load_country("uk"))
+        data = copy.deepcopy(load_country_catalog("uk"))
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data)
+        save_country_catalog("uk", data)
 
         acme = _acme(_flatten(uid))
         tracked = next(j for j in acme["jobs"] if normalize_job_url(j["url"]) == normalize_job_url(url))
@@ -191,11 +191,11 @@ class TestOrphanTrackedJobs:
 
         set_job_rejected("uk", company, url, True, user_id=uid)
 
-        data = copy.deepcopy(load_country("uk"))
+        data = copy.deepcopy(load_country_catalog("uk"))
         data["companies"][0]["matching_jobs"] = [
             j for j in data["companies"][0]["matching_jobs"] if j["url"] != url
         ]
-        save_country("uk", data)
+        save_country_catalog("uk", data)
 
         acme = _acme(_flatten(uid))
         assert normalize_job_url(url) in {
@@ -261,7 +261,7 @@ class TestScrapeMergeVsDbOverlay:
 
         set_job_applied("uk", company, url, True, user_id=uid)
 
-        data = copy.deepcopy(load_country("uk"))
+        data = copy.deepcopy(load_country_catalog("uk"))
         company_blob = data["companies"][0]
         existing = company_blob["matching_jobs"]
         scraped = [
@@ -272,7 +272,7 @@ class TestScrapeMergeVsDbOverlay:
         ]
         merged, _, _, _ = merge_matching_jobs(existing, scraped)
         company_blob["matching_jobs"] = merged
-        save_country("uk", data)
+        save_country_catalog("uk", data)
 
         acme = _acme(_flatten(uid))
         job = next(j for j in acme["jobs"] if j["url"] == url)

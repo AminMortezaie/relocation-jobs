@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """
-Scrape careers pages from germany_companies.json and find matching backend jobs.
+Scrape careers pages and find matching backend jobs.
 
-Strategy
---------
-ATS type and URL are cached per company in the JSON (fields: ats_type, ats_url).
+ATS type and URL are cached per company in Postgres (fields: ats_type, ats_url).
 On the first run (or when cache is missing) the scraper loads the careers page in
-Playwright and intercepts every XHR/fetch call to auto-detect the ATS. The
-discovered values are written back to the JSON so subsequent runs use the fast
-REST API directly — no Playwright needed unless the cache is empty.
+Playwright and intercepts XHR/fetch calls to auto-detect the ATS. Discovered values
+are written to the catalog so subsequent runs use the fast REST API directly.
 
-To force re-detection for a company, delete its ats_type / ats_url fields from
-the JSON and re-run.
+To force re-detection, clear ats_type / ats_url for the company and re-run.
 
 Install deps:
     pip install requests httpx beautifulsoup4 playwright lxml
@@ -71,9 +67,9 @@ try:
 except ImportError:
     sync_playwright = None  # type: ignore[misc, assignment]
 
-from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
 from relocation_jobs.catalog_db import (
-    load_country,
+    load_country_catalog,
     touch_country_meta,
     upsert_company,
 )
@@ -3127,7 +3123,7 @@ async def run_file_async(
     if not HTTPX_AVAILABLE:
         raise SystemExit("httpx is required for async scraping: pip install httpx")
 
-    data = load_country(country_key) or {"companies": []}
+    data = load_country_catalog(country_key) or {"companies": []}
 
     file_lock = threading.Lock()
 
@@ -3382,7 +3378,7 @@ def main():
         i += 1
 
     if run_all:
-        country_keys = list(COUNTRY_FILE_NAMES.keys())
+        country_keys = sorted(SUPPORTED_COUNTRIES)
 
     for country_key in country_keys:
         run_country(

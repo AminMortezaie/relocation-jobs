@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from relocation_jobs.services.admin_service import get_admin_overview, get_catalog_overview
-from relocation_jobs.catalog_db import save_country
+from relocation_jobs.catalog_db import save_country_catalog
 from relocation_jobs.db import list_users_with_stats
 
 pytestmark = pytest.mark.integration
@@ -23,13 +23,13 @@ def isolated_catalog_pg(pg_db):
 
 
 def test_catalog_overview_on_postgres(isolated_catalog_pg, sample_country_data):
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
     overview = get_catalog_overview()
     assert overview["totals"]["companies"] == 1
 
 
 def test_admin_overview_on_postgres(isolated_catalog_pg, sample_country_data):
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
     data = get_admin_overview(fetch_state={"running": False})
     assert data["catalog"]["companies"] == 1
 

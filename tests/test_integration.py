@@ -18,8 +18,8 @@ from tests.helpers.passwords import hash_test_password
 
 from relocation_jobs.catalog_db import (
     init_catalog_schema,
-    load_country,
-    save_country,
+    load_country_catalog,
+    save_country_catalog,
     touch_country_meta,
     upsert_company,
 )
@@ -69,7 +69,7 @@ from tests.helpers.postgres_mock import FakePgConnection, install_postgres_mock
 @pytest.fixture
 def rich_catalog(seeded_catalog, sample_country_data):
     data = copy.deepcopy(sample_country_data)
-    save_country("uk", data)
+    save_country_catalog("uk", data)
     return data
 
 def test_reset_password_load_env_import_error(monkeypatch):
@@ -274,7 +274,7 @@ def test_build_companies_main_module_entry(monkeypatch, db, sample_country_data)
 def test_build_companies_resolve_country_alias(monkeypatch, db, sample_country_data):
     from relocation_jobs.build_companies import load_country
 
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
     data, key = load_country("england")
     assert key == "uk"
     assert data["companies"]
@@ -283,7 +283,7 @@ def test_build_companies_resolve_country_alias(monkeypatch, db, sample_country_d
 def test_postgres_init_and_tracking(pg_db, sample_country_data):
     user = create_user("pguser", hash_test_password("pass123456"))
     uid = user["id"]
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
 
     set_job_applied_db(uid, "uk", "Acme Backend Ltd", "https://example.com/j/1", True, job_title="Dev")
     set_job_rejected_db(uid, "uk", "Acme Backend Ltd", "https://example.com/j/2", True)
@@ -312,7 +312,7 @@ def test_postgres_init_and_tracking(pg_db, sample_country_data):
 
 
 def test_postgres_catalog_upsert(pg_db, sample_country_data):
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
     upsert_company(
         "uk",
         {
@@ -325,7 +325,7 @@ def test_postgres_catalog_upsert(pg_db, sample_country_data):
         },
     )
     touch_country_meta("uk", last_fetch_new_jobs=3, total=5)
-    data = load_country("uk")
+    data = load_country_catalog("uk")
     assert any(c["name"] == "Pg Co" for c in data["companies"])
 
 
@@ -415,11 +415,11 @@ def test_schema_migrations_run_once(tmp_data_dir, monkeypatch):
 
 
 def test_load_country_cache_reuses_db_read(tmp_data_dir, monkeypatch, sample_country_data):
-    from relocation_jobs.catalog_db import invalidate_country_cache, load_country, save_country
+    from relocation_jobs.catalog_db import invalidate_country_cache, load_country_catalog, save_country_catalog
 
     install_postgres_mock(monkeypatch)
     init_db()
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
 
     reads = {"n": 0}
     real_load = __import__(
@@ -437,12 +437,12 @@ def test_load_country_cache_reuses_db_read(tmp_data_dir, monkeypatch, sample_cou
     )
 
     invalidate_country_cache()
-    assert load_country("uk") is not None
-    assert load_country("uk") is not None
+    assert load_country_catalog("uk") is not None
+    assert load_country_catalog("uk") is not None
     assert reads["n"] == 1
 
-    save_country("uk", sample_country_data)
-    load_country("uk")
+    save_country_catalog("uk", sample_country_data)
+    load_country_catalog("uk")
     assert reads["n"] == 2
 
 
@@ -515,7 +515,7 @@ def test_panel_data_enrich_and_detect(db, monkeypatch):
     assert company["name"] == "New Co"
     assert list_ats_types()
 
-    save_country("uk", {"source": "t", "companies": [company], "total": 1})
+    save_country_catalog("uk", {"source": "t", "companies": [company], "total": 1})
     update_company_city("uk", "New Co", locations=[{"country": "uk", "city": "Manchester"}])
     add_manual_jobs("uk", "New Co", [{"title": "Role", "url": "https://example.com/manual/1"}])
     set_company_fetch_problem("uk", "New Co", True)
@@ -625,16 +625,16 @@ def test_panel_api_value_error_paths(auth_client, rich_catalog, monkeypatch):
         raise ValueError("bad input")
 
     for route, target in [
-        ("/api/jobs/applied", "relocation_jobs.panel_server.set_job_applied"),
-        ("/api/jobs/rejected", "relocation_jobs.panel_server.set_job_rejected"),
-        ("/api/jobs/reapply", "relocation_jobs.panel_server.set_job_reapply"),
-        ("/api/jobs/ats-score", "relocation_jobs.panel_server.set_job_ats_score"),
-        ("/api/jobs/waiting-referral", "relocation_jobs.panel_server.set_job_waiting_referral"),
-        ("/api/jobs/not-for-me", "relocation_jobs.panel_server.set_job_not_for_me"),
-        ("/api/jobs/looking-to-apply", "relocation_jobs.panel_server.set_job_looking_to_apply"),
-        ("/api/jobs/seen", "relocation_jobs.panel_server.set_job_seen"),
-        ("/api/companies/applied", "relocation_jobs.panel_server.set_company_applied"),
-        ("/api/companies/awaiting-response", "relocation_jobs.panel_server.set_company_awaiting_response"),
+        ("/api/jobs/applied", "relocation_jobs.web.deps.set_job_applied"),
+        ("/api/jobs/rejected", "relocation_jobs.web.deps.set_job_rejected"),
+        ("/api/jobs/reapply", "relocation_jobs.web.deps.set_job_reapply"),
+        ("/api/jobs/ats-score", "relocation_jobs.web.deps.set_job_ats_score"),
+        ("/api/jobs/waiting-referral", "relocation_jobs.web.deps.set_job_waiting_referral"),
+        ("/api/jobs/not-for-me", "relocation_jobs.web.deps.set_job_not_for_me"),
+        ("/api/jobs/looking-to-apply", "relocation_jobs.web.deps.set_job_looking_to_apply"),
+        ("/api/jobs/seen", "relocation_jobs.web.deps.set_job_seen"),
+        ("/api/companies/applied", "relocation_jobs.web.deps.set_company_applied"),
+        ("/api/companies/awaiting-response", "relocation_jobs.web.deps.set_company_awaiting_response"),
     ]:
         monkeypatch.setattr(target, boom)
         resp = auth_client.post(route, json={**ctx, "applied": True, "ats_score": 50})
@@ -697,7 +697,7 @@ def test_panel_server_scrape_helpers(monkeypatch, db, seeded_catalog):
         def kill(self):
             pass
 
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     monkeypatch.setattr(ps.subprocess, "Popen", lambda *a, **k: FakeProc())
     monkeypatch.setattr(ps, "touch_country_meta", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("fail")))
 
@@ -711,7 +711,7 @@ def test_panel_server_scrape_exception(monkeypatch):
     import relocation_jobs.panel_server as ps
 
     ps._reset_fetch_run_state(country="uk", company=None, file_name="uk_companies.json", concurrency=1, user_id=1)
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     monkeypatch.setattr(ps.subprocess, "Popen", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom")))
     with ps._fetch_lock:
         ps._fetch_state["running"] = True
@@ -724,11 +724,11 @@ def test_panel_fetch_endpoints(auth_client, rich_catalog, monkeypatch):
 
     assert auth_client.post("/api/fetch/cancel").status_code == 400
 
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", False)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", False)
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
     assert auth_client.post("/api/fetch", json={"country": "uk"}).status_code == 503
 
-    monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "0")
     assert auth_client.post("/api/fetch", json={"country": "uk"}).status_code == 503
 
@@ -742,7 +742,7 @@ def test_panel_fetch_endpoints(auth_client, rich_catalog, monkeypatch):
 
 def test_panel_companies_add_conflict(auth_client, rich_catalog, monkeypatch):
     monkeypatch.setattr(
-        "relocation_jobs.panel_server.add_company",
+        "relocation_jobs.web.deps.add_company",
         lambda *a, **k: (_ for _ in ()).throw(LookupError("exists")),
     )
     resp = auth_client.post(
@@ -797,7 +797,7 @@ def test_tracking_bool_and_status_history_merge(db, seeded_catalog, test_user):
 def test_flatten_without_user_not_for_me_in_json(seeded_catalog, sample_country_data):
     data = copy.deepcopy(sample_country_data)
     data["companies"][0]["matching_jobs"][0]["not_for_me"] = True
-    save_country("uk", data)
+    save_country_catalog("uk", data)
     companies, _, _ = flatten_companies("uk", hide_applied=True, hide_empty=True, not_applied_only=True)
     assert isinstance(companies, list)
 

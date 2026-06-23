@@ -7,8 +7,8 @@ import pytest
 from relocation_jobs.catalog_db import (
     catalog_has_data,
     country_key_from_filename,
-    load_country,
-    save_country,
+    load_country_catalog,
+    save_country_catalog,
     touch_country_meta,
     upsert_companies,
     upsert_company,
@@ -25,21 +25,21 @@ def test_country_key_from_filename():
 
 @pytest.mark.integration
 def test_touch_country_meta(db, sample_country_data):
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
     touch_country_meta("uk", updated="2025-07-01", total=5, jobs_fetched="2025-07-01")
-    loaded = load_country("uk")
+    loaded = load_country_catalog("uk")
     assert loaded["updated"] == "2025-07-01"
     assert loaded["total"] == 5
 
     touch_country_meta("de", source="new-country", total=0)
-    assert load_country("de") is not None
+    assert load_country_catalog("de") is not None
 
     touch_country_meta("uk", invalid_field="ignored")
 
 
 @pytest.mark.integration
 def test_upsert_company_and_batch(db, sample_country_data):
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
 
     upsert_company(
         "uk",
@@ -56,7 +56,7 @@ def test_upsert_company_and_batch(db, sample_country_data):
             ],
         },
     )
-    loaded = load_country("uk")
+    loaded = load_country_catalog("uk")
     names = {c["name"] for c in loaded["companies"]}
     assert "Upsert Co" in names
 
@@ -71,30 +71,30 @@ def test_upsert_company_and_batch(db, sample_country_data):
         ],
         touch_meta=True,
     )
-    loaded = load_country("uk")
+    loaded = load_country_catalog("uk")
     assert any(c["name"] == "Batch Co" for c in loaded["companies"])
 
     upsert_companies("uk", [], touch_meta=False)
 
 
 @pytest.mark.integration
-def test_save_country_removes_absent_companies(db, sample_country_data):
-    save_country("uk", sample_country_data)
+def test_save_country_catalog_removes_absent_companies(db, sample_country_data):
+    save_country_catalog("uk", sample_country_data)
     slim = {**sample_country_data, "companies": []}
-    save_country("uk", slim)
-    assert load_country("uk")["companies"] == []
+    save_country_catalog("uk", slim)
+    assert load_country_catalog("uk")["companies"] == []
 
 
 @pytest.mark.integration
 def test_upsert_skips_empty_company_name(db, sample_country_data):
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
     upsert_company("uk", {"name": "  ", "city": "Nowhere"})
-    assert len(load_country("uk")["companies"]) == 1
+    assert len(load_country_catalog("uk")["companies"]) == 1
 
 
 @pytest.mark.integration
 def test_company_sources_and_visa_parsing(db):
-    save_country(
+    save_country_catalog(
         "uk",
         {
             "source": "test",
@@ -119,7 +119,7 @@ def test_company_sources_and_visa_parsing(db):
             ],
         },
     )
-    company = load_country("uk")["companies"][0]
+    company = load_country_catalog("uk")["companies"][0]
     assert company["sources"] == ["relocate.me"]
     jobs = {j["title"]: j for j in company["matching_jobs"]}
     assert jobs["Role"]["visa_sponsorship"] is True

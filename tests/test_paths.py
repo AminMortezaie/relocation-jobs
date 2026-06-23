@@ -5,8 +5,9 @@ from __future__ import annotations
 import pytest
 
 from relocation_jobs.core.paths import (
-    COUNTRY_FILE_NAMES,
+    COUNTRY_ARCHIVE_FILENAMES,
     PROJECT_ROOT,
+    SUPPORTED_COUNTRIES,
     data_dir,
     ensure_data_dir,
 )
@@ -29,5 +30,9 @@ def test_ensure_data_dir(tmp_path, monkeypatch):
     assert target.is_dir()
 
 
-def test_country_file_names_contains_known_countries():
-    assert set(COUNTRY_FILE_NAMES) >= {"uk", "germany", "netherlands", "portugal"}
+def test_supported_countries_contains_known_countries():
+    assert SUPPORTED_COUNTRIES >= {"uk", "germany", "netherlands", "portugal"}
+
+
+def test_country_archive_filenames():
+    assert COUNTRY_ARCHIVE_FILENAMES["uk"] == "uk_companies.json"

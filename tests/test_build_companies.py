@@ -166,12 +166,12 @@ def test_discover_careers_url_prefers_relocate(monkeypatch):
 
 @pytest.mark.integration
 def test_load_country_wrapper(db, sample_country_data):
-    from relocation_jobs.catalog_db import save_country
-    from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
+    from relocation_jobs.catalog_db import save_country_catalog
+    from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES
 
-    save_country("uk", sample_country_data)
+    save_country_catalog("uk", sample_country_data)
     data, key = load_country("uk")
-    assert COUNTRY_FILE_NAMES[key] == "uk_companies.json"
+    assert COUNTRY_ARCHIVE_FILENAMES[key] == "uk_companies.json"
     assert key == "uk"
     assert data["companies"]
 
@@ -347,7 +347,7 @@ def test_save_country_wrapper(db, sample_country_data, monkeypatch):
     saved = {}
     monkeypatch.setattr(
         build_companies,
-        "save_country_catalog",
+        "save_country_catalog_db",
         lambda key, data: saved.update({"key": key, "data": data}),
     )
     build_companies.save_country("uk", sample_country_data)

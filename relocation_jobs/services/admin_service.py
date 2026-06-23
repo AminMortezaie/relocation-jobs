@@ -25,8 +25,8 @@ from relocation_jobs.db import (
     user_count,
 )
 from relocation_jobs.core.location_tags import COUNTRY_LABELS, SUGGESTED_CITIES, load_custom_cities
-from relocation_jobs.core.paths import COUNTRY_FILE_NAMES, data_dir
-from relocation_jobs.services.catalog_service import COUNTRY_FILES, flatten_companies
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES, data_dir
+from relocation_jobs.services.catalog_service import flatten_companies
 
 
 def _normalize_ts_for_sort(ts: str) -> str:
@@ -52,7 +52,7 @@ def _visible_job_counts_by_country(
     try:
         companies, _, _ = flatten_companies("all", user_id=None)
         out: dict[str, dict[str, int]] = {
-            key: {"jobs": 0, "visa_jobs": 0} for key in COUNTRY_FILES
+            key: {"jobs": 0, "visa_jobs": 0} for key in SUPPORTED_COUNTRIES
         }
         for company in companies:
             key = company.get("country") or ""
@@ -67,7 +67,7 @@ def _visible_job_counts_by_country(
         return out
     except Exception:
         out: dict[str, dict[str, int]] = {}
-        for key in COUNTRY_FILES:
+        for key in SUPPORTED_COUNTRIES:
             stored = stored_by_country.get(
                 key,
                 {"stored_jobs": 0, "stored_visa_jobs": 0},
@@ -227,7 +227,7 @@ def get_catalog_overview() -> dict:
 
 def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
     custom = load_custom_cities()
-    archives = [COUNTRY_FILE_NAMES[key] for key in COUNTRY_FILES]
+    archives = [COUNTRY_ARCHIVE_FILENAMES[key] for key in sorted(SUPPORTED_COUNTRIES)]
     return {
         "database": "postgres",
         "data_dir": str(data_dir()),

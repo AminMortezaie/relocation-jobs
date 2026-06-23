@@ -24,7 +24,7 @@ from relocation_jobs.catalog_db import (
     update_company_location,
     upsert_company as upsert_company_catalog,
 )
-from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
 from relocation_jobs.db import (
     clear_company_tracking,
     rename_company_tracking,
@@ -313,7 +313,7 @@ def resolve_country_key(
     hint: str | None = None,
 ) -> tuple[str, dict]:
     hint = (hint or "").strip().lower()
-    if hint and hint not in ("auto", "all") and hint in COUNTRY_FILE_NAMES:
+    if hint and hint not in ("auto", "all") and hint in SUPPORTED_COUNTRIES:
         return hint, {}
 
     meta = fetch_relocate_metadata(name)
@@ -389,7 +389,7 @@ def touch_company_fetch_time(country_key: str, company_name: str) -> str:
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    if country_key not in COUNTRY_FILE_NAMES:
+    if country_key not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {country_key}")
     company = get_company(country_key, company_name)
     if company is None:
@@ -425,13 +425,13 @@ def add_company(
     careers_url = normalize_careers_url(careers_url)
     hint = None
     if country_keys:
-        cleaned_keys = [k.strip().lower() for k in country_keys if k.strip().lower() in COUNTRY_FILE_NAMES]
+        cleaned_keys = [k.strip().lower() for k in country_keys if k.strip().lower() in SUPPORTED_COUNTRIES]
         hint = cleaned_keys[0] if cleaned_keys else None
     elif country_key and country_key not in ("auto", "all", ""):
         hint = country_key.strip().lower()
 
     resolved_country, _meta = resolve_country_key(name, careers_url, hint=hint)
-    if resolved_country not in COUNTRY_FILE_NAMES:
+    if resolved_country not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {resolved_country}")
 
     if get_company(resolved_country, name) is not None:
@@ -465,7 +465,7 @@ def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
         raise ValueError("New company name is required")
     if company_name.casefold() == new_name.casefold():
         raise ValueError("New name must be different from the current name")
-    if country_key not in COUNTRY_FILE_NAMES:
+    if country_key not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {country_key}")
 
     company = get_company(country_key, company_name)
@@ -496,7 +496,7 @@ def update_company_careers(
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    if country_key not in COUNTRY_FILE_NAMES:
+    if country_key not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {country_key}")
 
     careers_url = normalize_careers_url(careers_url)
@@ -533,7 +533,7 @@ def update_company_city(
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    if country_key not in COUNTRY_FILE_NAMES:
+    if country_key not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {country_key}")
 
     company = get_company(country_key, company_name)
@@ -560,7 +560,7 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    if country_key not in COUNTRY_FILE_NAMES:
+    if country_key not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {country_key}")
 
     ts = today()
@@ -598,7 +598,7 @@ def set_company_fetch_problem(
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    if country_key not in COUNTRY_FILE_NAMES:
+    if country_key not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {country_key}")
 
     company = get_company(country_key, company_name)
@@ -646,7 +646,7 @@ def remove_company(country_key: str, company_name: str) -> dict:
     company_name = (company_name or "").strip()
     if not company_name:
         raise ValueError("Company name is required")
-    if country_key not in COUNTRY_FILE_NAMES:
+    if country_key not in SUPPORTED_COUNTRIES:
         raise ValueError(f"Unknown country: {country_key}")
 
     company = get_company(country_key, company_name)

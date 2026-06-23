@@ -31,8 +31,8 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 
-from relocation_jobs.catalog_db import load_country as load_country_catalog, save_country as save_country_catalog
-from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.catalog_db import load_country_catalog as load_country_catalog_db, save_country_catalog as save_country_catalog_db
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
 from relocation_jobs.core.slug import slug_from_name
 
 from playwright.sync_api import sync_playwright
@@ -53,7 +53,7 @@ TIMEOUT_PAGE_SETTLE = 2000
 TIMEOUT_BUTTON_SETTLE = 2500
 TIMEOUT_BUTTON_CLICK = 5000
 
-COUNTRY_FILES = {
+COUNTRY_CLI_ALIASES = {
     "germany": "germany_companies.json",
     "de": "germany_companies.json",
     "netherlands": "netherlands_companies.json",
@@ -343,19 +343,21 @@ def discover_careers_url(company: dict) -> str:
 
 def _resolve_country_key(country: str) -> str:
     alias = country.lower()
-    if alias in COUNTRY_FILE_NAMES:
+    if alias in SUPPORTED_COUNTRIES:
         return alias
-    filename = COUNTRY_FILES.get(alias)
+    filename = COUNTRY_CLI_ALIASES.get(alias)
     if filename:
-        for key, name in COUNTRY_FILE_NAMES.items():
+        for key, name in COUNTRY_ARCHIVE_FILENAMES.items():
             if name == filename:
                 return key
-    raise SystemExit(f"Unknown country '{country}'. Use: {', '.join(sorted(COUNTRY_FILE_NAMES))}")
+    raise SystemExit(
+        f"Unknown country '{country}'. Use: {', '.join(sorted(SUPPORTED_COUNTRIES))}"
+    )
 
 
 def load_country(country: str) -> tuple[dict, str]:
     country_key = _resolve_country_key(country)
-    data = load_country_catalog(country_key)
+    data = load_country_catalog_db(country_key)
     if data is None:
         data = {"companies": [], "total": 0}
     return data, country_key
@@ -363,7 +365,7 @@ def load_country(country: str) -> tuple[dict, str]:
 
 def save_country(country_key: str, data: dict) -> None:
     data["companies"] = sort_companies(data["companies"])
-    save_country_catalog(country_key, data)
+    save_country_catalog_db(country_key, data)
 
 
 def main() -> None:

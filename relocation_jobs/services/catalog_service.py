@@ -11,8 +11,8 @@ from urllib.parse import parse_qs, urlparse
 
 from relocation_jobs.catalog_db import (
     country_key_from_filename,
-    load_country as load_country_catalog,
-    save_country as save_country_catalog,
+    load_country_catalog,
+    save_country_catalog,
 )
 from relocation_jobs.db import (
     count_jobs_applied_db,
@@ -41,11 +41,9 @@ from relocation_jobs.core.location_tags import (
     picker_cities_for_country,
     sync_company_location_fields,
 )
-from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
 
 from relocation_jobs.core.ats_constants import ATS_TYPE_CHOICES
-
-COUNTRY_FILES: dict[str, str] = dict(COUNTRY_FILE_NAMES)
 
 
 # ---------------------------------------------------------------------------
@@ -619,14 +617,14 @@ def flatten_companies(
     company_tracking = load_company_tracking(user_id) if user_id else {}
     status_history = load_job_status_history(user_id) if user_id else {}
 
-    keys = [country_key] if country_key and country_key != "all" else list(COUNTRY_FILES)
-    company_keys = list(COUNTRY_FILES)
+    keys = [country_key] if country_key and country_key != "all" else sorted(SUPPORTED_COUNTRIES)
+    company_keys = sorted(SUPPORTED_COUNTRIES)
 
     location_filter = (location or city or "").strip() or None
     country_cache: dict[str, dict] = {}
 
     for key in keys:
-        filename = COUNTRY_FILES.get(key)
+        filename = COUNTRY_ARCHIVE_FILENAMES.get(key)
         if not filename:
             continue
         data = _load_country_data(key, cache=country_cache)
@@ -646,7 +644,7 @@ def flatten_companies(
         })
 
     for key in company_keys:
-        filename = COUNTRY_FILES.get(key)
+        filename = COUNTRY_ARCHIVE_FILENAMES.get(key)
         if not filename:
             continue
         data = _load_country_data(key, cache=country_cache)
@@ -947,11 +945,11 @@ def list_company_locations(
         keyed.setdefault(loc["key"], loc)
 
     if for_picker:
-        for key in COUNTRY_FILES:
+        for key in SUPPORTED_COUNTRIES:
             for city in picker_cities_for_country(key):
                 add(key, city)
 
-    for key in COUNTRY_FILES:
+    for key in sorted(SUPPORTED_COUNTRIES):
         data = _load_country_data(key)
         for company in data.get("companies") or []:
             locations = normalize_locations(

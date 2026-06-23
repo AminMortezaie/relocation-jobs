@@ -167,10 +167,10 @@ def sample_country_data():
 
 @pytest.fixture
 def seeded_catalog(db, sample_country_data):
-    from relocation_jobs.catalog_db import save_country
+    from relocation_jobs.catalog_db import save_country_catalog
 
     data = copy.deepcopy(sample_country_data)
-    save_country("uk", data)
+    save_country_catalog("uk", data)
     return data
 
 

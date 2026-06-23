@@ -143,7 +143,7 @@ class TestRunFile:
         }
 
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "load_country", lambda k: country_data)
+        monkeypatch.setattr(sj, "load_country_catalog", lambda k: country_data)
         monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
         monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
 
@@ -180,7 +180,7 @@ class TestRunFile:
         }
 
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "load_country", lambda k: country_data)
+        monkeypatch.setattr(sj, "load_country_catalog", lambda k: country_data)
         monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
         monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
 
@@ -212,7 +212,7 @@ class TestRunFile:
 
     def test_run_file_missing_company_raises(self, monkeypatch):
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "load_country", lambda k: {"companies": []})
+        monkeypatch.setattr(sj, "load_country_catalog", lambda k: {"companies": []})
         with pytest.raises(LookupError):
             asyncio.run(sj.run_file_async("test", target="MissingCo"))
 

@@ -246,7 +246,7 @@ class TestGetJobsAsyncBranches:
 class TestRunFileAsyncPaths:
     async def _run_with_data(self, monkeypatch, country_data, **kwargs):
         monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-        monkeypatch.setattr(sj, "load_country", lambda k: country_data)
+        monkeypatch.setattr(sj, "load_country_catalog", lambda k: country_data)
         monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
         monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
 
@@ -642,7 +642,7 @@ async def test_run_file_target_skip_message(monkeypatch, capsys):
         ]
     }
     monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(sj, "load_country", lambda k: data)
+    monkeypatch.setattr(sj, "load_country_catalog", lambda k: data)
     monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
     monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
     await sj.run_file_async("test", target="SkippedCo", skip_filled=True)
@@ -951,7 +951,7 @@ async def test_run_file_cancel_concurrent(monkeypatch):
         ]
     }
     monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(sj, "load_country", lambda k: data)
+    monkeypatch.setattr(sj, "load_country_catalog", lambda k: data)
     monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
     monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
 
@@ -1426,8 +1426,8 @@ class TestMainAllCountries:
         monkeypatch.setattr(sj, "run_country", fake_run_country)
         monkeypatch.setattr(sj.sys, "argv", ["scrape_jobs.py", "--all"])
         sj.main()
-        from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
-        assert len(calls) == len(COUNTRY_FILE_NAMES)
+        from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+        assert len(calls) == len(SUPPORTED_COUNTRIES)
 
 
 class TestRunFileNoHttpx:
@@ -1878,7 +1878,7 @@ async def test_run_file_async_paths(monkeypatch, capsys):
         ]
     }
     monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
-    monkeypatch.setattr(sj, "load_country", lambda k: data)
+    monkeypatch.setattr(sj, "load_country_catalog", lambda k: data)
     monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
     monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
     monkeypatch.setattr(sj, "get_jobs_async", AsyncMock(return_value=[]))

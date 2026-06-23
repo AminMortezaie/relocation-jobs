@@ -1,0 +1,5 @@
+render make my service down just in case less than 50 seconds of request, can i substitude with aws or other services which are free insead of it?
+
+---
+
+also the render gives me domain and hosting which one gives me service like this?

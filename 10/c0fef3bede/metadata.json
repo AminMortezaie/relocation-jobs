@@ -3,7 +3,7 @@
   "checkpoint_id": "10c0fef3bede",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 11,
+  "checkpoints_count": 13,
   "files_touched": [
     "relocation_jobs/core/ats_detection.py",
     "relocation_jobs/scrape/__init__.py",
@@ -88,6 +88,12 @@
       "transcript": "/10/c0fef3bede/4/full.jsonl",
       "content_hash": "/10/c0fef3bede/4/content_hash.txt",
       "prompt": "/10/c0fef3bede/4/prompt.txt"
+    },
+    {
+      "metadata": "/10/c0fef3bede/5/metadata.json",
+      "transcript": "/10/c0fef3bede/5/full.jsonl",
+      "content_hash": "/10/c0fef3bede/5/content_hash.txt",
+      "prompt": "/10/c0fef3bede/5/prompt.txt"
     }
   ]
 }

@@ -1,0 +1,54 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "de0706f0b4c3",
+  "session_id": "aa6bd94c-1131-4566-ace5-1022ac6689f7",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T17:05:17.368536Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/catalog/reads.py",
+    "relocation_jobs/catalog/schema.py",
+    "relocation_jobs/catalog/serialize.py",
+    "relocation_jobs/catalog/stats.py",
+    "relocation_jobs/catalog/writes.py",
+    "tests/test_integration.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "108d7352e334",
+  "checkpoint_transcript_start": 103,
+  "transcript_lines_at_start": 103,
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T17:05:17.363251Z",
+    "agent_lines": 48,
+    "agent_removed": 100,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 48,
+    "total_lines_changed": 148,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 48,
+      "agent_lines_removed": 100
+    }
+  ]
+}

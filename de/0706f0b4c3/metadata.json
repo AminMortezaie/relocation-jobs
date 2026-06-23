@@ -1,0 +1,23 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "de0706f0b4c3",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "relocation_jobs/catalog/reads.py",
+    "relocation_jobs/catalog/schema.py",
+    "relocation_jobs/catalog/serialize.py",
+    "relocation_jobs/catalog/stats.py",
+    "relocation_jobs/catalog/writes.py",
+    "tests/test_integration.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/de/0706f0b4c3/0/metadata.json",
+      "transcript": "/de/0706f0b4c3/0/full.jsonl",
+      "content_hash": "/de/0706f0b4c3/0/content_hash.txt",
+      "prompt": "/de/0706f0b4c3/0/prompt.txt"
+    }
+  ]
+}

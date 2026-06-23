@@ -1,0 +1,40 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "ebeb5ba78825",
+  "session_id": "de3df184-829f-4ad4-a1f7-a2351fa853b2",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T19:04:05.285511Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "README.md"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "1e5ab7fcbc52",
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T19:04:05.282981Z",
+    "agent_lines": 145,
+    "agent_removed": 460,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 145,
+    "total_lines_changed": 605,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

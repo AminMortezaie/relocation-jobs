@@ -735,6 +735,9 @@ def test_panel_server_helpers():
 
     cmd = ps._build_scrape_cmd("uk", skip_filled=True, concurrency=8)
     assert "scrape_jobs" in " ".join(cmd)
+    cmd_ats = ps._build_scrape_cmd("uk", skip_filled=False, concurrency=8, ats_type="greenhouse")
+    assert "--ats" in cmd_ats
+    assert "greenhouse" in cmd_ats
     cmd_serial = ps._build_scrape_cmd("uk", skip_filled=False, concurrency=1, company="Acme")
     assert cmd_serial[-1] == "Acme"
 

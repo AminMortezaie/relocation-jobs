@@ -291,7 +291,8 @@ function pollFetchStatus() {
 
   async function tick() {
     const st = await getFetchStatus();
-    if (st.company) return;
+    // Ignore per-company fetches from the job panel — admin modal is country-scoped only.
+    if (st.company && st.running) return;
     const result = applyFetchStatus(st);
     if (!result.done) return;
 

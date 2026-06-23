@@ -221,6 +221,9 @@ async def run_file_async(
                 print(f"Done {target} — skipped (already has {n} matching job(s))")
             else:
                 print(f"Done {target} — nothing to process")
+        elif ats_type:
+            scope = f"{country_key} · {ats_type}"
+            print(f"Done {scope} — no companies to process (all skipped or already filled)")
         else:
             total_jobs = sum(len(c.get("matching_jobs", [])) for c in data["companies"])
             print(

@@ -31,7 +31,7 @@ import {
   notForMeReasonMeta,
 } from "./render.js";
 import { saveShowRejectedCompanies } from "./storage.js";
-import { fetchOneCompany, cancelFetch } from "./scrape.js";
+import { fetchOneCompany, cancelFetch, startCountryFetch } from "./scrape.js";
 import { openEditCareersDialog, openEditCompanyNameDialog, openEditCityDialog } from "./dialogs.js";
 import { saveCollapsedCompanies } from "./storage.js";
 import { logout, submitAuth, setLoginMode } from "./auth.js";
@@ -884,6 +884,9 @@ function bindToolbarEvents() {
   });
   $("ats")?.addEventListener("change", loadJobs);
   $("location")?.addEventListener("change", loadJobs);
+  $("fetchCountryBtn")?.addEventListener("click", () => {
+    startCountryFetch();
+  });
   $("search").addEventListener("input", () => renderCompanies());
   $("fetchCancelBtn").addEventListener("click", () => {
     cancelFetch();

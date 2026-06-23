@@ -1,7 +1,7 @@
 /** Application entry point. */
 
 import { setOnUnauthorized } from "./state.js";
-import { showLogin, refreshAuth, setLoginMode } from "./auth.js";
+import { showLogin, refreshAuth, setLoginMode, setAdminNavVisible } from "./auth.js";
 import { loadConfig, loadCountries, loadAtsTypes, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
 import { bindDialogEvents } from "./dialogs.js";
 import { bindEvents } from "./events.js";
@@ -37,6 +37,7 @@ async function init() {
   showJobsLoading();
   setLoadingProgress(10);
   await Promise.all([loadConfig(), loadCountries(), loadAtsTypes()]);
+  setAdminNavVisible(Boolean(state.authState.user?.is_admin));
   setLoadingProgress(40);
   refreshFilterBar();
   await Promise.all([loadCities(), loadJobs()]);

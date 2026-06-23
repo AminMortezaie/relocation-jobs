@@ -216,6 +216,71 @@ class TestRunFile:
         with pytest.raises(LookupError):
             asyncio.run(sj.run_file_async("test", target="MissingCo"))
 
+    def test_run_file_async_filters_by_ats(self, monkeypatch, capsys):
+        country_data = {
+            "companies": [
+                {
+                    "name": "GH Co",
+                    "city": "London",
+                    "careers_url": "https://example.com/gh",
+                    "ats_type": "greenhouse",
+                    "matching_jobs": [],
+                },
+                {
+                    "name": "Lever Co",
+                    "city": "London",
+                    "careers_url": "https://example.com/lever",
+                    "ats_type": "lever",
+                    "matching_jobs": [],
+                },
+            ]
+        }
+        processed: list[str] = []
+
+        monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
+        monkeypatch.setattr(sj, "load_country_catalog", lambda k: country_data)
+        monkeypatch.setattr(sj, "upsert_company", lambda *a, **k: None)
+        monkeypatch.setattr(sj, "touch_country_meta", lambda *a, **k: None)
+
+        async def fake_get_jobs(client, company, **kwargs):
+            processed.append(company["name"])
+            return [{"title": "Backend Engineer", "url": "https://example.com/j/1"}]
+
+        monkeypatch.setattr(sj, "get_jobs_async", fake_get_jobs)
+
+        async def fake_enrich(client, jobs, company, **kwargs):
+            return jobs
+
+        monkeypatch.setattr(sj, "enrich_jobs_async_with_client", fake_enrich)
+
+        asyncio.run(sj.run_file_async("test", ats_type="greenhouse", concurrency=1))
+        assert processed == ["GH Co"]
+        assert "greenhouse" in capsys.readouterr().out
+
+        processed.clear()
+        asyncio.run(sj.run_file_async("test", ats_type="lever", concurrency=1))
+        assert processed == ["Lever Co"]
+
+    def test_run_file_async_raises_when_ats_has_no_companies(self, monkeypatch):
+        monkeypatch.setattr(sj, "HTTPX_AVAILABLE", True)
+        monkeypatch.setattr(
+            sj,
+            "load_country_catalog",
+            lambda k: {
+                "companies": [
+                    {
+                        "name": "GH Co",
+                        "city": "London",
+                        "careers_url": "https://example.com/gh",
+                        "ats_type": "greenhouse",
+                        "matching_jobs": [],
+                    }
+                ]
+            },
+        )
+        with pytest.raises(LookupError, match="No companies with ATS 'lever'"):
+            asyncio.run(sj.run_file_async("test", ats_type="lever", concurrency=1))
+
 
 class TestProcessCompanyAsync:
     @pytest.mark.asyncio

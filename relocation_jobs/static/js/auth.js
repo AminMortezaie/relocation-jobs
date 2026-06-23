@@ -11,11 +11,15 @@ export function showLogin(message = "") {
   $("loginUsername").focus();
 }
 
-function setAdminNavVisible(visible) {
+export function setAdminNavVisible(visible) {
   const adminLink = $("adminLink");
   const adminPanelBtn = $("adminPanelBtn");
+  const fetchCountryBtn = $("fetchCountryBtn");
   if (adminLink) adminLink.hidden = !visible;
   if (adminPanelBtn) adminPanelBtn.hidden = !visible;
+  if (fetchCountryBtn) {
+    fetchCountryBtn.hidden = !visible || state.scrapeConfig?.scrape_enabled === false;
+  }
 }
 
 export function showApp() {
@@ -85,6 +89,7 @@ export async function submitAuth(e) {
     showJobsLoading();
     setLoadingProgress(10);
     await Promise.all([loadConfig(), loadCountries(), loadAtsTypes()]);
+    setAdminNavVisible(Boolean(state.authState.user?.is_admin));
     setLoadingProgress(40);
     await loadCities();
     setLoadingProgress(60);

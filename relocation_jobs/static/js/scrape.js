@@ -6,6 +6,7 @@ import {
   cancelFetchRequest,
   fetchCompanyRequest,
   getFetchStatus,
+  startFetchRequest,
 } from "./api.js";
 import { loadJobs } from "./data.js";
 import {
@@ -29,6 +30,20 @@ import {
 function countryLabel(countryId) {
   const opt = [...$("country").options].find((o) => o.value === countryId);
   return opt?.textContent?.trim() || countryId || "";
+}
+
+function atsLabel(atsId) {
+  if (!atsId || atsId === "all") return "";
+  const opt = [...($("ats")?.options || [])].find((o) => o.value === atsId);
+  return opt?.textContent?.trim() || atsId;
+}
+
+function fetchScopeSubtitle(country, atsType, concurrency) {
+  const parts = [countryLabel(country)];
+  const ats = atsLabel(atsType);
+  if (ats) parts.push(ats);
+  if (concurrency) parts.push(`${concurrency} parallel workers`);
+  return parts.join(" · ");
 }
 
 function applyFetchStatus(st) {
@@ -67,9 +82,11 @@ function applyFetchStatus(st) {
       $("fetchLog").hidden = true;
       setFetchLogMode(true);
     } else {
-      $("fetchTitle").textContent = "Fetching companies";
       const n = st.concurrency || state.scrapeConfig?.default_concurrency || 16;
-      $("fetchSubtitle").textContent = `${countryLabel(st.country)} · ${n} parallel workers`;
+      $("fetchTitle").textContent = st.ats_type
+        ? `Fetching ${atsLabel(st.ats_type)} companies`
+        : "Fetching companies";
+      $("fetchSubtitle").textContent = fetchScopeSubtitle(st.country, st.ats_type, n);
       $("fetchProgressWrap").hidden = false;
       $("fetchActivity").hidden = false;
       $("fetchLog").hidden = true;
@@ -222,6 +239,62 @@ export async function cancelFetch() {
   }
 }
 
+export async function startCountryFetch() {
+  const country = $("country")?.value;
+  const atsType = $("ats")?.value || "all";
+  if (!country || country === "all") {
+    toast("Select a single country to fetch (not All countries).");
+    return;
+  }
+  if (state.fetchBusy) {
+    toast("A fetch is already running.");
+    return;
+  }
+  if (state.scrapeConfig?.scrape_enabled === false) {
+    toast("Scraping is disabled on this host.");
+    return;
+  }
+
+  const concurrency = Math.max(
+    1,
+    Math.min(
+      parseInt(localStorage.getItem("panel_concurrency"), 10)
+        || state.scrapeConfig?.default_concurrency
+        || 16,
+      state.scrapeConfig?.max_concurrency || 64,
+    ),
+  );
+
+  setFetchBusy(true);
+  state.lastFetchReview = null;
+  state.fetchPanelSingle = false;
+  showFetchPanel({
+    title: atsType !== "all" ? `Fetching ${atsLabel(atsType)} companies` : "Fetching companies",
+    subtitle: fetchScopeSubtitle(country, atsType),
+    singleCompany: false,
+    country,
+  });
+  $("fetchSubtitle").textContent = fetchScopeSubtitle(country, atsType, concurrency);
+
+  try {
+    const data = await startFetchRequest({
+      country,
+      ats_type: atsType !== "all" ? atsType : undefined,
+      concurrency,
+    });
+    if (!data) {
+      setFetchBusy(false);
+      hideFetchPanelOnFailure();
+      return;
+    }
+    pollFetchStatus();
+  } catch {
+    toast("Network error");
+    setFetchBusy(false);
+    hideFetchPanelOnFailure();
+  }
+}
+
 export async function fetchOneCompany(country, company) {
   if (state.fetchBusy) {
     toast("A fetch is already running.");
@@ -260,14 +333,28 @@ function hideFetchPanelOnFailure() {
 
 export async function resumeFetchIfRunning() {
   const st = await getFetchStatus();
-  if (!st.running || !st.company) return;
-  setFetchBusy(true, `${st.country}:${st.company}`);
+  if (!st.running) return;
+
+  if (st.company) {
+    setFetchBusy(true, `${st.country}:${st.company}`);
+    showFetchPanel({
+      title: `Fetching ${st.company}`,
+      subtitle: countryLabel(st.country),
+      singleCompany: true,
+      country: st.country,
+      company: st.company,
+    });
+    pollFetchStatus();
+    return;
+  }
+
+  setFetchBusy(true);
+  state.fetchPanelSingle = false;
   showFetchPanel({
-    title: `Fetching ${st.company}`,
-    subtitle: countryLabel(st.country),
-    singleCompany: true,
+    title: st.ats_type ? `Fetching ${atsLabel(st.ats_type)} companies` : "Fetching companies",
+    subtitle: fetchScopeSubtitle(st.country, st.ats_type),
+    singleCompany: false,
     country: st.country,
-    company: st.company,
   });
   pollFetchStatus();
 }

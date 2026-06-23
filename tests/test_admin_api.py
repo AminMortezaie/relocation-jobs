@@ -161,6 +161,49 @@ def test_admin_country_fetch(auth_client, seeded_catalog, monkeypatch):
     monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
     monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", lambda *a, **k: None)
 
+    with ps._fetch_lock:
+        ps._fetch_state["running"] = False
+
     resp = auth_client.post("/api/fetch", json={"country": "uk", "concurrency": 2})
     assert resp.status_code == 200
     assert resp.get_json()["ok"] is True
+
+    with ps._fetch_lock:
+        ps._fetch_state["running"] = False
+
+
+def test_admin_country_fetch_by_ats(auth_client, seeded_catalog, monkeypatch):
+    import relocation_jobs.panel_server as ps
+
+    captured: dict = {}
+
+    def fake_start(country, skip_filled, concurrency, *, company=None, ats_type=None):
+        captured["country"] = country
+        captured["skip_filled"] = skip_filled
+        captured["concurrency"] = concurrency
+        captured["company"] = company
+        captured["ats_type"] = ats_type
+
+    monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
+    monkeypatch.setattr("relocation_jobs.web.deps.HTTPX_AVAILABLE", True)
+    monkeypatch.setattr("relocation_jobs.web.scrape_runner._start_scrape_thread", fake_start)
+
+    with ps._fetch_lock:
+        ps._fetch_state["running"] = False
+
+    resp = auth_client.post(
+        "/api/fetch",
+        json={"country": "uk", "ats_type": "greenhouse", "concurrency": 4},
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["ok"] is True
+    assert body["ats_type"] == "greenhouse"
+    assert captured["ats_type"] == "greenhouse"
+    assert captured["company"] is None
+
+    bad = auth_client.post("/api/fetch", json={"country": "uk", "ats_type": "not-a-real-ats"})
+    assert bad.status_code == 400
+
+    with ps._fetch_lock:
+        ps._fetch_state["running"] = False

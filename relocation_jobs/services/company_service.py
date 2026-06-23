@@ -11,12 +11,10 @@ from __future__ import annotations
 import re
 from urllib.parse import urlparse
 
-try:
-    import requests
-except ImportError:
-    requests = None  # type: ignore[assignment]
+import requests
+from bs4 import BeautifulSoup
 
-from relocation_jobs.build_companies import slug_from_name
+from relocation_jobs.core.slug import slug_from_name
 from relocation_jobs.catalog_db import (
     delete_company,
     get_company,
@@ -46,9 +44,8 @@ from relocation_jobs.core.location_tags import (
 from relocation_jobs.services.catalog_service import now_iso, today
 from relocation_jobs.schemas import CompanyCreateInput, CompanyResponse
 
-from relocation_jobs.scrape_jobs import (
-    ATS_TYPE_CHOICES,
-    KNOWN_ATS,
+from relocation_jobs.core.ats_constants import ATS_TYPE_CHOICES, KNOWN_ATS
+from relocation_jobs.core.ats_detection import (
     detect_ats_for_hint,
     detect_ats_static,
     detect_ats_via_playwright,
@@ -238,7 +235,7 @@ def detect_ats_for_company(
     ats_hint: str | None = None,
 ) -> tuple[str, str]:
     hint = (ats_hint or "").strip().lower()
-    if hint and hint not in ("auto", "") and detect_ats_for_hint:
+    if hint and hint not in ("auto", ""):
         ats_type, ats_url = detect_ats_for_hint(name, careers_url, hint)
         if ats_type:
             return _finalize_detected_ats(name, ats_type, ats_url)
@@ -248,9 +245,9 @@ def detect_ats_for_company(
 
     if name in KNOWN_ATS:
         ats_type_val, ats_url_val = KNOWN_ATS[name]
-    elif detect_ats_static:
+    else:
         ats_type_val, ats_url_val = detect_ats_static(careers_url)
-        if not ats_type_val and detect_ats_via_playwright:
+        if not ats_type_val:
             ats_type_val, ats_url_val = detect_ats_via_playwright(careers_url)
 
     return _finalize_detected_ats(name, ats_type_val or "", ats_url_val or "")
@@ -261,8 +258,6 @@ def detect_ats_for_company(
 # ---------------------------------------------------------------------------
 
 def fetch_relocate_metadata(name: str, country_key: str | None = None) -> dict:
-    from bs4 import BeautifulSoup
-
     slug = slug_from_name(name)
     for candidate in {slug, slug.replace("-", "")}:
         try:

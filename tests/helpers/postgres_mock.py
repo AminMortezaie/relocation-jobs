@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import sqlite3
 from contextlib import contextmanager
@@ -111,6 +112,45 @@ class FakePgConnection:
         self.closed = True
         self._conn.close()
 
+    _DATA_TABLES = (
+        "job_status_events",
+        "fetch_runs",
+        "job_tracking",
+        "company_tracking",
+        "matching_jobs",
+        "companies",
+        "country_meta",
+        "users",
+    )
+
+    _TRACKING_TABLES = (
+        "job_status_events",
+        "fetch_runs",
+        "job_tracking",
+        "company_tracking",
+    )
+
+    def clear_data(self) -> None:
+        """Delete all rows but keep schema — fast reset between tests."""
+        self._conn.execute("PRAGMA foreign_keys = OFF")
+        for table in self._DATA_TABLES:
+            self._conn.execute(f"DELETE FROM {table}")
+        self._conn.execute("DELETE FROM sqlite_sequence")
+        self._conn.commit()
+        self._conn.execute("PRAGMA foreign_keys = ON")
+
+    def clear_tracking(self, *, keep_admin: str = "admin") -> None:
+        """Clear per-user state but keep catalog companies/jobs."""
+        self._conn.execute("PRAGMA foreign_keys = OFF")
+        for table in self._TRACKING_TABLES:
+            self._conn.execute(f"DELETE FROM {table}")
+        self._conn.execute(
+            "DELETE FROM users WHERE LOWER(username) != LOWER(?)",
+            (keep_admin,),
+        )
+        self._conn.commit()
+        self._conn.execute("PRAGMA foreign_keys = ON")
+
     def _adapt(self, sql: str) -> tuple[str, bool]:
         returning = bool(re.search(r"\bRETURNING\b", sql, re.I))
         out = sql.replace("%s", "?")
@@ -134,11 +174,33 @@ def install_postgres_mock(monkeypatch, *, database_url: str = "postgresql://test
     fake = FakePgConnection()
     monkeypatch.setenv("DATABASE_URL", database_url)
     core._pg_conn = None
+    core.reset_db_initialized()
 
     def _connect():
         nonlocal fake
         fake = FakePgConnection()
+        core.reset_db_initialized()
         return fake
 
     monkeypatch.setattr(core, "_connect_postgres", _connect)
+    return fake
+
+
+def install_session_postgres_mock(
+    *,
+    database_url: str = "postgresql://test:test@localhost/test",
+) -> FakePgConnection:
+    """Install a single in-memory connection for the whole test session."""
+    import relocation_jobs.core.db as core
+
+    fake = FakePgConnection()
+    os.environ["DATABASE_URL"] = database_url
+    core._pg_conn = None
+    core.reset_db_initialized()
+
+    def _connect():
+        return fake
+
+    core._connect_postgres = _connect
+    core._pg_conn = fake
     return fake

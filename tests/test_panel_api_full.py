@@ -8,11 +8,14 @@ import subprocess
 import threading
 import time
 from io import StringIO
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from relocation_jobs.catalog_db import save_country
+
+pytest_plugins = ["tests.helpers.panel_fixtures"]
 
 
 # ---------------------------------------------------------------------------
@@ -86,41 +89,13 @@ def _fake_start_scrape_thread(country, skip_filled, concurrency, *, company=None
     ps._fetch_thread.start()
 
 
-@pytest.fixture
-def rich_catalog(seeded_catalog, sample_country_data):
-    data = copy.deepcopy(sample_country_data)
-    acme = data["companies"][0]
-    acme["matching_jobs"][0]["visa_sponsorship"] = True
-    data["companies"].append(
-        {
-            "name": "Empty Corp",
-            "city": "Manchester",
-            "careers_url": "https://example.co.uk/empty",
-            "matching_jobs": [],
-        }
-    )
-    data["companies"].append(
-        {
-            "name": "Fetch Problem Inc",
-            "city": "London",
-            "careers_url": "https://example.co.uk/problem",
-            "fetch_problem": True,
-            "fetch_problem_date": "2025-06-01",
-            "matching_jobs": [],
-        }
-    )
-    data["companies"].append(
-        {
-            "name": "Fetch OK Ltd",
-            "city": "London",
-            "careers_url": "https://example.co.uk/ok",
-            "fetch_ok": True,
-            "fetch_ok_date": "2025-06-01",
-            "matching_jobs": [],
-        }
-    )
-    save_country("uk", data)
-    return data
+@pytest.fixture(autouse=True)
+def _panel_fetch_reset(request):
+    if "_module_panel" not in request.fixturenames:
+        yield
+        return
+    yield
+    _reset_fetch_state()
 
 
 @pytest.fixture
@@ -150,7 +125,7 @@ def mock_enrich(monkeypatch):
             "locations": [{"country": country_key, "city": "London"}],
         }
 
-    monkeypatch.setattr("relocation_jobs.panel_data.enrich_new_company", fake_enrich)
+    monkeypatch.setattr("relocation_jobs.services.company_service.enrich_new_company", fake_enrich)
 
 
 # ---------------------------------------------------------------------------
@@ -166,7 +141,7 @@ def test_index(auth_client):
 
 
 @pytest.mark.integration
-def test_auth_register_logout(app_client, db):
+def test_auth_register_logout(app_client):
     reg = app_client.post(
         "/api/auth/register",
         json={"username": "newuser", "password": "securepass123"},
@@ -273,7 +248,7 @@ def test_locations_add_custom_city_validation(auth_client, tmp_data_dir):
 
 
 @pytest.mark.integration
-def test_locations_add_custom_city_requires_auth(app_client, db, tmp_data_dir):
+def test_locations_add_custom_city_requires_auth(app_client, tmp_data_dir):
     assert app_client.post("/api/locations", json={"country": "uk", "city": "Reading"}).status_code == 401
 
 
@@ -464,7 +439,7 @@ def test_companies_add_remove_rename(auth_client, rich_catalog, mock_enrich):
 @pytest.mark.integration
 def test_companies_careers_city(auth_client, rich_catalog, monkeypatch):
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.detect_ats_for_company",
+        "relocation_jobs.services.company_service.detect_ats_for_company",
         lambda *a, **k: ("greenhouse", "https://boards.greenhouse.io/acmebackend"),
     )
     ctx = _job_ctx(auth_client)

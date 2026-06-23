@@ -1,4 +1,4 @@
-"""Full panel_data coverage — public functions, filters, CRUD, helpers."""
+"""Catalog service coverage — flatten_companies, filters, CRUD, helpers."""
 
 from __future__ import annotations
 
@@ -8,25 +8,28 @@ from pathlib import Path
 import pytest
 
 from relocation_jobs.catalog_db import save_country
-from relocation_jobs.panel_data import (
+from relocation_jobs.services.catalog_service import (
+    compute_stats,
+    flatten_companies,
+    flatten_jobs,
+    list_ats_types,
+    list_company_cities,
+    list_company_locations,
+    now_iso,
+    parse_company_cities,
+    today,
+)
+from relocation_jobs.services.company_service import (
     add_company,
     add_manual_jobs,
-    compute_stats,
     detect_ats_for_company,
     detect_country_from_url,
     enrich_new_company,
     fetch_relocate_metadata,
     find_company_in_data,
     find_job_in_data,
-    flatten_companies,
-    flatten_jobs,
-    list_ats_types,
-    list_company_cities,
-    list_company_locations,
     normalize_careers_url,
     normalize_company_size,
-    now_iso,
-    parse_company_cities,
     parse_country_from_location,
     remove_company,
     rename_company,
@@ -36,6 +39,11 @@ from relocation_jobs.panel_data import (
     set_company_awaiting_response,
     set_company_fetch_ok,
     set_company_fetch_problem,
+    touch_company_fetch_time,
+    update_company_careers,
+    update_company_city,
+)
+from relocation_jobs.services.job_service import (
     set_job_applied,
     set_job_ats_score,
     set_job_looking_to_apply,
@@ -44,10 +52,6 @@ from relocation_jobs.panel_data import (
     set_job_rejected,
     set_job_seen,
     set_job_waiting_referral,
-    today,
-    touch_company_fetch_time,
-    update_company_careers,
-    update_company_city,
 )
 
 
@@ -104,7 +108,7 @@ def _acme_job(rich_catalog) -> tuple[str, str]:
 @pytest.fixture
 def mock_external(monkeypatch):
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.fetch_relocate_metadata",
+        "relocation_jobs.services.company_service.fetch_relocate_metadata",
         lambda name, country_key=None: {
             "city": "London",
             "size": "51-200",
@@ -112,7 +116,7 @@ def mock_external(monkeypatch):
         },
     )
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.detect_ats_for_company",
+        "relocation_jobs.services.company_service.detect_ats_for_company",
         lambda name, url, *, ats_hint=None: ("greenhouse", url),
     )
 
@@ -289,7 +293,7 @@ def test_flatten_keeps_unknown_location_on_main_board(db, sample_country_data):
 
 @pytest.mark.integration
 def test_reconcile_wrong_location_restores_matching_job(db, sample_country_data, test_user):
-    from relocation_jobs.panel_data import reconcile_wrong_location_hides, set_job_not_for_me
+    from relocation_jobs.services.job_service import reconcile_wrong_location_hides, set_job_not_for_me
 
     uid = test_user["id"]
     company = sample_country_data["companies"][0]
@@ -401,7 +405,7 @@ def test_list_locations_and_cities(rich_catalog):
 @pytest.mark.integration
 def test_list_company_locations_picker_includes_custom_cities(rich_catalog, tmp_data_dir):
     from relocation_jobs.core.location_tags import add_custom_city
-    from relocation_jobs.panel_data import list_company_locations
+    from relocation_jobs.services.catalog_service import list_company_locations
 
     add_custom_city("uk", "Reading")
 
@@ -616,7 +620,7 @@ def test_remove_company_not_found(rich_catalog):
 @pytest.mark.integration
 def test_resolve_country_key_from_url(mock_external, monkeypatch):
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.fetch_relocate_metadata",
+        "relocation_jobs.services.company_service.fetch_relocate_metadata",
         lambda *a, **k: {},
     )
     key, _ = resolve_country_key("Co", "https://jobs.example.nl/careers")
@@ -626,7 +630,7 @@ def test_resolve_country_key_from_url(mock_external, monkeypatch):
 @pytest.mark.integration
 def test_resolve_country_key_failure(monkeypatch):
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.fetch_relocate_metadata",
+        "relocation_jobs.services.company_service.fetch_relocate_metadata",
         lambda *a, **k: {},
     )
     with pytest.raises(ValueError):
@@ -665,7 +669,7 @@ def test_fetch_relocate_metadata_failures(monkeypatch):
 @pytest.mark.integration
 def test_detect_ats_and_enrich(monkeypatch, mock_external):
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.detect_ats_for_company",
+        "relocation_jobs.services.company_service.detect_ats_for_company",
         lambda *a, **k: ("greenhouse", "https://boards.greenhouse.io/acme"),
     )
     ats_type, ats_url = detect_ats_for_company(

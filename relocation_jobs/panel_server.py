@@ -32,17 +32,22 @@ from relocation_jobs.core.auth import (
     register_user,
 )
 
-from relocation_jobs.core.location_tags import add_custom_city
-from relocation_jobs.panel_data import (
+from relocation_jobs.core.location_tags import COUNTRY_LABELS, add_custom_city
+from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILABLE
+from relocation_jobs.catalog_db import touch_country_meta
+from relocation_jobs.services.catalog_service import (
     COUNTRY_FILES,
-    COUNTRY_LABELS,
-    add_company,
-    add_manual_jobs,
     compute_stats,
     flatten_companies,
+    list_ats_types,
     list_company_cities,
     list_company_locations,
-    list_ats_types,
+)
+from relocation_jobs.services.company_service import (
+    add_company,
+    add_manual_jobs,
+    detect_ats_for_company,
+    enrich_new_company,
     remove_company,
     rename_company,
     resolve_company_name,
@@ -51,20 +56,21 @@ from relocation_jobs.panel_data import (
     set_company_fetch_ok,
     set_company_fetch_problem,
     touch_company_fetch_time,
-    set_job_applied,
-    set_job_ats_score,
-    set_job_not_for_me,
-    set_job_looking_to_apply,
-    set_job_rejected,
-    set_job_reapply,
-    set_job_seen,
-    set_job_waiting_referral,
     update_company_careers,
     update_company_city,
-    reconcile_wrong_location_hides,
 )
-from relocation_jobs.catalog_db import touch_country_meta
-from relocation_jobs.admin_data import (
+from relocation_jobs.services.job_service import (
+    reconcile_wrong_location_hides,
+    set_job_applied,
+    set_job_ats_score,
+    set_job_looking_to_apply,
+    set_job_not_for_me,
+    set_job_reapply,
+    set_job_rejected,
+    set_job_seen,
+    set_job_waiting_referral,
+)
+from relocation_jobs.services.admin_service import (
     get_admin_dashboard,
     get_admin_overview,
     get_catalog_overview,
@@ -81,29 +87,6 @@ from relocation_jobs.core.paths import (
     PROJECT_ROOT,
     STATIC_DIR,
 )
-
-try:
-    from relocation_jobs.scrape_jobs import (
-        DEFAULT_CONCURRENCY,
-        HTTPX_AVAILABLE,
-        clear_cancel_checker,
-        clear_progress_reporter,
-        clear_review_reporter,
-        run_country,
-        set_cancel_checker,
-        set_progress_reporter,
-        set_review_reporter,
-    )
-except ImportError:
-    DEFAULT_CONCURRENCY = 16
-    HTTPX_AVAILABLE = False
-    run_country = None  # type: ignore
-    set_cancel_checker = None  # type: ignore
-    clear_cancel_checker = None  # type: ignore
-    set_progress_reporter = None  # type: ignore
-    clear_progress_reporter = None  # type: ignore
-    set_review_reporter = None  # type: ignore
-    clear_review_reporter = None  # type: ignore
 
 ROOT = PROJECT_ROOT
 STATIC = STATIC_DIR

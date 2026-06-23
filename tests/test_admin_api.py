@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import pytest
-from werkzeug.security import generate_password_hash
+from tests.helpers.passwords import hash_test_password
 
 pytestmark = pytest.mark.integration
+pytest_plugins = ["tests.helpers.panel_fixtures"]
 
 
 def test_admin_page_served(app_client):
@@ -30,7 +31,7 @@ def test_admin_api_requires_auth(app_client):
 def test_admin_api_forbidden_for_non_admin(app_client, db):
     from relocation_jobs.db import create_user
 
-    create_user("regular", generate_password_hash("regularpass1"))
+    create_user("regular", hash_test_password("regularpass1"))
     login = app_client.post(
         "/api/auth/login",
         json={"username": "regular", "password": "regularpass1"},
@@ -139,7 +140,7 @@ def test_country_fetch_requires_admin(app_client, db, seeded_catalog, monkeypatc
     import relocation_jobs.panel_server as ps
 
     monkeypatch.setattr(ps, "HTTPX_AVAILABLE", True)
-    create_user("regular", generate_password_hash("regularpass12"))
+    create_user("regular", hash_test_password("regularpass12"))
     login = app_client.post(
         "/api/auth/login",
         json={"username": "regular", "password": "regularpass12"},

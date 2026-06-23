@@ -11,7 +11,7 @@ from relocation_jobs.db import (
     set_job_applied_db,
     set_job_seen_db,
 )
-from relocation_jobs.panel_data import compute_stats
+from relocation_jobs.services.catalog_service import compute_stats
 
 
 @pytest.fixture

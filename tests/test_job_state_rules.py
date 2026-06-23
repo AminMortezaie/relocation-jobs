@@ -13,8 +13,8 @@ import pytest
 
 from relocation_jobs.catalog_db import load_country, save_country
 from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
-from relocation_jobs.panel_data import (
-    flatten_companies,
+from relocation_jobs.services.catalog_service import flatten_companies
+from relocation_jobs.services.job_service import (
     set_job_applied,
     set_job_looking_to_apply,
     set_job_not_for_me,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from relocation_jobs.panel_data import _job_dict
+from relocation_jobs.services.catalog_service import _job_dict
 
 
 @pytest.mark.integration

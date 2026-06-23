@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import pytest
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
+from tests.helpers.passwords import hash_test_password
 
 from relocation_jobs.db import create_user, get_user_by_username
 from relocation_jobs.reset_password import main
@@ -11,7 +12,7 @@ from relocation_jobs.reset_password import main
 
 @pytest.mark.integration
 def test_main_updates_password(db, monkeypatch):
-    create_user("cliuser", generate_password_hash("oldpass123"))
+    create_user("cliuser", hash_test_password("oldpass123"))
     monkeypatch.setattr(
         "sys.argv",
         ["reset_password.py", "cliuser", "newpass12345"],
@@ -42,7 +43,7 @@ def test_main_user_not_found(db, monkeypatch, capsys):
 
 @pytest.mark.integration
 def test_main_rename_from(db, monkeypatch, capsys):
-    create_user("oldname", generate_password_hash("oldpass123"))
+    create_user("oldname", hash_test_password("oldpass123"))
     monkeypatch.setattr(
         "sys.argv",
         [
@@ -78,8 +79,8 @@ def test_main_rename_from_missing_user(db, monkeypatch, capsys):
 
 @pytest.mark.integration
 def test_main_rename_username_taken(db, monkeypatch, capsys):
-    create_user("holder", generate_password_hash("pass123456"))
-    create_user("oldname", generate_password_hash("pass123456"))
+    create_user("holder", hash_test_password("pass123456"))
+    create_user("oldname", hash_test_password("pass123456"))
     monkeypatch.setattr(
         "sys.argv",
         [
@@ -96,7 +97,7 @@ def test_main_rename_username_taken(db, monkeypatch, capsys):
 
 @pytest.mark.integration
 def test_main_module_entry(db, monkeypatch):
-    create_user("admin", generate_password_hash("pass123456"))
+    create_user("admin", hash_test_password("pass123456"))
     monkeypatch.setattr(
         "sys.argv",
         ["reset_password.py", "admin", "newpass12345"],
@@ -125,8 +126,9 @@ def test_load_env_with_dotenv(monkeypatch, tmp_path):
 
 
 @pytest.mark.integration
+@pytest.mark.fresh_db
 def test_main_uses_env_defaults(db, monkeypatch):
-    create_user("admin", generate_password_hash("old"))
+    create_user("admin", hash_test_password("old"))
     monkeypatch.setenv("PANEL_ADMIN_USER", "admin")
     monkeypatch.setenv("PANEL_ADMIN_PASSWORD", "fromenv123")
     monkeypatch.setattr("sys.argv", ["reset_password.py"])

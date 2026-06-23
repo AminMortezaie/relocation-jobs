@@ -10,6 +10,7 @@ import httpx
 import pytest
 
 from relocation_jobs import scrape_jobs as sj
+from relocation_jobs.core import ats_detection as ats_det
 from tests.helpers.http_mock import install_requests_mock, text_response
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -113,7 +114,9 @@ class TestDetectAtsForHint:
         assert ats_type == "recruitee"
         assert "recruitee.com" in ats_url
 
-    def test_detect_ats_for_hint_careers_page_ats(self):
+    def test_detect_ats_for_hint_careers_page_ats(self, monkeypatch):
+        monkeypatch.setattr(ats_det, "_detect_ats_in_html_for_hint", lambda *a, **k: ("", ""))
+        monkeypatch.setattr(ats_det, "detect_ats_via_playwright", None)
         ats_type, ats_url = sj.detect_ats_for_hint(
             "EPAM",
             "https://careers.epam.com/",

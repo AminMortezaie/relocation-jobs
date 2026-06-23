@@ -6,7 +6,7 @@ import json
 
 import pytest
 from flask import Flask, g, jsonify, session
-from werkzeug.security import generate_password_hash
+from tests.helpers.passwords import hash_test_password
 
 from relocation_jobs.core.auth import (
     allow_register,
@@ -75,7 +75,7 @@ def test_register_user_validation(db):
 
 @pytest.mark.integration
 def test_register_disabled_when_users_exist(db, monkeypatch):
-    create_user("existing", generate_password_hash("longpass1"))
+    create_user("existing", hash_test_password("longpass1"))
     monkeypatch.delenv("PANEL_ALLOW_REGISTER", raising=False)
     with pytest.raises(ValueError, match="disabled"):
         register_user("another", "longpass2")
@@ -83,13 +83,14 @@ def test_register_disabled_when_users_exist(db, monkeypatch):
 
 @pytest.mark.integration
 def test_authenticate(db):
-    create_user("authuser", generate_password_hash("correcthorse"))
+    create_user("authuser", hash_test_password("correcthorse"))
     assert authenticate("authuser", "correcthorse")["username"] == "authuser"
     assert authenticate("authuser", "wrong") is None
     assert authenticate("missing", "x") is None
 
 
 @pytest.mark.integration
+@pytest.mark.fresh_db
 def test_bootstrap_admin_creates_user(db, monkeypatch):
     monkeypatch.setenv("PANEL_ADMIN_USER", "bootstrap")
     monkeypatch.setenv("PANEL_ADMIN_PASSWORD", "bootstrap-pass-12")
@@ -99,27 +100,9 @@ def test_bootstrap_admin_creates_user(db, monkeypatch):
     assert bootstrap_admin() is None
 
 
-@pytest.mark.integration
-def test_bootstrap_admin_migrates_tracking(db, monkeypatch, sample_country_data, capsys):
-    monkeypatch.setenv("PANEL_ADMIN_USER", "admin2")
-    monkeypatch.setenv("PANEL_ADMIN_PASSWORD", "admin2-pass-12")
-
-    enriched = json.loads(json.dumps(sample_country_data))
-    job = enriched["companies"][0]["matching_jobs"][0]
-    job["applied"] = True
-    job["applied_date"] = "2025-06-01"
-
-    monkeypatch.setattr(
-        "relocation_jobs.catalog_db.load_country",
-        lambda key: enriched if key == "uk" else None,
-    )
-
-    user = bootstrap_admin()
-    assert user is not None
-    assert "migrated" in capsys.readouterr().out
-
 
 @pytest.mark.integration
+@pytest.mark.fresh_db
 def test_bootstrap_admin_generated_password(db, monkeypatch, capsys):
     monkeypatch.delenv("PANEL_ADMIN_PASSWORD", raising=False)
     monkeypatch.setenv("PANEL_ADMIN_USER", "genadmin")
@@ -130,6 +113,7 @@ def test_bootstrap_admin_generated_password(db, monkeypatch, capsys):
 
 
 @pytest.mark.integration
+@pytest.mark.fresh_db
 def test_bootstrap_admin_syncs_password_when_users_exist(db, monkeypatch):
     monkeypatch.setenv("PANEL_ADMIN_USER", "admin")
     monkeypatch.setenv("PANEL_ADMIN_PASSWORD", "first-password-12")

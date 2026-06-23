@@ -82,15 +82,24 @@ def install_playwright_mock(
     *,
     page: MockPlaywrightPage | None = None,
     available: bool = True,
-    module: str = "relocation_jobs.scrape_jobs",
+    module: str | None = None,
 ) -> MockPlaywrightPage:
     """Patch PLAYWRIGHT_AVAILABLE and sync_playwright."""
     page = page or MockPlaywrightPage()
-    monkeypatch.setattr(f"{module}.PLAYWRIGHT_AVAILABLE", available)
+    modules = (
+        [module]
+        if module
+        else [
+            "relocation_jobs.scrape_jobs",
+            "relocation_jobs.core.ats_detection",
+        ]
+    )
 
     @contextmanager
     def _cm():
         yield MockPlaywright(page)
 
-    monkeypatch.setattr(f"{module}.sync_playwright", _cm)
+    for mod in modules:
+        monkeypatch.setattr(f"{mod}.PLAYWRIGHT_AVAILABLE", available)
+        monkeypatch.setattr(f"{mod}.sync_playwright", _cm)
     return page

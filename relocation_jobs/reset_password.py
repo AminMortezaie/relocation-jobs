@@ -7,8 +7,7 @@ import argparse
 import os
 import sys
 
-from werkzeug.security import generate_password_hash
-
+from relocation_jobs.core.auth import _hash_password
 from relocation_jobs.core.paths import PROJECT_ROOT
 
 
@@ -58,7 +57,7 @@ def main() -> int:
         rename_user(old["id"], username)
         print(f"Renamed {args.rename_from} → {username}")
 
-    if not update_user_password(username, generate_password_hash(args.password)):
+    if not update_user_password(username, _hash_password(args.password)):
         print(f"User not found: {username}", file=sys.stderr)
         return 1
 

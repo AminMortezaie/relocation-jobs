@@ -60,7 +60,6 @@ from relocation_jobs.db.companies import (
 from relocation_jobs.db.fetch_runs import (
     list_all_fetch_runs,
     list_fetch_runs,
-    migrate_tracking_from_json,
     record_fetch_run,
     tracking_is_empty,
 )
@@ -108,7 +107,6 @@ __all__ = [
     # fetch_runs
     "list_all_fetch_runs",
     "list_fetch_runs",
-    "migrate_tracking_from_json",
     "record_fetch_run",
     "tracking_is_empty",
 ]

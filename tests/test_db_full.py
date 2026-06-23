@@ -6,7 +6,8 @@ import json
 from datetime import datetime, timezone
 
 import pytest
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
+from tests.helpers.passwords import hash_test_password
 
 from relocation_jobs.db import (
     clear_company_tracking,
@@ -19,7 +20,6 @@ from relocation_jobs.db import (
     load_company_tracking,
     load_job_status_history,
     load_job_tracking,
-    migrate_tracking_from_json,
     reapply_job_db,
     rename_company_tracking,
     rename_user,
@@ -42,9 +42,9 @@ from relocation_jobs.core.job_identity import normalize_job_url
 @pytest.mark.integration
 def test_create_user_validation_and_lookup(db):
     with pytest.raises(ValueError, match="Username is required"):
-        create_user("  ", generate_password_hash("pass12345"))
+        create_user("  ", hash_test_password("pass12345"))
 
-    user = create_user("LookupUser", generate_password_hash("pass12345"))
+    user = create_user("LookupUser", hash_test_password("pass12345"))
     assert user["username"] == "LookupUser"
     assert get_user_by_username("lookupuser")["id"] == user["id"]
     assert get_user_by_id(user["id"])["username"] == "LookupUser"
@@ -55,7 +55,7 @@ def test_create_user_validation_and_lookup(db):
 @pytest.mark.integration
 def test_update_password_and_rename_user(test_user):
     uid = test_user["id"]
-    new_hash = generate_password_hash("newpass12345")
+    new_hash = hash_test_password("newpass12345")
     assert update_user_password("testuser", new_hash) is True
     row = get_user_by_username("testuser")
     assert check_password_hash(row["password_hash"], "newpass12345")
@@ -216,29 +216,6 @@ def test_clear_and_rename_company_tracking(test_user):
         k[1] == new_name for k in load_job_tracking(uid)
     )
 
-
-@pytest.mark.integration
-def test_migrate_tracking_from_json(db, tmp_data_dir, sample_country_data, monkeypatch):
-    enriched = json.loads(json.dumps(sample_country_data))
-    company = enriched["companies"][0]
-    company["company_applied"] = True
-    company["company_applied_date"] = "2025-06-01"
-    job = company["matching_jobs"][0]
-    job["applied"] = True
-    job["applied_date"] = "2025-06-01"
-    company["matching_jobs"][1]["rejected"] = True
-    company["matching_jobs"][1]["rejected_date"] = "2025-06-02"
-
-    def fake_load_country(key):
-        return enriched if key == "uk" else None
-
-    monkeypatch.setattr("relocation_jobs.catalog_db.load_country", fake_load_country)
-
-    user = create_user("migrate_user", generate_password_hash("pass123456"))
-    assert tracking_is_empty()
-    written = migrate_tracking_from_json(user["id"])
-    assert written >= 2
-    assert not tracking_is_empty()
 
 
 @pytest.mark.integration

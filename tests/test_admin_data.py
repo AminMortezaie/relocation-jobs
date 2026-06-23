@@ -5,9 +5,9 @@ from __future__ import annotations
 import copy
 
 import pytest
-from werkzeug.security import generate_password_hash
+from tests.helpers.passwords import hash_test_password
 
-from relocation_jobs.admin_data import (
+from relocation_jobs.services.admin_service import (
     get_admin_overview,
     get_catalog_overview,
     get_system_config,
@@ -21,12 +21,8 @@ from relocation_jobs.db import (
     record_fetch_run,
     user_count,
 )
-from relocation_jobs.panel_data import (
-    compute_stats,
-    flatten_companies,
-    set_job_applied,
-    set_job_rejected,
-)
+from relocation_jobs.services.catalog_service import compute_stats, flatten_companies
+from relocation_jobs.services.job_service import set_job_applied, set_job_rejected
 
 
 @pytest.fixture
@@ -234,7 +230,7 @@ def test_admin_tracking_totals_match_user_stats(db, rich_catalog, test_user):
 @pytest.mark.integration
 def test_list_users_marks_env_admin_when_flag_missing(db, monkeypatch):
     monkeypatch.setenv("PANEL_ADMIN_USER", "legacyadmin")
-    create_user("legacyadmin", generate_password_hash("legacypass12"), is_admin=False)
+    create_user("legacyadmin", hash_test_password("legacypass12"), is_admin=False)
 
     admin_user = next(u for u in list_users_with_stats() if u["username"] == "legacyadmin")
     assert admin_user["is_admin"] is True
@@ -264,7 +260,7 @@ def test_catalog_visible_counts_fallback_on_load_error(
         raise IndexError("tuple index out of range")
 
     monkeypatch.setattr(
-        "relocation_jobs.panel_data.flatten_companies",
+        "relocation_jobs.services.catalog_service.flatten_companies",
         _boom,
     )
     overview = get_catalog_overview()

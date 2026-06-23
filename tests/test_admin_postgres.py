@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from relocation_jobs.admin_data import get_admin_overview, get_catalog_overview
+from relocation_jobs.services.admin_service import get_admin_overview, get_catalog_overview
 from relocation_jobs.catalog_db import save_country
 from relocation_jobs.db import list_users_with_stats
 

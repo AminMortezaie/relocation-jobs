@@ -167,10 +167,11 @@ def test_discover_careers_url_prefers_relocate(monkeypatch):
 @pytest.mark.integration
 def test_load_country_wrapper(db, sample_country_data):
     from relocation_jobs.catalog_db import save_country
+    from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 
     save_country("uk", sample_country_data)
-    filename, data, key = load_country("uk")
-    assert filename == "uk_companies.json"
+    data, key = load_country("uk")
+    assert COUNTRY_FILE_NAMES[key] == "uk_companies.json"
     assert key == "uk"
     assert data["companies"]
 
@@ -182,7 +183,10 @@ def test_resolve_country_key_unknown():
 
 @pytest.mark.network
 def test_discover_careers_playwright_unavailable(monkeypatch):
-    monkeypatch.setattr("relocation_jobs.build_companies.PLAYWRIGHT_AVAILABLE", False)
+    monkeypatch.setattr(
+        "relocation_jobs.build_companies.sync_playwright",
+        lambda: (_ for _ in ()).throw(RuntimeError("playwright unavailable")),
+    )
     from relocation_jobs.build_companies import discover_careers_playwright
 
     assert discover_careers_playwright("https://example.com") is None
@@ -190,8 +194,6 @@ def test_discover_careers_playwright_unavailable(monkeypatch):
 
 @pytest.mark.network
 def test_discover_careers_playwright_mocked(monkeypatch):
-    monkeypatch.setattr("relocation_jobs.build_companies.PLAYWRIGHT_AVAILABLE", True)
-
     mock_link = MagicMock()
     mock_link.get_attribute.return_value = "https://boards.greenhouse.io/x/jobs"
     mock_link.inner_text.return_value = "View jobs"
@@ -267,7 +269,7 @@ def test_main_company_not_found(db, sample_country_data, monkeypatch):
     monkeypatch.setattr(
         build_companies,
         "load_country",
-        lambda c: ("uk_companies.json", sample_country_data, "uk"),
+        lambda c: (sample_country_data, "uk"),
     )
     monkeypatch.setattr(build_companies.sys, "argv", ["build_companies.py", "uk", "Missing Co"])
     with pytest.raises(SystemExit, match="not found"):
@@ -288,7 +290,7 @@ def test_main_sort_only(db, sample_country_data, monkeypatch, capsys):
     monkeypatch.setattr(
         build_companies,
         "load_country",
-        lambda c: ("uk_companies.json", sample_country_data, "uk"),
+        lambda c: (sample_country_data, "uk"),
     )
     saved = {}
 
@@ -361,7 +363,7 @@ def test_main_discover_flow(db, sample_country_data, monkeypatch, capsys):
     monkeypatch.setattr(
         build_companies,
         "load_country",
-        lambda c: ("uk_companies.json", sample_country_data, "uk"),
+        lambda c: (sample_country_data, "uk"),
     )
     monkeypatch.setattr(build_companies, "discover_careers_url", lambda c: "https://new.example/careers")
     monkeypatch.setattr(build_companies, "save_country", lambda k, d: None)

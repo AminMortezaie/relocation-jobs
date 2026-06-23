@@ -33,6 +33,8 @@ Run (sequential, one company at a time):
     python3 scripts/scrape_jobs.py --file netherlands_companies.json --serial
 """
 
+from __future__ import annotations
+
 import asyncio
 import contextlib
 import json
@@ -50,26 +52,24 @@ from xml.etree import ElementTree
 import requests
 from bs4 import BeautifulSoup
 
-try:
+from relocation_jobs.core.ats_constants import (
+    ATS_TYPE_CHOICES,
+    BOL_CAREERS_API,
+    DEFAULT_CONCURRENCY,
+    EXCLUDE_KEYWORDS,
+    FORCE_KNOWN_ATS,
+    HTTPX_AVAILABLE,
+    INCLUDE_KEYWORDS,
+    KNOWN_ATS,
+)
+
+if HTTPX_AVAILABLE:
     import httpx
-    HTTPX_AVAILABLE = True
-except ImportError:
-    HTTPX_AVAILABLE = False
 
 try:
     from playwright.sync_api import sync_playwright
-    PLAYWRIGHT_AVAILABLE = True
 except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
-
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept-Language": "en-US,en;q=0.9",
-}
+    sync_playwright = None  # type: ignore[misc, assignment]
 
 from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 from relocation_jobs.catalog_db import (
@@ -84,13 +84,66 @@ from relocation_jobs.core.location_tags import (
     job_matches_expected_locations,
 )
 
+from relocation_jobs.core.ats_detection import (
+    ATS_HINT_URL_DETECTORS,
+    HTML_ATS_PATTERNS,
+    HEADERS,
+    PLAYWRIGHT_AVAILABLE,
+    XHR_ATS_PATTERNS,
+    _detect_ats_from_careers_url,
+    _detect_deel_from_url,
+    _detect_join_from_url,
+    _detect_applytojob_from_url,
+    _detect_bamboohr_from_url,
+    _detect_hirehive_from_url,
+    _detect_job_shop_from_url,
+    _detect_recruitee_board_url,
+    _detect_recruitee_from_careers_host,
+    _detect_smartrecruiters_from_careers_url,
+    _detect_smartrecruiters_from_redcare_careers,
+    _detect_teamtailor_from_url,
+    _detect_workday_from_url,
+    _extract_ashby,
+    _extract_greenhouse,
+    _extract_greenhouse_eu,
+    _extract_lever,
+    _extract_personio,
+    _extract_recruitee,
+    _extract_smartrecruiters,
+    _extract_teamtailor,
+    _extract_workable,
+    _extract_workday,
+    _company_slug,
+    _detect_ats_in_html_for_hint,
+    _CAREERS_PAGE_AS_ATS,
+    _parse_job_shop_config,
+    _resolve_nuxt_payload_node,
+    _resolve_nuxt_scalar,
+    _playwright_browser_context,
+    _playwright_pause,
+    _playwright_sem,
+    _smartrecruiters_api_url,
+    _smartrecruiters_company_id,
+    _workday_api_and_base,
+    detect_ats_for_hint,
+    detect_ats_static,
+    detect_ats_static_async,
+    detect_ats_via_playwright,
+    guess_ats_url_from_name,
+)
+from relocation_jobs.core.scrape_cancel import (
+    FetchCancelled,
+    clear_cancel_checker,
+    is_cancel_requested,
+    raise_if_cancelled,
+    set_cancel_checker,
+)
+
+
 # Concurrent in-flight tasks (asyncio), not OS threads or processes
-DEFAULT_CONCURRENCY = 16
 DEFAULT_WORKERS = DEFAULT_CONCURRENCY  # CLI alias: --workers
 _print_lock = threading.Lock()
 # Playwright launches Chromium; cap concurrent browsers during bulk fetch.
-_playwright_sem = threading.Semaphore(2)
-
 
 def _safe_print(*args, **kwargs) -> None:
     with _print_lock:
@@ -104,47 +157,6 @@ def today() -> str:
 def now_iso() -> str:
     """UTC timestamp for fetch ordering (same-day refetches sort correctly)."""
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-
-
-INCLUDE_KEYWORDS = [
-    "backend", "back-end", "back end",
-    "software engineer", "software developer",
-    "platform engineer", "platform developer",
-    "infrastructure engineer",
-    "golang", "go engineer", "go developer", "go backend",
-    "java ", "java,", "java/", "java-", "javascript", "typescript",
-    "kotlin", "spring boot",
-    "microservice", "distributed",
-    "fullstack", "full-stack", "full stack",
-    "product engineer",
-    "solutions engineer",
-    "senior engineer",
-]
-
-EXCLUDE_KEYWORDS = [
-    "frontend", "front-end", "front end",
-    "android", "ios", "mobile",
-    "designer", " design ",
-    "marketing", "sales", "account manager", "account executive",
-    "data scientist", "data analyst", "machine learning engineer",
-    "product manager", "product owner",
-    "recruiter", " hr ", "human resource", "talent acquisition",
-    "accounting", "legal counsel", "legal trainee",
-    "customer success", "customer support", "customer service",
-    "office manager", "executive assistant",
-    "content ", "copywriter", "seo",
-    "game designer", "game artist", "level designer",
-    "3d artist", "animator", "concept artist",
-    "vp of", "head of", "director of", "chief ",
-    "internship", "intern ",
-    "lead ", " lead",
-    "engineering manager",
-    "principal ",
-    "junior",
-    "devops", "dev ops",
-    "site reliability", " sre",
-    "cloud site reliability",
-]
 
 
 def _filter_relevant_jobs(jobs: list[dict], relevant_only: bool) -> list[dict]:
@@ -445,355 +457,6 @@ async def _jobs_from_listing_html_async(
     return [j for j in results if j]
 
 
-# ── ATS API patterns for XHR interception ────────────────────────────────────
-# Each entry: (regex matching an intercepted request URL, ats_type, fn to extract ats_url)
-
-def _extract_personio(url: str) -> str:
-    m = re.search(r"(https?://[a-z0-9-]+\.(?:jobs\.personio\.(?:de|com)|app\.personio\.com))", url)
-    return m.group(1) if m else url
-
-def _extract_lever(url: str) -> str:
-    m = re.search(r"https?://(?:jobs\.eu\.lever\.co|jobs\.lever\.co|api(?:\.eu)?\.lever\.co)/v0/postings/([a-z0-9-]+)", url)
-    if m:
-        host = "jobs.eu.lever.co" if "eu" in url else "jobs.lever.co"
-        return f"https://{host}/{m.group(1)}"
-    return url
-
-def _extract_greenhouse(url: str) -> str:
-    # Handle embed JS/HTML: greenhouse.io/embed/...?for=slug
-    m_embed = re.search(r"greenhouse\.io/embed[^?]*\?(?:[^&]*&)*for=([a-z0-9_-]+)", url)
-    if m_embed:
-        return f"https://boards.greenhouse.io/{m_embed.group(1)}"
-    m = re.search(r"boards(?:-api)?\.(?:eu\.)?greenhouse\.io/(?:v1/boards/)?([a-z0-9_-]+)", url)
-    slug = m.group(1) if m else ""
-    if slug in ("embed", "job_board", "jobs", ""):
-        return url  # could not extract real slug
-    return f"https://boards.greenhouse.io/{slug}"
-
-def _extract_greenhouse_eu(url: str) -> str:
-    # Handle embed: boards.eu.greenhouse.io/embed/job_board/js?for=slug
-    m_embed = re.search(r"greenhouse\.io/embed[^?]*\?(?:[^&]*&)*for=([a-z0-9_-]+)", url)
-    if m_embed:
-        return f"https://boards.eu.greenhouse.io/{m_embed.group(1)}"
-    m = re.search(r"boards(?:-api)?\.eu\.greenhouse\.io/(?:v1/boards/)?([a-z0-9_-]+)", url)
-    slug = m.group(1) if m else ""
-    if slug in ("embed", "job_board", "jobs", ""):
-        return url
-    return f"https://boards.eu.greenhouse.io/{slug}"
-
-def _extract_ashby(url: str) -> str:
-    m = re.search(r"api\.ashbyhq\.com/posting-api/job-board/([a-z0-9._-]+)", url)
-    if m:
-        return f"https://jobs.ashbyhq.com/{m.group(1)}"
-    m2 = re.search(r"jobs\.ashbyhq\.com/([a-z0-9._-]+)", url)
-    return f"https://jobs.ashbyhq.com/{m2.group(1)}" if m2 else url
-
-def _extract_workable(url: str) -> str:
-    m = re.search(r"apply\.workable\.com/(?:api/v\d+/accounts/)?([a-z0-9-]+)", url)
-    return f"https://apply.workable.com/{m.group(1)}/" if m else url
-
-def _extract_recruitee(url: str) -> str:
-    m = re.search(r"([a-z0-9-]+)\.recruitee\.com", url)
-    if not m:
-        return url
-    slug = m.group(1)
-    # careers-analytics is a tracking proxy — not the real company slug
-    if slug in ("careers-analytics", "careers"):
-        return url  # signal caller to dig deeper
-    return f"https://{slug}.recruitee.com/"
-
-def _smartrecruiters_company_id(ats_url: str) -> str:
-    url = (ats_url or "").split("?")[0].rstrip("/")
-    for pattern in (
-        r"api\.smartrecruiters\.com/v1/companies/([A-Za-z0-9_-]+)",
-        r"careers\.smartrecruiters\.com/([A-Za-z0-9_-]+)",
-        r"jobs\.smartrecruiters\.com/([A-Za-z0-9_-]+)",
-    ):
-        m = re.search(pattern, url, re.I)
-        if m:
-            return m.group(1)
-    slug = url.split("/")[-1]
-    return slug if slug and slug.lower() != "postings" else ""
-
-
-def _smartrecruiters_api_url(company_id: str) -> str:
-    return f"https://api.smartrecruiters.com/v1/companies/{company_id}/postings"
-
-
-def _extract_smartrecruiters(url: str) -> str:
-    company_id = _smartrecruiters_company_id(url)
-    return _smartrecruiters_api_url(company_id) if company_id else url
-
-def _extract_teamtailor(url: str, headers: dict) -> tuple[str, str]:
-    auth = headers.get("authorization", "")
-    m_token = re.search(r"token=(\S+)", auth)
-    m_key_url = re.search(r"api_key=([^&\s]+)", url)
-    key = m_token.group(1) if m_token else (m_key_url.group(1) if m_key_url else "")
-    return "teamtailor", key  # key is stored in ats_url for teamtailor
-
-
-def _workday_api_and_base(api_url: str) -> tuple[str, str]:
-    api = (api_url or "").split("|")[0].split("?")[0].rstrip("/")
-    if "|" in (api_url or ""):
-        return api, (api_url or "").split("|", 1)[1].strip()
-    m = re.match(r"(https://[^/]+)/wday/cxs/([^/]+)/([^/]+)/jobs", api)
-    if not m:
-        return api, ""
-    host, tenant, site = m.group(1), m.group(2), m.group(3)
-    if "myworkdaysite" in host:
-        base = f"{host}/en-US/{tenant}/{site}"
-    else:
-        base = f"{host}/en-US/{site}"
-    return api, base
-
-
-def _extract_workday(url: str) -> str:
-    api = url.split("?")[0]
-    _, base = _workday_api_and_base(api)
-    return f"{api}|{base}" if base else api
-
-
-XHR_ATS_PATTERNS = [
-    # (url_regex, ats_type, extractor_fn)
-    (r"personio\.com/api/careers/jobs",              "personio",
-     lambda url: "https://www.personio.com/api/careers/jobs/list"),
-    (r"\.jobs\.personio\.|\.app\.personio\.com",     "personio",        _extract_personio),
-    (r"api(?:\.eu)?\.lever\.co/v0/postings/",        "lever",           _extract_lever),
-    (r"jobs\.eu\.lever\.co/",                        "lever_eu",        _extract_lever),
-    (r"boards(?:-api)?\.eu\.greenhouse\.io",         "greenhouse_eu",   _extract_greenhouse_eu),
-    (r"boards(?:-api)?\.greenhouse\.io",             "greenhouse",      _extract_greenhouse),
-    (r"api\.ashbyhq\.com/posting-api/",              "ashby",           _extract_ashby),
-    (r"apply\.workable\.com/api/",                   "workable",        _extract_workable),
-    (r"\.recruitee\.com/api/",                       "recruitee",       _extract_recruitee),
-    (r"api\.smartrecruiters\.com/v1/companies/",     "smartrecruiters", _extract_smartrecruiters),
-    (r"api\.teamtailor\.com/v1/jobs",                "teamtailor",      None),
-    (r"join\.com/api/public/companies/\d+/jobs",     "join",
-     lambda url: _detect_join_from_url(url)[1] or url),
-    (r"api-prod\.letsdeel\.com",                     "deel",
-     lambda url: _detect_deel_from_url(url)[1] or url),
-    (r"/wday/cxs/[^/]+/[^/]+/jobs",                 "workday",         _extract_workday),
-]
-
-# Static HTML patterns as a secondary check (for pages that load ATS links in HTML
-# before JS executes the actual API calls)
-HTML_ATS_PATTERNS = [
-    (r"personio\.com/api/careers/jobs/list",         "personio",
-     lambda m: "https://www.personio.com/api/careers/jobs/list"),
-    (r"([a-z0-9-]+)\.jobs\.personio\.(de|com)",      "personio",
-     lambda m: f"https://{m.group(1)}.jobs.personio.{m.group(2)}/"),
-    (r"jobs\.eu\.lever\.co/([a-z0-9-]+)",            "lever_eu",
-     lambda m: f"https://jobs.eu.lever.co/{m.group(1)}"),
-    (r"jobs\.lever\.co/([a-z0-9-]+)",                "lever",
-     lambda m: f"https://jobs.lever.co/{m.group(1)}"),
-    (r"boards-api\.greenhouse\.io/v1/boards/([a-z0-9_-]+)", "greenhouse",
-     lambda m: f"https://boards.greenhouse.io/{m.group(1)}"),
-    (r"job-boards\.greenhouse\.io/([a-z0-9_-]+)",    "greenhouse",
-     lambda m: f"https://boards.greenhouse.io/{m.group(1)}"),
-    (r"boards\.eu\.greenhouse\.io/([a-z0-9_-]+)",    "greenhouse_eu",
-     lambda m: f"https://boards.eu.greenhouse.io/{m.group(1)}"),
-    (r"boards\.greenhouse\.io/([a-z0-9_-]+)",        "greenhouse",
-     lambda m: f"https://boards.greenhouse.io/{m.group(1)}"),
-    (r"([a-z0-9-]+)\.recruitee\.com/",              "recruitee",
-     lambda m: f"https://{m.group(1)}.recruitee.com/"),
-    (r"apply\.workable\.com/([a-z0-9-]+)/",          "workable",
-     lambda m: f"https://apply.workable.com/{m.group(1)}/"),
-    (r"jobs\.ashbyhq\.com/([a-z0-9._-]+)",           "ashby",
-     lambda m: f"https://jobs.ashbyhq.com/{m.group(1)}"),
-    (r"careers\.smartrecruiters\.com/([A-Za-z0-9_-]+)", "smartrecruiters",
-     lambda m: _smartrecruiters_api_url(m.group(1))),
-    (r"(?:teamtailor-cdn\.com|([a-z0-9-]+)\.teamtailor\.com)", "teamtailor",
-     lambda m: (
-         f"https://{m.group(1)}.teamtailor.com/jobs"
-         if m.group(1) and m.group(1).lower() not in ("www", "api", "careers", "app")
-         else None
-     )),
-    (r"join\.com/companies/([a-zA-Z0-9_-]+)",          "join",
-     lambda m: f"https://join.com/companies/{m.group(1)}"),
-    (r"jobs\.deel\.com/([a-zA-Z0-9_-]+)",             "deel",
-     lambda m: f"https://jobs.deel.com/{m.group(1)}"),
-]
-
-
-def _detect_deel_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    """Deel ATS boards live at jobs.deel.com/{slug} (optional location filters in query)."""
-    m = re.search(r"jobs\.deel\.com/([a-zA-Z0-9_-]+)", careers_url, re.I)
-    if not m:
-        return None, None
-    slug = m.group(1).lower()
-    if slug in ("embed", "jobs", "job-details"):
-        return None, None
-    parsed = urlparse(careers_url)
-    board = f"https://jobs.deel.com/{m.group(1)}"
-    if parsed.query:
-        board = f"{board}?{parsed.query}"
-    return "deel", board
-
-
-def _detect_applytojob_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    if re.search(r"\.applytojob\.com/?", careers_url, re.I):
-        base = careers_url.split("?", 1)[0].rstrip("/") + "/"
-        return "applytojob", base
-    return None, None
-
-
-def _detect_bamboohr_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    m = re.search(r"https?://([a-z0-9-]+)\.bamboohr\.com/careers", careers_url, re.I)
-    if m:
-        sub = m.group(1)
-        return "bamboohr", f"https://{sub}.bamboohr.com/careers/list"
-    return None, None
-
-
-def _detect_job_shop_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    """Talents Connect boards embed api.my-job-shop.com in the careers page."""
-    if not careers_url:
-        return None, None
-    page_url = careers_url.split("#", 1)[0].strip()
-    if not page_url:
-        return None, None
-    if "/search" not in page_url:
-        page_url = page_url.rstrip("/") + "/search"
-    try:
-        r = requests.get(page_url, headers=HEADERS, timeout=15)
-        r.raise_for_status()
-    except Exception:
-        return None, None
-    if "api.my-job-shop.com" not in r.text and "job-shop.com" not in r.text:
-        return None, None
-    if not _parse_job_shop_config(r.text, careers_url):
-        return None, None
-    base = careers_url.split("#", 1)[0].rstrip("/") + "/"
-    return "job_shop", base
-
-
-def _detect_smartrecruiters_from_careers_url(
-    careers_url: str,
-) -> tuple[str | None, str | None]:
-    for pattern in (
-        r"careers\.smartrecruiters\.com/([A-Za-z0-9_-]+)",
-        r"jobs\.smartrecruiters\.com/([A-Za-z0-9_-]+)",
-    ):
-        m = re.search(pattern, careers_url or "", re.I)
-        if m:
-            return "smartrecruiters", _smartrecruiters_api_url(m.group(1))
-    return None, None
-
-
-def _detect_smartrecruiters_from_redcare_careers(
-    careers_url: str,
-) -> tuple[str | None, str | None]:
-    if "redcare-pharmacy.com" not in (careers_url or ""):
-        return None, None
-    try:
-        r = requests.get(
-            "https://www.redcare-pharmacy.com/api/get-job-posting",
-            params={"loadAll": "true"},
-            headers=HEADERS,
-            timeout=20,
-        )
-        r.raise_for_status()
-        items = r.json().get("items") or []
-        for item in items:
-            ref = item.get("ref") or ""
-            m = re.search(
-                r"api\.smartrecruiters\.com/v1/companies/([A-Za-z0-9_-]+)/",
-                ref,
-                re.I,
-            )
-            if m:
-                return "smartrecruiters", _smartrecruiters_api_url(m.group(1))
-            identifier = (item.get("company") or {}).get("identifier") or ""
-            if identifier:
-                return "smartrecruiters", _smartrecruiters_api_url(identifier)
-    except Exception:
-        pass
-    return None, None
-
-
-def _detect_recruitee_from_careers_host(careers_url: str) -> tuple[str | None, str | None]:
-    """careers.{slug}.com / careers.{slug}.io often maps to {slug}.recruitee.com."""
-    parsed = urlparse(careers_url)
-    host = (parsed.hostname or "").lower()
-    if host.startswith("www."):
-        host = host[4:]
-    if host.endswith(".smartrecruiters.com") or host == "smartrecruiters.com":
-        return None, None
-    m = re.match(r"careers\.([a-z0-9-]+)\.(com|io|co|eu)$", host)
-    if not m:
-        return None, None
-    slug = m.group(1)
-    if slug in ("www", "jobs", "apply"):
-        return None, None
-    return "recruitee", f"https://{slug}.recruitee.com/"
-
-
-def _detect_recruitee_board_url(careers_url: str) -> tuple[str | None, str | None]:
-    m = re.search(r"https?://([a-z0-9-]+)\.recruitee\.com", careers_url, re.I)
-    if not m:
-        return None, None
-    slug = m.group(1).lower()
-    if slug in ("www", "api", "careers", "app"):
-        return None, None
-    return "recruitee", f"https://{slug}.recruitee.com/"
-
-
-def _detect_teamtailor_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    """boards at {company}.teamtailor.com/jobs"""
-    m = re.search(r"https?://([a-z0-9-]+)\.teamtailor\.com", careers_url, re.I)
-    if not m:
-        return None, None
-    slug = m.group(1).lower()
-    if slug in ("www", "api", "careers", "app"):
-        return None, None
-    return "teamtailor", f"https://{slug}.teamtailor.com/jobs"
-
-
-def _detect_workday_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    parsed = urlparse(careers_url)
-    host = (parsed.hostname or "").lower()
-    if "myworkdayjobs.com" not in host and "myworkdaysite.com" not in host:
-        return None, None
-    path_parts = [p for p in parsed.path.split("/") if p]
-    if not path_parts:
-        return None, None
-    tenant = host.split(".")[0]
-    site = path_parts[0]
-    if tenant == "wd3" and "myworkdaysite" in host and len(path_parts) >= 2:
-        tenant, site = path_parts[0], path_parts[1]
-    api = f"https://{host}/wday/cxs/{tenant}/{site}/jobs"
-    _, base = _workday_api_and_base(api)
-    if not base:
-        return None, None
-    return "workday", f"{api}|{base}"
-
-
-def _detect_hirehive_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    m = re.search(r"https?://([a-z0-9-]+)\.hirehive\.com", careers_url, re.I)
-    if not m:
-        return None, None
-    return "hirehive", f"https://{m.group(1)}.hirehive.com"
-
-
-def _detect_ats_from_careers_url(careers_url: str) -> tuple[str | None, str | None]:
-    for detector in (
-        _detect_smartrecruiters_from_careers_url,
-        _detect_smartrecruiters_from_redcare_careers,
-        _detect_workday_from_url,
-        _detect_hirehive_from_url,
-        _detect_teamtailor_from_url,
-        _detect_deel_from_url,
-        _detect_join_from_url,
-        _detect_applytojob_from_url,
-        _detect_bamboohr_from_url,
-        _detect_recruitee_board_url,
-        _detect_recruitee_from_careers_host,
-    ):
-        detected = detector(careers_url)
-        if detected[0]:
-            return detected
-    return None, None
-
-
 _DEEL_POSTING_PATTERNS = (
     re.compile(
         r'\\"id\\":\\"([a-f0-9-]+)\\",\\"jobId\\":\\"[a-f0-9-]+\\",\\"title\\":\\"((?:\\\\.|[^\\"])*)\\"',
@@ -848,17 +511,6 @@ def scrape_deel(board_url: str, *, relevant_only: bool = True) -> list[dict]:
         return []
 
     return _parse_deel_jobs(r.text, slug, relevant_only=relevant_only)
-
-
-def _detect_join_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    """join.com hosts company boards at /companies/{slug}."""
-    m = re.search(r"join\.com/companies/([a-zA-Z0-9_-]+)/?", careers_url, re.I)
-    if not m:
-        return None, None
-    slug = m.group(1)
-    if slug.lower() in ("embed", "jobs"):
-        return None, None
-    return "join", f"https://join.com/companies/{slug}"
 
 
 def _parse_join_next_data(html: str) -> tuple[str | None, int | None, list[dict]]:
@@ -961,247 +613,6 @@ def scrape_join(careers_url: str, *, relevant_only: bool = True) -> list[dict]:
             items = api_items
 
     return _join_jobs_from_items(items, slug, relevant_only=relevant_only)
-
-
-# ── ATS auto-detection via Playwright ────────────────────────────────────────
-
-def detect_ats_via_playwright(
-    careers_url: str,
-    *,
-    ats_hint: str | None = None,
-) -> tuple[str | None, str | None]:
-    """
-    Load the careers page in a headless browser, intercept all XHR/fetch calls,
-    and match against known ATS patterns.
-    Returns (ats_type, ats_url) or (None, None).
-    """
-    if not PLAYWRIGHT_AVAILABLE:
-        return None, None
-
-    found_ats: list[tuple[str, str]] = []
-
-    def on_request(req):
-        if req.resource_type not in ("xhr", "fetch", "script", "document"):
-            return
-        url = req.url
-        hdrs = dict(req.headers)
-        for pattern, ats_type, extractor in XHR_ATS_PATTERNS:
-            if re.search(pattern, url, re.I):
-                if ats_type == "teamtailor":
-                    _, key = _extract_teamtailor(url, hdrs)
-                    found_ats.append(("teamtailor", key or url))
-                else:
-                    found_ats.append((ats_type, extractor(url)))
-                return
-
-    try:
-        raise_if_cancelled()
-        with _playwright_sem:
-            with sync_playwright() as p:
-                browser, context = _playwright_browser_context(p)
-                page = context.new_page()
-                page.on("request", on_request)
-                page.goto(careers_url, wait_until="domcontentloaded", timeout=25000)
-                _playwright_pause(page, 3500)
-
-                # If XHR interception found nothing, try parsing the rendered HTML
-                if not found_ats:
-                    raise_if_cancelled()
-                    html = page.content()
-                    hint = (ats_hint or "").strip().lower()
-                    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
-                        if hint and ats_type != hint:
-                            continue
-                        m = re.search(pattern, html)
-                        if m:
-                            slug_or_url = builder(m)
-                            if slug_or_url and slug_or_url.split("/")[-1] not in ("embed", "jobs", ""):
-                                found_ats.append((ats_type, slug_or_url))
-                                break
-
-                browser.close()
-    except FetchCancelled:
-        raise
-    except Exception as e:
-        print(f"    Playwright detection error: {e}")
-
-    if found_ats:
-        if ats_hint:
-            hint = ats_hint.strip().lower()
-            for ats_type, ats_url in found_ats:
-                if ats_type == hint and ats_url:
-                    return ats_type, ats_url
-            return None, None
-        return found_ats[0]
-    return None, None
-
-
-def detect_ats_static(careers_url: str) -> tuple[str | None, str | None]:
-    """Fast static HTML fetch — no JS, no Playwright."""
-    url_detected = _detect_ats_from_careers_url(careers_url)
-    if url_detected[0]:
-        return url_detected
-
-    try:
-        r = requests.get(careers_url, headers=HEADERS, timeout=12)
-        html = r.text
-    except Exception:
-        return None, None
-
-    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
-        m = re.search(pattern, html)
-        if m:
-            slug_or_url = builder(m)
-            if slug_or_url and slug_or_url.rstrip("/").split("/")[-1] not in ("embed", "jobs", ""):
-                return ats_type, slug_or_url
-
-    return None, None
-
-
-ATS_TYPE_CHOICES: tuple[tuple[str, str], ...] = (
-    ("ashby", "Ashby"),
-    ("atlassian", "Atlassian"),
-    ("applytojob", "ApplyToJob"),
-    ("bamboohr", "BambooHR"),
-    ("bol", "bol.com API"),
-    ("deel", "Deel"),
-    ("epam", "EPAM"),
-    ("greenhouse", "Greenhouse"),
-    ("greenhouse_eu", "Greenhouse (EU)"),
-    ("hirehive", "HireHive"),
-    ("jibe", "Jibe"),
-    ("job_shop", "Job Shop / Talents Connect"),
-    ("join", "JOIN"),
-    ("lever", "Lever"),
-    ("lever_eu", "Lever (EU)"),
-    ("movingimage", "movingimage"),
-    ("personio", "Personio"),
-    ("project_a", "Project A"),
-    ("recruitee", "Recruitee"),
-    ("rss", "RSS feed"),
-    ("smartrecruiters", "SmartRecruiters"),
-    ("teamtailor", "Teamtailor"),
-    ("workable", "Workable"),
-    ("workday", "Workday"),
-)
-
-ATS_HINT_URL_DETECTORS = (
-    _detect_smartrecruiters_from_careers_url,
-    _detect_smartrecruiters_from_redcare_careers,
-    _detect_workday_from_url,
-    _detect_hirehive_from_url,
-    _detect_teamtailor_from_url,
-    _detect_deel_from_url,
-    _detect_join_from_url,
-    _detect_applytojob_from_url,
-    _detect_bamboohr_from_url,
-    _detect_recruitee_board_url,
-    _detect_recruitee_from_careers_host,
-    _detect_job_shop_from_url,
-)
-
-_CAREERS_PAGE_AS_ATS = frozenset({
-    "atlassian",
-    "bol",
-    "epam",
-    "jibe",
-    "movingimage",
-    "project_a",
-    "rss",
-})
-
-
-def _company_slug(name: str) -> str:
-    from relocation_jobs.build_companies import slug_from_name
-
-    slug = slug_from_name(name or "")
-    if slug:
-        return slug
-    return re.sub(r"[^a-z0-9]+", "", (name or "").lower())
-
-
-def guess_ats_url_from_name(ats_type: str, company_name: str) -> str:
-    slug = _company_slug(company_name)
-    if not slug:
-        return ""
-    builders: dict[str, object] = {
-        "recruitee": lambda s: f"https://{s}.recruitee.com/",
-        "greenhouse": lambda s: f"https://boards.greenhouse.io/{s}",
-        "greenhouse_eu": lambda s: f"https://boards.eu.greenhouse.io/{s}",
-        "ashby": lambda s: f"https://jobs.ashbyhq.com/{s}",
-        "workable": lambda s: f"https://apply.workable.com/{s}/",
-        "lever": lambda s: f"https://jobs.lever.co/{s}",
-        "lever_eu": lambda s: f"https://jobs.eu.lever.co/{s}",
-        "personio": lambda s: f"https://{s}.jobs.personio.de/",
-        "smartrecruiters": lambda s: _smartrecruiters_api_url(s),
-        "join": lambda s: f"https://join.com/companies/{s}",
-        "deel": lambda s: f"https://jobs.deel.com/{s}",
-        "teamtailor": lambda s: f"https://{s}.teamtailor.com/jobs",
-        "applytojob": lambda s: f"https://{s}.applytojob.com/",
-        "bamboohr": lambda s: f"https://{s}.bamboohr.com/careers/list",
-        "hirehive": lambda s: f"https://{s}.hirehive.com",
-    }
-    builder = builders.get(ats_type)
-    return builder(slug) if builder else ""
-
-
-def _detect_ats_in_html_for_hint(
-    careers_url: str,
-    ats_hint: str,
-) -> tuple[str | None, str | None]:
-    try:
-        r = requests.get(careers_url, headers=HEADERS, timeout=12)
-        html = r.text
-    except Exception:
-        return None, None
-
-    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
-        if ats_type != ats_hint:
-            continue
-        m = re.search(pattern, html)
-        if not m:
-            continue
-        slug_or_url = builder(m)
-        if slug_or_url and slug_or_url.rstrip("/").split("/")[-1] not in ("embed", "jobs", ""):
-            return ats_type, slug_or_url
-    return None, None
-
-
-def detect_ats_for_hint(
-    company_name: str,
-    careers_url: str,
-    ats_hint: str,
-) -> tuple[str, str]:
-    """
-    Resolve ATS type + board URL when the user picked an ATS in the add-company form.
-    Falls back to slug guesses and finally stores the hint with an empty board URL.
-    """
-    hint = (ats_hint or "").strip().lower()
-    if not hint or hint == "auto":
-        return "", ""
-
-    for detector in ATS_HINT_URL_DETECTORS:
-        detected = detector(careers_url)
-        if detected[0] == hint and detected[1]:
-            return detected
-
-    static_match = _detect_ats_in_html_for_hint(careers_url, hint)
-    if static_match[0] and static_match[1]:
-        return static_match
-
-    if detect_ats_via_playwright:
-        playwright_match = detect_ats_via_playwright(careers_url, ats_hint=hint)
-        if playwright_match[0] and playwright_match[1]:
-            return playwright_match
-
-    if hint in _CAREERS_PAGE_AS_ATS and careers_url:
-        return hint, careers_url.rstrip("/") + "/"
-
-    guessed = guess_ats_url_from_name(hint, company_name)
-    if guessed:
-        return hint, guessed
-
-    return hint, ""
 
 
 # ── ATS REST API scrapers ─────────────────────────────────────────────────────
@@ -1354,8 +765,6 @@ def scrape_greenhouse(ats_url: str) -> list[dict]:
         return []
 
 
-BOL_CAREERS_API = "https://careers.bol.com/wp-json/wp/v2/hggns/multilanguage_vacature_search"
-
 
 def _bol_doelgroep_from_url(careers_url: str) -> str | None:
     qs = parse_qs(urlparse(careers_url).query)
@@ -1421,97 +830,6 @@ def _jobs_from_bol_response(data: dict) -> list[dict]:
 JOB_SHOP_TYPESENSE_URL = "https://api.my-job-shop.com/api/typesense/multi_search"
 
 
-def _resolve_nuxt_payload_node(data: list, idx, resolving: set | None = None):
-    if resolving is None:
-        resolving = set()
-    if idx in resolving:
-        return None
-    if not isinstance(idx, int) or idx < 0 or idx >= len(data):
-        return idx
-    resolving.add(idx)
-    val = data[idx]
-    if isinstance(val, list) and len(val) >= 2 and val[0] in ("ShallowReactive", "Reactive"):
-        return _resolve_nuxt_payload_node(data, val[1], resolving)
-    if (
-        isinstance(val, list)
-        and len(val) >= 3
-        and isinstance(val[0], str)
-        and val[0] == ""
-    ):
-        out = {}
-        for pos in range(1, len(val) - 1, 2):
-            key = _resolve_nuxt_payload_node(data, val[pos], resolving)
-            item = _resolve_nuxt_payload_node(data, val[pos + 1], resolving)
-            if isinstance(key, str):
-                out[key] = item
-        return out
-    if isinstance(val, list):
-        return [_resolve_nuxt_payload_node(data, item, resolving) for item in val]
-    return val
-
-
-def _resolve_nuxt_scalar(data: list, value):
-    if isinstance(value, int):
-        resolved = _resolve_nuxt_payload_node(data, value, set())
-        if isinstance(resolved, int):
-            return _resolve_nuxt_scalar(data, resolved)
-        return resolved
-    return value
-
-
-def _parse_job_shop_config(html: str, careers_url: str) -> tuple[str, str, str] | None:
-    """Return (typesense_api_key, tenant_id, backoffice_vanity) from a Job Shop page."""
-    match = re.search(
-        r'<script type="application/json"[^>]*id="__NUXT_DATA__"[^>]*>(.*?)</script>',
-        html,
-        re.S,
-    )
-    if not match:
-        return None
-    try:
-        payload = json.loads(match.group(1))
-        root = _resolve_nuxt_payload_node(payload, 1)
-        store = _resolve_nuxt_scalar(payload, root.get("data")) if isinstance(root, dict) else None
-    except (json.JSONDecodeError, TypeError, IndexError):
-        return None
-    if not isinstance(store, dict):
-        return None
-
-    job_shop = _resolve_nuxt_scalar(payload, store.get("jobShopData"))
-    if not isinstance(job_shop, dict):
-        return None
-
-    job_shop_id = str(_resolve_nuxt_scalar(payload, job_shop.get("jobShopId")) or "").strip()
-    vanity = str(_resolve_nuxt_scalar(payload, job_shop.get("jobShopCompanyVanity")) or "").strip()
-    if not job_shop_id or not vanity:
-        return None
-
-    api_key = _resolve_nuxt_scalar(
-        payload,
-        store.get(f"typesenseApiKey-{job_shop_id}-{vanity}")
-        or store.get(f"typesenseApiKey-{job_shop_id}"),
-    )
-    if not api_key:
-        for key, value in store.items():
-            if key.startswith("typesenseApiKey-"):
-                api_key = _resolve_nuxt_scalar(payload, value)
-                if isinstance(api_key, str) and len(api_key) > 20:
-                    break
-        else:
-            api_key = None
-    if not isinstance(api_key, str) or not api_key:
-        return None
-
-    host = (urlparse(careers_url).hostname or "").lower()
-    if host.startswith("www."):
-        host = host[4:]
-    tenant_match = re.match(r"careers\.([a-z0-9-]+)\.", host)
-    tenant_id = tenant_match.group(1) if tenant_match else ""
-    if not tenant_id:
-        tenant_id = vanity.rsplit("-", 1)[0]
-    if not tenant_id:
-        return None
-    return api_key, tenant_id, vanity
 
 
 def _job_shop_search_payload(
@@ -2178,10 +1496,6 @@ def scrape_rss(feed_url: str, *, relevant_only: bool = True) -> list[dict]:
         return []
 
 
-def _playwright_browser_context(playwright):
-    browser = playwright.chromium.launch(headless=True)
-    context = browser.new_context(user_agent=HEADERS["User-Agent"], locale="en-US")
-    return browser, context
 
 
 def scrape_jibe(careers_url: str, *, relevant_only: bool = True) -> list[dict]:
@@ -2788,94 +2102,7 @@ def scrape_generic(url: str) -> list[dict]:
     return _jobs_from_listing_html(r.text, url)
 
 
-# ── Known corrections for companies whose auto-detection gives wrong results ──
-# These are applied when auto-detection fails or returns a bad slug (embed, proxy).
-# Add a company here if: their careers page blocks bots, uses an unusual ATS
-# embed pattern, or routes through a proxy that hides the real slug.
-KNOWN_ATS: dict[str, tuple[str, str]] = {
-    # Greenhouse embed pages where ?for=slug is hard to intercept
-    "SimScale":            ("greenhouse",    "https://boards.greenhouse.io/simscale"),
-    # Greenhouse boards behind CDN that blocks direct requests
-    "HelloFresh":          ("greenhouse",    "https://boards.greenhouse.io/hellofresh"),
-    # Greenhouse embed with ?for=talonone on EU board
-    "Talon.One":           ("greenhouse_eu", "https://boards.eu.greenhouse.io/talonone"),
-    # adjoe: migrated from Lever (applike) to Ashby; old Lever board is stale
-    "adjoe":               ("ashby",         "https://jobs.ashbyhq.com/adjoe"),
-    # ePages: careers page embeds Personio iframe (epages-gmbh.jobs.personio.de)
-    "ePages":              ("personio",      "https://epages-gmbh.jobs.personio.de/"),
-    # epilot: careers page embeds Recruitee widget (epilot.recruitee.com)
-    "epilot":              ("recruitee",     "https://epilot.recruitee.com/"),
-    # Recruitee pages routed through careers-analytics tracking proxy
-    "Instapro Group":      ("recruitee",     "https://instaprogroup.recruitee.com/"),
-    "Limehome":            ("recruitee",     "https://limehome.recruitee.com/"),
-    # ── Netherlands ──────────────────────────────────────────────────────────
-    # Adyen: careers.adyen.com is custom-rendered, real board is Greenhouse
-    "Adyen":               ("greenhouse",    "https://boards.greenhouse.io/adyen"),
-    # bol: careers.bol.com WP API; boards.greenhouse.io/bolcom omits tech roles
-    "bol":                 ("bol",           BOL_CAREERS_API),
-    # Catawiki: catawiki.com blocks bots, real board is Greenhouse
-    "Catawiki":            ("greenhouse",    "https://boards.greenhouse.io/catawiki"),
-    # Housing Anywhere: detected as greenhouse but slug needed explicit cache
-    "Housing Anywhere":    ("greenhouse",    "https://boards.greenhouse.io/housinganywhere"),
-    # LINKIT: careers.linkit.nl routes through careers-analytics proxy
-    "LINKIT":              ("recruitee",     "https://linkit.recruitee.com/"),
-    # Mollie: jobs.mollie.com is JS-rendered, real board is Ashby
-    "Mollie":              ("ashby",         "https://jobs.ashbyhq.com/mollie"),
-    # Bunq: careers.bunq.com is a Recruitee-powered board
-    "Bunq":                ("recruitee",     "https://bunq.recruitee.com/"),
-    # Picnic: jobs.picnic.app is custom UI, real board is SmartRecruiters
-    "Picnic":              ("smartrecruiters", "https://api.smartrecruiters.com/v1/companies/picnic/postings"),
-    # Reaktor: reaktor.com/careers is JS-rendered, real board is Ashby
-    "Reaktor":             ("ashby",         "https://jobs.ashbyhq.com/reaktor"),
-    # GreenFlux: greenflux.eu/jobs is JS-rendered, real board is Recruitee
-    "GreenFlux":           ("recruitee",     "https://greenflux.recruitee.com/"),
-    # HomeToGo: Personio /xml feed disabled, board at hometogo.jobs.personio.de
-    "HomeToGo":            ("personio",      "https://hometogo.jobs.personio.de/"),
-    # Personio: marketing careers page; jobs at personio.com JSON API (not *.jobs.personio.de)
-    "Personio":            ("personio",      "https://www.personio.com/api/careers/jobs/list"),
-    # ── Netherlands fetch-problem fixes ───────────────────────────────────────
-    "ASML":                ("workday",       "https://asml.wd3.myworkdayjobs.com/wday/cxs/asml/ASMLEXT1/jobs|https://asml.wd3.myworkdayjobs.com/en-US/ASMLEXT1"),
-    "Atlassian":           ("atlassian",     "https://www.atlassian.com/company/careers/all-jobs?location=Netherlands"),
-    "Booking.com":         ("jibe",          "https://jobs.booking.com/booking/jobs"),
-    "C Teleport":          ("teamtailor",    "https://careers.cteleport.com/jobs"),
-    "Elements":            ("workable",      "https://apply.workable.com/elements/"),
-    "EPAM":                ("epam",          "https://careers.epam.com/"),
-    "EVBox":               ("rss",           "https://evbox.com/en/about/careers/feed/"),
-    "Just Eat Takeaway.com": ("workday",     "https://wd3.myworkdaysite.com/wday/cxs/takeaway/JET-ECS-R/jobs|https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R"),
-    "NXP":                 ("workday",       "https://nxp.wd3.myworkdayjobs.com/wday/cxs/nxp/careers/jobs|https://nxp.wd3.myworkdayjobs.com/en-US/careers"),
-    "TomTom":              ("lever_eu",      "https://jobs.eu.lever.co/tomtom"),
-    "ZooStation":          ("hirehive",      "https://zoostation-bv.hirehive.com"),
-    # ── Germany fetch-problem fixes ───────────────────────────────────────────
-    "arculus":               ("greenhouse",    "https://boards.greenhouse.io/arculus"),
-    "Blinkist":              ("greenhouse",    "https://boards.greenhouse.io/blinkslabgmbh"),
-    "Highsnobiety":          ("teamtailor",    "KgRa_9irgDNXSf7nuil0A_ySurtx4Xgw0OGFvkFb"),
-    "justDice":              ("ashby",         "https://jobs.ashbyhq.com/justDice"),
-    "justtrack":             ("ashby",         "https://jobs.ashbyhq.com/justtrack"),
-    "movingimage":           ("movingimage",   "https://www.movingimage.com/careers/"),
-    "N26":                   ("greenhouse",    "https://boards.greenhouse.io/n26"),
-    "Onefootball":           ("applytojob",    "https://onefootball.applytojob.com/"),
-    "Prime Intellect":       ("ashby",         "https://jobs.ashbyhq.com/PrimeIntellect"),
-    "Project A Ventures":    ("project_a",     "https://www.project-a.vc/careers"),
-    "Solvians":              ("bamboohr",      "https://wsd.bamboohr.com/careers/list"),
-    "Taxfix":                ("ashby",         "https://jobs.ashbyhq.com/taxfix.com"),
-    "ToolTime":              ("teamtailor",    "ot2xtYSXyjp5WG59fCbHpro2vAcLiljIDNfSfqps"),
-    "Vimcar":                ("workable",      "https://apply.workable.com/shiftmove/"),
-    "Deutsche Boerse":       ("job_shop",      "https://careers.deutsche-boerse.com/"),
-    # Redcare: Next.js careers page proxies SmartRecruiters via redcare-pharmacy.com API
-    "Redcare - Dusseldorf":  ("smartrecruiters", "https://api.smartrecruiters.com/v1/companies/Redcare-Pharmacy/postings"),
-}
-
-
 # ── Core dispatch: detect ATS → call scraper ─────────────────────────────────
-
-# Companies where cached ATS detection is wrong and KNOWN_ATS must always win.
-FORCE_KNOWN_ATS = frozenset({
-    "bol", "adjoe",
-    "Deutsche Boerse",
-    "Highsnobiety", "ToolTime", "Vimcar",
-    "ASML", "Atlassian", "Booking.com", "C Teleport", "Elements", "EPAM",
-    "EVBox", "Just Eat Takeaway.com", "TomTom", "ZooStation",
-})
 
 
 def _apply_known_ats_override(company: dict, save_fn=None) -> None:
@@ -3081,25 +2308,6 @@ async def scrape_deel_async(
     return _parse_deel_jobs(r.text, slug, relevant_only=relevant_only)
 
 
-async def detect_ats_static_async(
-    client: httpx.AsyncClient, careers_url: str
-) -> tuple[str | None, str | None]:
-    url_detected = _detect_ats_from_careers_url(careers_url)
-    if url_detected[0]:
-        return url_detected
-
-    try:
-        r = await client.get(careers_url, timeout=12.0)
-        html = r.text
-    except Exception:
-        return None, None
-    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
-        m = re.search(pattern, html)
-        if m:
-            slug_or_url = builder(m)
-            if slug_or_url and slug_or_url.rstrip("/").split("/")[-1] not in ("embed", "jobs", ""):
-                return ats_type, slug_or_url
-    return None, None
 
 
 async def scrape_lever_async(client: httpx.AsyncClient, ats_url: str) -> list[dict]:
@@ -3666,29 +2874,6 @@ async def get_jobs_async(
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-class FetchCancelled(Exception):
-    """Raised when the panel (or CLI) requests scrape cancellation."""
-
-
-_cancel_checker: Callable[[], bool] | None = None
-
-
-def set_cancel_checker(checker: Callable[[], bool] | None) -> None:
-    global _cancel_checker
-    _cancel_checker = checker
-
-
-def clear_cancel_checker() -> None:
-    set_cancel_checker(None)
-
-
-def is_cancel_requested() -> bool:
-    return bool(_cancel_checker and _cancel_checker())
-
-
-def raise_if_cancelled() -> None:
-    if is_cancel_requested():
-        raise FetchCancelled()
 
 
 def _emit_panel_ipc(kind: str, payload: dict) -> None:
@@ -3704,14 +2889,6 @@ def _report_activity(message: str, *, detail: str = "") -> None:
     _emit_panel_ipc("ACTIVITY", {"message": message, "detail": (detail or "").strip()})
 
 
-def _playwright_pause(page, total_ms: int = 3500, step_ms: int = 200) -> None:
-    """Sleep in short chunks so cancellation can interrupt Playwright waits."""
-    elapsed = 0
-    while elapsed < total_ms:
-        raise_if_cancelled()
-        chunk = min(step_ms, total_ms - elapsed)
-        page.wait_for_timeout(chunk)
-        elapsed += chunk
 
 
 _progress_reporter: Callable[[dict], None] | None = None

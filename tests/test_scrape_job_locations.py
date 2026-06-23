@@ -9,7 +9,7 @@ import pytest
 
 from relocation_jobs import scrape_jobs as sj
 from relocation_jobs.catalog_db import load_country, save_country
-from relocation_jobs.panel_data import _job_dict
+from relocation_jobs.services.catalog_service import _job_dict
 from relocation_jobs.scrape_jobs import backfill_listing_locations, merge_matching_jobs
 from tests.helpers.http_mock import install_requests_mock, json_response, load_ats_fixture, text_response
 
@@ -160,7 +160,7 @@ def test_api_job_dict_has_city_after_fetch_style_backfill(seeded_catalog):
 
 @pytest.mark.integration
 def test_wrong_location_jobs_hidden_after_catalog_save(db, sample_country_data):
-    from relocation_jobs.panel_data import flatten_companies
+    from relocation_jobs.services.catalog_service import flatten_companies
 
     company = sample_country_data["companies"][0]
     company["locations"] = [{"country": "uk", "city": "London"}]

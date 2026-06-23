@@ -33,6 +33,7 @@ from bs4 import BeautifulSoup
 
 from relocation_jobs.catalog_db import load_country as load_country_catalog, save_country as save_country_catalog
 from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
+from relocation_jobs.core.slug import slug_from_name
 
 from playwright.sync_api import sync_playwright
 
@@ -121,12 +122,6 @@ def company_sort_key(company: dict) -> tuple:
 
 def sort_companies(companies: list[dict]) -> list[dict]:
     return sorted(companies, key=company_sort_key)
-
-
-def slug_from_name(name: str) -> str:
-    s = name.lower().strip()
-    s = re.sub(r"[^a-z0-9]+", "-", s)
-    return s.strip("-")
 
 
 def root_url(url: str) -> str:
@@ -301,23 +296,26 @@ def _handle_cta_button(el, page, base_url: str) -> list[tuple[int, str]]:
 def discover_careers_playwright(start_url: str) -> str | None:
     candidates: list[tuple[int, str]] = []
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page(user_agent=HEADERS["User-Agent"])
-        try:
-            page.goto(start_url, wait_until="domcontentloaded", timeout=TIMEOUT_PAGE_LOAD)
-            page.wait_for_timeout(TIMEOUT_PAGE_SETTLE)
-            final = page.url
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page(user_agent=HEADERS["User-Agent"])
+            try:
+                page.goto(start_url, wait_until="domcontentloaded", timeout=TIMEOUT_PAGE_LOAD)
+                page.wait_for_timeout(TIMEOUT_PAGE_SETTLE)
+                final = page.url
 
-            candidates.extend(_find_page_link_candidates(page, final))
-            candidates.extend(probe_common_paths(final))
+                candidates.extend(_find_page_link_candidates(page, final))
+                candidates.extend(probe_common_paths(final))
 
-            for el in page.query_selector_all("a, button"):
-                candidates.extend(_handle_cta_button(el, page, final))
-        except Exception:
-            pass
-        finally:
-            browser.close()
+                for el in page.query_selector_all("a, button"):
+                    candidates.extend(_handle_cta_button(el, page, final))
+            except Exception:
+                pass
+            finally:
+                browser.close()
+    except Exception:
+        return None
 
     return pick_best(candidates)
 

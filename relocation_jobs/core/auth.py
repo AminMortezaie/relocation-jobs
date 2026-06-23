@@ -9,14 +9,18 @@ from functools import wraps
 from flask import g, jsonify, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
+_PASSWORD_HASH_METHOD = "pbkdf2:sha256"
+
+
+def _hash_password(password: str) -> str:
+    return generate_password_hash(password, method=_PASSWORD_HASH_METHOD)
+
 from relocation_jobs.db import (
     create_user,
     get_user_by_id,
     get_user_by_username,
     init_db,
     is_user_admin,
-    migrate_tracking_from_json,
-    tracking_is_empty,
     update_user_password,
     user_count,
 )
@@ -114,7 +118,7 @@ def register_user(username: str, password: str) -> dict:
         raise ValueError("Username already taken")
     if not allow_register() and user_count() > 0:
         raise ValueError("Registration is disabled")
-    password_hash = generate_password_hash(password)
+    password_hash = _hash_password(password)
     return create_user(username, password_hash)
 
 
@@ -131,12 +135,12 @@ def sync_admin_password_from_env() -> bool:
         return False
     if not get_user_by_username(username):
         return False
-    return update_user_password(username, generate_password_hash(password))
+    return update_user_password(username, _hash_password(password))
 
 
 def bootstrap_admin() -> dict | None:
     """
-    Create the first admin user from env and migrate JSON tracking into DB.
+    Create the first admin user from env.
     When users already exist, sync PANEL_ADMIN_PASSWORD to PANEL_ADMIN_USER so
     Render env updates take effect without a manual DB reset.
     Returns the created user dict, or None if users already existed.
@@ -155,11 +159,7 @@ def bootstrap_admin() -> dict | None:
             "Set PANEL_ADMIN_USER and PANEL_ADMIN_PASSWORD to control this on first run."
         )
 
-    user = create_user(username, generate_password_hash(password), is_admin=True)
-    if tracking_is_empty():
-        n = migrate_tracking_from_json(user["id"])
-        if n:
-            print(f"Panel: migrated {n} tracking row(s) from JSON into the database.")
+    user = create_user(username, _hash_password(password), is_admin=True)
     return user
 
 

@@ -9,15 +9,15 @@ from __future__ import annotations
 import copy
 
 import pytest
-from werkzeug.security import generate_password_hash
+from tests.helpers.passwords import hash_test_password
 
 from relocation_jobs.catalog_db import load_country, save_country
 from relocation_jobs.db import create_user, load_job_status_history
 from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
 from relocation_jobs.core.location_tags import filter_jobs_by_expected_locations
-from relocation_jobs.panel_data import (
-    flatten_companies,
-    set_company_applied,
+from relocation_jobs.services.catalog_service import flatten_companies
+from relocation_jobs.services.company_service import set_company_applied
+from relocation_jobs.services.job_service import (
     set_job_applied,
     set_job_ats_score,
     set_job_looking_to_apply,
@@ -28,25 +28,7 @@ from relocation_jobs.panel_data import (
 )
 from relocation_jobs.scrape_jobs import is_relevant, merge_matching_jobs
 
-
-@pytest.fixture
-def rich_catalog(seeded_catalog, sample_country_data):
-    data = copy.deepcopy(sample_country_data)
-    acme = data["companies"][0]
-    acme["matching_jobs"][0]["visa_sponsorship"] = True
-    acme["matching_jobs"][1]["visa_sponsorship"] = False
-    acme["locations"] = [{"country": "uk", "city": "London"}]
-    data["companies"].append(
-        {
-            "name": "Empty Corp",
-            "city": "Manchester",
-            "locations": [{"country": "uk", "city": "Manchester"}],
-            "careers_url": "https://example.co.uk/empty",
-            "matching_jobs": [],
-        }
-    )
-    save_country("uk", data)
-    return data
+pytest_plugins = ["tests.helpers.panel_fixtures"]
 
 
 def _jobs(state_catalog):
@@ -402,7 +384,7 @@ class TestRule16LocationGate:
     @pytest.mark.integration
     def test_wrong_location_hidden_from_main_job_list(self, db, sample_country_data):
         from relocation_jobs.catalog_db import save_country
-        from relocation_jobs.panel_data import flatten_companies
+        from relocation_jobs.services.catalog_service import flatten_companies
 
         company = sample_country_data["companies"][0]
         company["locations"] = [{"country": "uk", "city": "London"}]
@@ -433,8 +415,8 @@ class TestAdditionalState:
     def test_tracking_isolated_per_user(self, rich_catalog, db):
         from relocation_jobs.db import create_user
 
-        user_a = create_user("user_a", generate_password_hash("pass123456"))
-        user_b = create_user("user_b", generate_password_hash("pass123456"))
+        user_a = create_user("user_a", hash_test_password("pass123456"))
+        user_b = create_user("user_b", hash_test_password("pass123456"))
         company, url, _ = _jobs(rich_catalog)
 
         set_job_applied("uk", company, url, True, user_id=user_a["id"])

@@ -58,10 +58,10 @@ Plain-language contracts extracted from the code (`panel_data`, `db`, `catalog_d
 |-------|-----------|
 | 1–14, state workflows | `tests/test_job_state_rules.py` |
 | 1–16 + API round-trip | `tests/test_business_rules_coverage.py` |
-| DB writes / history | `tests/test_db_full.py`, `tests/test_db_tracking.py`, `tests/test_applied_today.py` |
+| DB writes / history | `tests/test_db_full.py`, `tests/test_applied_today.py` |
 | Panel API | `tests/test_panel_api_full.py` |
 | Panel data / CRUD | `tests/test_panel_data_full.py` |
-| Scrapers / relevance | `tests/test_scrape_*.py`, `tests/test_scrape_job_locations.py` |
+| Scrapers / relevance | `tests/test_scrape_*.py` (run `pytest -m scrape`) |
 | Location gate | `tests/test_location_tags*.py` |
 | Custom picker cities (`POST /api/locations`, `data/custom_cities.json`) | `tests/test_location_tags_full.py`, `tests/test_panel_data_full.py`, `tests/test_panel_api_full.py` |
 
@@ -69,4 +69,10 @@ Run business-rule tests only:
 
 ```bash
 pytest tests/test_job_state_rules.py tests/test_business_rules_coverage.py -v
+```
+
+Run scraper tests (not included in default `pytest`):
+
+```bash
+pytest -m scrape -v
 ```

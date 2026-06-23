@@ -12,6 +12,12 @@ from relocation_jobs.catalog_db import (
     catalog_has_data,
     load_catalog_stats,
 )
+from relocation_jobs.core.ats_constants import (
+    DEFAULT_CONCURRENCY,
+    EXCLUDE_KEYWORDS,
+    INCLUDE_KEYWORDS,
+    KNOWN_ATS,
+)
 from relocation_jobs.db import (
     admin_tracking_totals,
     list_all_fetch_runs,
@@ -19,7 +25,8 @@ from relocation_jobs.db import (
     user_count,
 )
 from relocation_jobs.core.location_tags import COUNTRY_LABELS, SUGGESTED_CITIES, load_custom_cities
-from relocation_jobs.core.paths import COMPANIES_DIR, data_dir
+from relocation_jobs.core.paths import COUNTRY_FILE_NAMES, data_dir
+from relocation_jobs.services.catalog_service import COUNTRY_FILES, flatten_companies
 
 
 def _normalize_ts_for_sort(ts: str) -> str:
@@ -41,8 +48,6 @@ def _max_timestamp(*values: str | None) -> str:
 def _visible_job_counts_by_country(
     stored_by_country: dict[str, dict[str, int]] | None = None,
 ) -> dict[str, dict[str, int]]:
-    from relocation_jobs.services.catalog_service import COUNTRY_FILES, flatten_companies
-
     stored_by_country = stored_by_country or {}
     try:
         companies, _, _ = flatten_companies("all", user_id=None)
@@ -221,15 +226,8 @@ def get_catalog_overview() -> dict:
 
 
 def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
-    from relocation_jobs.scrape_jobs import (
-        DEFAULT_CONCURRENCY,
-        EXCLUDE_KEYWORDS,
-        INCLUDE_KEYWORDS,
-        KNOWN_ATS,
-    )
-
     custom = load_custom_cities()
-    archives = sorted(p.name for p in COMPANIES_DIR.glob("*_companies.json"))
+    archives = [COUNTRY_FILE_NAMES[key] for key in COUNTRY_FILES]
     return {
         "database": "postgres",
         "data_dir": str(data_dir()),

@@ -43,7 +43,7 @@ from relocation_jobs.core.location_tags import (
 )
 from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 
-from relocation_jobs.scrape_jobs import ATS_TYPE_CHOICES
+from relocation_jobs.core.ats_constants import ATS_TYPE_CHOICES
 
 COUNTRY_FILES: dict[str, str] = dict(COUNTRY_FILE_NAMES)
 
@@ -136,7 +136,6 @@ def _resolve_track(
     company_name: str,
     job: dict,
 ) -> dict:
-    from relocation_jobs.core.job_identity import job_idempotency_key_for_job
     direct_key = _tracking_key(country, company_name, job.get("url", ""))
     direct = job_tracking.get(direct_key)
     job_key = job_idempotency_key_for_job(job)
@@ -187,7 +186,6 @@ def _resolve_status_history(
     company_name: str,
     job: dict,
 ) -> dict[str, list]:
-    from relocation_jobs.core.job_identity import job_idempotency_key_for_job
     empty: dict[str, list] = {
         "applied": [], "rejected": [], "applied_events": [], "rejected_events": []
     }

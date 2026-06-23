@@ -279,6 +279,8 @@ def test_locations_add_custom_city_requires_auth(app_client, tmp_data_dir):
         "country=uk&location=London",
         "country=uk&city=London",
         "country=uk&timezone=Europe/London",
+        "country=uk&ats_type=greenhouse",
+        "country=uk&ats_type=generic",
     ],
 )
 def test_jobs_list_filters(auth_client, rich_catalog, test_user, query):

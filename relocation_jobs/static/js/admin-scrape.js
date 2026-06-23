@@ -2,6 +2,7 @@
 
 import {
   cancelFetchRequest,
+  fetchAtsTypes,
   fetchConfig,
   fetchCountries,
   getFetchStatus,
@@ -27,6 +28,22 @@ function countryLabel(countryId) {
   if (!sel) return countryId || "";
   const opt = [...sel.options].find((o) => o.value === countryId);
   return opt?.textContent?.trim() || countryId || "";
+}
+
+function atsLabel(atsId) {
+  if (!atsId || atsId === "all") return "";
+  const sel = $("adminFetchAts");
+  if (!sel) return atsId;
+  const opt = [...sel.options].find((o) => o.value === atsId);
+  return opt?.textContent?.trim() || atsId;
+}
+
+function fetchScopeSubtitle(country, atsType, concurrency) {
+  const parts = [countryLabel(country)];
+  const ats = atsLabel(atsType);
+  if (ats) parts.push(ats);
+  if (concurrency) parts.push(`${concurrency} parallel workers`);
+  return parts.join(" · ");
 }
 
 function setFetchBusy(busy) {
@@ -217,8 +234,10 @@ function applyFetchStatus(st) {
 
   if (st.running) {
     const n = st.concurrency || $("adminFetchConcurrency")?.value || scrapeConfig.default_concurrency;
-    $("adminFetchTitle").textContent = "Fetching companies";
-    $("adminFetchSubtitle").textContent = `${countryLabel(st.country)} · ${n} parallel workers`;
+    $("adminFetchTitle").textContent = st.ats_type
+      ? `Fetching ${atsLabel(st.ats_type)} companies`
+      : "Fetching companies";
+    $("adminFetchSubtitle").textContent = fetchScopeSubtitle(st.country, st.ats_type, n);
     updateProgress({
       current,
       total,
@@ -297,6 +316,7 @@ function pollFetchStatus() {
 
 async function startCountryFetch() {
   const country = $("adminFetchCountry")?.value;
+  const atsType = $("adminFetchAts")?.value || "all";
   if (!country) {
     toast("Select a country.");
     return;
@@ -312,8 +332,8 @@ async function startCountryFetch() {
 
   setFetchBusy(true);
   showPanel({
-    title: "Fetching companies",
-    subtitle: `${countryLabel(country)} · preparing…`,
+    title: atsType !== "all" ? `Fetching ${atsLabel(atsType)} companies` : "Fetching companies",
+    subtitle: fetchScopeSubtitle(country, atsType),
   });
 
   try {
@@ -325,10 +345,14 @@ async function startCountryFetch() {
       ),
     );
     localStorage.setItem("panel_concurrency", String(concurrency));
-    $("adminFetchSubtitle").textContent = `${countryLabel(country)} · ${concurrency} parallel workers`;
+    if (atsType !== "all") {
+      localStorage.setItem("panel_ats", atsType);
+    }
+    $("adminFetchSubtitle").textContent = fetchScopeSubtitle(country, atsType, concurrency);
 
     const data = await startFetchRequest({
       country,
+      ats_type: atsType !== "all" ? atsType : undefined,
       skip_filled: Boolean($("adminFetchSkipFilled")?.checked),
       concurrency,
     });
@@ -358,7 +382,7 @@ async function cancelCountryFetch() {
 
 export async function initAdminFetch() {
   scrapeConfig = await fetchConfig();
-  const countries = await fetchCountries();
+  const [countries, atsTypes] = await Promise.all([fetchCountries(), fetchAtsTypes()]);
   const countrySel = $("adminFetchCountry");
   if (countrySel) {
     countrySel.innerHTML = countries
@@ -367,6 +391,19 @@ export async function initAdminFetch() {
       .join("");
     const saved = localStorage.getItem("panel_country");
     if (saved && saved !== "all") countrySel.value = saved;
+  }
+
+  const atsSel = $("adminFetchAts");
+  if (atsSel) {
+    atsSel.innerHTML = [
+      `<option value="all">All ATS in country</option>`,
+      `<option value="generic">Generic / unknown</option>`,
+      ...atsTypes.map((t) =>
+        `<option value="${escapeHtml(t.id)}">${escapeHtml(t.label)}</option>`
+      ),
+    ].join("");
+    const savedAts = localStorage.getItem("panel_ats");
+    if (savedAts) atsSel.value = savedAts;
   }
 
   const concurrencyInput = $("adminFetchConcurrency");
@@ -392,8 +429,8 @@ export async function initAdminFetch() {
   if (st.running && !st.company) {
     setFetchBusy(true);
     showPanel({
-      title: "Fetching companies",
-      subtitle: countryLabel(st.country),
+      title: st.ats_type ? `Fetching ${atsLabel(st.ats_type)} companies` : "Fetching companies",
+      subtitle: fetchScopeSubtitle(st.country, st.ats_type),
     });
     pollFetchStatus();
   }

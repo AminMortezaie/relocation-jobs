@@ -308,7 +308,22 @@ class TestDetectFromUrl:
         url = "https://acme.wd3.myworkdayjobs.com/en-US/careers"
         ats_type, ats_url = _detect_workday_from_url(url)
         assert ats_type == "workday"
-        assert "wday/cxs" in ats_url
+        assert "wday/cxs/acme/careers/jobs" in ats_url
+        assert ats_url.endswith("/en-US/careers")
+
+    def test_detect_workday_swisscom_locale_site(self):
+        url = "https://swisscom.wd103.myworkdayjobs.com/de-DE/SwisscomExternalCareers"
+        ats_type, ats_url = _detect_workday_from_url(url)
+        assert ats_type == "workday"
+        assert "wday/cxs/swisscom/SwisscomExternalCareers/jobs" in ats_url
+        assert "/de-DE/SwisscomExternalCareers" in ats_url
+
+    def test_detect_workday_myworkdaysite_locale(self):
+        url = "https://wd3.myworkdaysite.com/en-US/takeaway/JET-ECS-R"
+        ats_type, ats_url = _detect_workday_from_url(url)
+        assert ats_type == "workday"
+        assert "wday/cxs/takeaway/JET-ECS-R/jobs" in ats_url
+        assert ats_url.endswith("/en-US/takeaway/JET-ECS-R")
 
     def test_detect_ats_from_careers_url_chain(self):
         ats_type, _ = _detect_ats_from_careers_url("https://careers.smartrecruiters.com/Acme")

@@ -218,6 +218,7 @@ def test_resolve_company_name_touch_fetch(rich_catalog):
         {"fetch_problem_only": True},
         {"location": "London"},
         {"city": "Manchester"},
+        {"ats_type": "greenhouse"},
         {"country_key": None},
     ],
 )
@@ -231,6 +232,32 @@ def test_flatten_companies_filters(rich_catalog, test_user, kwargs):
     assert isinstance(companies, list)
     assert isinstance(file_meta, list)
     assert fetch_problem_count >= 0
+
+
+@pytest.mark.integration
+def test_flatten_filters_by_ats_type(db, sample_country_data):
+    companies_data = {
+        **sample_country_data,
+        "companies": [
+            {
+                **sample_country_data["companies"][0],
+                "name": "Greenhouse Co",
+                "ats_type": "greenhouse",
+            },
+            {
+                **sample_country_data["companies"][0],
+                "name": "Lever Co",
+                "ats_type": "lever",
+            },
+        ],
+    }
+    save_country_catalog("uk", companies_data)
+
+    greenhouse_only, _, _ = flatten_companies("uk", ats_type="greenhouse")
+    assert [c["name"] for c in greenhouse_only] == ["Greenhouse Co"]
+
+    lever_only, _, _ = flatten_companies("uk", ats_type="lever")
+    assert [c["name"] for c in lever_only] == ["Lever Co"]
 
 
 @pytest.mark.integration

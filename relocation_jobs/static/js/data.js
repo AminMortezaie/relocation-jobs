@@ -2,7 +2,7 @@
 
 import { state } from "./state.js";
 import { $, escapeAttr, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
-import { fetchConfig, fetchCountries, fetchLocations, fetchJobs } from "./api.js";
+import { fetchConfig, fetchCountries, fetchAtsTypes, fetchLocations, fetchJobs } from "./api.js";
 import { renderStats, renderCompanies } from "./render.js";
 
 function skeletonCard() {
@@ -46,6 +46,22 @@ export async function loadCountries() {
   if (saved) sel.value = saved;
 }
 
+export async function loadAtsTypes() {
+  const sel = $("ats");
+  if (!sel) return;
+
+  const types = await fetchAtsTypes();
+  sel.innerHTML = [
+    `<option value="all">All ATS</option>`,
+    `<option value="generic">Generic / unknown</option>`,
+    ...types.map((t) =>
+      `<option value="${escapeAttr(t.id)}">${escapeHtml(t.label)}</option>`
+    ),
+  ].join("");
+  const saved = localStorage.getItem("panel_ats");
+  if (saved) sel.value = saved;
+}
+
 export async function loadCities() {
   const sel = $("location");
   if (!sel) return;
@@ -73,6 +89,9 @@ export async function loadCities() {
 export async function loadJobs(options = {}) {
   const country = $("country").value;
   localStorage.setItem("panel_country", country);
+  if ($("ats")) {
+    localStorage.setItem("panel_ats", $("ats").value);
+  }
   if ($("location")) {
     localStorage.setItem("panel_location", $("location").value);
   }

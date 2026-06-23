@@ -91,6 +91,9 @@ def install_playwright_mock(
         if module
         else [
             "relocation_jobs.scrape_jobs",
+            "relocation_jobs.scrape.playwright",
+            "relocation_jobs.scrape.generic",
+            "relocation_jobs.scrape.misc",
             "relocation_jobs.core.ats_detection",
         ]
     )

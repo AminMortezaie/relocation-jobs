@@ -26,6 +26,7 @@ def admin_fetch_snapshot() -> dict:
             "running": running,
             "country": _fetch_state.get("country"),
             "company": _fetch_state.get("company"),
+            "ats_type": _fetch_state.get("ats_type"),
             "scope": "company" if _fetch_state.get("company") else "country",
             "progress": dict(progress) if isinstance(progress, dict) else {},
             "started_at": _fetch_state.get("started_at"),
@@ -42,12 +43,15 @@ def query_flags() -> dict:
     timezone_name = (request.args.get("timezone") or "").strip() or None
     city = (request.args.get("city") or "").strip() or None
     location = (request.args.get("location") or "").strip() or None
+    ats = (request.args.get("ats_type") or request.args.get("ats") or "all").strip()
+    ats_type = ats if ats and ats != "all" else None
     return {
         "country_key": country_key,
         "country_all": country == "all",
         "timezone_name": timezone_name,
         "city": city,
         "location": location,
+        "ats_type": ats_type,
         "visa_only": query_bool("visa_only"),
         "hide_applied": query_bool("hide_applied"),
         "hide_empty": query_bool("hide_empty"),

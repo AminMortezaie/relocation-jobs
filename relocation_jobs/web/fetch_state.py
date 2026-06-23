@@ -12,6 +12,7 @@ _fetch_state: dict = {
     "running": False,
     "country": None,
     "company": None,
+    "ats_type": None,
     "file": None,
     "concurrency": DEFAULT_CONCURRENCY,
     "started_at": None,

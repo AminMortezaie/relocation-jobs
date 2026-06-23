@@ -66,11 +66,12 @@ def _on_scrape_review(info: dict) -> None:
         }
 
 
-def _reset_fetch_run_state(*, country, company, file_name, concurrency, user_id=None) -> None:
+def _reset_fetch_run_state(*, country, company, file_name, concurrency, user_id=None, ats_type=None) -> None:
     fetch_state._fetch_thread = None
     _fetch_state["running"] = True
     _fetch_state["country"] = country
     _fetch_state["company"] = company
+    _fetch_state["ats_type"] = ats_type
     _fetch_state["file"] = file_name
     _fetch_state["concurrency"] = concurrency
     _fetch_state["user_id"] = user_id
@@ -286,6 +287,7 @@ def _build_scrape_cmd(
     concurrency: int,
     *,
     company: str | None = None,
+    ats_type: str | None = None,
 ) -> list[str]:
     if country not in SUPPORTED_COUNTRIES:
         raise LookupError(f"Unknown country: {country}")
@@ -296,6 +298,8 @@ def _build_scrape_cmd(
         "--country",
         country,
     ]
+    if ats_type:
+        cmd.extend(["--ats", ats_type])
     if skip_filled and not company:
         cmd.append("--skip-filled")
     workers = 1 if company else max(1, min(int(concurrency), 64))
@@ -338,6 +342,7 @@ def _run_scrape(
     concurrency: int,
     *,
     company: str | None = None,
+    ats_type: str | None = None,
 ) -> None:
     proc: subprocess.Popen | None = None
     exit_code: int | None = None
@@ -353,6 +358,8 @@ def _run_scrape(
         filename = COUNTRY_ARCHIVE_FILENAMES.get(country)
         if company:
             _log(f"Fetching {company}")
+        elif ats_type:
+            _log(f"Fetching {ats_type} companies in {filename} ({concurrency} workers)")
         else:
             _log(f"Fetching all companies in {filename} ({concurrency} workers)")
 
@@ -366,6 +373,7 @@ def _run_scrape(
             skip_filled and not company,
             concurrency,
             company=company,
+            ats_type=ats_type,
         )
         env = {**os.environ, "PANEL_SCRAPE_CHILD": "1"}
         proc = subprocess.Popen(
@@ -441,6 +449,7 @@ def _start_scrape_thread(
     concurrency: int,
     *,
     company: str | None = None,
+    ats_type: str | None = None,
 ) -> None:
     import threading
 
@@ -448,7 +457,7 @@ def _start_scrape_thread(
     fetch_state._fetch_thread = threading.Thread(
         target=_run_scrape,
         args=(country, skip_filled, workers),
-        kwargs={"company": company},
+        kwargs={"company": company, "ats_type": ats_type},
         daemon=True,
     )
     fetch_state._fetch_thread.start()

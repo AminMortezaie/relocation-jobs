@@ -591,6 +591,10 @@ def _append_tracked_status_jobs(
 # Main public query functions
 # ---------------------------------------------------------------------------
 
+def _company_ats_type(company: dict) -> str:
+    return (company.get("ats_type") or "").strip() or "generic"
+
+
 def flatten_companies(
     country_key: str | None = None,
     *,
@@ -607,6 +611,7 @@ def flatten_companies(
     fetch_problem_only: bool = False,
     location: str | None = None,
     city: str | None = None,
+    ats_type: str | None = None,
     user_id: int | None = None,
 ) -> tuple[list[dict], list[dict], int]:
     companies_out: list[dict] = []
@@ -658,6 +663,8 @@ def flatten_companies(
                 if not company_visible_for_country_filter(company, country_key, catalog_country=key):
                     continue
             if location_filter and not company_matches_location_filter(company, location_filter, catalog_country=key):
+                continue
+            if ats_type and _company_ats_type(company) != ats_type:
                 continue
             if company.get("fetch_problem"):
                 fetch_problem_count += 1

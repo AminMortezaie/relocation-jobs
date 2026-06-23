@@ -882,6 +882,7 @@ function bindToolbarEvents() {
     await loadCities();
     await loadJobs();
   });
+  $("ats")?.addEventListener("change", loadJobs);
   $("location")?.addEventListener("change", loadJobs);
   $("search").addEventListener("input", () => renderCompanies());
   $("fetchCancelBtn").addEventListener("click", () => {

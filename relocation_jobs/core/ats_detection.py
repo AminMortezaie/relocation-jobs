@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import re
 import threading
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import requests
 
@@ -136,6 +136,55 @@ def _extract_teamtailor(url: str, headers: dict) -> tuple[str, str]:
     return "teamtailor", key  # key is stored in ats_url for teamtailor
 
 
+_WORKDAY_LOCALE_RE = re.compile(r"^[a-z]{2}-[A-Z]{2}$", re.I)
+_META_REFRESH_RE = re.compile(
+    r'<meta[^>]+http-equiv\s*=\s*["\']?refresh["\']?[^>]*content\s*=\s*["\'][^"\']*?\burl\s*=\s*([^"\'>\s;]+)',
+    re.I,
+)
+_WORKDAY_BOARD_URL_RE = re.compile(
+    r"(https?://[a-z0-9.-]*myworkday(?:jobs|site)\.com"
+    r"(?:/[a-z]{2}-[A-Z]{2})?/[A-Za-z0-9][A-Za-z0-9_-]+(?:/[A-Za-z0-9][A-Za-z0-9_-]+)?)",
+    re.I,
+)
+
+
+def _workday_board_base(
+    host: str,
+    tenant: str,
+    site: str,
+    locale: str = "en-US",
+) -> str:
+    host = host.removeprefix("https://").removeprefix("http://")
+    if "myworkdaysite" in host:
+        return f"https://{host}/{locale}/{tenant}/{site}"
+    return f"https://{host}/{locale}/{site}"
+
+
+def _parse_workday_board_url(
+    host: str,
+    path_parts: list[str],
+) -> tuple[str, str, str] | None:
+    """Return (tenant, site, locale) from a Workday careers board URL."""
+    host_l = (host or "").lower()
+    if "myworkdayjobs.com" not in host_l and "myworkdaysite.com" not in host_l:
+        return None
+    subdomain = host_l.split(".")[0]
+    parts = [p for p in path_parts if p]
+    if not parts:
+        return None
+    locale = "en-US"
+    if _WORKDAY_LOCALE_RE.match(parts[0]):
+        locale = parts[0]
+        parts = parts[1:]
+    if not parts:
+        return None
+    if "myworkdaysite" in host_l and subdomain == "wd3":
+        if len(parts) < 2:
+            return None
+        return parts[0], parts[1], locale
+    return subdomain, parts[0], locale
+
+
 def _workday_api_and_base(api_url: str) -> tuple[str, str]:
     api = (api_url or "").split("|")[0].split("?")[0].rstrip("/")
     if "|" in (api_url or ""):
@@ -144,11 +193,39 @@ def _workday_api_and_base(api_url: str) -> tuple[str, str]:
     if not m:
         return api, ""
     host, tenant, site = m.group(1), m.group(2), m.group(3)
-    if "myworkdaysite" in host:
-        base = f"{host}/en-US/{tenant}/{site}"
-    else:
-        base = f"{host}/en-US/{site}"
-    return api, base
+    return api, _workday_board_base(host, tenant, site)
+
+
+def _workday_url_from_html_match(m: re.Match) -> str | None:
+    return _detect_workday_from_url(m.group(1))[1]
+
+
+def _accept_html_ats_match(ats_type: str, slug_or_url: str | None) -> bool:
+    if not slug_or_url:
+        return False
+    if ats_type == "workday":
+        return "|" in slug_or_url and "/wday/cxs/" in slug_or_url
+    return slug_or_url.rstrip("/").split("/")[-1] not in ("embed", "jobs", "")
+
+
+def _scan_html_for_ats(html: str) -> tuple[str | None, str | None]:
+    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
+        m = re.search(pattern, html)
+        if m:
+            slug_or_url = builder(m)
+            if _accept_html_ats_match(ats_type, slug_or_url):
+                return ats_type, slug_or_url
+    return None, None
+
+
+def _follow_meta_refresh(html: str, page_url: str) -> str | None:
+    m = _META_REFRESH_RE.search(html)
+    if not m:
+        return None
+    target = urljoin(page_url, m.group(1).strip())
+    if target.rstrip("/") == page_url.rstrip("/"):
+        return None
+    return target
 
 
 def _extract_workday(url: str) -> str:
@@ -215,6 +292,8 @@ HTML_ATS_PATTERNS = [
      lambda m: f"https://join.com/companies/{m.group(1)}"),
     (r"jobs\.deel\.com/([a-zA-Z0-9_-]+)",             "deel",
      lambda m: f"https://jobs.deel.com/{m.group(1)}"),
+    (_WORKDAY_BOARD_URL_RE.pattern,                  "workday",
+     _workday_url_from_html_match),
 ]
 def _detect_deel_from_url(careers_url: str) -> tuple[str | None, str | None]:
     """Deel ATS boards live at jobs.deel.com/{slug} (optional location filters in query)."""
@@ -359,21 +438,26 @@ def _detect_teamtailor_from_url(careers_url: str) -> tuple[str | None, str | Non
 
 
 def _detect_workday_from_url(careers_url: str) -> tuple[str | None, str | None]:
-    parsed = urlparse(careers_url)
+    parsed = urlparse(careers_url.split("?")[0])
     host = (parsed.hostname or "").lower()
     if "myworkdayjobs.com" not in host and "myworkdaysite.com" not in host:
         return None, None
     path_parts = [p for p in parsed.path.split("/") if p]
     if not path_parts:
         return None, None
-    tenant = host.split(".")[0]
-    site = path_parts[0]
-    if tenant == "wd3" and "myworkdaysite" in host and len(path_parts) >= 2:
-        tenant, site = path_parts[0], path_parts[1]
-    api = f"https://{host}/wday/cxs/{tenant}/{site}/jobs"
-    _, base = _workday_api_and_base(api)
-    if not base:
+    if path_parts[:2] == ["wday", "cxs"] and len(path_parts) >= 5 and path_parts[-1] == "jobs":
+        tenant, site = path_parts[2], path_parts[3]
+        api = f"https://{host}/wday/cxs/{tenant}/{site}/jobs"
+        base = _workday_api_and_base(api)[1]
+        if not base:
+            return None, None
+        return "workday", f"{api}|{base}"
+    board = _parse_workday_board_url(host, path_parts)
+    if not board:
         return None, None
+    tenant, site, locale = board
+    api = f"https://{host}/wday/cxs/{tenant}/{site}/jobs"
+    base = _workday_board_base(host, tenant, site, locale)
     return "workday", f"{api}|{base}"
 
 
@@ -447,15 +531,10 @@ def detect_ats_via_playwright(
                     raise_if_cancelled()
                     html = page.content()
                     hint = (ats_hint or "").strip().lower()
-                    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
-                        if hint and ats_type != hint:
-                            continue
-                        m = re.search(pattern, html)
-                        if m:
-                            slug_or_url = builder(m)
-                            if slug_or_url and slug_or_url.split("/")[-1] not in ("embed", "jobs", ""):
-                                found_ats.append((ats_type, slug_or_url))
-                                break
+                    html_match = _scan_html_for_ats(html)
+                    if html_match[0]:
+                        if not hint or html_match[0] == hint:
+                            found_ats.append(html_match)
 
                 browser.close()
     except FetchCancelled:
@@ -474,24 +553,32 @@ def detect_ats_via_playwright(
     return None, None
 
 
-def detect_ats_static(careers_url: str) -> tuple[str | None, str | None]:
+def detect_ats_static(careers_url: str, *, _depth: int = 0) -> tuple[str | None, str | None]:
     """Fast static HTML fetch — no JS, no Playwright."""
     url_detected = _detect_ats_from_careers_url(careers_url)
     if url_detected[0]:
         return url_detected
 
     try:
-        r = requests.get(careers_url, headers=HEADERS, timeout=12)
+        r = requests.get(
+            careers_url,
+            headers=HEADERS,
+            timeout=12,
+            allow_redirects=True,
+        )
         html = r.text
+        page_url = getattr(r, "url", None) or careers_url
     except Exception:
         return None, None
 
-    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
-        m = re.search(pattern, html)
-        if m:
-            slug_or_url = builder(m)
-            if slug_or_url and slug_or_url.rstrip("/").split("/")[-1] not in ("embed", "jobs", ""):
-                return ats_type, slug_or_url
+    found = _scan_html_for_ats(html)
+    if found[0]:
+        return found
+
+    if _depth < 2:
+        refresh_target = _follow_meta_refresh(html, page_url)
+        if refresh_target:
+            return detect_ats_static(refresh_target, _depth=_depth + 1)
 
     return None, None
 
@@ -705,21 +792,35 @@ def _parse_job_shop_config(html: str, careers_url: str) -> tuple[str, str, str] 
     return api_key, tenant_id, vanity
 
 
-async def detect_ats_static_async(client, careers_url: str) -> tuple[str | None, str | None]:
+async def detect_ats_static_async(
+    client,
+    careers_url: str,
+    *,
+    _depth: int = 0,
+) -> tuple[str | None, str | None]:
     """Async variant used by scrape_jobs bulk fetch."""
     url_detected = _detect_ats_from_careers_url(careers_url)
     if url_detected[0]:
         return url_detected
 
     try:
-        r = await client.get(careers_url, timeout=12.0)
+        r = await client.get(careers_url, timeout=12.0, follow_redirects=True)
         html = r.text
+        page_url = str(r.url)
     except Exception:
         return None, None
-    for pattern, ats_type, builder in HTML_ATS_PATTERNS:
-        m = re.search(pattern, html)
-        if m:
-            slug_or_url = builder(m)
-            if slug_or_url and slug_or_url.rstrip("/").split("/")[-1] not in ("embed", "jobs", ""):
-                return ats_type, slug_or_url
+
+    found = _scan_html_for_ats(html)
+    if found[0]:
+        return found
+
+    if _depth < 2:
+        refresh_target = _follow_meta_refresh(html, page_url)
+        if refresh_target:
+            return await detect_ats_static_async(
+                client,
+                refresh_target,
+                _depth=_depth + 1,
+            )
+
     return None, None

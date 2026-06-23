@@ -1,7 +1,10 @@
 """Pure scrape logic: relevance filter, job merge, static ATS URL detection."""
 
-from relocation_jobs.scrape_jobs import (
+from relocation_jobs.core.ats_detection import (
+    _follow_meta_refresh,
     detect_ats_static,
+)
+from relocation_jobs.scrape_jobs import (
     explain_title_filter,
     is_relevant,
     merge_matching_jobs,
@@ -114,7 +117,7 @@ class TestMergeMatchingJobs:
 
 class TestDetectAtsStatic:
     def test_detects_greenhouse_from_html(self, monkeypatch):
-        response = type("R", (), {"text": "https://boards.greenhouse.io/acme"})()
+        response = type("R", (), {"text": "https://boards.greenhouse.io/acme", "url": "https://example.com/careers"})()
         monkeypatch.setattr(
             "relocation_jobs.scrape_jobs.requests.get",
             lambda *args, **kwargs: response,
@@ -124,7 +127,7 @@ class TestDetectAtsStatic:
         assert "acme" in ats_url
 
     def test_detects_lever_eu_from_html(self, monkeypatch):
-        response = type("R", (), {"text": "https://jobs.eu.lever.co/acme"})()
+        response = type("R", (), {"text": "https://jobs.eu.lever.co/acme", "url": "https://example.com/careers"})()
         monkeypatch.setattr(
             "relocation_jobs.scrape_jobs.requests.get",
             lambda *args, **kwargs: response,
@@ -132,3 +135,58 @@ class TestDetectAtsStatic:
         ats_type, ats_url = detect_ats_static("https://example.com/careers")
         assert ats_type == "lever_eu"
         assert "acme" in ats_url
+
+    def test_detects_workday_from_careers_html(self, monkeypatch):
+        html = (
+            '<a href="https://swisscom.wd103.myworkdayjobs.com/de-DE/'
+            'SwisscomExternalCareers">Jobs</a>'
+        )
+        response = type("R", (), {"text": html, "url": "https://example.com/careers"})()
+        monkeypatch.setattr(
+            "relocation_jobs.scrape_jobs.requests.get",
+            lambda *args, **kwargs: response,
+        )
+        ats_type, ats_url = detect_ats_static("https://example.com/careers")
+        assert ats_type == "workday"
+        assert "SwisscomExternalCareers" in ats_url
+
+    def test_follows_meta_refresh_to_workday(self, monkeypatch):
+        calls: list[str] = []
+
+        def fake_get(url, **kwargs):
+            calls.append(url)
+            if url.endswith("/jobs/"):
+                return type(
+                    "R",
+                    (),
+                    {
+                        "text": (
+                            '<meta http-equiv="Refresh" content="0; '
+                            'url=https://example.com/karriere.html">'
+                        ),
+                        "url": url,
+                    },
+                )()
+            return type(
+                "R",
+                (),
+                {
+                    "text": (
+                        "https://swisscom.wd103.myworkdayjobs.com/de-DE/"
+                        "SwisscomExternalCareers"
+                    ),
+                    "url": url,
+                },
+            )()
+
+        monkeypatch.setattr("relocation_jobs.scrape_jobs.requests.get", fake_get)
+        ats_type, ats_url = detect_ats_static("https://example.com/jobs/")
+        assert len(calls) == 2
+        assert ats_type == "workday"
+        assert "SwisscomExternalCareers" in ats_url
+
+    def test_meta_refresh_helper(self):
+        html = '<meta http-equiv="Refresh" content="0; url=/karriere.html">'
+        assert _follow_meta_refresh(html, "https://example.com/jobs/") == (
+            "https://example.com/karriere.html"
+        )

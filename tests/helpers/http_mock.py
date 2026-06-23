@@ -60,7 +60,7 @@ def install_requests_mock(
     post_routes: dict[str, MockResponse | Callable[..., MockResponse]] | None = None,
     default_get: MockResponse | None = None,
     default_post: MockResponse | None = None,
-    module: str = "relocation_jobs.scrape_jobs",
+    module: str = "relocation_jobs.scrape.http",
 ) -> dict[str, list]:
     """Patch requests.get/post; route keys are URL substrings."""
     get_routes = get_routes or {}
@@ -88,8 +88,12 @@ def install_requests_mock(
         calls["post"].append((url, kwargs))
         return _resolve(post_routes, url, kwargs, default_post)
 
-    monkeypatch.setattr(f"{module}.requests.get", fake_get)
-    monkeypatch.setattr(f"{module}.requests.post", fake_post)
+    modules = [module]
+    if module != "relocation_jobs.scrape_jobs":
+        modules.append("relocation_jobs.scrape_jobs")
+    for mod in modules:
+        monkeypatch.setattr(f"{mod}.requests.get", fake_get)
+        monkeypatch.setattr(f"{mod}.requests.post", fake_post)
     return calls
 
 

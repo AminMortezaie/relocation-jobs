@@ -2,7 +2,7 @@
 
 import { state } from "./state.js";
 import { $ } from "./utils.js";
-import { loadConfig, loadCountries, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
+import { loadConfig, loadCountries, loadAtsTypes, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
 
 export function showLogin(message = "") {
   $("mainContent").classList.add("hidden");
@@ -84,7 +84,7 @@ export async function submitAuth(e) {
     showApp();
     showJobsLoading();
     setLoadingProgress(10);
-    await Promise.all([loadConfig(), loadCountries()]);
+    await Promise.all([loadConfig(), loadCountries(), loadAtsTypes()]);
     setLoadingProgress(40);
     await loadCities();
     setLoadingProgress(60);

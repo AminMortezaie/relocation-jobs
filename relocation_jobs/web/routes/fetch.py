@@ -7,6 +7,7 @@ from relocation_jobs.core.auth import admin_required, login_required
 from relocation_jobs.web import deps
 from relocation_jobs.core.location_tags import COUNTRY_LABELS
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
+from relocation_jobs.services.catalog_service import list_ats_types
 from relocation_jobs.db import is_user_admin, list_fetch_runs
 from relocation_jobs.web.helpers import scrape_enabled
 from relocation_jobs.web import scrape_runner
@@ -23,6 +24,7 @@ def register(app):
                 "running": _fetch_state["running"],
                 "country": _fetch_state["country"],
                 "company": _fetch_state.get("company"),
+                "ats_type": _fetch_state.get("ats_type"),
                 "file": _fetch_state["file"],
                 "started_at": _fetch_state["started_at"],
                 "finished_at": _fetch_state["finished_at"],
@@ -136,6 +138,8 @@ def register(app):
         country = body.get("country", "netherlands")
         skip_filled = bool(body.get("skip_filled", False))
         concurrency = int(body.get("concurrency", body.get("workers", deps.DEFAULT_CONCURRENCY)))
+        ats_raw = (body.get("ats_type") or body.get("ats") or "").strip()
+        ats_type = ats_raw if ats_raw and ats_raw != "all" else None
 
         if not scrape_enabled():
             return jsonify({
@@ -152,6 +156,10 @@ def register(app):
         if country not in SUPPORTED_COUNTRIES:
             return jsonify({"error": f"Unknown country: {country}"}), 400
 
+        valid_ats = {item["id"] for item in list_ats_types()} | {"generic"}
+        if ats_type and ats_type not in valid_ats:
+            return jsonify({"error": f"Unknown ATS type: {ats_type}"}), 400
+
         with _fetch_lock:
             scrape_runner._reap_zombie_fetch()
             if _fetch_state["running"]:
@@ -164,17 +172,24 @@ def register(app):
                 file_name=COUNTRY_ARCHIVE_FILENAMES[country],
                 concurrency=workers,
                 user_id=g.user_id,
+                ats_type=ats_type,
             )
 
-        scrape_runner._start_scrape_thread(country, skip_filled, workers)
+        scrape_runner._start_scrape_thread(country, skip_filled, workers, ats_type=ats_type)
 
+        ats_label = ""
+        if ats_type:
+            labels = {item["id"]: item["label"] for item in list_ats_types()}
+            ats_label = labels.get(ats_type, ats_type.replace("_", " ").title())
+        scope = f"{ats_label} companies in " if ats_type else ""
         return jsonify({
             "ok": True,
             "country": country,
+            "ats_type": ats_type,
             "file": COUNTRY_ARCHIVE_FILENAMES[country],
             "concurrency": workers,
             "message": (
-                f"Started scraping {COUNTRY_LABELS[country]} "
+                f"Started scraping {scope}{COUNTRY_LABELS[country]} "
                 f"({workers} concurrent, asyncio)"
             ),
         })

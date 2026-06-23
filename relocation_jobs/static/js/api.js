@@ -503,6 +503,8 @@ function filterQueryFlag(id) {
 
 export function jobsQueryParams() {
   const country = document.getElementById("country").value;
+  const atsEl = document.getElementById("ats");
+  const atsType = atsEl && atsEl.value !== "all" ? atsEl.value : "";
   const locationEl = document.getElementById("location");
   const location = locationEl && locationEl.value !== "all" ? locationEl.value : "";
   const params = new URLSearchParams({
@@ -520,6 +522,7 @@ export function jobsQueryParams() {
     fetch_problem_only: filterQueryFlag("fetchProblemOnly"),
   });
   if (location) params.set("location", location);
+  if (atsType) params.set("ats_type", atsType);
   return params.toString();
 }
 

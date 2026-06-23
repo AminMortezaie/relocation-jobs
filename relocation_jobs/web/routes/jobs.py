@@ -31,6 +31,7 @@ def register(app):
             fetch_problem_only=flags["fetch_problem_only"],
             location=flags["location"],
             city=flags["city"],
+            ats_type=flags["ats_type"],
             user_id=g.user_id,
         )
         stats = compute_stats(

@@ -104,7 +104,7 @@ function renderOverview(data) {
   const tracking = data.tracking || {};
   const fetch = data.fetch || {};
   const fetchLabel = fetch.running
-    ? `Running (${escapeHtml(fetch.country || "?")}${fetch.company ? ` · ${escapeHtml(fetch.company)}` : ""})`
+    ? `Running (${escapeHtml(fetch.country || "?")}${fetch.ats_type ? ` · ${escapeHtml(fetch.ats_type)}` : ""}${fetch.company ? ` · ${escapeHtml(fetch.company)}` : ""})`
     : "Idle";
 
   $("adminOverview").innerHTML = `

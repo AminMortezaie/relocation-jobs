@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "d567ccfbbd22",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "files_touched": [
+    ".env.example",
+    "docker-entrypoint.sh",
+    "relocation_jobs/admin_data.py",
+    "relocation_jobs/build_companies.py",
+    "relocation_jobs/catalog_db.py",
+    "relocation_jobs/core/db.py",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/db/users.py",
+    "relocation_jobs/panel_server.py",
+    "relocation_jobs/services/admin_service.py",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/data.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/job-board.js",
+    "relocation_jobs/static/js/main.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "tests/conftest.py",
+    "tests/test_admin_api.py",
+    "tests/test_push_95.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/d5/67ccfbbd22/0/metadata.json",
+      "transcript": "/d5/67ccfbbd22/0/full.jsonl",
+      "content_hash": "/d5/67ccfbbd22/0/content_hash.txt",
+      "prompt": "/d5/67ccfbbd22/0/prompt.txt"
+    }
+  ]
+}

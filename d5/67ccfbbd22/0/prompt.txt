@@ -1,0 +1,45 @@
+i've deployed on render and its not working correctly.
+File "/opt/render/project/src/.venv/lib/python3.14/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/opt/render/project/src/relocation_jobs/panel_server.py", line 685, in api_auth_login
+    user = authenticate(username, password)
+  File "/opt/render/project/src/relocation_jobs/core/auth.py", line 100, in authenticate
+    user = get_user_by_username(username)
+  File "/opt/render/project/src/relocation_jobs/db/users.py", line 41, in get_user_by_username
+    row = get_connection().execute(
+          ~~~~~~~~~~~~~~~~~~~~~~~~^
+        """
+        ^^^
+    ...<3 lines>...
+        (username.strip(),),
+        ^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+  File "/opt/render/project/src/.venv/lib/python3.14/site-packages/psycopg/connection.py", line 300, in execute
+    raise ex.with_traceback(None)
+psycopg.OperationalError: consuming input failed: SSL connection has been closed unexpectedly
+the problem is this
+
+---
+
+panel starting up in local is so slow and takes long to start and load, why this happening?
+
+---
+
+do it
+
+---
+
+the admin page is to heavy and it takes to long to load.
+what do you think?
+
+---
+
+the admin page is to heavy and it takes to long to load.
+what do you think?
+
+---
+
+in job board also everything takes too long, by just changing a state in single position everything loading again.
+i think that the entire code has lots of performance issues which are created by using vibe coding can you find them?

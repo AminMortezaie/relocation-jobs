@@ -1,0 +1,22 @@
+Read `CLAUDE.md` first — especially the **"Fetch UI + cancel handoff"** section at the top.
+
+**Your task:** Fix two related bugs in the relocation jobs panel:
+
+1. **UI** — During a country fetch, the header is broken: both the **Fetch** button and the progress chip can appear at once, and the layout looks corrupt. Target state: when idle show **Fetch** only; when running show the **progress chip** only (click opens the modal, never restarts the fetch).
+
+2. **Cancel** — The **Cancel** button in the fetch progress modal does not reliably stop a running country fetch. It can stay on "Cancelling…" while scraping continues.
+
+**Context:**
+- Phase 2 DB-backed fetch runs are partially implemented (server + client) but uncommitted — run `git status` and `git diff` before changing anything.
+- Likely cancel root cause: the scrape subprocess never gets `set_cancel_checker()` wired; parent only sends SIGTERM, which may not stop Playwright/Chromium promptly.
+- Key files: `web/scrape_runner.py`, `web/routes/fetch.py`, `static/js/scrape.js`, `static/js/render.js`, `static/index.html`, `static/styles.css`, `core/scrape_cancel.py`, `scrape/runner.py`.
+
+**How to work:**
+1. Reproduce locally: start panel, run a country fetch, try Cancel, watch `GET /api/fetch/status` until `running: false`.
+2. Fix cancel end-to-end first (cooperative cancel in child + robust process termination), then fix header UI toggling.
+3. Run `pytest tests/test_panel_api_full.py -k fetch -o addopts=` after meaningful changes.
+4. Do **not** commit unless I ask.
+
+Follow `engineering-standards` and `collaboration-style` skills. Ask before any structural refactors.
+
+---

@@ -1,0 +1,9 @@
+Read .claude/REFACTOR_HANDOFF.md. Finish Phase C: extract enrich, dispatch, runner from scrape_jobs.py, wire ipc.py, slim shim to ~100 LOC. 334 + 398 tests must pass. Don't commit unless I ask.
+
+---
+
+Read .claude/REFACTOR_HANDOFF.md. Finish Phase C: extract enrich, dispatch, runner from scrape_jobs.py, wire ipc.py, slim shim to ~100 LOC. 334 + 398 tests must pass. Don't commit unless I ask.
+
+---
+
+write handoff to do by another agent.

@@ -3,10 +3,11 @@
   "checkpoint_id": "10c0fef3bede",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 8,
+  "checkpoints_count": 10,
   "files_touched": [
     "relocation_jobs/core/ats_detection.py",
     "relocation_jobs/scrape/__init__.py",
+    "relocation_jobs/scrape/_compat.py",
     "relocation_jobs/scrape/ashby.py",
     "relocation_jobs/scrape/bol.py",
     "relocation_jobs/scrape/deel.py",
@@ -27,6 +28,7 @@
     "relocation_jobs/scrape/playwright.py",
     "relocation_jobs/scrape/recruitee.py",
     "relocation_jobs/scrape/relevance.py",
+    "relocation_jobs/scrape/runner.py",
     "relocation_jobs/scrape/shim_bind.py",
     "relocation_jobs/scrape/smartrecruiters.py",
     "relocation_jobs/scrape/teamtailor.py",
@@ -73,6 +75,12 @@
       "transcript": "/10/c0fef3bede/2/full.jsonl",
       "content_hash": "/10/c0fef3bede/2/content_hash.txt",
       "prompt": "/10/c0fef3bede/2/prompt.txt"
+    },
+    {
+      "metadata": "/10/c0fef3bede/3/metadata.json",
+      "transcript": "/10/c0fef3bede/3/full.jsonl",
+      "content_hash": "/10/c0fef3bede/3/content_hash.txt",
+      "prompt": "/10/c0fef3bede/3/prompt.txt"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "checkpoint_id": "d567ccfbbd22",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 4,
+  "checkpoints_count": 5,
   "files_touched": [
     ".env.example",
     "docker-entrypoint.sh",
@@ -33,6 +33,12 @@
       "transcript": "/d5/67ccfbbd22/0/full.jsonl",
       "content_hash": "/d5/67ccfbbd22/0/content_hash.txt",
       "prompt": "/d5/67ccfbbd22/0/prompt.txt"
+    },
+    {
+      "metadata": "/d5/67ccfbbd22/1/metadata.json",
+      "transcript": "/d5/67ccfbbd22/1/full.jsonl",
+      "content_hash": "/d5/67ccfbbd22/1/content_hash.txt",
+      "prompt": "/d5/67ccfbbd22/1/prompt.txt"
     }
   ]
 }

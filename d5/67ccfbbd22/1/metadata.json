@@ -1,0 +1,75 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "d567ccfbbd22",
+  "session_id": "9bad969e-25d0-45b8-8fee-d73f46ea4609",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T11:36:08.174753Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".env.example",
+    "docker-entrypoint.sh",
+    "relocation_jobs/build_companies.py",
+    "relocation_jobs/catalog_db.py",
+    "relocation_jobs/core/db.py",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/db/users.py",
+    "relocation_jobs/panel_server.py",
+    "relocation_jobs/static/js/main.js",
+    "tests/conftest.py",
+    "tests/test_push_95.py"
+  ],
+  "agent": "Cursor",
+  "model": "composer-2.5-fast",
+  "turn_id": "f9502b82bbf0",
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T11:36:08.172921Z",
+    "agent_lines": 0,
+    "agent_removed": 2,
+    "human_added": 154,
+    "human_modified": 145,
+    "human_removed": 0,
+    "total_committed": 238,
+    "total_lines_changed": 367,
+    "agent_percentage": 0.544959128065395,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 409,
+      "user_lines_removed": 145,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".cursor/hooks.json": 40,
+        ".env.example": 6,
+        "docker-entrypoint.sh": 4,
+        "relocation_jobs/build_companies.py": 65,
+        "relocation_jobs/catalog_db.py": 60,
+        "relocation_jobs/core/db.py": 72,
+        "relocation_jobs/core/migrations.py": 50,
+        "relocation_jobs/db/users.py": 46,
+        "relocation_jobs/panel_server.py": 7,
+        "relocation_jobs/static/js/main.js": 1,
+        "tests/conftest.py": 3,
+        "tests/test_push_95.py": 55
+      },
+      "user_removed_per_file": {
+        ".env.example": 1,
+        "docker-entrypoint.sh": 5,
+        "relocation_jobs/build_companies.py": 54,
+        "relocation_jobs/catalog_db.py": 21,
+        "relocation_jobs/core/db.py": 8,
+        "relocation_jobs/core/migrations.py": 7,
+        "relocation_jobs/db/users.py": 43,
+        "relocation_jobs/panel_server.py": 3,
+        "relocation_jobs/static/js/main.js": 3
+      }
+    }
+  ]
+}

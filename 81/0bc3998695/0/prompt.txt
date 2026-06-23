@@ -1,0 +1,3 @@
+Read .claude/REFACTOR_HANDOFF.md and complete Phase B: extract ATS detection 
+from scrape_jobs so company_service no longer imports scrape_jobs. Run pytest 
+when done.

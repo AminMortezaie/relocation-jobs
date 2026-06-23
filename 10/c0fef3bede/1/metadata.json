@@ -1,0 +1,119 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "10c0fef3bede",
+  "session_id": "55b44cf8-71ec-4ea9-b98a-9f4a788256e8",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T18:49:27.356725Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/scrape/__init__.py",
+    "relocation_jobs/scrape/ashby.py",
+    "relocation_jobs/scrape/bol.py",
+    "relocation_jobs/scrape/deel.py",
+    "relocation_jobs/scrape/descriptions.py",
+    "relocation_jobs/scrape/dispatch.py",
+    "relocation_jobs/scrape/enrich.py",
+    "relocation_jobs/scrape/generic.py",
+    "relocation_jobs/scrape/greenhouse.py",
+    "relocation_jobs/scrape/http.py",
+    "relocation_jobs/scrape/ipc.py",
+    "relocation_jobs/scrape/job_shop.py",
+    "relocation_jobs/scrape/join.py",
+    "relocation_jobs/scrape/lever.py",
+    "relocation_jobs/scrape/listing.py",
+    "relocation_jobs/scrape/merge.py",
+    "relocation_jobs/scrape/misc.py",
+    "relocation_jobs/scrape/personio.py",
+    "relocation_jobs/scrape/recruitee.py",
+    "relocation_jobs/scrape/relevance.py",
+    "relocation_jobs/scrape/shim_bind.py",
+    "relocation_jobs/scrape/smartrecruiters.py",
+    "relocation_jobs/scrape/teamtailor.py",
+    "relocation_jobs/scrape/util.py",
+    "relocation_jobs/scrape/workable.py",
+    "relocation_jobs/scrape/workday.py",
+    "relocation_jobs/scrape_jobs.py",
+    "tests/helpers/http_mock.py",
+    "tests/helpers/playwright_mock.py",
+    "tests/test_scrape_core.py",
+    "tests/test_scrape_helpers.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "b3083e5f5421",
+  "session_metrics": {
+    "duration_ms": 833843,
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T18:49:27.35431Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 741,
+    "human_removed": 2743,
+    "total_committed": 740,
+    "total_lines_changed": 3502,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 2782,
+      "user_lines_removed": 2034,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/scrape/__init__.py": 16,
+        "relocation_jobs/scrape/ashby.py": 87,
+        "relocation_jobs/scrape/bol.py": 122,
+        "relocation_jobs/scrape/deel.py": 86,
+        "relocation_jobs/scrape/descriptions.py": 65,
+        "relocation_jobs/scrape/generic.py": 71,
+        "relocation_jobs/scrape/greenhouse.py": 79,
+        "relocation_jobs/scrape/http.py": 12,
+        "relocation_jobs/scrape/ipc.py": 77,
+        "relocation_jobs/scrape/job_shop.py": 172,
+        "relocation_jobs/scrape/join.py": 166,
+        "relocation_jobs/scrape/lever.py": 76,
+        "relocation_jobs/scrape/listing.py": 261,
+        "relocation_jobs/scrape/merge.py": 167,
+        "relocation_jobs/scrape/misc.py": 361,
+        "relocation_jobs/scrape/personio.py": 131,
+        "relocation_jobs/scrape/playwright.py": 23,
+        "relocation_jobs/scrape/recruitee.py": 94,
+        "relocation_jobs/scrape/relevance.py": 57,
+        "relocation_jobs/scrape/smartrecruiters.py": 90,
+        "relocation_jobs/scrape/teamtailor.py": 203,
+        "relocation_jobs/scrape/workable.py": 71,
+        "relocation_jobs/scrape/workday.py": 108,
+        "relocation_jobs/scrape_jobs.py": 177,
+        "tests/helpers/http_mock.py": 7,
+        "tests/helpers/playwright_mock.py": 3
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/scrape_jobs.py": 2031,
+        "tests/helpers/http_mock.py": 3
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 647,
+      "user_lines_removed": 1450,
+      "agent_lines_added": 3414,
+      "agent_lines_removed": 2034,
+      "user_added_per_file": {
+        "relocation_jobs/scrape/_compat.py": 182,
+        "relocation_jobs/scrape/runner.py": 419,
+        "relocation_jobs/scrape_jobs.py": 46
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/scrape_jobs.py": 1450
+      }
+    }
+  ]
+}

@@ -1,7 +1,1 @@
-the big issue is still exists is about fetching jobs and it stills locks the whole process to just wait for it, this problem is because of fetching based on the client side not server side and it happens. whats your solution for this.
-before anything you should read the skills.
-
----
-
-the big issue is still exists is about fetching jobs and it stills locks the whole process to just wait for it, this problem is because of fetching based on the client side not server side and it happens. whats your solution for this.
-before anything you should read the skills.
+2, admin required.

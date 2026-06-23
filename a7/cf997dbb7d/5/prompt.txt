@@ -1,0 +1,65 @@
+2, admin required.
+
+---
+
+whats the changes on UI?
+
+---
+
+it should show something like background job is running and show something to open up the modal to see the process there not freezing the button just.
+
+---
+
+you made the UI bad and also if the server goes off the background job will go stale and it doesn't permit to do anything about fetch.
+
+---
+
+if i click on the button it should show the progress, and when its closed i should see the progress correctly.
+
+---
+
+whats this button?
+its completely confusing and if i click on it, i think that it will make retry everyhing and not working correctly, you need to think of the UX and then redesign it and also it should work find not something like this flakky.
+
+---
+
+whats this button?
+its completely confusing and if i click on it, i think that it will make retry everyhing and not working correctly, you need to think of the UX and then redesign it and also it should work find not something like this flakky.
+
+---
+
+cancelation button in not working correctly also the UI made corrupt after applying this change.
+
+---
+
+canceling not working again.
+
+---
+
+handoff the task to do by other agent.
+
+---
+
+handoff the task to do by other agent.
+
+---
+
+just write down the handoff task i will tell the other agent to do it, 
+UI problem, Cancelation problem.
+
+---
+
+just write down the handoff task i will tell the other agent to do it, 
+UI problem, Cancelation problem.
+
+---
+
+write down in cluade.md to handoff directly.
+
+---
+
+write down in cluade.md to handoff directly.
+
+---
+
+write the correct prompt to say to them

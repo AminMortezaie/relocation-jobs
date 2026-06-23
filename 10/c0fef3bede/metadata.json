@@ -3,7 +3,7 @@
   "checkpoint_id": "10c0fef3bede",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 10,
+  "checkpoints_count": 11,
   "files_touched": [
     "relocation_jobs/core/ats_detection.py",
     "relocation_jobs/scrape/__init__.py",
@@ -40,6 +40,7 @@
     "relocation_jobs/static/admin.html",
     "relocation_jobs/static/index.html",
     "relocation_jobs/static/js/admin-scrape.js",
+    "relocation_jobs/static/js/admin.js",
     "relocation_jobs/static/js/api.js",
     "relocation_jobs/static/js/auth.js",
     "relocation_jobs/static/js/data.js",
@@ -81,6 +82,12 @@
       "transcript": "/10/c0fef3bede/3/full.jsonl",
       "content_hash": "/10/c0fef3bede/3/content_hash.txt",
       "prompt": "/10/c0fef3bede/3/prompt.txt"
+    },
+    {
+      "metadata": "/10/c0fef3bede/4/metadata.json",
+      "transcript": "/10/c0fef3bede/4/full.jsonl",
+      "content_hash": "/10/c0fef3bede/4/content_hash.txt",
+      "prompt": "/10/c0fef3bede/4/prompt.txt"
     }
   ]
 }

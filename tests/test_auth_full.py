@@ -130,6 +130,17 @@ def test_bootstrap_admin_generated_password(db, monkeypatch, capsys):
 
 
 @pytest.mark.integration
+def test_bootstrap_admin_syncs_password_when_users_exist(db, monkeypatch):
+    monkeypatch.setenv("PANEL_ADMIN_USER", "admin")
+    monkeypatch.setenv("PANEL_ADMIN_PASSWORD", "first-password-12")
+    bootstrap_admin()
+    monkeypatch.setenv("PANEL_ADMIN_PASSWORD", "second-password-12")
+    assert bootstrap_admin() is None
+    assert authenticate("admin", "second-password-12") is not None
+    assert authenticate("admin", "first-password-12") is None
+
+
+@pytest.mark.integration
 def test_session_helpers(auth_app, test_user):
     with auth_app.test_request_context():
         login_user(test_user["id"], test_user["username"])

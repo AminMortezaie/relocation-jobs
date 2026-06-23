@@ -3,8 +3,10 @@ set -e
 python3 -c "
 from relocation_jobs.db import init_db
 from relocation_jobs.catalog_db import catalog_has_data, init_catalog_schema
+from relocation_jobs.core.auth import bootstrap_admin
 init_db()
 init_catalog_schema()
+bootstrap_admin()
 if catalog_has_data():
     print('catalog ready')
 else:

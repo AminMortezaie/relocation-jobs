@@ -17,6 +17,7 @@ from relocation_jobs.db import (
     is_user_admin,
     migrate_tracking_from_json,
     tracking_is_empty,
+    update_user_password,
     user_count,
 )
 
@@ -117,16 +118,36 @@ def register_user(username: str, password: str) -> dict:
     return create_user(username, password_hash)
 
 
+def _admin_credentials_from_env() -> tuple[str, str]:
+    username = os.environ.get("PANEL_ADMIN_USER", "admin").strip() or "admin"
+    password = os.environ.get("PANEL_ADMIN_PASSWORD", "").strip()
+    return username, password
+
+
+def sync_admin_password_from_env() -> bool:
+    """Apply PANEL_ADMIN_PASSWORD to the env-configured admin user."""
+    username, password = _admin_credentials_from_env()
+    if not password:
+        return False
+    if not get_user_by_username(username):
+        return False
+    return update_user_password(username, generate_password_hash(password))
+
+
 def bootstrap_admin() -> dict | None:
     """
     Create the first admin user from env and migrate JSON tracking into DB.
-    Returns the created user dict, or None if users already exist.
+    When users already exist, sync PANEL_ADMIN_PASSWORD to PANEL_ADMIN_USER so
+    Render env updates take effect without a manual DB reset.
+    Returns the created user dict, or None if users already existed.
     """
+    username, password = _admin_credentials_from_env()
+
     if user_count() > 0:
+        if sync_admin_password_from_env():
+            print(f"Panel: synced admin password for '{username}' from env.")
         return None
 
-    username = os.environ.get("PANEL_ADMIN_USER", "admin").strip() or "admin"
-    password = os.environ.get("PANEL_ADMIN_PASSWORD", "").strip()
     if not password:
         password = secrets.token_urlsafe(12)
         print(

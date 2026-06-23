@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "3a70aa543162",
+  "session_id": "7cb5a521-9c7e-41b5-b672-1b7ae31a8c58",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T11:42:45.725694Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".env.example",
+    "docker-entrypoint.sh",
+    "relocation_jobs/core/auth.py",
+    "tests/test_auth_full.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "c8e49041d68a",
+  "checkpoint_transcript_start": 106,
+  "transcript_lines_at_start": 106,
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T11:42:45.721884Z",
+    "agent_lines": 40,
+    "agent_removed": 4,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 40,
+    "total_lines_changed": 44,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "b6dc06d11034",
+  "session_id": "cbda01eb-ddba-4235-91aa-bb09458158a5",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T19:11:49.074094Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/scrape/runner.py",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/admin-scrape.js",
+    "relocation_jobs/static/js/auth.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/main.js",
+    "relocation_jobs/static/js/scrape.js",
+    "tests/test_admin_api.py",
+    "tests/test_panel_api_full.py",
+    "tests/test_scrape_runner.py"
+  ],
+  "agent": "Claude Code",
+  "model": "default",
+  "turn_id": "5b2965c3c2d1",
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T19:11:49.071571Z",
+    "agent_lines": 229,
+    "agent_removed": 12,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 229,
+    "total_lines_changed": 241,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 919,
+      "user_lines_removed": 889,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/companies/__init__.py": 1,
+        "relocation_jobs/companies/repo.py": 201,
+        "relocation_jobs/companies/service.py": 696,
+        "relocation_jobs/db/companies.py": 19,
+        "relocation_jobs/services/company_service.py": 2
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/db/companies.py": 198,
+        "relocation_jobs/services/company_service.py": 691
+      }
+    }
+  ]
+}

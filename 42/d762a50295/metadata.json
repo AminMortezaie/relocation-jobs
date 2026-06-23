@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "42d762a50295",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "relocation_jobs/build_companies.py",
+    "relocation_jobs/catalog_db.py",
+    "relocation_jobs/core/paths.py",
+    "relocation_jobs/panel_server.py",
+    "relocation_jobs/scrape_jobs.py",
+    "relocation_jobs/services/admin_service.py",
+    "relocation_jobs/services/catalog_service.py",
+    "relocation_jobs/services/company_service.py",
+    "render.yaml",
+    "tests/BUSINESS_RULES.md",
+    "tests/conftest.py",
+    "tests/helpers/panel_fixtures.py",
+    "tests/test_admin_api.py",
+    "tests/test_admin_data.py",
+    "tests/test_admin_postgres.py",
+    "tests/test_build_companies.py",
+    "tests/test_business_rules_coverage.py",
+    "tests/test_catalog_full.py",
+    "tests/test_integration.py",
+    "tests/test_job_state_rules.py",
+    "tests/test_panel_api_full.py",
+    "tests/test_panel_data_full.py",
+    "tests/test_paths.py",
+    "tests/test_scrape_branches.py",
+    "tests/test_scrape_job_locations.py",
+    "tests/test_scrape_runner.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/42/d762a50295/0/metadata.json",
+      "transcript": "/42/d762a50295/0/full.jsonl",
+      "content_hash": "/42/d762a50295/0/content_hash.txt",
+      "prompt": "/42/d762a50295/0/prompt.txt"
+    }
+  ]
+}

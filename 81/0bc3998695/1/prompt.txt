@@ -1,0 +1,31 @@
+read the new skill i've added for tests in @CLAUDE.md and then tell me, whats your idea about my tests currently?
+
+---
+
+I think that we need to make them something more practical these tests are just slowing the pipeline not anything else.
+
+---
+
+I need to keep the business logic cause scrapper not to write again and business logic changes during making product better so you can split it and make them isolated and not running just in case they're needed we should run them and always run the business logic test which roughly takes short time under 30 seconds.
+what do you think?
+
+---
+
+Session-scoped app_client — bootstrap once per module/session, not per test
+and then apply others you know.
+
+---
+
+is the tests using real db conncetion or a mock one?
+
+---
+
+Getting under 30s would need a deeper change (reuse DB connection + truncate between tests, or module-scoped API fixtures).
+
+---
+
+do it quick, it took too long.
+
+---
+
+how to run?

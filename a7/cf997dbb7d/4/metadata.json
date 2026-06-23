@@ -1,0 +1,109 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "a7cf997dbb7d",
+  "session_id": "acd82651-d264-4506-b05b-8ff4b22208f5",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T20:39:52.570873Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 3,
+  "files_touched": [
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/db/__init__.py",
+    "relocation_jobs/db/fetch_runs.py",
+    "relocation_jobs/panel_server.py",
+    "relocation_jobs/static/admin.html",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/auth.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/filters.js",
+    "relocation_jobs/static/js/main.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/static/js/utils.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/fetch_state.py",
+    "relocation_jobs/web/helpers.py",
+    "relocation_jobs/web/routes/fetch.py",
+    "relocation_jobs/web/scrape_runner.py",
+    "tests/test_admin_api.py",
+    "tests/test_panel_api_full.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "e6b4b5cc2ed4",
+  "session_metrics": {
+    "duration_ms": 1117500,
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T20:39:52.567879Z",
+    "agent_lines": 1091,
+    "agent_removed": 212,
+    "human_added": 0,
+    "human_modified": 100,
+    "human_removed": 31,
+    "total_committed": 1191,
+    "total_lines_changed": 1451,
+    "agent_percentage": 89.80013783597519,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 772,
+      "user_lines_removed": 131,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/core/migrations.py": 24,
+        "relocation_jobs/db/__init__.py": 16,
+        "relocation_jobs/db/fetch_runs.py": 313,
+        "relocation_jobs/panel_server.py": 3,
+        "relocation_jobs/static/index.html": 6,
+        "relocation_jobs/static/js/events.js": 8,
+        "relocation_jobs/static/js/main.js": 1,
+        "relocation_jobs/static/js/render.js": 69,
+        "relocation_jobs/static/js/scrape.js": 46,
+        "relocation_jobs/static/js/state.js": 4,
+        "relocation_jobs/static/styles.css": 61,
+        "relocation_jobs/web/fetch_state.py": 1,
+        "relocation_jobs/web/helpers.py": 13,
+        "relocation_jobs/web/routes/fetch.py": 18,
+        "relocation_jobs/web/scrape_runner.py": 162,
+        "tests/test_admin_api.py": 6,
+        "tests/test_panel_api_full.py": 21
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/db/fetch_runs.py": 10,
+        "relocation_jobs/static/index.html": 1,
+        "relocation_jobs/static/js/events.js": 1,
+        "relocation_jobs/static/js/main.js": 1,
+        "relocation_jobs/static/js/render.js": 7,
+        "relocation_jobs/static/js/scrape.js": 20,
+        "relocation_jobs/web/fetch_state.py": 1,
+        "relocation_jobs/web/helpers.py": 13,
+        "relocation_jobs/web/routes/fetch.py": 28,
+        "relocation_jobs/web/scrape_runner.py": 47,
+        "tests/test_panel_api_full.py": 2
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1238,
+      "agent_lines_removed": 149
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1836,
+      "agent_lines_removed": 279
+    }
+  ]
+}

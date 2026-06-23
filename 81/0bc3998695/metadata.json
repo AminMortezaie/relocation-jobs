@@ -3,7 +3,7 @@
   "checkpoint_id": "810bc3998695",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 18,
+  "checkpoints_count": 19,
   "files_touched": [
     "pytest.ini",
     "relocation_jobs/admin_data.py",
@@ -77,6 +77,19 @@
       "transcript": "/81/0bc3998695/2/full.jsonl",
       "content_hash": "/81/0bc3998695/2/content_hash.txt",
       "prompt": "/81/0bc3998695/2/prompt.txt"
+    },
+    {
+      "metadata": "/81/0bc3998695/3/metadata.json",
+      "transcript": "/81/0bc3998695/3/full.jsonl",
+      "content_hash": "/81/0bc3998695/3/content_hash.txt",
+      "prompt": "/81/0bc3998695/3/prompt.txt"
     }
-  ]
+  ],
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  }
 }

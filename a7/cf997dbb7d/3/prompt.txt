@@ -1,0 +1,2 @@
+after somechanges the panel is not running up and just loading, whats the problem.
+see the skills and then apply the fixes

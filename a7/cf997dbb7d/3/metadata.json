@@ -1,0 +1,82 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "a7cf997dbb7d",
+  "session_id": "8e3931b8-d6ab-4324-9db2-e43a53b4d236",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-23T20:39:52.516702Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/db/__init__.py",
+    "relocation_jobs/db/fetch_runs.py",
+    "relocation_jobs/panel_server.py",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/main.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/fetch_state.py",
+    "relocation_jobs/web/helpers.py",
+    "relocation_jobs/web/routes/fetch.py",
+    "relocation_jobs/web/scrape_runner.py",
+    "tests/test_admin_api.py",
+    "tests/test_panel_api_full.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "2fee244fa463",
+  "session_metrics": {
+    "duration_ms": 1430841,
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-23T20:39:52.514504Z",
+    "agent_lines": 1159,
+    "agent_removed": 182,
+    "human_added": 101,
+    "human_modified": 111,
+    "human_removed": 0,
+    "total_committed": 1371,
+    "total_lines_changed": 1620,
+    "agent_percentage": 82.77777777777777,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 612,
+      "user_lines_removed": 111,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/core/migrations.py": 24,
+        "relocation_jobs/db/__init__.py": 16,
+        "relocation_jobs/db/fetch_runs.py": 313,
+        "relocation_jobs/panel_server.py": 3,
+        "relocation_jobs/static/js/render.js": 27,
+        "relocation_jobs/static/js/scrape.js": 5,
+        "relocation_jobs/static/js/state.js": 3,
+        "relocation_jobs/web/fetch_state.py": 1,
+        "relocation_jobs/web/helpers.py": 13,
+        "relocation_jobs/web/routes/fetch.py": 18,
+        "relocation_jobs/web/scrape_runner.py": 162,
+        "tests/test_admin_api.py": 6,
+        "tests/test_panel_api_full.py": 21
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/db/fetch_runs.py": 10,
+        "relocation_jobs/static/js/render.js": 6,
+        "relocation_jobs/static/js/scrape.js": 4,
+        "relocation_jobs/web/fetch_state.py": 1,
+        "relocation_jobs/web/helpers.py": 13,
+        "relocation_jobs/web/routes/fetch.py": 28,
+        "relocation_jobs/web/scrape_runner.py": 47,
+        "tests/test_panel_api_full.py": 2
+      }
+    }
+  ]
+}

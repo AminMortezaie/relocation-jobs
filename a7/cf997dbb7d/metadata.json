@@ -3,7 +3,7 @@
   "checkpoint_id": "a7cf997dbb7d",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 10,
+  "checkpoints_count": 11,
   "files_touched": [
     "relocation_jobs/core/migrations.py",
     "relocation_jobs/db/__init__.py",
@@ -53,6 +53,12 @@
       "transcript": "/a7/cf997dbb7d/2/full.jsonl",
       "content_hash": "/a7/cf997dbb7d/2/content_hash.txt",
       "prompt": "/a7/cf997dbb7d/2/prompt.txt"
+    },
+    {
+      "metadata": "/a7/cf997dbb7d/3/metadata.json",
+      "transcript": "/a7/cf997dbb7d/3/full.jsonl",
+      "content_hash": "/a7/cf997dbb7d/3/content_hash.txt",
+      "prompt": "/a7/cf997dbb7d/3/prompt.txt"
     }
   ]
 }

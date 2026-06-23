@@ -76,9 +76,14 @@ export async function loadJobs(options = {}) {
   if ($("location")) {
     localStorage.setItem("panel_location", $("location").value);
   }
-  showJobsLoading();
+  if (!options.silent) {
+    showJobsLoading();
+  }
   const data = await fetchJobs(options);
   state.allCompanies = data.companies || [];
+  state.boardStats = data.stats || null;
   if (data.stats) renderStats(data.stats);
   renderCompanies();
 }
+
+export { refreshJobBoard } from "./job-board.js";

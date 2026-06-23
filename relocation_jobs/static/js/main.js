@@ -39,9 +39,7 @@ async function init() {
   await Promise.all([loadConfig(), loadCountries()]);
   setLoadingProgress(40);
   refreshFilterBar();
-  await loadCities();
-  setLoadingProgress(60);
-  await loadJobs();
+  await Promise.all([loadCities(), loadJobs()]);
   finishLoadingProgress();
   await resumeFetchIfRunning();
 }

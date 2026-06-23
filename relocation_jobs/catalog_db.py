@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -37,24 +38,36 @@ def _today() -> str:
 
 def _convert_text_to_jsonb(conn, table: str, column: str) -> None:
     """Safely convert TEXT JSON column to JSONB if not already done."""
+    savepoint = f"jsonb_{table}_{column}"
     try:
+        conn.execute(f"SAVEPOINT {savepoint}")
         conn.execute(
             f"ALTER TABLE {table} ALTER COLUMN {column} TYPE jsonb USING COALESCE({column}::jsonb, '[]'::jsonb)"
         )
+        conn.execute(f"RELEASE SAVEPOINT {savepoint}")
     except Exception:
-        pass
+        conn.execute(f"ROLLBACK TO SAVEPOINT {savepoint}")
 
 
-def _migrate_columns_to_jsonb() -> None:
-    """Migrate TEXT JSON columns to JSONB in a separate transaction."""
-    try:
-        with db_transaction() as conn:
-            _convert_text_to_jsonb(conn, "companies", "sources_json")
-            _convert_text_to_jsonb(conn, "companies", "cities_json")
-            _convert_text_to_jsonb(conn, "companies", "locations_json")
-            _convert_text_to_jsonb(conn, "matching_jobs", "locations_json")
-    except Exception:
-        pass
+def _migrate_columns_to_jsonb(conn) -> None:
+    """Migrate TEXT JSON columns to JSONB."""
+    _convert_text_to_jsonb(conn, "companies", "sources_json")
+    _convert_text_to_jsonb(conn, "companies", "cities_json")
+    _convert_text_to_jsonb(conn, "companies", "locations_json")
+    _convert_text_to_jsonb(conn, "matching_jobs", "locations_json")
+
+
+_country_cache: dict[str, dict | None] = {}
+_country_cache_lock = threading.Lock()
+
+
+def invalidate_country_cache(country_key: str | None = None) -> None:
+    """Drop cached catalog reads after writes (country_key=None clears all)."""
+    with _country_cache_lock:
+        if country_key is None:
+            _country_cache.clear()
+        else:
+            _country_cache.pop(country_key, None)
 
 
 def country_key_from_filename(name: str) -> str | None:
@@ -77,6 +90,8 @@ def _visa_from_db(value) -> bool | None:
 
 
 def init_catalog_schema() -> None:
+    from relocation_jobs.core.migrations import run_migration_once
+
     with db_transaction() as conn:
         conn.execute(
             """
@@ -123,10 +138,14 @@ def init_catalog_schema() -> None:
             CREATE INDEX IF NOT EXISTS idx_jobs_idempotency ON matching_jobs(idempotency_key);
             """
         )
-        _ensure_company_columns(conn)
-        _ensure_job_columns(conn)
-        _ensure_country_meta_columns(conn)
-    _migrate_columns_to_jsonb()
+
+        def _apply_catalog_extra_columns(c) -> None:
+            _ensure_company_columns(c)
+            _ensure_job_columns(c)
+            _ensure_country_meta_columns(c)
+
+        run_migration_once(conn, "catalog_extra_columns_v1", _apply_catalog_extra_columns)
+        run_migration_once(conn, "catalog_jsonb_columns_v1", _migrate_columns_to_jsonb)
 
 
 def _ensure_country_meta_columns(conn) -> None:
@@ -356,7 +375,7 @@ def _job_row_to_dict(row) -> dict:
     return job
 
 
-def load_country(country_key: str) -> dict | None:
+def _load_country_from_db(country_key: str) -> dict | None:
     with db_read() as conn:
         meta_row = conn.execute(
             "SELECT * FROM country_meta WHERE country = %s",
@@ -402,6 +421,17 @@ def load_country(country_key: str) -> dict | None:
         "last_fetch_new_jobs": int(meta.get("last_fetch_new_jobs") or 0),
         "companies": companies,
     }
+
+
+def load_country(country_key: str) -> dict | None:
+    with _country_cache_lock:
+        if country_key in _country_cache:
+            return _country_cache[country_key]
+
+    data = _load_country_from_db(country_key)
+    with _country_cache_lock:
+        _country_cache[country_key] = data
+    return data
 
 
 def _upsert_country_meta(conn, country_key: str, meta: dict) -> None:
@@ -582,11 +612,12 @@ def touch_country_meta(country_key: str, **fields) -> None:
             }
             meta.update(updates)
             _upsert_country_meta(conn, country_key, meta)
-            return
-
-        meta = _row_dict(row)
-        meta.update(updates)
-        _upsert_country_meta(conn, country_key, meta)
+        else:
+            meta = _row_dict(row)
+            meta.update(updates)
+            _upsert_country_meta(conn, country_key, meta)
+    invalidate_country_cache(country_key)
+    invalidate_country_cache(country_key)
 
 
 def upsert_company(country_key: str, company: dict, *, updated: str | None = None) -> None:
@@ -594,6 +625,7 @@ def upsert_company(country_key: str, company: dict, *, updated: str | None = Non
     ts = updated or _today()
     with db_transaction() as conn:
         _upsert_company_and_jobs(conn, country_key, company, updated=ts)
+    invalidate_country_cache(country_key)
 
 
 def upsert_companies(
@@ -621,6 +653,7 @@ def upsert_companies(
                 "jobs_fetched": ts,
                 "total": total,
             })
+    invalidate_country_cache(country_key)
 
 
 def save_country(country_key: str, data: dict) -> None:
@@ -653,6 +686,7 @@ def save_country(country_key: str, data: dict) -> None:
             )
         else:
             conn.execute("DELETE FROM companies WHERE country = %s", (country_key,))
+    invalidate_country_cache(country_key)
 
 
 # ---------------------------------------------------------------------------
@@ -703,6 +737,7 @@ def rename_company_in_catalog(country_key: str, old_name: str, new_name: str) ->
             "UPDATE companies SET name = %s, updated = %s WHERE country = %s AND lower(name) = lower(%s)",
             (new_name, _today(), country_key, old_name),
         )
+    invalidate_country_cache(country_key)
 
 
 def update_company_fields(country_key: str, company_name: str, **fields) -> None:
@@ -724,6 +759,7 @@ def update_company_fields(country_key: str, company_name: str, **fields) -> None
             f"UPDATE companies SET {cols} WHERE country = %s AND lower(name) = lower(%s)",
             (*vals, country_key, company_name),
         )
+    invalidate_country_cache(country_key)
 
 
 def update_company_location(
@@ -746,6 +782,7 @@ def update_company_location(
             """,
             (city, cities_json, locations_json, _today(), country_key, company_name),
         )
+    invalidate_country_cache(country_key)
 
 
 def delete_company(country_key: str, company_name: str) -> bool:
@@ -755,7 +792,10 @@ def delete_company(country_key: str, company_name: str) -> bool:
             "DELETE FROM companies WHERE country = %s AND lower(name) = lower(%s) RETURNING id",
             (country_key, company_name),
         )
-        return cur.fetchone() is not None
+        deleted = cur.fetchone() is not None
+    if deleted:
+        invalidate_country_cache(country_key)
+    return deleted
 
 
 def insert_jobs(country_key: str, company_name: str, jobs: list[dict]) -> int:
@@ -798,6 +838,8 @@ def insert_jobs(country_key: str, company_name: str, jobs: list[dict]) -> int:
             )
             if cur.fetchone() is not None:
                 inserted += 1
+    if inserted:
+        invalidate_country_cache(country_key)
     return inserted
 
 

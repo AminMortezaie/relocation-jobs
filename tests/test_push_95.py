@@ -28,6 +28,7 @@ from relocation_jobs.db import (
     count_jobs_applied_db,
     count_jobs_applied_today_db,
     create_user,
+    get_user_by_username,
     init_db,
     load_company_tracking,
     load_job_status_history,
@@ -348,6 +349,115 @@ def test_postgres_reconnect_when_closed(tmp_data_dir, monkeypatch):
     conn2 = db_module.get_connection()
     assert conn2 is not None
     assert not conn2.closed
+
+
+@pytest.mark.integration
+def test_db_read_retries_operational_error(tmp_data_dir, monkeypatch):
+    from psycopg import OperationalError
+
+    import relocation_jobs.core.db as core
+
+    install_postgres_mock(monkeypatch)
+    init_db()
+    create_user("retryuser", generate_password_hash("password123"))
+
+    conn = core._acquire_connection()
+    real_execute = conn.execute
+    calls = {"n": 0}
+
+    def flaky_execute(sql, params=()):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise OperationalError("SSL connection has been closed unexpectedly")
+        return real_execute(sql, params)
+
+    conn.execute = flaky_execute
+    monkeypatch.setattr(core, "_acquire_connection", lambda: conn)
+    monkeypatch.setattr(core, "_reset_pg_connection", lambda: None)
+
+    user = get_user_by_username("retryuser")
+    assert user is not None
+    assert user["username"] == "retryuser"
+    assert calls["n"] == 2
+
+
+@pytest.mark.integration
+def test_get_connection_serializes_concurrent_reads(tmp_data_dir, monkeypatch):
+    install_postgres_mock(monkeypatch)
+    init_db()
+    create_user("threaduser", generate_password_hash("password123"))
+
+    errors: list[Exception] = []
+
+    def worker() -> None:
+        try:
+            for _ in range(20):
+                user = get_user_by_username("threaduser")
+                assert user is not None
+        except Exception as exc:
+            errors.append(exc)
+
+    threads = [threading.Thread(target=worker) for _ in range(8)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=30)
+    assert not errors
+
+
+@pytest.mark.integration
+def test_schema_migrations_run_once(tmp_data_dir, monkeypatch):
+    import relocation_jobs.core.migrations as migrations
+
+    install_postgres_mock(monkeypatch)
+    calls = {"n": 0}
+    real_backfill = migrations._backfill_job_status_events
+
+    def counted_backfill(conn):
+        calls["n"] += 1
+        return real_backfill(conn)
+
+    monkeypatch.setattr(migrations, "_backfill_job_status_events", counted_backfill)
+
+    from relocation_jobs.core.db import reset_db_initialized
+
+    reset_db_initialized()
+    init_db(force=True)
+    init_db(force=True)
+    assert calls["n"] == 1
+
+
+@pytest.mark.integration
+def test_load_country_cache_reuses_db_read(tmp_data_dir, monkeypatch, sample_country_data):
+    from relocation_jobs.catalog_db import invalidate_country_cache, load_country, save_country
+
+    install_postgres_mock(monkeypatch)
+    init_db()
+    save_country("uk", sample_country_data)
+
+    reads = {"n": 0}
+    real_load = __import__(
+        "relocation_jobs.catalog_db",
+        fromlist=["_load_country_from_db"],
+    )._load_country_from_db
+
+    def counted_load(country_key: str):
+        reads["n"] += 1
+        return real_load(country_key)
+
+    monkeypatch.setattr(
+        "relocation_jobs.catalog_db._load_country_from_db",
+        counted_load,
+    )
+
+    invalidate_country_cache()
+    assert load_country("uk") is not None
+    assert load_country("uk") is not None
+    assert reads["n"] == 1
+
+    save_country("uk", sample_country_data)
+    load_country("uk")
+    assert reads["n"] == 2
 
 
 # ---------------------------------------------------------------------------

@@ -15,6 +15,7 @@ export const state = {
   editCityContext: null,
   fetchPanelSingle: false,
   fetchReviewFeedback: null,
+  boardStats: null,
 };
 
 /** Called by api.js on 401 — wired in main.js to avoid circular imports. */
@@ -39,15 +40,24 @@ function looseJobUrl(url) {
 }
 
 export function findJobInCompany(company, url, idempotencyKey = "") {
-  const jobs = company.jobs || [];
-  const direct = jobs.find((j) => j.url === url);
-  if (direct) return direct;
-  const key = (idempotencyKey || "").trim();
-  if (key) {
-    const byKey = jobs.find((j) => j.idempotency_key === key);
-    if (byKey) return byKey;
+  const buckets = [
+    company.jobs || [],
+    company.rejected_jobs || [],
+    company.not_for_me_jobs || [],
+    company.hidden_jobs || [],
+  ];
+  for (const jobs of buckets) {
+    const direct = jobs.find((j) => j.url === url);
+    if (direct) return direct;
+    const key = (idempotencyKey || "").trim();
+    if (key) {
+      const byKey = jobs.find((j) => j.idempotency_key === key);
+      if (byKey) return byKey;
+    }
+    const loose = looseJobUrl(url);
+    if (!loose) continue;
+    const match = jobs.find((j) => looseJobUrl(j.url) === loose);
+    if (match) return match;
   }
-  const loose = looseJobUrl(url);
-  if (!loose) return undefined;
-  return jobs.find((j) => looseJobUrl(j.url) === loose);
+  return undefined;
 }

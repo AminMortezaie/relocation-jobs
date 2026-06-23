@@ -1,7 +1,15 @@
 /** HTTP client and backend API calls. */
 
 import { findCompany, findJobInCompany, onUnauthorized } from "./state.js";
-import { renderCompanies } from "./render.js";
+import {
+  hideJobAsNotForMe,
+  moveJobBetweenBuckets,
+  reapplyJobLocally,
+  refreshJobBoard,
+  restoreJobToOpen,
+  syncAppliedVisibility,
+  syncLookingToApplyVisibility,
+} from "./job-board.js";
 import { toast, browserTimezone } from "./utils.js";
 
 export async function apiFetch(url, options = {}) {
@@ -162,6 +170,14 @@ export async function setNotForMe(country, company, url, notForMe, reason = null
     toast(msg);
     return false;
   }
+  const co = findCompany(country, company);
+  if (co) {
+    if (notForMe) {
+      hideJobAsNotForMe(co, url, data.idempotency_key, reason || data.not_for_me_reason);
+    } else {
+      restoreJobToOpen(co, url, data.idempotency_key);
+    }
+  }
   return true;
 }
 
@@ -210,6 +226,7 @@ export async function toggleCompanyAwaitingResponse(country, company, awaiting) 
   if (co) {
     co.awaiting_response = data.awaiting_response;
     co.awaiting_response_date = data.awaiting_response_date || "";
+    refreshJobBoard();
   }
   return data;
 }
@@ -239,6 +256,7 @@ export async function toggleApplied(country, company, url, applied) {
     }
     if (co) co.positions_applied = (co.jobs || []).filter((j) => j.applied).length;
   }
+  if (co) syncAppliedVisibility(co, url, data.applied, data.idempotency_key);
   return data;
 }
 
@@ -266,6 +284,7 @@ export async function saveAtsScore(country, company, url, atsScore) {
   if (job) {
     job.ats_score = data.ats_score ?? null;
   }
+  if (co) refreshJobBoard();
   return data;
 }
 
@@ -286,6 +305,14 @@ export async function saveWaitingReferral(country, company, url, waitingReferral
     toast(data.error || "Could not save waiting referral");
     return null;
   }
+  const co = findCompany(country, company);
+  const job = co ? findJobInCompany(co, url) : null;
+  if (job) {
+    job.waiting_referral = data.waiting_referral;
+    job.waiting_referral_date = data.waiting_referral_date || "";
+    job.referral_linkedin_url = data.referral_linkedin_url || "";
+  }
+  if (co) refreshJobBoard();
   return data;
 }
 
@@ -303,6 +330,8 @@ export async function reapplyJob(country, company, url) {
     toast(msg);
     return null;
   }
+  const co = findCompany(country, company);
+  if (co) reapplyJobLocally(co, url, data.idempotency_key, data);
   return data;
 }
 
@@ -321,12 +350,18 @@ export async function toggleRejected(country, company, url, rejected) {
     return null;
   }
   const co = findCompany(country, company);
-  const job = co ? findJobInCompany(co, url) : null;
-  if (job) {
-    job.rejected = data.rejected;
-    job.rejected_date = data.rejected_date || "";
-    if (co) {
-      co.positions_rejected = (co.rejected_jobs || []).length;
+  if (co) {
+    if (data.rejected) {
+      moveJobBetweenBuckets(co, url, data.idempotency_key, "rejected_jobs", {
+        rejected: true,
+        rejected_date: data.rejected_date || "",
+        rejected_events: data.rejected_events,
+      });
+    } else {
+      moveJobBetweenBuckets(co, url, data.idempotency_key, "jobs", {
+        rejected: false,
+        rejected_date: "",
+      });
     }
   }
   return data;
@@ -349,6 +384,7 @@ export async function toggleLookingToApply(country, company, url, lookingToApply
     job.looking_to_apply = data.looking_to_apply;
     job.looking_to_apply_date = data.looking_to_apply_date || "";
   }
+  if (co) syncLookingToApplyVisibility(co, url, data.looking_to_apply, data.idempotency_key);
   return data;
 }
 
@@ -370,7 +406,7 @@ export async function toggleSeen(country, company, url, seen, idempotencyKey = "
   if (job) {
     job.seen = data.seen;
     job.seen_date = data.seen_date || "";
-    renderCompanies();
+    refreshJobBoard();
   }
   return data;
 }

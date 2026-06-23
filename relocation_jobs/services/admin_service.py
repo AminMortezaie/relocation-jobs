@@ -12,7 +12,12 @@ from relocation_jobs.catalog_db import (
     catalog_has_data,
     load_catalog_stats,
 )
-from relocation_jobs.db import admin_tracking_totals, user_count
+from relocation_jobs.db import (
+    admin_tracking_totals,
+    list_all_fetch_runs,
+    list_users_with_stats,
+    user_count,
+)
 from relocation_jobs.core.location_tags import COUNTRY_LABELS, SUGGESTED_CITIES, load_custom_cities
 from relocation_jobs.core.paths import COMPANIES_DIR, data_dir
 
@@ -39,34 +44,37 @@ def _visible_job_counts_by_country(
     from relocation_jobs.services.catalog_service import COUNTRY_FILES, flatten_companies
 
     stored_by_country = stored_by_country or {}
-    out: dict[str, dict[str, int]] = {}
-    for key in COUNTRY_FILES:
-        stored = stored_by_country.get(
-            key,
-            {"stored_jobs": 0, "stored_visa_jobs": 0},
-        )
-        try:
-            companies, _, _ = flatten_companies(key, user_id=None)
-            jobs = sum(c.get("job_count", len(c.get("jobs", []))) for c in companies)
-            visa_jobs = sum(
+    try:
+        companies, _, _ = flatten_companies("all", user_id=None)
+        out: dict[str, dict[str, int]] = {
+            key: {"jobs": 0, "visa_jobs": 0} for key in COUNTRY_FILES
+        }
+        for company in companies:
+            key = company.get("country") or ""
+            if key not in out:
+                continue
+            out[key]["jobs"] += company.get("job_count", len(company.get("jobs", [])))
+            out[key]["visa_jobs"] += sum(
                 1
-                for c in companies
-                for j in c.get("jobs", [])
+                for j in company.get("jobs", [])
                 if j.get("visa_sponsorship") is True
             )
-            out[key] = {"jobs": jobs, "visa_jobs": visa_jobs}
-        except Exception:
+        return out
+    except Exception:
+        out: dict[str, dict[str, int]] = {}
+        for key in COUNTRY_FILES:
+            stored = stored_by_country.get(
+                key,
+                {"stored_jobs": 0, "stored_visa_jobs": 0},
+            )
             out[key] = {
                 "jobs": int(stored.get("stored_jobs") or 0),
                 "visa_jobs": int(stored.get("stored_visa_jobs") or 0),
             }
-    return out
+        return out
 
 
 def get_catalog_overview() -> dict:
-    from relocation_jobs.catalog_db import init_catalog_schema
-
-    init_catalog_schema()
     if not catalog_has_data():
         return {
             "has_data": False,
@@ -252,4 +260,30 @@ def get_admin_overview(*, fetch_state: dict | None = None) -> dict:
         "catalog": catalog["totals"],
         "tracking": tracking,
         "fetch": fetch_state or {"running": False},
+    }
+
+
+def get_admin_dashboard(
+    *,
+    fetch_state: dict | None = None,
+    scrape_enabled: bool,
+    httpx_available: bool,
+    fetch_runs_limit: int = 50,
+) -> dict:
+    """Single round-trip payload for the admin HTML dashboard."""
+    catalog = get_catalog_overview()
+    return {
+        "overview": {
+            "users": user_count(),
+            "catalog": catalog["totals"],
+            "tracking": admin_tracking_totals(),
+            "fetch": fetch_state or {"running": False},
+        },
+        "catalog": catalog,
+        "users": {"users": list_users_with_stats()},
+        "runs": {"runs": list_all_fetch_runs(limit=fetch_runs_limit)},
+        "config": get_system_config(
+            scrape_enabled=scrape_enabled,
+            httpx_available=httpx_available,
+        ),
     }

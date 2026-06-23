@@ -358,7 +358,6 @@ async function submitHideReasonFromCard(card, reason) {
   closeHideReasonPopovers();
   const { label } = notForMeReasonMeta(reason);
   toast(currentReason ? `Category changed · ${label}` : `Hidden · ${label}`);
-  await loadJobs();
   return true;
 }
 
@@ -404,7 +403,6 @@ async function submitWaitingReferralFromCard(card, waitingReferral, linkedinUrl 
   if (!result) return false;
   closeReferralPopovers();
   toast(waitingReferral ? "Waiting for referral" : "Referral status cleared");
-  await loadJobs();
   return true;
 }
 
@@ -512,7 +510,6 @@ async function submitAtsScoreFromCard(card, atsScore) {
   if (!result) return false;
   closeAtsPopovers();
   toast(atsScore == null ? "ATS score removed" : `ATS score · ${atsScore}`);
-  await loadJobs();
   return true;
 }
 
@@ -667,7 +664,6 @@ function bindJobsListEvents() {
       const result = await toggleCompanyAwaitingResponse(country, company, awaiting);
       awaitingResponseBtn.disabled = false;
       if (!result) return;
-      await loadJobs();
       return;
     }
 
@@ -676,9 +672,7 @@ function bindJobsListEvents() {
       const card = jobTitleLink.closest(".position-card");
       if (card && card.dataset.country && card.dataset.country !== "all") {
         const { country, company, url, idempotencyKey } = card.dataset;
-        markJobSeen(country, company, url, idempotencyKey).then((result) => {
-          if (result) loadJobs();
-        });
+        markJobSeen(country, company, url, idempotencyKey);
       }
       return;
     }
@@ -693,7 +687,6 @@ function bindJobsListEvents() {
       const result = await toggleApplied(country, company, url, applied);
       appliedBtn.disabled = false;
       if (!result) return;
-      await loadJobs();
       return;
     }
 
@@ -760,7 +753,6 @@ function bindJobsListEvents() {
         state.showRejectedCompanies.add(companyKey(country, company));
         saveShowRejectedCompanies();
       }
-      await loadJobs();
       return;
     }
 
@@ -774,7 +766,6 @@ function bindJobsListEvents() {
       const result = await toggleLookingToApply(country, company, url, lookingToApply);
       lookingToApplyBtn.disabled = false;
       if (!result) return;
-      await loadJobs();
       return;
     }
 
@@ -788,7 +779,6 @@ function bindJobsListEvents() {
       const result = await toggleSeen(country, company, url, seen, idempotencyKey);
       sawBeforeBtn.disabled = false;
       if (!result) return;
-      await loadJobs();
       return;
     }
 
@@ -804,7 +794,6 @@ function bindJobsListEvents() {
         return;
       }
       toast("Moved back to open positions");
-      await loadJobs();
       return;
     }
 
@@ -820,7 +809,6 @@ function bindJobsListEvents() {
         return;
       }
       toast("Role restored");
-      await loadJobs();
       return;
     }
 
@@ -921,7 +909,7 @@ function bindToolbarEvents() {
       state.fetchReviewFeedback = { country, company, status: action === "ok" ? "ok" : "problem" };
       setFetchReviewFeedbackDone(state.fetchReviewFeedback.status);
       toast(action === "ok" ? `Fetch OK — ${company}` : `Fetch problem — ${company}`);
-      await loadJobs();
+      await loadJobs({ silent: true });
       if (
         state.fetchReviewFeedback?.country === country
         && state.fetchReviewFeedback?.company === company

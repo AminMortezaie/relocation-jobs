@@ -167,7 +167,7 @@ export function pollFetchStatus() {
     const optimisticTs = fetchingKey
       ? state.allCompanies.find((c) => `${c.country}:${c.name}` === fetchingKey)?.updated
       : null;
-    await loadJobs();
+    await loadJobs({ silent: true });
     if (fetchingKey && optimisticTs) {
       const company = state.allCompanies.find((c) => `${c.country}:${c.name}` === fetchingKey);
       if (company) {
@@ -244,7 +244,7 @@ export async function fetchOneCompany(country, company) {
       hideFetchPanelOnFailure();
       return;
     }
-    await loadJobs();
+    await loadJobs({ silent: true });
     pollFetchStatus();
   } catch {
     toast("Network error");

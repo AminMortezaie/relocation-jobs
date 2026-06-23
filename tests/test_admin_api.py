@@ -16,6 +16,7 @@ def test_admin_page_served(app_client):
 
 def test_admin_api_requires_auth(app_client):
     for path in (
+        "/api/admin/dashboard",
         "/api/admin/overview",
         "/api/admin/catalog",
         "/api/admin/users",
@@ -58,6 +59,17 @@ def test_admin_overview(auth_client, seeded_catalog):
     assert "tracking" in body
     assert "fetch" in body
     assert body["catalog"]["companies"] >= 1
+
+
+def test_admin_dashboard(auth_client, seeded_catalog):
+    resp = auth_client.get("/api/admin/dashboard?limit=10")
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["overview"]["catalog"]["companies"] >= 1
+    assert body["catalog"]["has_data"] is True
+    assert isinstance(body["users"]["users"], list)
+    assert isinstance(body["runs"]["runs"], list)
+    assert body["config"]["database"] == "postgres"
 
 
 def test_admin_catalog(auth_client, seeded_catalog):

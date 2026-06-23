@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import os
 
-from relocation_jobs.core.db import _utc_now, db_transaction, get_connection
+from relocation_jobs.core.db import _utc_now, db_read, db_transaction
 from relocation_jobs.core.migrations import _ensure_users_admin_column
 
 
 def user_count() -> int:
-    row = get_connection().execute("SELECT COUNT(*) AS n FROM users").fetchone()
+    with db_read() as conn:
+        row = conn.execute("SELECT COUNT(*) AS n FROM users").fetchone()
     return int((row or {}).get("n", 0))
 
 
@@ -38,32 +39,33 @@ def create_user(username: str, password_hash: str, *, is_admin: bool = False) ->
 
 
 def get_user_by_username(username: str) -> dict | None:
-    row = get_connection().execute(
-        """
-        SELECT id, username, password_hash, created_at
-        FROM users WHERE LOWER(username) = LOWER(%s)
-        """,
-        (username.strip(),),
-    ).fetchone()
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT id, username, password_hash, created_at
+            FROM users WHERE LOWER(username) = LOWER(%s)
+            """,
+            (username.strip(),),
+        ).fetchone()
     return row or None
 
 
 def get_user_by_id(user_id: int) -> dict | None:
-    conn = get_connection()
-    try:
-        row = conn.execute(
-            "SELECT id, username, created_at, is_admin FROM users WHERE id = %s",
-            (user_id,),
-        ).fetchone()
-    except Exception as exc:
-        if "is_admin" not in str(exc).lower():
-            raise
-        with db_transaction() as migrate_conn:
-            _ensure_users_admin_column(migrate_conn)
-        row = conn.execute(
-            "SELECT id, username, created_at, is_admin FROM users WHERE id = %s",
-            (user_id,),
-        ).fetchone()
+    with db_read() as conn:
+        try:
+            row = conn.execute(
+                "SELECT id, username, created_at, is_admin FROM users WHERE id = %s",
+                (user_id,),
+            ).fetchone()
+        except Exception as exc:
+            if "is_admin" not in str(exc).lower():
+                raise
+            with db_transaction() as migrate_conn:
+                _ensure_users_admin_column(migrate_conn)
+            row = conn.execute(
+                "SELECT id, username, created_at, is_admin FROM users WHERE id = %s",
+                (user_id,),
+            ).fetchone()
     if not row:
         return None
     data = dict(row)
@@ -99,15 +101,15 @@ def list_users_with_stats() -> list[dict]:
         FROM users u
         ORDER BY u.created_at ASC, u.id ASC
     """
-    conn = get_connection()
-    try:
-        rows = conn.execute(sql).fetchall()
-    except Exception as exc:
-        if "is_admin" not in str(exc).lower():
-            raise
-        with db_transaction() as migrate_conn:
-            _ensure_users_admin_column(migrate_conn)
-        rows = conn.execute(sql).fetchall()
+    with db_read() as conn:
+        try:
+            rows = conn.execute(sql).fetchall()
+        except Exception as exc:
+            if "is_admin" not in str(exc).lower():
+                raise
+            with db_transaction() as migrate_conn:
+                _ensure_users_admin_column(migrate_conn)
+            rows = conn.execute(sql).fetchall()
     out: list[dict] = []
     admin_name = os.environ.get("PANEL_ADMIN_USER", "admin").strip().lower() or "admin"
     for row in rows:
@@ -129,16 +131,17 @@ def list_users_with_stats() -> list[dict]:
 
 
 def admin_tracking_totals() -> dict:
-    row = get_connection().execute(
-        """
-        SELECT
-            COUNT(*) AS tracking_rows,
-            COALESCE(SUM(applied), 0) AS applied_positions,
-            COALESCE(SUM(rejected), 0) AS rejected_positions,
-            COALESCE(SUM(not_for_me), 0) AS not_for_me_positions
-        FROM job_tracking
-        """
-    ).fetchone()
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT
+                COUNT(*) AS tracking_rows,
+                COALESCE(SUM(applied), 0) AS applied_positions,
+                COALESCE(SUM(rejected), 0) AS rejected_positions,
+                COALESCE(SUM(not_for_me), 0) AS not_for_me_positions
+            FROM job_tracking
+            """
+        ).fetchone()
     return {
         "tracking_rows": int((row or {}).get("tracking_rows") or 0),
         "applied_positions": int((row or {}).get("applied_positions") or 0),

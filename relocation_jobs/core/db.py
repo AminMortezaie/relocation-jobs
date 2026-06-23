@@ -16,7 +16,45 @@ except ImportError:  # pragma: no cover
 
 _db_lock = threading.RLock()
 _pg_conn = None
+_pg_conn_last_used: float = 0.0
 _db_initialized = False
+
+# Neon free tier suspends compute after ~5 min idle; ping before that threshold.
+_IDLE_PING_THRESHOLD_S = 270.0  # 4.5 minutes
+
+
+class _RetryConnection:
+    """Proxy that reconnects once when a query hits a dropped SSL connection."""
+
+    def __init__(self, conn):
+        self._conn = conn
+
+    def execute(self, sql, params=()):
+        with _db_lock:
+            try:
+                return self._conn.execute(sql, params)
+            except _PgOperationalError:
+                _reset_pg_connection()
+                self._conn = _acquire_connection()
+                return self._conn.execute(sql, params)
+
+    def executemany(self, sql, params_seq):
+        with _db_lock:
+            try:
+                return self._conn.executemany(sql, params_seq)
+            except _PgOperationalError:
+                _reset_pg_connection()
+                self._conn = _acquire_connection()
+                return self._conn.executemany(sql, params_seq)
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+    def __enter__(self):
+        return self._conn.__enter__()
+
+    def __exit__(self, *args):
+        return self._conn.__exit__(*args)
 
 
 def reset_db_initialized() -> None:
@@ -40,24 +78,52 @@ def _connect_postgres():
         os.environ["DATABASE_URL"],
         row_factory=dict_row,
         autocommit=True,
+        connect_timeout=10,
+        # Neon pooler rejects server-side prepared statements.
+        prepare_threshold=None,
+        keepalives=1,
+        keepalives_idle=30,
+        keepalives_interval=10,
+        keepalives_count=5,
     )
 
 
 def _reset_pg_connection() -> None:
-    global _pg_conn
+    global _pg_conn, _pg_conn_last_used
     if _pg_conn is not None:
         try:
             _pg_conn.close()
         except Exception:
             pass
     _pg_conn = None
+    _pg_conn_last_used = 0.0
+
+
+def _acquire_connection():
+    """Return the shared connection, reconnecting when idle or closed."""
+    import time
+
+    global _pg_conn, _pg_conn_last_used
+    now = time.monotonic()
+    if _pg_conn is None or _pg_conn.closed:
+        _pg_conn = _connect_postgres()
+        _pg_conn_last_used = now
+    elif now - _pg_conn_last_used > _IDLE_PING_THRESHOLD_S:
+        try:
+            _pg_conn.execute("SELECT 1")
+        except Exception:
+            _reset_pg_connection()
+            _pg_conn = _connect_postgres()
+        _pg_conn_last_used = now
+    else:
+        _pg_conn_last_used = now
+    return _pg_conn
 
 
 def get_connection():
-    global _pg_conn
-    if _pg_conn is None or _pg_conn.closed:
-        _pg_conn = _connect_postgres()
-    return _pg_conn
+    """Thread-safe access to the shared Postgres connection."""
+    with _db_lock:
+        return _RetryConnection(_acquire_connection())
 
 
 @contextmanager
@@ -65,10 +131,8 @@ def db_read():
     """Serialize catalog reads with writes on the shared DB connection."""
     with _db_lock:
         try:
-            yield get_connection()
+            yield _RetryConnection(_acquire_connection())
         except _PgOperationalError:
-            # Connection was dropped by the server (e.g. Neon idle timeout, SSL drop).
-            # Reset so the next get_connection() creates a fresh connection.
             _reset_pg_connection()
             raise
 
@@ -76,10 +140,10 @@ def db_read():
 @contextmanager
 def db_transaction():
     with _db_lock:
-        conn = get_connection()
+        conn = _acquire_connection()
         try:
             with conn.transaction():
-                yield conn
+                yield _RetryConnection(conn)
         except _PgOperationalError:
             _reset_pg_connection()
             raise

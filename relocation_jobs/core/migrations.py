@@ -3,12 +3,50 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 
 from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction
 
 
-def _migrate_schema(conn) -> None:
-    """Add columns introduced after initial deploy."""
+def _ensure_migrations_table(conn) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS schema_migrations (
+            name TEXT PRIMARY KEY,
+            applied_at TEXT NOT NULL
+        )
+        """
+    )
+
+
+def migration_applied(conn, name: str) -> bool:
+    row = conn.execute(
+        "SELECT 1 FROM schema_migrations WHERE name = %s",
+        (name,),
+    ).fetchone()
+    return row is not None
+
+
+def mark_migration_applied(conn, name: str) -> None:
+    conn.execute(
+        """
+        INSERT INTO schema_migrations (name, applied_at)
+        VALUES (%s, %s)
+        ON CONFLICT (name) DO NOTHING
+        """,
+        (name, _utc_now()),
+    )
+
+
+def run_migration_once(conn, name: str, fn: Callable) -> None:
+    _ensure_migrations_table(conn)
+    if migration_applied(conn, name):
+        return
+    fn(conn)
+    mark_migration_applied(conn, name)
+
+
+def _apply_job_tracking_columns(conn) -> None:
     conn.execute(
         "ALTER TABLE job_tracking ADD COLUMN IF NOT EXISTS rejected INTEGER NOT NULL DEFAULT 0"
     )
@@ -45,11 +83,16 @@ def _migrate_schema(conn) -> None:
     conn.execute(
         "ALTER TABLE job_tracking ADD COLUMN IF NOT EXISTS looking_to_apply_date TEXT"
     )
-    _ensure_status_events_table(conn)
-    _backfill_job_status_events(conn)
-    _migrate_company_tracking_schema(conn)
-    _ensure_fetch_runs_table(conn)
-    _ensure_users_admin_column(conn)
+
+
+def _migrate_schema(conn) -> None:
+    """Add columns introduced after initial deploy."""
+    run_migration_once(conn, "job_tracking_columns_v1", _apply_job_tracking_columns)
+    run_migration_once(conn, "job_status_events_table_v1", _ensure_status_events_table)
+    run_migration_once(conn, "job_status_events_backfill_v1", _backfill_job_status_events)
+    run_migration_once(conn, "company_tracking_columns_v1", _migrate_company_tracking_schema)
+    run_migration_once(conn, "fetch_runs_table_v1", _ensure_fetch_runs_table)
+    run_migration_once(conn, "users_admin_column_v1", _ensure_users_admin_column)
 
 
 def _ensure_users_admin_column(conn) -> None:

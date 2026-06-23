@@ -65,6 +65,7 @@ from relocation_jobs.panel_data import (
 )
 from relocation_jobs.catalog_db import touch_country_meta
 from relocation_jobs.admin_data import (
+    get_admin_dashboard,
     get_admin_overview,
     get_catalog_overview,
     get_system_config,
@@ -573,6 +574,13 @@ def _run_scrape(
             _terminate_scrape_process(proc)
 
 
+@app.before_request
+def _ensure_bootstrapped():
+    if request.endpoint == "static":
+        return
+    bootstrap_app()
+
+
 @app.after_request
 def _static_no_cache(response):
     if request.path.startswith("/static/"):
@@ -606,6 +614,30 @@ def _admin_fetch_snapshot() -> dict:
             "progress": dict(progress) if isinstance(progress, dict) else {},
             "started_at": _fetch_state.get("started_at"),
         }
+
+
+@app.get("/api/admin/dashboard")
+@admin_required
+def api_admin_dashboard():
+    try:
+        limit = 50
+        raw_limit = request.args.get("limit")
+        if raw_limit is not None:
+            try:
+                limit = int(raw_limit)
+            except ValueError:
+                limit = 50
+        return jsonify(
+            get_admin_dashboard(
+                fetch_state=_admin_fetch_snapshot(),
+                scrape_enabled=scrape_enabled(),
+                httpx_available=HTTPX_AVAILABLE,
+                fetch_runs_limit=limit,
+            )
+        )
+    except Exception as exc:
+        app.logger.exception("admin dashboard failed")
+        return jsonify({"error": str(exc)}), 500
 
 
 @app.get("/api/admin/overview")
@@ -1591,14 +1623,10 @@ def api_fetch():
 
 
 def main():
-    bootstrap_app()
     port = int(os.environ.get("PORT", "5050"))
     host = "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1"
     print(f"Job panel: http://{host}:{port}")
     app.run(host=host, port=port, debug=False, threaded=True)
-
-
-bootstrap_app()
 
 
 if __name__ == "__main__":

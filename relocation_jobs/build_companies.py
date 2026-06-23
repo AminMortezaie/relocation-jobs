@@ -34,12 +34,7 @@ from bs4 import BeautifulSoup
 from relocation_jobs.catalog_db import load_country as load_country_catalog, save_country as save_country_catalog
 from relocation_jobs.core.paths import COUNTRY_FILE_NAMES
 
-try:
-    from playwright.sync_api import sync_playwright
-
-    PLAYWRIGHT_AVAILABLE = True
-except ImportError:
-    PLAYWRIGHT_AVAILABLE = False
+from playwright.sync_api import sync_playwright
 
 HEADERS = {
     "User-Agent": (
@@ -49,6 +44,13 @@ HEADERS = {
     ),
     "Accept-Language": "en-US,en;q=0.9",
 }
+
+TIMEOUT_FETCH = 15
+TIMEOUT_HEAD = 8
+TIMEOUT_PAGE_LOAD = 25000
+TIMEOUT_PAGE_SETTLE = 2000
+TIMEOUT_BUTTON_SETTLE = 2500
+TIMEOUT_BUTTON_CLICK = 5000
 
 COUNTRY_FILES = {
     "germany": "germany_companies.json",
@@ -160,7 +162,7 @@ def pick_best(candidates: list[tuple[int, str]]) -> str | None:
 
 def fetch_html(url: str) -> tuple[str | None, str | None]:
     try:
-        r = requests.get(url, headers=HEADERS, timeout=15, allow_redirects=True)
+        r = requests.get(url, headers=HEADERS, timeout=TIMEOUT_FETCH, allow_redirects=True)
         if r.status_code >= 400:
             return None, None
         return r.text, r.url
@@ -188,7 +190,7 @@ def probe_common_paths(base_url: str) -> list[tuple[int, str]]:
     for path in paths:
         url = root + path
         try:
-            r = requests.head(url, headers=HEADERS, timeout=8, allow_redirects=True)
+            r = requests.head(url, headers=HEADERS, timeout=TIMEOUT_HEAD, allow_redirects=True)
             if r.status_code < 400:
                 found.append((score_careers_url(r.url), r.url))
         except requests.RequestException:
@@ -250,58 +252,68 @@ def discover_careers_static(start_url: str) -> str | None:
     return pick_best(candidates)
 
 
-def discover_careers_playwright(start_url: str) -> str | None:
-    if not PLAYWRIGHT_AVAILABLE:
-        return None
+def _find_page_link_candidates(page, page_url: str) -> list[tuple[int, str]]:
+    candidates: list[tuple[int, str]] = []
+    for a in page.query_selector_all("a[href]"):
+        href = a.get_attribute("href") or ""
+        text = (a.inner_text() or "").strip()
+        full = urljoin(page_url, href)
+        if not full.startswith("http"):
+            continue
+        if ATS_HOST.search(full) or CAREER_TEXT.search(text) or CAREER_TEXT.search(full):
+            candidates.append((score_careers_url(full, text), full))
+    return candidates
 
+
+def _handle_cta_button(el, page, base_url: str) -> list[tuple[int, str]]:
+    candidates: list[tuple[int, str]] = []
+    try:
+        text = (el.inner_text() or "").strip()
+    except Exception:
+        return candidates
+
+    if not text or not FOLLOW_BUTTON_TEXT.search(text):
+        return candidates
+
+    try:
+        if el.evaluate("el => el.tagName.toLowerCase()") == "a":
+            href = el.get_attribute("href")
+            if href:
+                full = urljoin(base_url, href)
+                if full.startswith("http"):
+                    candidates.append((score_careers_url(full, text) + 4, full))
+        else:
+            el.click(timeout=TIMEOUT_BUTTON_CLICK)
+            page.wait_for_timeout(TIMEOUT_BUTTON_SETTLE)
+            sub = page.url
+            candidates.append((score_careers_url(sub, text) + 4, sub))
+            for a in page.query_selector_all("a[href]"):
+                href = a.get_attribute("href") or ""
+                full = urljoin(sub, href)
+                if ATS_HOST.search(full) or CAREER_TEXT.search(full):
+                    candidates.append((score_careers_url(full), full))
+    except Exception:
+        pass
+
+    return candidates
+
+
+def discover_careers_playwright(start_url: str) -> str | None:
     candidates: list[tuple[int, str]] = []
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(user_agent=HEADERS["User-Agent"])
         try:
-            page.goto(start_url, wait_until="domcontentloaded", timeout=25000)
-            page.wait_for_timeout(2000)
+            page.goto(start_url, wait_until="domcontentloaded", timeout=TIMEOUT_PAGE_LOAD)
+            page.wait_for_timeout(TIMEOUT_PAGE_SETTLE)
             final = page.url
 
-            for a in page.query_selector_all("a[href]"):
-                href = a.get_attribute("href") or ""
-                text = (a.inner_text() or "").strip()
-                full = urljoin(final, href)
-                if not full.startswith("http"):
-                    continue
-                if ATS_HOST.search(full) or CAREER_TEXT.search(text) or CAREER_TEXT.search(full):
-                    candidates.append((score_careers_url(full, text), full))
-
+            candidates.extend(_find_page_link_candidates(page, final))
             candidates.extend(probe_common_paths(final))
 
-            # Follow CTA buttons (Open positions, View jobs, …)
             for el in page.query_selector_all("a, button"):
-                try:
-                    text = (el.inner_text() or "").strip()
-                except Exception:
-                    continue
-                if not text or not FOLLOW_BUTTON_TEXT.search(text):
-                    continue
-                try:
-                    if el.evaluate("el => el.tagName.toLowerCase()") == "a":
-                        href = el.get_attribute("href")
-                        if href:
-                            full = urljoin(final, href)
-                            if full.startswith("http"):
-                                candidates.append((score_careers_url(full, text) + 4, full))
-                    else:
-                        el.click(timeout=5000)
-                        page.wait_for_timeout(2500)
-                        sub = page.url
-                        candidates.append((score_careers_url(sub, text) + 4, sub))
-                        for a in page.query_selector_all("a[href]"):
-                            href = a.get_attribute("href") or ""
-                            full = urljoin(sub, href)
-                            if ATS_HOST.search(full) or CAREER_TEXT.search(full):
-                                candidates.append((score_careers_url(full), full))
-                except Exception:
-                    continue
+                candidates.extend(_handle_cta_button(el, page, final))
         except Exception:
             pass
         finally:
@@ -343,13 +355,12 @@ def _resolve_country_key(country: str) -> str:
     raise SystemExit(f"Unknown country '{country}'. Use: {', '.join(sorted(COUNTRY_FILE_NAMES))}")
 
 
-def load_country(country: str) -> tuple[str, dict, str]:
+def load_country(country: str) -> tuple[dict, str]:
     country_key = _resolve_country_key(country)
-    filename = COUNTRY_FILE_NAMES[country_key]
     data = load_country_catalog(country_key)
     if data is None:
         data = {"companies": [], "total": 0}
-    return filename, data, country_key
+    return data, country_key
 
 
 def save_country(country_key: str, data: dict) -> None:
@@ -365,13 +376,13 @@ def main() -> None:
 
     country = args[0]
     target = args[1] if len(args) > 1 else None
-    filename, data, country_key = load_country(country)
+    data, country_key = load_country(country)
     companies = data["companies"]
 
     if target:
         companies = [c for c in companies if c["name"].lower() == target.lower()]
         if not companies:
-            raise SystemExit(f"Company '{target}' not found in {filename}")
+            raise SystemExit(f"Company '{target}' not found")
 
     total = len(companies)
     for i, company in enumerate(companies, 1):
@@ -389,7 +400,7 @@ def main() -> None:
         time.sleep(0.3)
 
     save_country(country_key, data)
-    print(f"\nSaved catalog + archive {filename} ({data['total']} companies, sorted by city → size → name)")
+    print(f"\nSaved {len(companies)} companies, sorted by city → size → name")
 
 
 if __name__ == "__main__":

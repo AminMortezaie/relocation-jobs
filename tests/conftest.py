@@ -23,10 +23,13 @@ def _reset_db_connections() -> None:
 def reset_custom_cities_cache():
     """Custom city loader caches by path; clear between tests."""
     from relocation_jobs.core.location_tags import _invalidate_custom_cities_cache
+    from relocation_jobs.catalog_db import invalidate_country_cache
 
     _invalidate_custom_cities_cache()
+    invalidate_country_cache()
     yield
     _invalidate_custom_cities_cache()
+    invalidate_country_cache()
 
 
 @pytest.fixture

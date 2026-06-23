@@ -367,19 +367,13 @@ async function loadDashboard() {
   $("adminError").hidden = true;
   showAdminSkeletons();
   setLoadingProgress(15);
-  const [overview, catalog, users, runs, config] = await Promise.all([
-    apiGet("/api/admin/overview"),
-    apiGet("/api/admin/catalog"),
-    apiGet("/api/admin/users"),
-    apiGet("/api/admin/fetch-runs?limit=50"),
-    apiGet("/api/admin/config"),
-  ]);
+  const data = await apiGet("/api/admin/dashboard?limit=50");
   setLoadingProgress(80);
-  renderOverview(overview);
-  renderCatalog(catalog);
-  renderUsers(users);
-  renderFetchRuns(runs);
-  renderConfig(config);
+  renderOverview(data.overview);
+  renderCatalog(data.catalog);
+  renderUsers(data.users);
+  renderFetchRuns(data.runs);
+  renderConfig(data.config);
   finishLoadingProgress();
 }
 

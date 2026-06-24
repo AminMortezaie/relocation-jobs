@@ -3,7 +3,7 @@
   "checkpoint_id": "cec6d10dcecb",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 8,
+  "checkpoints_count": 10,
   "files_touched": [
     "relocation_jobs/static/index.html",
     "relocation_jobs/static/js/api.js",
@@ -11,13 +11,17 @@
     "relocation_jobs/static/js/state.js",
     "relocation_jobs/v2/catalog/lookup.py",
     "relocation_jobs/v2/catalog/repo.py",
+    "relocation_jobs/v2/fetch/runner.py",
     "relocation_jobs/v2/panel/flatten.py",
     "relocation_jobs/v2/panel/tracking.py",
     "relocation_jobs/v2/positions/repo.py",
     "relocation_jobs/v2/positions/service.py",
     "relocation_jobs/v2/positions/tracking_resolve.py",
+    "relocation_jobs/v2/web/routes/companies.py",
+    "relocation_jobs/v2/web/routes/fetch.py",
     "tests/v2/catalog/test_repo.py",
-    "tests/v2/positions/test_workflows.py"
+    "tests/v2/positions/test_workflows.py",
+    "tests/v2/web/test_fetch_api.py"
   ],
   "sessions": [
     {
@@ -31,6 +35,12 @@
       "transcript": "/ce/c6d10dcecb/1/full.jsonl",
       "content_hash": "/ce/c6d10dcecb/1/content_hash.txt",
       "prompt": "/ce/c6d10dcecb/1/prompt.txt"
+    },
+    {
+      "metadata": "/ce/c6d10dcecb/2/metadata.json",
+      "transcript": "/ce/c6d10dcecb/2/full.jsonl",
+      "content_hash": "/ce/c6d10dcecb/2/content_hash.txt",
+      "prompt": "/ce/c6d10dcecb/2/prompt.txt"
     }
   ]
 }

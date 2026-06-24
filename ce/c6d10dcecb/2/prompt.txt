@@ -1,0 +1,6 @@
+can you see the handoff v2?
+
+---
+
+the most important thing to fix is fetch scenario.
+lets check the flow for fetch it has a real blocking issue.

@@ -1,0 +1,90 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "cec6d10dcecb",
+  "session_id": "fec8ed38-dea4-4bfe-b3cc-ed4d60d35f35",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T16:28:46.871565Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/job-board.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/v2/catalog/lookup.py",
+    "relocation_jobs/v2/catalog/repo.py",
+    "relocation_jobs/v2/fetch/runner.py",
+    "relocation_jobs/v2/panel/flatten.py",
+    "relocation_jobs/v2/panel/tracking.py",
+    "relocation_jobs/v2/positions/repo.py",
+    "relocation_jobs/v2/positions/service.py",
+    "relocation_jobs/v2/web/routes/companies.py",
+    "relocation_jobs/v2/web/routes/fetch.py",
+    "tests/v2/catalog/test_repo.py",
+    "tests/v2/positions/test_workflows.py",
+    "tests/v2/web/test_fetch_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "a14bdb5a0a55",
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T16:28:46.869472Z",
+    "agent_lines": 0,
+    "agent_removed": 12,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 253,
+    "total_committed": 52,
+    "total_lines_changed": 265,
+    "agent_percentage": 4.528301886792453,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 437,
+      "user_lines_removed": 253,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/static/index.html": 1,
+        "relocation_jobs/static/js/api.js": 43,
+        "relocation_jobs/static/js/job-board.js": 3,
+        "relocation_jobs/static/js/state.js": 36,
+        "relocation_jobs/v2/catalog/lookup.py": 13,
+        "relocation_jobs/v2/catalog/repo.py": 21,
+        "relocation_jobs/v2/panel/flatten.py": 9,
+        "relocation_jobs/v2/panel/tracking.py": 29,
+        "relocation_jobs/v2/positions/repo.py": 137,
+        "relocation_jobs/v2/positions/service.py": 43,
+        "relocation_jobs/v2/positions/tracking_resolve.py": 60,
+        "tests/v2/catalog/test_repo.py": 15,
+        "tests/v2/positions/test_workflows.py": 27
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/index.html": 1,
+        "relocation_jobs/static/js/api.js": 87,
+        "relocation_jobs/static/js/job-board.js": 10,
+        "relocation_jobs/static/js/state.js": 15,
+        "relocation_jobs/v2/catalog/lookup.py": 5,
+        "relocation_jobs/v2/catalog/repo.py": 6,
+        "relocation_jobs/v2/panel/flatten.py": 1,
+        "relocation_jobs/v2/panel/tracking.py": 28,
+        "relocation_jobs/v2/positions/repo.py": 75,
+        "relocation_jobs/v2/positions/service.py": 24,
+        "tests/v2/catalog/test_repo.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 437,
+      "agent_lines_removed": 253
+    }
+  ]
+}

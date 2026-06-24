@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "97317acb6afc",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 20,
+  "files_touched": [
+    "relocation_jobs/v2/__init__.py",
+    "relocation_jobs/v2/catalog/lookup.py",
+    "relocation_jobs/v2/catalog/repo.py",
+    "relocation_jobs/v2/db/migrate.py",
+    "relocation_jobs/v2/fetch/__init__.py",
+    "relocation_jobs/v2/fetch/repo.py",
+    "relocation_jobs/v2/fetch/service.py",
+    "relocation_jobs/v2/fetch/types.py",
+    "relocation_jobs/v2/panel/__init__.py",
+    "relocation_jobs/v2/panel/flatten.py",
+    "relocation_jobs/v2/panel/service.py",
+    "relocation_jobs/v2/panel/tracking.py",
+    "relocation_jobs/v2/panel/types.py",
+    "relocation_jobs/v2/positions/__init__.py",
+    "relocation_jobs/v2/positions/repo.py",
+    "relocation_jobs/v2/positions/service.py",
+    "relocation_jobs/v2/positions/state.py",
+    "relocation_jobs/v2/positions/types.py",
+    "relocation_jobs/v2/shared/__init__.py",
+    "relocation_jobs/v2/shared/coerce.py",
+    "relocation_jobs/v2/shared/schema.py",
+    "relocation_jobs/v2/shared/timestamps.py",
+    "relocation_jobs/v2/users/history.py",
+    "relocation_jobs/v2/users/repo.py",
+    "tests/v2/conftest.py",
+    "tests/v2/fetch/test_repo.py",
+    "tests/v2/fetch/test_service.py",
+    "tests/v2/panel/test_jobs.py",
+    "tests/v2/panel/test_types.py",
+    "tests/v2/positions/test_state.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/97/317acb6afc/0/metadata.json",
+      "transcript": "/97/317acb6afc/0/full.jsonl",
+      "content_hash": "/97/317acb6afc/0/content_hash.txt",
+      "prompt": "/97/317acb6afc/0/prompt.txt"
+    }
+  ]
+}

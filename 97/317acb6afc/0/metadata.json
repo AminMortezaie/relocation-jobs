@@ -1,0 +1,505 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "97317acb6afc",
+  "session_id": "c0f06ef3-942f-441b-a2a2-712eaae56c10",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T03:07:08.956415Z",
+  "branch": "main",
+  "checkpoints_count": 20,
+  "save_step_count": 18,
+  "files_touched": [
+    "relocation_jobs/v2/__init__.py",
+    "relocation_jobs/v2/catalog/lookup.py",
+    "relocation_jobs/v2/catalog/repo.py",
+    "relocation_jobs/v2/db/migrate.py",
+    "relocation_jobs/v2/fetch/__init__.py",
+    "relocation_jobs/v2/fetch/repo.py",
+    "relocation_jobs/v2/fetch/service.py",
+    "relocation_jobs/v2/fetch/types.py",
+    "relocation_jobs/v2/panel/__init__.py",
+    "relocation_jobs/v2/panel/flatten.py",
+    "relocation_jobs/v2/panel/service.py",
+    "relocation_jobs/v2/panel/tracking.py",
+    "relocation_jobs/v2/panel/types.py",
+    "relocation_jobs/v2/positions/__init__.py",
+    "relocation_jobs/v2/positions/repo.py",
+    "relocation_jobs/v2/positions/service.py",
+    "relocation_jobs/v2/positions/state.py",
+    "relocation_jobs/v2/positions/types.py",
+    "relocation_jobs/v2/shared/__init__.py",
+    "relocation_jobs/v2/shared/coerce.py",
+    "relocation_jobs/v2/shared/schema.py",
+    "relocation_jobs/v2/shared/timestamps.py",
+    "relocation_jobs/v2/users/history.py",
+    "relocation_jobs/v2/users/repo.py",
+    "tests/v2/conftest.py",
+    "tests/v2/fetch/test_repo.py",
+    "tests/v2/fetch/test_service.py",
+    "tests/v2/panel/test_jobs.py",
+    "tests/v2/panel/test_types.py",
+    "tests/v2/positions/test_state.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "a0e9fa834b93",
+  "session_metrics": {
+    "turn_count": 20,
+    "context_tokens": 186381,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T03:07:08.94602Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 482,
+    "human_modified": 1889,
+    "human_removed": 0,
+    "total_committed": 1132,
+    "total_lines_changed": 2371,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 4,
+      "user_lines_removed": 39,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/catalog_db.py": 1,
+        "relocation_jobs/panel_server.py": 1,
+        "relocation_jobs/scrape/_compat.py": 1,
+        "relocation_jobs/services/job_service.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/catalog_db.py": 4,
+        "relocation_jobs/db/__init__.py": 1,
+        "relocation_jobs/panel_server.py": 6,
+        "relocation_jobs/scrape/_compat.py": 1,
+        "relocation_jobs/services/job_service.py": 5,
+        "relocation_jobs/static/js/admin-scrape.js": 4,
+        "relocation_jobs/static/js/api.js": 12,
+        "relocation_jobs/static/js/scrape.js": 4,
+        "tests/test_integration.py": 1,
+        "tests/test_panel_api_full.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 4,
+      "user_lines_removed": 47,
+      "agent_lines_added": 4,
+      "agent_lines_removed": 39,
+      "user_added_per_file": {
+        "relocation_jobs/panel_server.py": 1,
+        "tests/test_integration.py": 2,
+        "tests/test_panel_api_full.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/panel_server.py": 20,
+        "tests/test_integration.py": 15,
+        "tests/test_panel_api_full.py": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 7,
+      "agent_lines_removed": 85
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 7,
+      "agent_lines_removed": 85
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 430,
+      "agent_lines_removed": 2
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 430,
+      "agent_lines_removed": 2
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 430,
+      "agent_lines_removed": 2
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 3,
+      "user_lines_removed": 9,
+      "agent_lines_added": 476,
+      "agent_lines_removed": 2,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 3
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 9
+      }
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 3,
+      "user_lines_removed": 9,
+      "agent_lines_added": 476,
+      "agent_lines_removed": 2,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 3
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 9
+      }
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 48,
+      "user_lines_removed": 24,
+      "agent_lines_added": 1057,
+      "agent_lines_removed": 275,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 29,
+        "tests/test_v2_fetch_repo.py": 8,
+        "tests/test_v2_fetch_service.py": 4
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 9,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "tests/test_v2_fetch_repo.py": 8,
+        "tests/test_v2_fetch_service.py": 4
+      }
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 102,
+      "user_lines_removed": 66,
+      "agent_lines_added": 1090,
+      "agent_lines_removed": 275,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 29,
+        "relocation_jobs/v2/positions/__init__.py": 16,
+        "tests/test_v2_fetch_repo.py": 8,
+        "tests/test_v2_fetch_service.py": 4,
+        "tests/test_v2_positions_state.py": 38
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 9,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/positions/__init__.py": 11,
+        "tests/test_v2_fetch_repo.py": 8,
+        "tests/test_v2_fetch_service.py": 4,
+        "tests/test_v2_positions_state.py": 31
+      }
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 99,
+      "user_lines_removed": 141,
+      "agent_lines_added": 1089,
+      "agent_lines_removed": 276,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/positions/__init__.py": 13,
+        "relocation_jobs/v2/positions/actions.py": 1,
+        "relocation_jobs/v2/positions/repo.py": 4,
+        "tests/test_v2_fetch_repo.py": 8,
+        "tests/test_v2_fetch_service.py": 4,
+        "tests/test_v2_positions_state.py": 37
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 7,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 12,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/positions/__init__.py": 11,
+        "relocation_jobs/v2/positions/actions.py": 9,
+        "relocation_jobs/v2/positions/buckets.py": 11,
+        "relocation_jobs/v2/positions/filters.py": 3,
+        "relocation_jobs/v2/positions/repo.py": 6,
+        "relocation_jobs/v2/positions/service.py": 2,
+        "relocation_jobs/v2/positions/tracking.py": 10,
+        "relocation_jobs/v2/positions/view.py": 4,
+        "tests/test_v2_fetch_repo.py": 10,
+        "tests/test_v2_fetch_service.py": 6,
+        "tests/test_v2_positions_state.py": 32
+      }
+    },
+    {
+      "checkpoint_number": 13,
+      "user_lines_added": 111,
+      "user_lines_removed": 141,
+      "agent_lines_added": 1551,
+      "agent_lines_removed": 488,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/positions/__init__.py": 13,
+        "relocation_jobs/v2/positions/actions.py": 1,
+        "relocation_jobs/v2/positions/repo.py": 4,
+        "relocation_jobs/v2/positions/tracking.py": 12,
+        "tests/test_v2_fetch_repo.py": 8,
+        "tests/test_v2_fetch_service.py": 4,
+        "tests/test_v2_positions_state.py": 37
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 7,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 12,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/positions/__init__.py": 11,
+        "relocation_jobs/v2/positions/actions.py": 9,
+        "relocation_jobs/v2/positions/buckets.py": 11,
+        "relocation_jobs/v2/positions/filters.py": 3,
+        "relocation_jobs/v2/positions/repo.py": 6,
+        "relocation_jobs/v2/positions/service.py": 2,
+        "relocation_jobs/v2/positions/tracking.py": 10,
+        "relocation_jobs/v2/positions/view.py": 4,
+        "tests/test_v2_fetch_repo.py": 10,
+        "tests/test_v2_fetch_service.py": 6,
+        "tests/test_v2_positions_state.py": 32
+      }
+    },
+    {
+      "checkpoint_number": 14,
+      "user_lines_added": 137,
+      "user_lines_removed": 326,
+      "agent_lines_added": 2330,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/panel/jobs.py": 47,
+        "relocation_jobs/v2/panel/service.py": 25,
+        "relocation_jobs/v2/positions/__init__.py": 13,
+        "relocation_jobs/v2/positions/actions.py": 1,
+        "relocation_jobs/v2/positions/repo.py": 4,
+        "relocation_jobs/v2/positions/tracking.py": 15
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 7,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 12,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/panel/jobs.py": 36,
+        "relocation_jobs/v2/panel/service.py": 183,
+        "relocation_jobs/v2/positions/__init__.py": 11,
+        "relocation_jobs/v2/positions/actions.py": 9,
+        "relocation_jobs/v2/positions/buckets.py": 11,
+        "relocation_jobs/v2/positions/filters.py": 3,
+        "relocation_jobs/v2/positions/repo.py": 6,
+        "relocation_jobs/v2/positions/service.py": 2,
+        "relocation_jobs/v2/positions/tracking.py": 24,
+        "relocation_jobs/v2/positions/view.py": 4
+      }
+    },
+    {
+      "checkpoint_number": 15,
+      "user_lines_added": 329,
+      "user_lines_removed": 285,
+      "agent_lines_added": 2060,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/panel/service.py": 86,
+        "relocation_jobs/v2/panel/tracking.py": 177,
+        "relocation_jobs/v2/positions/__init__.py": 13,
+        "relocation_jobs/v2/positions/actions.py": 1,
+        "relocation_jobs/v2/positions/repo.py": 4,
+        "relocation_jobs/v2/positions/tracking.py": 15,
+        "tests/v2/panel/test_jobs.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 7,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 12,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/panel/service.py": 177,
+        "relocation_jobs/v2/positions/__init__.py": 11,
+        "relocation_jobs/v2/positions/actions.py": 9,
+        "relocation_jobs/v2/positions/buckets.py": 11,
+        "relocation_jobs/v2/positions/filters.py": 3,
+        "relocation_jobs/v2/positions/repo.py": 6,
+        "relocation_jobs/v2/positions/service.py": 2,
+        "relocation_jobs/v2/positions/tracking.py": 24,
+        "relocation_jobs/v2/positions/view.py": 4,
+        "tests/v2/panel/test_jobs.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 16,
+      "user_lines_added": 329,
+      "user_lines_removed": 285,
+      "agent_lines_added": 2060,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/panel/service.py": 86,
+        "relocation_jobs/v2/panel/tracking.py": 177,
+        "relocation_jobs/v2/positions/__init__.py": 13,
+        "relocation_jobs/v2/positions/actions.py": 1,
+        "relocation_jobs/v2/positions/repo.py": 4,
+        "relocation_jobs/v2/positions/tracking.py": 15,
+        "tests/v2/panel/test_jobs.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 7,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 12,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/panel/service.py": 177,
+        "relocation_jobs/v2/positions/__init__.py": 11,
+        "relocation_jobs/v2/positions/actions.py": 9,
+        "relocation_jobs/v2/positions/buckets.py": 11,
+        "relocation_jobs/v2/positions/filters.py": 3,
+        "relocation_jobs/v2/positions/repo.py": 6,
+        "relocation_jobs/v2/positions/service.py": 2,
+        "relocation_jobs/v2/positions/tracking.py": 24,
+        "relocation_jobs/v2/positions/view.py": 4,
+        "tests/v2/panel/test_jobs.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 17,
+      "user_lines_added": 329,
+      "user_lines_removed": 285,
+      "agent_lines_added": 2060,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/panel/service.py": 86,
+        "relocation_jobs/v2/panel/tracking.py": 177,
+        "relocation_jobs/v2/positions/__init__.py": 13,
+        "relocation_jobs/v2/positions/actions.py": 1,
+        "relocation_jobs/v2/positions/repo.py": 4,
+        "relocation_jobs/v2/positions/tracking.py": 15,
+        "tests/v2/panel/test_jobs.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 7,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 12,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/panel/service.py": 177,
+        "relocation_jobs/v2/positions/__init__.py": 11,
+        "relocation_jobs/v2/positions/actions.py": 9,
+        "relocation_jobs/v2/positions/buckets.py": 11,
+        "relocation_jobs/v2/positions/filters.py": 3,
+        "relocation_jobs/v2/positions/repo.py": 6,
+        "relocation_jobs/v2/positions/service.py": 2,
+        "relocation_jobs/v2/positions/tracking.py": 24,
+        "relocation_jobs/v2/positions/view.py": 4,
+        "tests/v2/panel/test_jobs.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 18,
+      "user_lines_added": 381,
+      "user_lines_removed": 259,
+      "agent_lines_added": 7516,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/v2/__init__.py": 2,
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/service.py": 2,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/panel/flatten.py": 3,
+        "relocation_jobs/v2/panel/service.py": 87,
+        "relocation_jobs/v2/panel/tracking.py": 177,
+        "relocation_jobs/v2/panel/types.py": 2,
+        "relocation_jobs/v2/positions/__init__.py": 34,
+        "relocation_jobs/v2/positions/service.py": 28,
+        "relocation_jobs/v2/shared/__init__.py": 1,
+        "tests/v2/fetch/test_service.py": 2,
+        "tests/v2/panel/test_jobs.py": 2,
+        "tests/v2/positions/test_state.py": 9
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 6,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 14,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/panel/flatten.py": 5,
+        "relocation_jobs/v2/panel/service.py": 178,
+        "relocation_jobs/v2/panel/types.py": 2,
+        "relocation_jobs/v2/positions/__init__.py": 8,
+        "relocation_jobs/v2/positions/service.py": 18,
+        "tests/v2/fetch/test_service.py": 2,
+        "tests/v2/panel/test_jobs.py": 2,
+        "tests/v2/positions/test_state.py": 6
+      }
+    },
+    {
+      "checkpoint_number": 19,
+      "user_lines_added": 367,
+      "user_lines_removed": 262,
+      "agent_lines_added": 2603,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/v2/__init__.py": 2,
+        "relocation_jobs/v2/fetch/__init__.py": 4,
+        "relocation_jobs/v2/fetch/repo.py": 3,
+        "relocation_jobs/v2/fetch/service.py": 10,
+        "relocation_jobs/v2/fetch/types.py": 25,
+        "relocation_jobs/v2/panel/flatten.py": 3,
+        "relocation_jobs/v2/panel/service.py": 87,
+        "relocation_jobs/v2/panel/tracking.py": 177,
+        "relocation_jobs/v2/panel/types.py": 2,
+        "relocation_jobs/v2/positions/__init__.py": 34,
+        "relocation_jobs/v2/positions/service.py": 4,
+        "relocation_jobs/v2/shared/__init__.py": 1,
+        "tests/v2/fetch/test_service.py": 4,
+        "tests/v2/panel/test_jobs.py": 2,
+        "tests/v2/positions/test_state.py": 9
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/__init__.py": 6,
+        "relocation_jobs/v2/fetch/__init__.py": 11,
+        "relocation_jobs/v2/fetch/repo.py": 5,
+        "relocation_jobs/v2/fetch/service.py": 18,
+        "relocation_jobs/v2/fetch/types.py": 2,
+        "relocation_jobs/v2/panel/flatten.py": 5,
+        "relocation_jobs/v2/panel/service.py": 178,
+        "relocation_jobs/v2/panel/types.py": 2,
+        "relocation_jobs/v2/positions/__init__.py": 8,
+        "relocation_jobs/v2/positions/service.py": 7,
+        "tests/v2/fetch/test_service.py": 12,
+        "tests/v2/panel/test_jobs.py": 2,
+        "tests/v2/positions/test_state.py": 6
+      }
+    }
+  ]
+}

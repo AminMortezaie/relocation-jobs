@@ -1,0 +1,367 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "25102482efc1",
+  "session_id": "fec8ed38-dea4-4bfe-b3cc-ed4d60d35f35",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T23:11:10.831253Z",
+  "branch": "main",
+  "checkpoints_count": 38,
+  "save_step_count": 36,
+  "files_touched": [
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/core/db.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/core/scrape_cancel.py",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/v2/fetch/country_runner.py",
+    "relocation_jobs/v2/fetch/pipeline.py",
+    "relocation_jobs/v2/fetch/repo.py",
+    "relocation_jobs/v2/fetch/runner.py",
+    "relocation_jobs/v2/fetch/service.py",
+    "relocation_jobs/v2/scrape/ats_resolve.py",
+    "relocation_jobs/v2/scrape/board.py",
+    "relocation_jobs/v2/scrape/boards/_async.py",
+    "relocation_jobs/v2/scrape/boards/generic.py",
+    "relocation_jobs/v2/scrape/boards/greenhouse.py",
+    "relocation_jobs/v2/scrape/company.py",
+    "relocation_jobs/v2/scrape/enrich.py",
+    "relocation_jobs/v2/scrape/job_text.py",
+    "relocation_jobs/v2/scrape/relevance.py",
+    "relocation_jobs/v2/web/routes/companies.py",
+    "relocation_jobs/v2/web/routes/fetch.py",
+    "relocation_jobs/v2/web/server.py",
+    "tests/helpers/postgres_mock.py",
+    "tests/v2/scrape/test_company.py",
+    "tests/v2/scrape/test_enrich.py",
+    "tests/v2/scrape/test_relevance.py",
+    "tests/v2/web/test_fetch_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "126c24b5ad54",
+  "checkpoint_transcript_start": 29,
+  "transcript_lines_at_start": 29,
+  "session_metrics": {
+    "turn_count": 40,
+    "context_tokens": 190753,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T23:11:10.819042Z",
+    "agent_lines": 180,
+    "agent_removed": 3339,
+    "human_added": 15392,
+    "human_modified": 30,
+    "human_removed": 0,
+    "total_committed": 15602,
+    "total_lines_changed": 44850,
+    "agent_percentage": 7.846153846153846,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 98,
+      "agent_lines_removed": 3
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 451,
+      "agent_lines_removed": 6
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 106,
+      "user_lines_removed": 1,
+      "agent_lines_added": 710,
+      "agent_lines_removed": 30,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/log.py": 81,
+        "tests/v2/fetch/test_log.py": 25
+      },
+      "user_removed_per_file": {
+        "tests/v2/fetch/test_log.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 123,
+      "user_lines_removed": 38,
+      "agent_lines_added": 717,
+      "agent_lines_removed": 31,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/log.py": 95,
+        "relocation_jobs/v2/scrape/http_trace.py": 4,
+        "tests/v2/fetch/test_log.py": 24
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/log.py": 1,
+        "relocation_jobs/v2/scrape/http_trace.py": 36,
+        "tests/v2/fetch/test_log.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 126,
+      "user_lines_removed": 39,
+      "agent_lines_added": 352,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/log.py": 95,
+        "relocation_jobs/v2/scrape/ats_resolve.py": 3,
+        "relocation_jobs/v2/scrape/http_trace.py": 4,
+        "tests/v2/fetch/test_log.py": 24
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/log.py": 1,
+        "relocation_jobs/v2/scrape/ats_resolve.py": 1,
+        "relocation_jobs/v2/scrape/http_trace.py": 36,
+        "tests/v2/fetch/test_log.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 478,
+      "agent_lines_removed": 5
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 478,
+      "agent_lines_removed": 5
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 580,
+      "agent_lines_removed": 38
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 592,
+      "agent_lines_removed": 38
+    },
+    {
+      "checkpoint_number": 13,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 14,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 590,
+      "agent_lines_removed": 40
+    },
+    {
+      "checkpoint_number": 15,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 591,
+      "agent_lines_removed": 40
+    },
+    {
+      "checkpoint_number": 16,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 722,
+      "agent_lines_removed": 84
+    },
+    {
+      "checkpoint_number": 17,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 18,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 722,
+      "agent_lines_removed": 84
+    },
+    {
+      "checkpoint_number": 19,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 742,
+      "agent_lines_removed": 88
+    },
+    {
+      "checkpoint_number": 20,
+      "user_lines_added": 45,
+      "user_lines_removed": 23,
+      "agent_lines_added": 742,
+      "agent_lines_removed": 88,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/country_runner.py": 42,
+        "relocation_jobs/v2/web/server.py": 3
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/country_runner.py": 23
+      }
+    },
+    {
+      "checkpoint_number": 21,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 767,
+      "agent_lines_removed": 88
+    },
+    {
+      "checkpoint_number": 22,
+      "user_lines_added": 4,
+      "user_lines_removed": 3,
+      "agent_lines_added": 764,
+      "agent_lines_removed": 86,
+      "user_added_per_file": {
+        "relocation_jobs/core/ats_constants.py": 4
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/core/ats_constants.py": 3
+      }
+    },
+    {
+      "checkpoint_number": 23,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 768,
+      "agent_lines_removed": 89
+    },
+    {
+      "checkpoint_number": 24,
+      "user_lines_added": 19,
+      "user_lines_removed": 3,
+      "agent_lines_added": 770,
+      "agent_lines_removed": 91,
+      "user_added_per_file": {
+        "relocation_jobs/v2/fetch/country_runner.py": 3,
+        "relocation_jobs/v2/fetch/runner.py": 16
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/fetch/country_runner.py": 1,
+        "relocation_jobs/v2/fetch/runner.py": 2
+      }
+    },
+    {
+      "checkpoint_number": 25,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 788,
+      "agent_lines_removed": 93
+    },
+    {
+      "checkpoint_number": 26,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 27,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 941,
+      "agent_lines_removed": 97
+    },
+    {
+      "checkpoint_number": 28,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1047,
+      "agent_lines_removed": 111
+    },
+    {
+      "checkpoint_number": 29,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1047,
+      "agent_lines_removed": 111
+    },
+    {
+      "checkpoint_number": 30,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1047,
+      "agent_lines_removed": 111
+    },
+    {
+      "checkpoint_number": 31,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1047,
+      "agent_lines_removed": 111
+    },
+    {
+      "checkpoint_number": 32,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1047,
+      "agent_lines_removed": 111
+    },
+    {
+      "checkpoint_number": 33,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1047,
+      "agent_lines_removed": 111
+    },
+    {
+      "checkpoint_number": 34,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 35,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1047,
+      "agent_lines_removed": 111
+    },
+    {
+      "checkpoint_number": 36,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

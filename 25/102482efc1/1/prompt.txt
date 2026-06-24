@@ -1,0 +1,4 @@
+i think this application has a real issue and we wanted to fix this just by changing the flow and try to solve the issue.
+
+i think that the most important problem we face is about handling the processes, python needs to hardly handle the processes using some system threads and they're slow and hard to catch or cancel.
+what do you think about this?

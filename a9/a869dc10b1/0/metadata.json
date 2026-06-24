@@ -1,0 +1,223 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "a9a869dc10b1",
+  "session_id": "c0f06ef3-942f-441b-a2a2-712eaae56c10",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T04:09:03.317786Z",
+  "branch": "main",
+  "checkpoints_count": 15,
+  "save_step_count": 15,
+  "files_touched": [
+    "relocation_jobs/v2/RULES.md",
+    "relocation_jobs/v2/catalog/repo.py",
+    "relocation_jobs/v2/catalog/writes.py",
+    "relocation_jobs/v2/fetch/country_runner.py",
+    "relocation_jobs/v2/fetch/pipeline.py",
+    "relocation_jobs/v2/fetch/repo.py",
+    "relocation_jobs/v2/fetch/runner.py",
+    "relocation_jobs/v2/panel/stats.py",
+    "relocation_jobs/v2/positions/state.py",
+    "relocation_jobs/v2/positions/types.py",
+    "relocation_jobs/v2/scrape/board.py",
+    "relocation_jobs/v2/scrape/boards/__init__.py",
+    "relocation_jobs/v2/scrape/boards/greenhouse.py",
+    "relocation_jobs/v2/scrape/company.py",
+    "relocation_jobs/v2/scrape/listing.py",
+    "relocation_jobs/v2/scrape/merge.py",
+    "relocation_jobs/v2/scrape/relevance.py",
+    "relocation_jobs/v2/web/routes/__init__.py",
+    "relocation_jobs/v2/web/routes/catalog.py",
+    "relocation_jobs/v2/web/routes/fetch.py",
+    "relocation_jobs/v2/web/validators.py",
+    "tests/v2/catalog/test_repo.py",
+    "tests/v2/catalog/test_writes.py",
+    "tests/v2/conftest.py",
+    "tests/v2/fetch/test_fetch_attempts.py",
+    "tests/v2/fetch/test_repo.py",
+    "tests/v2/helpers/seed.py",
+    "tests/v2/scrape/test_greenhouse_board.py",
+    "tests/v2/web/test_fetch_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "eee584c277c7",
+  "session_metrics": {
+    "turn_count": 42,
+    "context_tokens": 191562,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T04:09:03.300986Z",
+    "agent_lines": 1166,
+    "agent_removed": 318,
+    "human_added": 619,
+    "human_modified": 138,
+    "human_removed": 0,
+    "total_committed": 1923,
+    "total_lines_changed": 2241,
+    "agent_percentage": 66.22043730477465,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 239,
+      "agent_lines_removed": 212
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 11,
+      "agent_lines_added": 239,
+      "agent_lines_removed": 212,
+      "user_removed_per_file": {
+        "relocation_jobs/v2/catalog/board_sync.py": 11
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 9,
+      "user_lines_removed": 181,
+      "agent_lines_added": 408,
+      "agent_lines_removed": 216,
+      "user_added_per_file": {
+        "relocation_jobs/v2/catalog/board_sync.py": 9
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/catalog/board_sync.py": 181
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 229,
+      "agent_lines_removed": 216
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 332,
+      "agent_lines_removed": 216
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 2,
+      "user_lines_removed": 2,
+      "agent_lines_added": 724,
+      "agent_lines_removed": 272,
+      "user_added_per_file": {
+        "relocation_jobs/v2/RULES.md": 2
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/RULES.md": 2
+      }
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 2,
+      "user_lines_removed": 2,
+      "agent_lines_added": 862,
+      "agent_lines_removed": 323,
+      "user_added_per_file": {
+        "relocation_jobs/v2/RULES.md": 2
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/RULES.md": 2
+      }
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 174,
+      "user_lines_removed": 125,
+      "agent_lines_added": 937,
+      "agent_lines_removed": 324,
+      "user_added_per_file": {
+        "relocation_jobs/v2/RULES.md": 14,
+        "relocation_jobs/v2/panel/flatten.py": 8,
+        "relocation_jobs/v2/positions/state.py": 22,
+        "relocation_jobs/v2/positions/types.py": 8,
+        "relocation_jobs/v2/scrape/board.py": 6,
+        "relocation_jobs/v2/scrape/company.py": 82,
+        "relocation_jobs/v2/scrape/relevance.py": 14,
+        "relocation_jobs/v2/web/validators.py": 20
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/RULES.md": 2,
+        "relocation_jobs/v2/positions/state.py": 20,
+        "relocation_jobs/v2/positions/types.py": 7,
+        "relocation_jobs/v2/scrape/company.py": 68,
+        "relocation_jobs/v2/scrape/relevance.py": 11,
+        "relocation_jobs/v2/web/validators.py": 17
+      }
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1007,
+      "agent_lines_removed": 380
+    },
+    {
+      "checkpoint_number": 13,
+      "user_lines_added": 1,
+      "user_lines_removed": 1,
+      "agent_lines_added": 1079,
+      "agent_lines_removed": 419,
+      "user_added_per_file": {
+        "relocation_jobs/v2/RULES.md": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/RULES.md": 1
+      }
+    },
+    {
+      "checkpoint_number": 14,
+      "user_lines_added": 1,
+      "user_lines_removed": 1,
+      "agent_lines_added": 1057,
+      "agent_lines_removed": 414,
+      "user_added_per_file": {
+        "relocation_jobs/v2/RULES.md": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/RULES.md": 1
+      }
+    },
+    {
+      "checkpoint_number": 15,
+      "user_lines_added": 585,
+      "user_lines_removed": 7,
+      "agent_lines_added": 1492,
+      "agent_lines_removed": 454,
+      "user_added_per_file": {
+        "relocation_jobs/v2/RULES.md": 1,
+        "relocation_jobs/v2/fetch/runner.py": 382,
+        "relocation_jobs/v2/web/routes/fetch.py": 116,
+        "tests/v2/web/test_fetch_api.py": 86
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/RULES.md": 1,
+        "relocation_jobs/v2/fetch/runner.py": 1,
+        "relocation_jobs/v2/web/routes/fetch.py": 5
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "a9a869dc10b1",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 15,
+  "files_touched": [
+    "relocation_jobs/v2/RULES.md",
+    "relocation_jobs/v2/catalog/repo.py",
+    "relocation_jobs/v2/catalog/writes.py",
+    "relocation_jobs/v2/fetch/country_runner.py",
+    "relocation_jobs/v2/fetch/pipeline.py",
+    "relocation_jobs/v2/fetch/repo.py",
+    "relocation_jobs/v2/fetch/runner.py",
+    "relocation_jobs/v2/panel/stats.py",
+    "relocation_jobs/v2/positions/state.py",
+    "relocation_jobs/v2/positions/types.py",
+    "relocation_jobs/v2/scrape/board.py",
+    "relocation_jobs/v2/scrape/boards/__init__.py",
+    "relocation_jobs/v2/scrape/boards/greenhouse.py",
+    "relocation_jobs/v2/scrape/company.py",
+    "relocation_jobs/v2/scrape/listing.py",
+    "relocation_jobs/v2/scrape/merge.py",
+    "relocation_jobs/v2/scrape/relevance.py",
+    "relocation_jobs/v2/web/routes/__init__.py",
+    "relocation_jobs/v2/web/routes/catalog.py",
+    "relocation_jobs/v2/web/routes/fetch.py",
+    "relocation_jobs/v2/web/validators.py",
+    "tests/v2/catalog/test_repo.py",
+    "tests/v2/catalog/test_writes.py",
+    "tests/v2/conftest.py",
+    "tests/v2/fetch/test_fetch_attempts.py",
+    "tests/v2/fetch/test_repo.py",
+    "tests/v2/helpers/seed.py",
+    "tests/v2/scrape/test_greenhouse_board.py",
+    "tests/v2/web/test_fetch_api.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/a9/a869dc10b1/0/metadata.json",
+      "transcript": "/a9/a869dc10b1/0/full.jsonl",
+      "content_hash": "/a9/a869dc10b1/0/content_hash.txt",
+      "prompt": "/a9/a869dc10b1/0/prompt.txt"
+    }
+  ]
+}

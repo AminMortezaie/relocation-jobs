@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 
 from relocation_jobs.v2.catalog.repo import get_company
-from relocation_jobs.v2.catalog.writes import save_company
+from relocation_jobs.v2.catalog.repo import sync_company_board_to_catalog
 from relocation_jobs.v2.fetch import service as fetch_service
 from relocation_jobs.v2.scrape.company import process_company
 
@@ -27,8 +27,8 @@ async def fetch_and_persist_company(
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
 
-    def persist() -> None:
-        save_company(country_key, company)
+    def persist_board() -> None:
+        sync_company_board_to_catalog(country_key, company)
 
     async def process(
         proc_client,
@@ -44,7 +44,7 @@ async def fetch_and_persist_company(
             total,
             fetch_board=fetch_board,
             enrich_board=enrich_board,
-            save_fn=persist,
+            save_fn=persist_board,
             enrich_only=enrich_only,
             skip_enriched=skip_enriched,
             enrich_concurrency=enrich_concurrency,
@@ -58,7 +58,7 @@ async def fetch_and_persist_company(
         1,
         country_key=country_key,
         process_company=process,
-        save_fn=persist,
+        save_fn=persist_board,
         enrich_only=enrich_only,
         skip_enriched=skip_enriched,
         enrich_concurrency=enrich_concurrency,

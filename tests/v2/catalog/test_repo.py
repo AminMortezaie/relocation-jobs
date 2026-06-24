@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from relocation_jobs.v2.catalog.repo import get_company
-from relocation_jobs.v2.catalog.writes import save_company
+from relocation_jobs.v2.catalog.repo import get_company, sync_company_board_to_catalog
 
 
-def test_save_company_upserts_jobs(seeded_catalog_v2):
+def test_sync_company_board_appends_job(seeded_catalog_v2):
     company = get_company("uk", "Acme Backend Ltd")
     assert company is not None
     jobs = list(company["matching_jobs"])
@@ -19,7 +18,7 @@ def test_save_company_upserts_jobs(seeded_catalog_v2):
     company["matching_jobs"] = jobs
     company["fetch_ok"] = True
     company["fetch_ok_date"] = "2025-06-02"
-    save_company("uk", company)
+    sync_company_board_to_catalog("uk", company)
 
     reloaded = get_company("uk", "Acme Backend Ltd")
     assert reloaded is not None
@@ -27,13 +26,13 @@ def test_save_company_upserts_jobs(seeded_catalog_v2):
     assert reloaded.get("fetch_ok") is True
 
 
-def test_save_company_syncs_fetch_problem(seeded_catalog_v2):
+def test_sync_company_board_persists_fetch_problem_flags(seeded_catalog_v2):
     company = get_company("uk", "Acme Backend Ltd")
     assert company is not None
     company["fetch_problem"] = True
     company["fetch_problem_date"] = "2025-06-03"
     company["fetch_ok"] = False
-    save_company("uk", company)
+    sync_company_board_to_catalog("uk", company)
 
     reloaded = get_company("uk", "Acme Backend Ltd")
     assert reloaded is not None

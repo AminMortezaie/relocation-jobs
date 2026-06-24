@@ -13,9 +13,11 @@ FIXTURES = Path(__file__).parent.parent / "fixtures"
 @pytest.fixture(autouse=True)
 def _v2_schema(db):
     from relocation_jobs.core.db import get_connection
+    from relocation_jobs.v2.fetch.repo import clear_running_fetch_runs_for_tests
 
     apply_v2_migrations(get_connection())
     get_connection().execute("DELETE FROM company_fetch_attempts")
+    clear_running_fetch_runs_for_tests()
     yield
 
 

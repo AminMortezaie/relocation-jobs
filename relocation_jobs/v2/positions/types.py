@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from enum import Enum
 
 from pydantic import Field
@@ -29,6 +30,13 @@ class PositionBucket(str, Enum):
     JOBS = "jobs"
     REJECTED = "rejected_jobs"
     NOT_FOR_ME = "not_for_me_jobs"
+
+
+_ACTIVE_TRACKING_RULES: tuple[Callable[[TrackingFlags], bool], ...] = (
+    lambda flags: flags.applied,
+    lambda flags: flags.rejected,
+    lambda flags: flags.looking_to_apply,
+)
 
 
 class TrackingFlags(BaseSchema):
@@ -70,13 +78,6 @@ class TrackingFlags(BaseSchema):
         if self.not_for_me:
             return False
         return any_of(self, _ACTIVE_TRACKING_RULES)
-
-
-_ACTIVE_TRACKING_RULES: tuple = (
-    lambda flags: flags.applied,
-    lambda flags: flags.rejected,
-    lambda flags: flags.looking_to_apply,
-)
 
 
 class PositionFilters(BaseSchema):

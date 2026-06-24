@@ -6,7 +6,7 @@ from pathlib import Path
 from relocation_jobs.core.db import db_transaction
 from relocation_jobs.core.job_identity import job_idempotency_key, stamp_job_identity
 from relocation_jobs.v2.catalog.repo import get_company
-from relocation_jobs.v2.catalog.writes import save_company
+from relocation_jobs.v2.catalog.repo import sync_company_board_to_catalog
 from relocation_jobs.v2.scrape.merge import merge_matching_jobs
 
 
@@ -45,7 +45,7 @@ def seed_country(country_key: str, fixture_path: Path) -> dict:
         for job in blob.get("matching_jobs") or []:
             stamp_job_identity(job)
             job.setdefault("idempotency_key", job_idempotency_key(job.get("url", "")))
-        save_company(country_key, blob)
+        sync_company_board_to_catalog(country_key, blob)
     return data
 
 
@@ -54,7 +54,7 @@ def replace_matching_jobs(country_key: str, company_name: str, jobs: list[dict])
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
     company["matching_jobs"] = jobs
-    save_company(country_key, company)
+    sync_company_board_to_catalog(country_key, company)
 
 
 def merge_and_save_jobs(country_key: str, company_name: str, scraped: list[dict]) -> list[dict]:
@@ -63,5 +63,5 @@ def merge_and_save_jobs(country_key: str, company_name: str, scraped: list[dict]
         raise LookupError(f"Company not found: {company_name}")
     merged, _, _, _ = merge_matching_jobs(company.get("matching_jobs") or [], scraped)
     company["matching_jobs"] = merged
-    save_company(country_key, company)
+    sync_company_board_to_catalog(country_key, company)
     return merged

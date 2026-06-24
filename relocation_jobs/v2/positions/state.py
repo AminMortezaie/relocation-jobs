@@ -5,6 +5,22 @@ from collections.abc import Callable
 from relocation_jobs.v2.positions.types import PositionBucket, PositionFilters, PositionView, TrackingFlags
 from relocation_jobs.v2.shared.predicates import all_of
 
+_BUCKET_RULES: tuple[
+    tuple[Callable[[tuple[TrackingFlags, bool]], bool], PositionBucket],
+    ...,
+] = (
+    (lambda ctx: ctx[0].not_for_me or ctx[1], PositionBucket.NOT_FOR_ME),
+    (lambda ctx: ctx[0].rejected, PositionBucket.REJECTED),
+)
+
+_POSITION_FILTER_RULES: tuple[Callable[[tuple[TrackingFlags, PositionFilters]], bool], ...] = (
+    lambda ctx: not (ctx[1].hide_applied and ctx[0].applied),
+    lambda ctx: not (ctx[1].hide_rejected and ctx[0].rejected),
+    lambda ctx: not (ctx[1].applied_only and not ctx[0].applied),
+    lambda ctx: not (ctx[1].rejected_only and not ctx[0].rejected),
+    lambda ctx: not (ctx[1].looking_to_apply_only and not ctx[0].looking_to_apply),
+)
+
 
 def derive_bucket(
     flags: TrackingFlags,
@@ -36,23 +52,3 @@ def position_view_from_row(
 
 def passes_position_filters(flags: TrackingFlags, filters: PositionFilters) -> bool:
     return all_of((flags, filters), _POSITION_FILTER_RULES)
-
-
-# First match wins — read-path priority (rule 10: not-for-me, then rejected).
-_BUCKET_RULES: tuple[
-    tuple[Callable[[tuple[TrackingFlags, bool]], bool], PositionBucket],
-    ...,
-] = (
-    (lambda ctx: ctx[0].not_for_me or ctx[1], PositionBucket.NOT_FOR_ME),
-    (lambda ctx: ctx[0].rejected, PositionBucket.REJECTED),
-)
-
-
-# Each rule returns True when the position may stay visible under that filter.
-_POSITION_FILTER_RULES: tuple[Callable[[tuple[TrackingFlags, PositionFilters]], bool], ...] = (
-    lambda ctx: not (ctx[1].hide_applied and ctx[0].applied),
-    lambda ctx: not (ctx[1].hide_rejected and ctx[0].rejected),
-    lambda ctx: not (ctx[1].applied_only and not ctx[0].applied),
-    lambda ctx: not (ctx[1].rejected_only and not ctx[0].rejected),
-    lambda ctx: not (ctx[1].looking_to_apply_only and not ctx[0].looking_to_apply),
-)

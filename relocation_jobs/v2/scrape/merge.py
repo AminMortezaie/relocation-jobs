@@ -27,11 +27,7 @@ def _copy_location_fields(target: dict, *sources: dict) -> None:
         target["locations"] = locations
 
 
-def merge_matching_jobs(
-    existing: list[dict],
-    scraped: list[dict],
-) -> tuple[list[dict], int, int, int]:
-    seen_at = now_iso()
+def _index_existing_by_key(existing: list[dict]) -> dict[str, dict]:
     by_key: dict[str, dict] = {}
     for job in existing:
         key = job_idempotency_key_for_job(job)
@@ -40,49 +36,69 @@ def merge_matching_jobs(
         prev = by_key.get(key)
         if prev is None or (job.get("fetched") or "9999") < (prev.get("fetched") or "9999"):
             by_key[key] = job
+    return by_key
+
+
+def _update_from_scrape(old: dict, scraped: dict, key: str, seen_at: str) -> dict:
+    out: dict = {
+        "title": scraped.get("title") or old.get("title", ""),
+        "url": old.get("url") or scraped.get("url", ""),
+        "idempotency_key": key,
+        "fetched": old.get("fetched") or scraped.get("fetched") or seen_at,
+        "last_seen": old.get("last_seen") or old.get("fetched") or seen_at,
+    }
+    if old.get("visa_sponsorship") is not None:
+        out["visa_sponsorship"] = old["visa_sponsorship"]
+    elif scraped.get("visa_sponsorship") is not None:
+        out["visa_sponsorship"] = scraped["visa_sponsorship"]
+    _copy_location_fields(out, scraped, old)
+    return out
+
+
+def _add_from_scrape(scraped: dict, key: str, seen_at: str) -> dict:
+    out = dict(scraped)
+    out["idempotency_key"] = key
+    out["fetched"] = out.get("fetched") or seen_at
+    out["last_seen"] = seen_at
+    return out
+
+
+def merge_matching_jobs(
+    existing: list[dict],
+    scraped: list[dict],
+) -> tuple[list[dict], int, int, int]:
+    seen_at = now_iso()
+    cache = _index_existing_by_key(existing)
 
     merged: list[dict] = []
-    seen: set[str] = set()
+    scraped_keys: set[str] = set()
     preserved = 0
     new_count = 0
 
     for job in scraped:
         key = job_idempotency_key(job.get("url", ""))
-        if not key or key in seen:
+        if not key or key in scraped_keys:
             continue
-        seen.add(key)
-        if key in by_key:
-            old = by_key[key]
-            merged_job: dict = {
-                "title": job.get("title") or old.get("title", ""),
-                "url": old.get("url") or job.get("url", ""),
-                "idempotency_key": key,
-            }
-            merged_job["fetched"] = old.get("fetched") or job.get("fetched") or seen_at
-            merged_job["last_seen"] = old.get("last_seen") or old.get("fetched") or seen_at
-            if old.get("visa_sponsorship") is not None:
-                merged_job["visa_sponsorship"] = old["visa_sponsorship"]
-            elif job.get("visa_sponsorship") is not None:
-                merged_job["visa_sponsorship"] = job["visa_sponsorship"]
-            _copy_location_fields(merged_job, job, old)
-            merged.append(merged_job)
+        scraped_keys.add(key)
+
+        old = cache.get(key)
+        if old is not None:
+            merged.append(_update_from_scrape(old, job, key, seen_at))
             preserved += 1
         else:
-            merged_job = dict(job)
-            merged_job["idempotency_key"] = key
-            merged_job["fetched"] = merged_job.get("fetched") or seen_at
-            merged_job["last_seen"] = seen_at
-            merged.append(merged_job)
+            merged.append(_add_from_scrape(job, key, seen_at))
             new_count += 1
 
     stale_kept = 0
-    for key, old in by_key.items():
-        if key not in seen:
-            kept = dict(old)
-            stamp_job_identity(kept)
-            merged.append(kept)
-            stale_kept += 1
+    for key, old in cache.items():
+        if key in scraped_keys:
+            continue
+        kept = dict(old)
+        stamp_job_identity(kept)
+        merged.append(kept)
+        stale_kept += 1
 
     for job in merged:
         stamp_job_identity(job)
+
     return merged, preserved, new_count, stale_kept

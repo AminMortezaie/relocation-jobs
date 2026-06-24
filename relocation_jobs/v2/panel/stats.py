@@ -1,6 +1,13 @@
 from __future__ import annotations
 
+from relocation_jobs.v2.fetch import repo as fetch_repo
 from relocation_jobs.v2.users import applied as applied_queries
+
+
+def _list_recent_fetch_runs(user_id: int, country_key: str | None) -> list[dict]:
+    if country_key and country_key != "all":
+        return fetch_repo.list_user_fetch_runs(user_id, country=country_key, limit=5)
+    return fetch_repo.list_user_fetch_runs(user_id, limit=5)
 
 
 def compute_stats(
@@ -43,6 +50,10 @@ def compute_stats(
         )
         if user_id else []
     )
+    recent_fetch_runs = (
+        _list_recent_fetch_runs(user_id, country_key)
+        if user_id else []
+    )
     by_country: dict[str, int] = {}
     for company in companies:
         key = company["country"]
@@ -60,7 +71,7 @@ def compute_stats(
         "fetch_problems": fetch_problem_count,
         "latest_job_fetch": latest_fetch,
         "latest_fetch_new_jobs": latest_fetch_new_jobs,
-        "recent_fetch_runs": [],
+        "recent_fetch_runs": recent_fetch_runs,
         "by_country": by_country,
         "files": file_meta,
     }

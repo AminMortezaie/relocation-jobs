@@ -1,0 +1,18 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "cec6d10dcecb",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "relocation_jobs/v2/panel/flatten.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/ce/c6d10dcecb/0/metadata.json",
+      "transcript": "/ce/c6d10dcecb/0/full.jsonl",
+      "content_hash": "/ce/c6d10dcecb/0/content_hash.txt",
+      "prompt": "/ce/c6d10dcecb/0/prompt.txt"
+    }
+  ]
+}

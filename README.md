@@ -4,6 +4,8 @@ A job-search tool for backend and software engineering roles at tech companies t
 
 **Supported countries:** Germany, Netherlands, UK, Portugal.
 
+> **Contributors:** start with [`.claude/ONBOARDING.md`](.claude/ONBOARDING.md).
+
 ## Features
 
 - **ATS auto-detection** — Greenhouse, Lever, Ashby, Personio, Workable, Recruitee, SmartRecruiters, TeamTailor, and a generic Playwright fallback
@@ -24,8 +26,8 @@ cp .env.example .env
 # Edit .env — set DATABASE_URL at minimum
 
 # Run the panel
-python3 scripts/panel_server.py
-# → http://127.0.0.1:5050
+PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py
+# → http://127.0.0.1:5051
 ```
 
 On first startup the app creates the Postgres schema and bootstraps an admin user from `PANEL_ADMIN_USER` / `PANEL_ADMIN_PASSWORD`. If no password is set, a random one is printed to the terminal.
@@ -36,25 +38,27 @@ Copy `.env.example` to `.env` before running locally.
 
 | Variable | Purpose |
 |----------|---------|
-| `DATABASE_URL` | **Required.** Neon Postgres URL (no SQLite fallback) |
+| `DATABASE_URL` | **Required.** Postgres URL — AWS EC2 (see `.env.example`) or local instance |
 | `PANEL_SECRET_KEY` | Flask session signing |
 | `PANEL_ADMIN_USER` / `PANEL_ADMIN_PASSWORD` | Bootstrap admin on first run |
-| `PANEL_SCRAPE_ENABLED` | Set to `0` on Render free tier (512 MB RAM) |
+| `PANEL_SCRAPE_ENABLED` | Set to `0` on Render free tier (512 MB RAM); `1` locally for fetch |
 | `PANEL_DATA_DIR` | Local data dir for `custom_cities.json` (default: `data/`) |
 | `PANEL_ALLOW_REGISTER` | Allow self-service registration after first user |
 
-For local dev, a local Postgres instance is faster than remote Neon (~150 ms/query). See comments in `.env.example`.
+AWS Postgres ops: `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes. See [`.claude/AWS_POSTGRES_MIGRATION_HANDOFF.md`](.claude/AWS_POSTGRES_MIGRATION_HANDOFF.md).
+
+For local dev, a local Postgres instance is faster than remote AWS (~150 ms/query). See comments in `.env.example`.
 
 ## Usage
 
 ### Web panel
 
 ```bash
-python3 scripts/panel_server.py
-# or: python3 -m relocation_jobs.panel_server
+PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py
+# → http://127.0.0.1:5051
 ```
 
-Sign in with the admin credentials. Select a single country, then use **Fetch new jobs** to scrape. Per-company fetch, skip-filled, visa-only filter, and search are available in the toolbar and company cards.
+Sign in with the admin credentials. Select a single country, then use **Fetch** (admin) to scrape. Per-company fetch, skip-filled, visa-only filter, and search are in the toolbar and company cards.
 
 Tracking (applied, not-for-me, company-level applied) is stored per user in Postgres. Re-scrapes merge jobs by URL — existing `fetched` dates and tracking state are preserved; jobs removed from an ATS stay in the catalog as orphans and reappear if you have tracking for them.
 
@@ -98,39 +102,40 @@ relocate.me (country page)
     ↓
 build_companies.py       ← careers URL discovery → Postgres catalog
     ↓
-scrape_jobs.py           ← ATS detection + job fetch → Postgres catalog
+v2 fetch / scrape_jobs   ← ATS detection + job fetch → Postgres catalog
     ↓
-panel_server.py          ← Flask API (catalog + per-user tracking)
+web/server.py         ← Flask API (catalog + per-user tracking)
 ```
 
 ### Data stores
 
 | Store | Contents |
 |-------|----------|
-| **Neon Postgres** (`DATABASE_URL`) | Catalog (companies, jobs), users, per-user tracking, fetch run history |
+| **Postgres** (`DATABASE_URL`) | Catalog, users, tracking, fetch runs — AWS EC2 in production |
 | `companies/*.json` | Git archive only — not read at runtime |
-| `data/custom_cities.json` | User-added cities for the location picker (`PANEL_DATA_DIR`) |
-
-On server startup, `init_db()` creates or migrates the Postgres schema. Populate the catalog with `build_companies.py` and `scrape_jobs.py`.
+| `data/custom_cities.json` | User-added cities (`PANEL_DATA_DIR`) |
 
 ### Package layout
 
 ```
 relocation_jobs/
-├── panel_server.py     # Entry-point shim
-├── web/                # Flask app, routes/, scrape_runner.py
-├── catalog_db.py       # Shim → catalog/
-├── catalog/            # Postgres catalog (schema, reads, writes, stats)
-├── scrape_jobs.py      # Shim → scrape/
-├── scrape/             # ATS dispatch, runner, enrich, IPC
-├── build_companies.py  # Careers URL discovery CLI
-├── core/               # db, auth, paths, ats_detection, ats_constants, job_identity
-├── schemas/            # Pydantic models for JSON columns + API contracts
-├── db/                 # User/tracking repo
-└── services/           # Business logic (catalog, company, job, admin)
+├── catalog/      # Postgres catalog repo + writes
+├── positions/    # Job tracking (apply, reject, not-for-me)
+├── panel/        # flatten_companies, stats, filters
+├── fetch/        # In-process country + company fetch
+├── scrape/       # ATS boards, merge, enrich
+├── web/          # Flask server + routes
+├── companies/    # Company CRUD orchestration
+├── users/        # Per-user repo, history
+├── admin/        # Dashboard aggregates
+├── core/         # db helpers, auth, ATS constants, paths
+├── db/           # User tracking, fetch runs, migrations
+├── schemas/      # Pydantic contracts
+├── static/       # UI (JS, CSS)
+└── build_companies.py  # Careers URL discovery CLI
 ```
 
-Import graph: `panel_server → web → services → (catalog_db, db/) → core/db → psycopg`. `scrape_jobs → catalog_db + scrape/ + core/ats_detection`.
+Rules: [`relocation_jobs/RULES.md`](relocation_jobs/RULES.md).
 
 ### ATS detection (first run per company)
 
@@ -165,24 +170,24 @@ Jobs match when the title contains an **include** keyword and no **exclude** key
 ## Testing
 
 ```bash
-pytest                                   # business tier (default; excludes @scrape)
-pytest -m scrape                         # scraper + build_companies
+pytest tests -o addopts=                 # full suite (~103 tests)
+pytest tests/test_route_manifest.py -o addopts=   # fast route check
 pytest --cov --cov-report=term-missing   # coverage (90% gate on business modules)
 ```
 
-Tests use an in-memory Postgres mock (`tests/helpers/postgres_mock.py`) — no live ATS or Neon in CI. Business rules are documented in `tests/BUSINESS_RULES.md`.
+Tests use an in-memory Postgres mock — no live ATS or Postgres in CI. Business rules: `tests/BUSINESS_RULES.md`.
 
 ## Deployment (Render)
 
-`render.yaml` targets Render's **free** web tier. Scraping is disabled in production (`PANEL_SCRAPE_ENABLED=0`) because of the 512 MB RAM limit.
+`render.yaml` targets Render's **free** web tier. Scraping is disabled in production (`PANEL_SCRAPE_ENABLED=0`).
 
-**Workflow:** scrape locally → push to GitHub → Render redeploys. All runtime state lives in Neon Postgres.
+**Workflow:** scrape locally → push to GitHub → Render redeploys. Runtime state lives in Postgres (AWS EC2).
 
 ### One-time setup
 
-1. Create a [Neon](https://neon.tech) project and copy the Postgres connection string.
-2. Push this repo to GitHub.
-3. In [Render](https://render.com): **New → Blueprint** → connect the repo.
+1. Ensure AWS Postgres is running and `DATABASE_URL` points to the Elastic IP.
+2. Run `./scripts/aws_postgres_migrate.sh sync-sg` so Render can reach port 5432.
+3. Push repo to GitHub; in Render: **New → Blueprint** → connect the repo.
 4. Set env vars: `DATABASE_URL`, `PANEL_ADMIN_PASSWORD`.
 5. Deploy and sign in at `https://<your-service>.onrender.com`.
 
@@ -199,11 +204,13 @@ docker run --rm -p 8080:10000 \
 
 ## Development
 
-Contributor-oriented docs (commands, fixtures, refactor status):
+Contributor docs:
 
-- [`CLAUDE.md`](CLAUDE.md) — architecture, test tiers, deployment notes
+- [`.claude/ONBOARDING.md`](.claude/ONBOARDING.md) — **start here** (setup, v2 architecture, skills)
+- [`relocation_jobs/RULES.md`](relocation_jobs/RULES.md) — v2 coding standards
+- [`CLAUDE.md`](CLAUDE.md) — agent-oriented architecture + commands
 - [`tests/BUSINESS_RULES.md`](tests/BUSINESS_RULES.md) — panel job-state rules
-- [`.claude/REFACTOR_HANDOFF.md`](.claude/REFACTOR_HANDOFF.md) — active structural refactor checklist
+- [`relocation_jobs/PARITY.md`](relocation_jobs/PARITY.md) — parity checklist (complete)
 
 ## Troubleshooting
 

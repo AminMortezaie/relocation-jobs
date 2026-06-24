@@ -1,16 +1,39 @@
-"""Company catalog API routes."""
-
 from __future__ import annotations
+
+import os
 
 from flask import g, jsonify, request
 
+from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import login_required
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
-from relocation_jobs.services.catalog_service import list_ats_types
+from relocation_jobs.core.location_tags import COUNTRY_LABELS
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
+from relocation_jobs.catalog.repo import get_company
+from relocation_jobs.fetch.runner import (
+    _fetch_lock,
+    _reap_zombie_fetch,
+    fetch_is_running,
+    start_company_fetch,
+)
 from relocation_jobs.web import deps
 
 
+def scrape_enabled() -> bool:
+    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
+
+
 def register(app):
+    @app.get("/api/companies/<country>/<path:company_name>")
+    @login_required
+    def api_company_detail(country: str, company_name: str):
+        country = country.strip().lower()
+        if country not in SUPPORTED_COUNTRIES:
+            return jsonify({"error": f"Unknown country: {country}"}), 400
+        company = get_company(country, company_name)
+        if company is None:
+            return jsonify({"error": f"Company not found: {company_name}"}), 404
+        return jsonify({"company": company})
+
     @app.patch("/api/companies/applied")
     @app.post("/api/companies/applied")
     @login_required
@@ -35,7 +58,6 @@ def register(app):
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 
-
     @app.patch("/api/companies/awaiting-response")
     @app.post("/api/companies/awaiting-response")
     @login_required
@@ -54,14 +76,13 @@ def register(app):
 
         try:
             result = deps.set_company_awaiting_response(
-                country, company, awaiting, user_id=g.user_id
+                country, company, awaiting, user_id=g.user_id,
             )
             return jsonify({"ok": True, **result})
         except LookupError as e:
             return jsonify({"error": str(e)}), 404
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-
 
     @app.post("/api/companies")
     @login_required
@@ -99,7 +120,7 @@ def register(app):
         if locations is not None and not isinstance(locations, list):
             return jsonify({"error": "locations must be an array"}), 400
 
-        valid_ats = {item["id"] for item in list_ats_types()}
+        valid_ats = {item["id"] for item in deps.list_ats_types()}
         if ats_hint and ats_hint not in ("auto", "") and ats_hint not in valid_ats:
             return jsonify({"error": f"Unknown ATS: {ats_hint}"}), 400
         ats_hint_arg = None if ats_hint in ("", "auto") else ats_hint
@@ -118,7 +139,6 @@ def register(app):
             return jsonify({"error": str(e)}), 409
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-
 
     @app.delete("/api/companies")
     @app.post("/api/companies/remove")
@@ -143,7 +163,6 @@ def register(app):
             return jsonify({"error": str(e)}), 404
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-
 
     @app.patch("/api/companies/name")
     @app.post("/api/companies/name")
@@ -172,7 +191,6 @@ def register(app):
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 
-
     @app.patch("/api/companies/careers")
     @app.post("/api/companies/careers")
     @login_required
@@ -195,14 +213,13 @@ def register(app):
         try:
             company = deps.resolve_company_name(country, company)
             result = deps.update_company_careers(
-                country, company, careers_url, redetect_ats=redetect_ats
+                country, company, careers_url, redetect_ats=redetect_ats,
             )
             return jsonify({"ok": True, **result})
         except LookupError as e:
             return jsonify({"error": str(e)}), 404
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-
 
     @app.patch("/api/companies/city")
     @app.post("/api/companies/city")
@@ -243,7 +260,6 @@ def register(app):
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
 
-
     @app.patch("/api/companies/fetch-problem")
     @app.post("/api/companies/fetch-problem")
     @login_required
@@ -264,14 +280,13 @@ def register(app):
         try:
             company = deps.resolve_company_name(country, company)
             result = deps.set_company_fetch_problem(
-                country, company, fetch_problem, mark_fetch_ok=mark_fetch_ok
+                country, company, fetch_problem, mark_fetch_ok=mark_fetch_ok,
             )
             return jsonify({"ok": True, **result})
         except LookupError as e:
             return jsonify({"error": str(e)}), 404
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-
 
     @app.post("/api/companies/fetch-ok")
     @login_required
@@ -295,7 +310,6 @@ def register(app):
             return jsonify({"error": str(e)}), 404
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-
 
     @app.post("/api/companies/jobs/manual-add")
     @login_required
@@ -322,3 +336,63 @@ def register(app):
             return jsonify({"error": str(e)}), 404
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
+
+    @app.post("/api/companies/fetch")
+    @login_required
+    def api_companies_fetch():
+        if not scrape_enabled():
+            return jsonify({
+                "error": (
+                    "Scraping is disabled on this host. "
+                    "Run scrapes locally, then sync catalog to Postgres."
+                ),
+            }), 503
+
+        if not HTTPX_AVAILABLE:
+            return jsonify({
+                "error": "httpx is not installed. Run: pip install httpx",
+            }), 503
+
+        body = request.get_json(silent=True) or {}
+        country = (body.get("country") or "").strip().lower()
+        company = (body.get("company") or "").strip()
+
+        if not country or country == "all":
+            return jsonify({"error": "country is required (not 'all')"}), 400
+        if country not in SUPPORTED_COUNTRIES:
+            return jsonify({"error": f"Unknown country: {country}"}), 400
+        if not company:
+            return jsonify({"error": "company is required"}), 400
+
+        try:
+            company = deps.resolve_company_name(country, company)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+
+        with _fetch_lock:
+            _reap_zombie_fetch()
+            if fetch_is_running():
+                return jsonify({"error": "A fetch is already running"}), 409
+
+        try:
+            deps.touch_company_fetch_time(country, company)
+        except (LookupError, ValueError) as exc:
+            return jsonify({"error": str(exc)}), 404
+
+        try:
+            run_id = start_company_fetch(
+                user_id=g.user_id,
+                country_key=country,
+                company_name=company,
+            )
+        except RuntimeError as exc:
+            return jsonify({"error": str(exc)}), 409
+
+        return jsonify({
+            "ok": True,
+            "run_id": run_id,
+            "country": country,
+            "company": company,
+            "file": COUNTRY_ARCHIVE_FILENAMES.get(country, ""),
+            "message": f"Fetching jobs for {company} ({COUNTRY_LABELS.get(country, country)})",
+        })

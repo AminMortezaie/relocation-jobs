@@ -2,35 +2,10 @@
 
 import { state } from "./state.js";
 import { $, escapeAttr, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
-import { fetchConfig, fetchCountries, fetchAtsTypes, fetchLocations, fetchJobs } from "./api.js";
-import { renderStats, renderCompanies, releaseCompanyOrder } from "./render.js";
+import { fetchConfig, fetchCountries, fetchAtsTypes, fetchLocations } from "./api.js";
+import { loadBoard, showJobsLoading } from "./board.js";
 
-function skeletonCard() {
-  return `
-    <div class="skeleton-card">
-      <div class="skeleton-card-header">
-        <div class="skeleton-block skeleton-name"></div>
-        <div class="skeleton-badges">
-          <div class="skeleton-block skeleton-badge"></div>
-          <div class="skeleton-block skeleton-badge"></div>
-        </div>
-      </div>
-      <hr class="skeleton-divider" />
-      <div class="skeleton-jobs">
-        <div class="skeleton-block skeleton-job"></div>
-        <div class="skeleton-block skeleton-job skeleton-job--short"></div>
-      </div>
-    </div>`;
-}
-
-export { setLoadingProgress, finishLoadingProgress };
-
-export function showJobsLoading() {
-  const list = $("jobs");
-  if (list) {
-    list.innerHTML = Array(4).fill(0).map(skeletonCard).join("");
-  }
-}
+export { setLoadingProgress, finishLoadingProgress, showJobsLoading };
 
 export async function loadConfig() {
   state.scrapeConfig = await fetchConfig();
@@ -87,25 +62,7 @@ export async function loadCities() {
 }
 
 export async function loadJobs(options = {}) {
-  // User-initiated reloads (filters, country/ATS/location, manual refresh) should
-  // re-sort the board; the silent post-fetch reload keeps the frozen order.
-  if (!options.silent) releaseCompanyOrder();
-  const country = $("country").value;
-  localStorage.setItem("panel_country", country);
-  if ($("ats")) {
-    localStorage.setItem("panel_ats", $("ats").value);
-  }
-  if ($("location")) {
-    localStorage.setItem("panel_location", $("location").value);
-  }
-  if (!options.silent) {
-    showJobsLoading();
-  }
-  const data = await fetchJobs(options);
-  state.allCompanies = data.companies || [];
-  state.boardStats = data.stats || null;
-  if (data.stats) renderStats(data.stats);
-  renderCompanies();
+  return loadBoard(options);
 }
 
 export { refreshJobBoard } from "./job-board.js";

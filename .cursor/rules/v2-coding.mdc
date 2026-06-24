@@ -1,23 +1,22 @@
 ---
-description: Coding standards for relocation_jobs/v2 — layers, module layout, no comments, function size, naming. Read before editing v2 or tests/v2.
-globs: relocation_jobs/v2/**,tests/v2/**
+description: Coding standards for relocation_jobs — layers, module layout, no comments, function size, naming.
+globs: relocation_jobs/**/*.py,tests/**/*.py
 alwaysApply: false
 ---
 
-# v2 coding standards
+# Coding standards
 
-**Canonical doc:** `relocation_jobs/v2/RULES.md`  
+**Start here for new contributors:** [`.claude/ONBOARDING.md`](../../.claude/ONBOARDING.md)  
+**Canonical doc:** `relocation_jobs/RULES.md`  
 **Handoff / violations backlog:** `.claude/V2_CODING_VERDICT.md`
 
-v1 (`services/`, `catalog/`, `scrape/`, v1 `web/`) is **reference only** — never import into v2 app layers.
-
-Tests: `pytest tests/v2`. Do not commit unless the user asks.
+Tests: `pytest tests -o addopts=`. Do not commit unless the user asks.
 
 ## Layers
 
 | Layer | SQL? |
-|-------|------|
-| `*/repo.py`, `v2/db/migrate.py` | **Yes — only here** |
+|----|---|
+| `*/repo.py`, `db/migrate.py` | **Yes — only here** |
 | `*/service.py`, `*/pipeline.py`, `web/routes/*`, `shared/` | No |
 
 Known violation: SQL still in `users/history.py` and `users/applied.py` — move to `users/repo.py`.
@@ -30,7 +29,7 @@ Known violation: SQL still in `users/history.py` and `users/applied.py` — move
 4. Private helpers (`_`)  
 5. Public API  
 
-## No comments in v2 source
+## No comments in source
 
 No section banners (`# --- types ---`), no narrating block comments, no docstrings by default.
 
@@ -38,7 +37,7 @@ No section banners (`# --- types ---`), no narrating block comments, no docstrin
 
 - Target **~30–40 lines**; split multi-step logic.  
 - **Different workflows = different functions** (scrape vs enrich), not one god boolean.  
-- **Guards** = predicate tuples + `v2/shared/predicates.any_of` / `all_of`.  
+- **Guards** = predicate tuples + `shared/predicates.any_of` / `all_of`.  
 - Prefer **readable linear flow** (see `scrape/merge.py`) over many indirection layers.
 
 ## Naming
@@ -51,10 +50,13 @@ Top of module only. No `try/except ImportError`. No imports inside functions (fi
 
 ## Data
 
-Postgres is source of truth. `sync_company_board_to_catalog` requires **full** post-merge `matching_jobs`.
+Postgres (AWS EC2) is source of truth. `sync_company_board_to_catalog` requires **full** post-merge `matching_jobs`.
+
+## Client JS (static/)
+
+After job API success, update board locally via `job-board.js` — avoid `reloadBoard()` when company is in memory.
 
 ## Do not
 
-- Re-export facades or empty shims (`web/routes/catalog.py`)  
-- Bulk-copy from v1  
-- Run full v1 pytest on every small v2 edit
+- Re-export facades or empty shims  
+- Run unrelated legacy test tiers on every small edit

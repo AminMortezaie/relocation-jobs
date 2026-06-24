@@ -19,6 +19,9 @@ _pg_conn = None
 _pg_conn_last_used: float = 0.0
 _db_initialized = False
 
+# Thread-local storage: each thread gets its own DB connection.
+_thread_local = threading.local()
+
 # Neon free tier suspends compute after ~5 min idle; ping before that threshold.
 _IDLE_PING_THRESHOLD_S = 270.0  # 4.5 minutes
 
@@ -26,26 +29,32 @@ _IDLE_PING_THRESHOLD_S = 270.0  # 4.5 minutes
 class _RetryConnection:
     """Proxy that reconnects once when a query hits a dropped SSL connection."""
 
-    def __init__(self, conn):
+    def __init__(self, conn, *, thread_owned: bool = False):
         self._conn = conn
+        self._thread_owned = thread_owned
+
+    def _reconnect(self):
+        if self._thread_owned:
+            self._conn = _connect_postgres()
+            _thread_local.conn = self._conn
+            _thread_local.last_used = __import__("time").monotonic()
+        else:
+            _reset_pg_connection()
+            self._conn = _acquire_connection()
 
     def execute(self, sql, params=()):
-        with _db_lock:
-            try:
-                return self._conn.execute(sql, params)
-            except _PgOperationalError:
-                _reset_pg_connection()
-                self._conn = _acquire_connection()
-                return self._conn.execute(sql, params)
+        try:
+            return self._conn.execute(sql, params)
+        except _PgOperationalError:
+            self._reconnect()
+            return self._conn.execute(sql, params)
 
     def executemany(self, sql, params_seq):
-        with _db_lock:
-            try:
-                return self._conn.executemany(sql, params_seq)
-            except _PgOperationalError:
-                _reset_pg_connection()
-                self._conn = _acquire_connection()
-                return self._conn.executemany(sql, params_seq)
+        try:
+            return self._conn.executemany(sql, params_seq)
+        except _PgOperationalError:
+            self._reconnect()
+            return self._conn.executemany(sql, params_seq)
 
     def __getattr__(self, name):
         return getattr(self._conn, name)
@@ -120,36 +129,105 @@ def _acquire_connection():
     return _pg_conn
 
 
+def _acquire_thread_connection():
+    """Return a per-thread connection, creating one if needed."""
+    import time
+
+    conn = getattr(_thread_local, "conn", None)
+    last_used = getattr(_thread_local, "last_used", 0.0)
+    now = time.monotonic()
+
+    if conn is None or conn.closed:
+        conn = _connect_postgres()
+        _thread_local.conn = conn
+        _thread_local.last_used = now
+        return conn
+
+    if now - last_used > _IDLE_PING_THRESHOLD_S:
+        try:
+            conn.execute("SELECT 1")
+        except Exception:
+            try:
+                conn.close()
+            except Exception:
+                pass
+            conn = _connect_postgres()
+            _thread_local.conn = conn
+        _thread_local.last_used = now
+    else:
+        _thread_local.last_used = now
+    return conn
+
+
+def _is_main_thread() -> bool:
+    return threading.current_thread() is threading.main_thread()
+
+
 def get_connection():
-    """Thread-safe access to the shared Postgres connection."""
-    with _db_lock:
-        return _RetryConnection(_acquire_connection())
+    """Thread-safe access to a Postgres connection.
+
+    Main thread uses the shared connection (with lock).
+    Other threads get their own connection (no lock contention).
+    """
+    if _is_main_thread():
+        with _db_lock:
+            return _RetryConnection(_acquire_connection())
+    return _RetryConnection(_acquire_thread_connection(), thread_owned=True)
 
 
 @contextmanager
 def db_read():
-    """Serialize catalog reads with writes on the shared DB connection."""
-    with _db_lock:
+    """Scoped DB read — per-thread connection for worker threads."""
+    if _is_main_thread():
+        with _db_lock:
+            try:
+                yield _RetryConnection(_acquire_connection())
+            except _PgOperationalError:
+                _reset_pg_connection()
+                raise
+    else:
+        conn = _acquire_thread_connection()
         try:
-            yield _RetryConnection(_acquire_connection())
+            yield _RetryConnection(conn, thread_owned=True)
         except _PgOperationalError:
-            _reset_pg_connection()
+            try:
+                conn.close()
+            except Exception:
+                pass
+            _thread_local.conn = None
             raise
 
 
 @contextmanager
 def db_transaction():
-    with _db_lock:
-        conn = _acquire_connection()
+    if _is_main_thread():
+        with _db_lock:
+            conn = _acquire_connection()
+            try:
+                with conn.transaction():
+                    yield _RetryConnection(conn)
+            except _PgOperationalError:
+                _reset_pg_connection()
+                raise
+            except Exception:
+                if conn.closed:
+                    _reset_pg_connection()
+                raise
+    else:
+        conn = _acquire_thread_connection()
         try:
             with conn.transaction():
-                yield _RetryConnection(conn)
+                yield _RetryConnection(conn, thread_owned=True)
         except _PgOperationalError:
-            _reset_pg_connection()
+            try:
+                conn.close()
+            except Exception:
+                pass
+            _thread_local.conn = None
             raise
         except Exception:
             if conn.closed:
-                _reset_pg_connection()
+                _thread_local.conn = None
             raise
 
 
@@ -159,7 +237,7 @@ def init_db(*, force: bool = False) -> None:
         return
 
     # Lazy imports to break the core → migrations → events → core cycle.
-    from relocation_jobs.catalog_db import init_catalog_schema
+    from relocation_jobs.catalog.schema import init_catalog_schema
     from relocation_jobs.core.migrations import _migrate_schema
 
     init_catalog_schema()

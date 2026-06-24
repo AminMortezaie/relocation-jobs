@@ -1,13 +1,18 @@
 /** Shared mutable application state. */
 
 export const state = {
+  boardCatalog: [],
+  boardMeta: {},
+  boardUserStats: {},
+  boardScopeKey: "",
   allCompanies: [],
   pollTimer: null,
+  fetchVisibilityHandler: null,
   fetchingCompanyKey: null,
   collapsedCompanies: new Set(),
   showNotForMeCompanies: new Set(),
   showRejectedCompanies: new Set(),
-  scrapeConfig: { default_concurrency: 16, max_concurrency: 64 },
+  scrapeConfig: { default_concurrency: 16, max_concurrency: 16 },
   authState: { authenticated: false, allow_register: false },
   loginMode: "login",
   editCareersContext: null,
@@ -39,7 +44,7 @@ export function companyKey(country, company) {
 }
 
 export function findCompany(country, company) {
-  return state.allCompanies.find(
+  return state.boardCatalog.find(
     (c) => c.country === country && c.name === company
   );
 }

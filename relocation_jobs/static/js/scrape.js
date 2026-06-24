@@ -9,6 +9,7 @@ import {
   startFetchRequest,
 } from "./api.js";
 import { loadJobs } from "./data.js";
+import { applyBoardView } from "./board.js";
 import {
   setFetchBusy,
   showFetchPanel,
@@ -27,9 +28,16 @@ import {
   normalizeTsForSort,
   syncFetchJobSummary,
   openFetchPanel,
+  patchRunningFetchPanel,
+  setFetchCancelPending,
+  showFetchNotice,
 } from "./render.js";
 
 const FETCH_POLL_FAILURE_LIMIT = 3;
+
+function fetchClientActive() {
+  return state.countryFetchActive || state.fetchBusy || state.serverFetchRunning;
+}
 
 function countryLabel(countryId) {
   const opt = [...$("country").options].find((o) => o.value === countryId);
@@ -54,6 +62,10 @@ export function clearFetchActivity({ toast: showToast = false, message } = {}) {
   if (state.pollTimer) {
     clearInterval(state.pollTimer);
     state.pollTimer = null;
+  }
+  if (state.fetchVisibilityHandler) {
+    document.removeEventListener("visibilitychange", state.fetchVisibilityHandler);
+    state.fetchVisibilityHandler = null;
   }
   state.fetchPollFailures = 0;
   setFetchBusy(false);
@@ -86,6 +98,9 @@ export async function syncFetchStateFromServer({ toastOnClear = false } = {}) {
     return st;
   }
   if (clientThinksActive) {
+    if (!st.running) {
+      applyFetchStatus(st, { replaceLog: true });
+    }
     clearFetchActivity({
       toast: toastOnClear,
       message: "Fetch is no longer running",
@@ -95,10 +110,21 @@ export async function syncFetchStateFromServer({ toastOnClear = false } = {}) {
   return st;
 }
 
+function showSingleCompanyReviewDuringFetch(st) {
+  if (!st?.company || !st?.review_jobs) return false;
+  renderFetchReview(st.review_jobs, {
+    country: st.country,
+    company: st.company,
+    missingReview: false,
+  });
+  setFetchLogMode(false);
+  return true;
+}
+
 function applyFetchStatus(st, { replaceLog = false } = {}) {
   const logText = (st.log || []).join("\n") || "(waiting…)";
   if (replaceLog) {
-    $("fetchLog").textContent = `${logText}\n`;
+    appendFetchLog(`${logText}\n`);
   } else {
     appendFetchLog(logText);
   }
@@ -116,34 +142,45 @@ function applyFetchStatus(st, { replaceLog = false } = {}) {
   if (st.running) {
     const singleFetch = Boolean(st.company);
     if (singleFetch) {
-      clearFetchReviewContent();
-      setFetchReviewFooterPending({
-        country: st.country,
-        company: st.company,
-      });
+      if (!showSingleCompanyReviewDuringFetch(st)) {
+        clearFetchReviewContent();
+        setFetchReviewFooterPending({
+          country: st.country,
+          company: st.company,
+        });
+      }
     } else {
       clearFetchReview();
     }
     state.fetchPanelSingle = singleFetch;
     if (singleFetch) {
-      $("fetchTitle").textContent = `Fetching ${st.company}`;
       const activityMsg = (st.activity?.message || "").trim();
-      $("fetchSubtitle").textContent = st.cancel_requested
-        ? `${countryLabel(st.country)} · cancelling…`
-        : (activityMsg || `${countryLabel(st.country)} · working…`);
-      $("fetchProgressWrap").hidden = true;
-      $("fetchActivity").hidden = false;
-      $("fetchLog").hidden = true;
-      setFetchLogMode(true);
+      const reviewReady = Boolean(st.review_jobs);
+      patchRunningFetchPanel({
+        title: `Fetching ${st.company}`,
+        subtitle: st.cancel_requested
+          ? `${countryLabel(st.country)} · cancelling…`
+          : (reviewReady
+            ? `${countryLabel(st.country)} · saving roles…`
+            : (activityMsg || `${countryLabel(st.country)} · working…`)),
+        singleCompany: true,
+        progressWrapHidden: true,
+        activityHidden: reviewReady,
+        logHidden: true,
+        cancelRequested: st.cancel_requested,
+      });
+      if (!reviewReady) setFetchLogMode(true);
     } else {
       const n = st.concurrency || state.scrapeConfig?.default_concurrency || 16;
-      $("fetchTitle").textContent = st.ats_type
-        ? `Fetching ${atsLabel(st.ats_type)} companies`
-        : "Fetching companies";
-      $("fetchSubtitle").textContent = fetchScopeSubtitle(st.country, st.ats_type, n);
-      $("fetchProgressWrap").hidden = false;
-      $("fetchActivity").hidden = false;
-      $("fetchLog").hidden = true;
+      patchRunningFetchPanel({
+        title: st.ats_type ? `Fetching ${atsLabel(st.ats_type)} companies` : "Fetching companies",
+        subtitle: fetchScopeSubtitle(st.country, st.ats_type, n),
+        singleCompany: false,
+        progressWrapHidden: false,
+        activityHidden: false,
+        logHidden: true,
+        cancelRequested: st.cancel_requested,
+      });
       updateFetchProgress({
         current,
         total,
@@ -153,10 +190,6 @@ function applyFetchStatus(st, { replaceLog = false } = {}) {
         cancelled: st.cancel_requested,
         newJobsTotal: st.new_jobs_total,
       });
-    }
-    if (st.cancel_requested) {
-      $("fetchCancelBtn").disabled = true;
-      $("fetchCancelBtn").textContent = "Cancelling…";
     }
     syncFetchJobSummary(st);
     return { done: false };
@@ -174,8 +207,8 @@ function applyFetchStatus(st, { replaceLog = false } = {}) {
       cancelled,
       newJobsTotal: st.new_jobs_total,
     });
-  } else {
-    $("fetchLog").hidden = false;
+  } else if (!st.review_jobs) {
+    patchRunningFetchPanel({ logHidden: false });
   }
 
   const newJobsTotal = Math.max(0, Number(st.new_jobs_total) || 0);
@@ -281,8 +314,14 @@ export async function openFetchProgress() {
   }
 
   if (!st?.running) {
-    if (state.countryFetchActive || state.fetchBusy || state.serverFetchRunning) {
+    if (fetchClientActive()) {
+      applyFetchStatus(st, { replaceLog: true });
       clearFetchActivity({ toast: true, message: "Fetch is no longer running" });
+      return;
+    }
+    if (st?.company && st?.review_jobs) {
+      openFetchPanel();
+      applyFetchStatus(st, { replaceLog: true });
     }
     return;
   }
@@ -309,9 +348,9 @@ export async function handleFetchCountryClick() {
   }
 
   if (st.running) {
-    toast("A fetch is already running — use the progress chip to view it");
-    syncFetchJobSummary(st);
     markFetchActiveFromStatus(st);
+    syncFetchJobSummary(st);
+    await openFetchProgress();
     ensureFetchPolling();
     return;
   }
@@ -324,6 +363,10 @@ export async function handleFetchCountryClick() {
 
 export function pollFetchStatus() {
   if (state.pollTimer) clearInterval(state.pollTimer);
+  if (state.fetchVisibilityHandler) {
+    document.removeEventListener("visibilitychange", state.fetchVisibilityHandler);
+    state.fetchVisibilityHandler = null;
+  }
 
   async function tick() {
     let st;
@@ -342,9 +385,9 @@ export function pollFetchStatus() {
       return;
     }
 
-    if (!st.running && (state.countryFetchActive || state.fetchBusy || state.serverFetchRunning)) {
+    if (!st.running && fetchClientActive()) {
       syncFetchJobSummary(st);
-      applyFetchStatus(st);
+      applyFetchStatus(st, { replaceLog: true });
       clearFetchActivity();
       return;
     }
@@ -356,11 +399,11 @@ export function pollFetchStatus() {
     state.pollTimer = null;
     const fetchingKey = state.fetchingCompanyKey;
     const optimisticTs = fetchingKey
-      ? state.allCompanies.find((c) => `${c.country}:${c.name}` === fetchingKey)?.updated
+      ? state.boardCatalog.find((c) => `${c.country}:${c.name}` === fetchingKey)?.updated
       : null;
-    await loadJobs({ silent: true });
+    await loadJobs({ silent: true, force: true });
     if (fetchingKey && optimisticTs) {
-      const company = state.allCompanies.find((c) => `${c.country}:${c.name}` === fetchingKey);
+      const company = state.boardCatalog.find((c) => `${c.country}:${c.name}` === fetchingKey);
       if (company) {
         const serverTs = company.updated || company.newest_job_fetched || "";
         if (!serverTs || normalizeTsForSort(optimisticTs).localeCompare(normalizeTsForSort(serverTs)) > 0) {
@@ -368,6 +411,7 @@ export function pollFetchStatus() {
           company.newest_job_fetched = optimisticTs;
         }
       }
+      applyBoardView();
     }
     setFetchBusy(false);
 
@@ -398,6 +442,12 @@ export function pollFetchStatus() {
     }
   }
 
+  const onVisibility = () => {
+    if (!document.hidden && state.pollTimer) tick();
+  };
+  state.fetchVisibilityHandler = onVisibility;
+  document.addEventListener("visibilitychange", onVisibility);
+
   tick();
   state.pollTimer = setInterval(tick, 800);
 }
@@ -416,12 +466,10 @@ export async function cancelFetch() {
   }
   if (!active) return;
 
-  $("fetchCancelBtn").disabled = true;
-  $("fetchCancelBtn").textContent = "Cancelling…";
+  setFetchCancelPending(true);
   const ok = await cancelFetchRequest();
   if (!ok) {
-    $("fetchCancelBtn").disabled = false;
-    $("fetchCancelBtn").textContent = "Cancel";
+    setFetchCancelPending(false);
     return;
   }
   ensureFetchPolling();
@@ -432,10 +480,18 @@ export async function startCountryFetch() {
   const atsType = $("ats")?.value || "all";
   if (!country || country === "all") {
     toast("Select a single country to fetch (not All countries).");
+    showFetchNotice({
+      title: "Select a country",
+      subtitle: "Choose one country from the dropdown above — All countries cannot be fetched at once.",
+    });
     return;
   }
   if (state.scrapeConfig?.scrape_enabled === false) {
     toast("Scraping is disabled on this host.");
+    showFetchNotice({
+      title: "Scraping disabled",
+      subtitle: "Scraping is disabled on this host. Run scrapes locally, then sync catalog to Postgres.",
+    });
     return;
   }
 
@@ -454,11 +510,10 @@ export async function startCountryFetch() {
   state.fetchPanelSingle = false;
   showFetchPanel({
     title: atsType !== "all" ? `Fetching ${atsLabel(atsType)} companies` : "Fetching companies",
-    subtitle: fetchScopeSubtitle(country, atsType),
+    subtitle: fetchScopeSubtitle(country, atsType, concurrency),
     singleCompany: false,
     country,
   });
-  $("fetchSubtitle").textContent = fetchScopeSubtitle(country, atsType, concurrency);
 
   try {
     const data = await startFetchRequest({
@@ -514,7 +569,7 @@ export async function fetchOneCompany(country, company) {
       hideFetchPanelOnFailure();
       return;
     }
-    await loadJobs({ silent: true });
+    await loadJobs({ silent: true, force: true });
     pollFetchStatus();
   } catch {
     toast("Network error");
@@ -531,6 +586,10 @@ function hideFetchPanelOnFailure() {
 export async function resumeFetchIfRunning() {
   const st = await syncFetchStateFromServer();
   if (!st?.running) {
+    if (st?.company && st?.review_jobs && fetchClientActive()) {
+      openFetchPanel();
+      applyFetchStatus(st, { replaceLog: true });
+    }
     clearFetchActivity();
     return;
   }

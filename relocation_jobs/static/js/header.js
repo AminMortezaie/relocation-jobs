@@ -3,16 +3,24 @@
 import { $ } from "./utils.js";
 
 function closePopover(popoverId, btnId) {
-  $(popoverId).hidden = true;
-  if (btnId) $(btnId).setAttribute("aria-expanded", "false");
+  const popover = $(popoverId);
+  if (!popover) return;
+  popover.hidden = true;
+  if (btnId) {
+    const btn = $(btnId);
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
 }
 
 function togglePopover(popoverId, btnId) {
-  const open = $(popoverId).hidden;
+  const popover = $(popoverId);
+  const btn = btnId ? $(btnId) : null;
+  if (!popover || !btn) return;
+  const open = popover.hidden;
   closeAllHeaderPopovers();
   if (open) {
-    $(popoverId).hidden = false;
-    $(btnId).setAttribute("aria-expanded", "true");
+    popover.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
   }
 }
 

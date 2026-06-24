@@ -1,17 +1,14 @@
 /** DOM event listeners for the jobs panel. */
 
 import { state, companyKey } from "./state.js";
-import { $, toast, atsScoreTone, isNarrowViewport } from "./utils.js";
+import { $, toast, atsScoreTone, isNarrowViewport, debounce } from "./utils.js";
 import {
   removeCompany,
-  toggleFetchProblem,
-  markFetchOk,
   setNotForMe,
   restoreJob,
   toggleApplied,
   toggleRejected,
   reapplyJob,
-  addManualJobs,
   saveAtsScore,
   saveWaitingReferral,
   markJobSeen,
@@ -25,13 +22,13 @@ import {
   toggleCompanyCollapse,
   toggleShowNotForMe,
   toggleShowRejected,
-  toggleFetchReviewFilteredExpanded,
   hideFetchPanel,
-  setFetchReviewFeedbackDone,
   notForMeReasonMeta,
+  updateFetchHeaderUI,
 } from "./render.js";
 import { saveShowRejectedCompanies } from "./storage.js";
-import { fetchOneCompany, cancelFetch, handleFetchCountryClick, openFetchProgress, ensureFetchPolling } from "./scrape.js";
+import { fetchOneCompany, ensureFetchPolling } from "./scrape.js";
+import { fetchPanelState } from "./fetch-ui.js";
 import { openEditCareersDialog, openEditCompanyNameDialog, openEditCityDialog } from "./dialogs.js";
 import { saveCollapsedCompanies } from "./storage.js";
 import { logout, submitAuth, setLoginMode } from "./auth.js";
@@ -878,7 +875,7 @@ function bindJobsListEvents() {
     const removeBtn = e.target.closest(".remove-company-btn");
     if (removeBtn) {
       const { country, company } = removeBtn.dataset;
-      if (!confirm(`Remove ${company} from ${country}? This deletes it from the JSON file.`)) {
+      if (!confirm(`Remove ${company} from ${country}? This deletes it from the catalog.`)) {
         return;
       }
       removeBtn.disabled = true;
@@ -898,106 +895,16 @@ function bindJobsListEvents() {
 
 function bindToolbarEvents() {
   $("country").addEventListener("change", async () => {
+    updateFetchHeaderUI();
     await loadCities();
     await loadJobs();
   });
   $("ats")?.addEventListener("change", loadJobs);
   $("location")?.addEventListener("change", loadJobs);
-  $("fetchCountryBtn")?.addEventListener("click", () => {
-    handleFetchCountryClick();
-  });
-  $("fetchProgressChip")?.addEventListener("click", () => {
-    openFetchProgress();
-  });
-  $("search").addEventListener("input", () => renderCompanies());
-  $("fetchCancelBtn").addEventListener("click", () => {
-    cancelFetch();
-  });
-  $("fetchCloseBtn").addEventListener("click", () => {
-    hideFetchPanel();
-    ensureFetchPolling();
-  });
-  async function handleFetchReviewFeedback(btn, action) {
-    const { country, company } = btn.dataset;
-    if (!country || !company) return;
-    const okBtn = $("fetchReviewOkBtn");
-    const problemBtn = $("fetchReviewProblemBtn");
-    okBtn.disabled = true;
-    problemBtn.disabled = true;
-    try {
-      const result = action === "ok"
-        ? await markFetchOk(country, company)
-        : await toggleFetchProblem(country, company, true);
-      if (!result) {
-        okBtn.disabled = false;
-        problemBtn.disabled = false;
-        return;
-      }
-      state.fetchReviewFeedback = { country, company, status: action === "ok" ? "ok" : "problem" };
-      setFetchReviewFeedbackDone(state.fetchReviewFeedback.status);
-      toast(action === "ok" ? `Fetch OK — ${company}` : `Fetch problem — ${company}`);
-      await loadJobs({ silent: true });
-      if (
-        state.fetchReviewFeedback?.country === country
-        && state.fetchReviewFeedback?.company === company
-      ) {
-        setFetchReviewFeedbackDone(state.fetchReviewFeedback.status);
-      }
-    } catch (err) {
-      okBtn.disabled = false;
-      problemBtn.disabled = false;
-      if (err?.message !== "auth") {
-        toast(err?.message || "Could not save fetch status");
-      }
-    }
-  }
-
-  const fetchReviewOkBtn = $("fetchReviewOkBtn");
-  if (fetchReviewOkBtn) {
-    fetchReviewOkBtn.addEventListener("click", () => {
-      handleFetchReviewFeedback(fetchReviewOkBtn, "ok");
-    });
-  }
-  const fetchReviewProblemBtn = $("fetchReviewProblemBtn");
-  if (fetchReviewProblemBtn) {
-    fetchReviewProblemBtn.addEventListener("click", () => {
-      handleFetchReviewFeedback(fetchReviewProblemBtn, "problem");
-    });
-  }
-  $("fetchReviewExpandBtn")?.addEventListener("click", () => {
-    toggleFetchReviewFilteredExpanded();
-  });
-  $("fetchReviewAddBtn").addEventListener("click", async () => {
-    const list = $("fetchReviewFilteredList");
-    const country = list.dataset.country;
-    const company = list.dataset.company;
-    const jobs = list._jobs || [];
-    const selected = [...list.querySelectorAll(".fetch-review-check:checked")]
-      .map((el) => jobs[Number(el.dataset.idx)])
-      .filter(Boolean);
-    if (!selected.length) {
-      toast("Select at least one role");
-      return;
-    }
-    $("fetchReviewAddBtn").disabled = true;
-    const result = await addManualJobs(country, company, selected);
-    if (!result) {
-      $("fetchReviewAddBtn").disabled = false;
-      return;
-    }
-    toast(`Added ${result.added} role(s) to ${result.company}`);
-    await loadJobs();
-    hideFetchPanel();
-  });
-  $("fetchPanelBackdrop").addEventListener("click", (e) => {
-    if (e.target === $("fetchPanelBackdrop")) {
-      hideFetchPanel();
-      ensureFetchPolling();
-    }
-  });
+  $("search").addEventListener("input", debounce(() => renderCompanies(), 200));
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
-    if ($("fetchPanelBackdrop").classList.contains("open")) {
+    if (fetchPanelState.open) {
       hideFetchPanel();
       ensureFetchPolling();
     }

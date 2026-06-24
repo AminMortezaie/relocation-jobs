@@ -31,7 +31,8 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 
-from relocation_jobs.catalog_db import load_country_catalog as load_country_catalog_db, save_country_catalog as save_country_catalog_db
+from relocation_jobs.catalog.repo import load_country_catalog as load_country_catalog_db
+from relocation_jobs.catalog.writes import save_country_catalog as save_country_catalog_db
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
 from relocation_jobs.core.slug import slug_from_name
 

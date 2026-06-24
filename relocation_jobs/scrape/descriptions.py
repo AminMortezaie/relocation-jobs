@@ -1,13 +1,9 @@
-"""HTML-to-text and visa/relocation pattern detection."""
-
 from __future__ import annotations
 
 import re
 
 from bs4 import BeautifulSoup
 
-# Patterns aligned with relocate.me relocation-package guide:
-# https://relocate.me/international-jobs/job-search-guide/relocation-packages
 VISA_RELOCATION_POSITIVE = [
     r"visa\s+sponsor",
     r"visa\s+(?:application|paperwork|support|assistance)",
@@ -53,11 +49,9 @@ def html_to_text(html: str) -> str:
 
 
 def detect_visa_relocation(text: str) -> bool | None:
-    """Return True/False for visa or relocation support; None if text unavailable."""
     if not text:
         return None
-    normalized = text.lower()
-    normalized = re.sub(r"\s+", " ", normalized)
+    normalized = re.sub(r"\s+", " ", text.lower())
     if any(re.search(p, normalized) for p in VISA_RELOCATION_POSITIVE):
         return True
     if any(re.search(p, normalized) for p in VISA_RELOCATION_NEGATIVE):

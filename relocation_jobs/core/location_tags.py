@@ -264,9 +264,23 @@ def job_location_fields(job: dict) -> dict:
     return fields
 
 
+_COUNTRY_SUFFIX_RE = re.compile(
+    r"(?:\s*\((?:"
+    + "|".join(re.escape(lbl) for lbl in COUNTRY_LABELS.values())
+    + r")\))+\s*$",
+    re.I,
+)
+
+
+def _strip_country_suffix(city: str) -> str:
+    """Remove trailing ``(Country)`` labels from city strings."""
+    stripped = _COUNTRY_SUFFIX_RE.sub("", city).strip()
+    return stripped or city
+
+
 def normalize_location(country: str, city: str) -> dict | None:
     country_key = normalize_country_key(country)
-    city_label = (city or "").strip()
+    city_label = _strip_country_suffix((city or "").strip())
     if not country_key or country_key not in COUNTRY_LABELS or not city_label:
         return None
     return {

@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import re
 import sqlite3
+import threading
 from contextlib import contextmanager
 from typing import Any
 
@@ -40,11 +41,17 @@ class _PgShimCursor:
 class FakePgConnection:
     """Minimal psycopg-like connection for exercising ``use_postgres()`` branches."""
 
-    def __init__(self) -> None:
-        self._conn = sqlite3.connect(":memory:", check_same_thread=False)
+    def __init__(self, *, _shared_conn: sqlite3.Connection | None = None,
+                 _lock: threading.Lock | None = None) -> None:
+        self._conn = _shared_conn or sqlite3.connect(":memory:", check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
+        self._lock = _lock or threading.Lock()
         self.closed = False
         self.autocommit = True
+
+    def clone(self) -> "FakePgConnection":
+        """New wrapper around the same in-memory SQLite DB (simulates reconnect)."""
+        return FakePgConnection(_shared_conn=self._conn, _lock=self._lock)
 
     @contextmanager
     def transaction(self):
@@ -72,15 +79,16 @@ class FakePgConnection:
 
     def _run(self, sql: str, params: tuple | list) -> sqlite3.Cursor:
         sql, params = self._adapt_any(sql, params)
-        try:
-            return self._conn.execute(sql, params)
-        except sqlite3.OperationalError as exc:
-            msg = str(exc).lower()
-            if "duplicate column name" in msg or "already exists" in msg:
-                return self._conn.execute("SELECT 1 AS ok")
-            if "cannot add a column" in msg and "alter table" in msg.lower():
-                return self._conn.execute("SELECT 1 AS ok")
-            raise
+        with self._lock:
+            try:
+                return self._conn.execute(sql, params)
+            except sqlite3.OperationalError as exc:
+                msg = str(exc).lower()
+                if "duplicate column name" in msg or "already exists" in msg:
+                    return self._conn.execute("SELECT 1 AS ok")
+                if "cannot add a column" in msg and "alter table" in msg.lower():
+                    return self._conn.execute("SELECT 1 AS ok")
+                raise
 
     def _adapt_any(self, sql: str, params: tuple | list) -> tuple[str, tuple]:
         """Translate PostgreSQL ``= ANY(?)`` with a list param to ``IN (?, ?, ...)``."""
@@ -97,10 +105,12 @@ class FakePgConnection:
         return sql, tuple(params)
 
     def executemany(self, sql: str, params_seq: list[tuple]) -> None:
-        self._conn.executemany(self._adapt(sql)[0], params_seq)
+        with self._lock:
+            self._conn.executemany(self._adapt(sql)[0], params_seq)
 
     def executescript(self, sql: str) -> None:
-        self._conn.executescript(self._adapt(sql)[0])
+        with self._lock:
+            self._conn.executescript(self._adapt(sql)[0])
 
     def commit(self) -> None:
         self._conn.commit()
@@ -178,13 +188,11 @@ def install_postgres_mock(monkeypatch, *, database_url: str = "postgresql://test
     fake = FakePgConnection()
     monkeypatch.setenv("DATABASE_URL", database_url)
     core._pg_conn = None
+    core._thread_local.__dict__.clear()
     core.reset_db_initialized()
 
     def _connect():
-        nonlocal fake
-        fake = FakePgConnection()
-        core.reset_db_initialized()
-        return fake
+        return fake.clone()
 
     monkeypatch.setattr(core, "_connect_postgres", _connect)
     return fake
@@ -200,6 +208,7 @@ def install_session_postgres_mock(
     fake = FakePgConnection()
     os.environ["DATABASE_URL"] = database_url
     core._pg_conn = None
+    core._thread_local.__dict__.clear()
     core.reset_db_initialized()
 
     def _connect():

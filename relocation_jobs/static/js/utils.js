@@ -19,6 +19,14 @@ export function toast(msg) {
   setTimeout(() => el.classList.remove("show"), 3500);
 }
 
+export function debounce(fn, waitMs = 200) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), waitMs);
+  };
+}
+
 export function browserTimezone() {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";

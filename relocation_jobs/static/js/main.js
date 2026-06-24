@@ -7,6 +7,8 @@ import { bindDialogEvents } from "./dialogs.js";
 import { bindEvents } from "./events.js";
 import { bindFilterBar, refreshFilterBar } from "./filters.js";
 import { bindHeaderBar } from "./header.js";
+import { registerFetchActions } from "./fetch-actions.js";
+import { publishFetchUi } from "./fetch-ui.js";
 import { resumeFetchIfRunning, syncFetchStateFromServer } from "./scrape.js";
 import {
   loadCollapsedCompanies,
@@ -30,6 +32,8 @@ async function init() {
   bindDialogEvents();
   bindFilterBar();
   bindHeaderBar();
+  registerFetchActions();
+  publishFetchUi();
 
   const ok = await refreshAuth();
   if (!ok) return;

@@ -1,12 +1,13 @@
 /** HTTP client and backend API calls. */
 
-import { findCompany, onUnauthorized } from "./state.js";
-import { refreshJobBoard } from "./job-board.js";
+import { findCompany, state, onUnauthorized } from "./state.js";
+import { hideJobAsNotForMe, restoreJobToOpen, refreshJobBoard } from "./job-board.js";
+import { renderStats } from "./render.js";
 import { toast, browserTimezone } from "./utils.js";
 
 async function reloadBoard() {
-  const { loadJobs } = await import("./data.js");
-  await loadJobs({ silent: true });
+  const { loadBoard } = await import("./board.js");
+  await loadBoard({ silent: true, force: true, refreshUserStats: true });
 }
 
 export async function apiFetch(url, options = {}) {
@@ -167,7 +168,22 @@ export async function setNotForMe(country, company, url, notForMe, reason = null
     toast(msg);
     return false;
   }
-  await reloadBoard();
+  const co = findCompany(country, company);
+  const idempotencyKey = data.idempotency_key || "";
+  if (co) {
+    if (notForMe) {
+      hideJobAsNotForMe(co, url, idempotencyKey, reason);
+    } else {
+      restoreJobToOpen(co, url, idempotencyKey);
+    }
+    if (state.boardStats) {
+      const delta = notForMe ? 1 : -1;
+      state.boardStats.not_for_me = Math.max(0, (state.boardStats.not_for_me ?? 0) + delta);
+      renderStats(state.boardStats);
+    }
+  } else {
+    await reloadBoard();
+  }
   return true;
 }
 
@@ -461,6 +477,47 @@ export async function cancelFetchRequest() {
 function filterQueryFlag(id) {
   const el = document.getElementById(id);
   return el && el.checked ? "1" : "0";
+}
+
+export function catalogQueryParams() {
+  const country = document.getElementById("country").value;
+  const atsEl = document.getElementById("ats");
+  const atsType = atsEl && atsEl.value !== "all" ? atsEl.value : "";
+  const locationEl = document.getElementById("location");
+  const location = locationEl && locationEl.value !== "all" ? locationEl.value : "";
+  const params = new URLSearchParams({ country });
+  if (location) params.set("location", location);
+  if (atsType) params.set("ats_type", atsType);
+  return params.toString();
+}
+
+export async function fetchBoard(options = {}) {
+  const bust = options.bustCache ? `&_=${Date.now()}` : "";
+  const res = await apiFetch(`/api/board?${catalogQueryParams()}${bust}`, {
+    cache: "no-store",
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    const msg = data.error || "Could not load board";
+    toast(msg);
+    throw new Error(msg);
+  }
+  return data;
+}
+
+export async function fetchBoardUserStats() {
+  const params = new URLSearchParams(catalogQueryParams());
+  params.set("timezone", browserTimezone());
+  const res = await apiFetch(`/api/board/stats?${params.toString()}`, {
+    cache: "no-store",
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    const msg = data.error || "Could not load board stats";
+    toast(msg);
+    throw new Error(msg);
+  }
+  return data;
 }
 
 export function jobsQueryParams() {

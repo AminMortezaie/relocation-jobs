@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 DEFAULT_CONCURRENCY = 16
+MAX_CONCURRENCY = 16
 
 INCLUDE_KEYWORDS = [
     "backend", "back-end", "back end",
@@ -22,7 +23,7 @@ INCLUDE_KEYWORDS = [
 EXCLUDE_KEYWORDS = [
     "frontend", "front-end", "front end",
     "android", "ios", "mobile",
-    "designer", " design ",
+    "designer", " design ", "security", "security engineer",
     "marketing", "sales", "account manager", "account executive",
     "data scientist", "data analyst", "machine learning engineer",
     "product manager", "product owner",
@@ -38,9 +39,10 @@ EXCLUDE_KEYWORDS = [
     "lead ", " lead",
     "engineering manager",
     "principal ",
-    "junior",
-    "devops", "dev ops",
-    "site reliability", " sre",
+    "junior", "AI Operations", "AI Ops", "integration engineer",
+    "Data analytics", "data analytics engineer",
+    "devops", "dev ops", "unity", "value engineer"
+    "site reliability", " sre", "associate"
     "cloud site reliability",
 ]
 

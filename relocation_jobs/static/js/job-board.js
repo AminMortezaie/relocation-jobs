@@ -1,12 +1,7 @@
 /** Local job-board updates after tracking mutations (avoid full /api/jobs reload). */
 
-import { state } from "./state.js";
+import { applyBoardView } from "./board.js";
 import { findJobInCompany } from "./state.js";
-import { renderCompanies } from "./render.js";
-
-function filterOn(id) {
-  return Boolean(document.getElementById(id)?.checked);
-}
 
 function jobMatches(job, url, idempotencyKey = "") {
   if (!job) return false;
@@ -49,38 +44,16 @@ function recomputeCounts(company) {
   company.positions_not_for_me = (company.not_for_me_jobs || []).length;
 }
 
-function shouldDropCompany(company) {
-  const jobs = company.jobs || [];
-  const rejected = company.rejected_jobs || [];
-  const hidden = company.not_for_me_jobs || [];
-  if (filterOn("positionRejectedOnly") && !rejected.length) return true;
-  if ((filterOn("positionAppliedOnly") || filterOn("positionLookingToApplyOnly")) && !jobs.length) {
-    return true;
-  }
-  if (filterOn("hideEmpty") && !jobs.length && !rejected.length && !hidden.length) return true;
-  return false;
-}
-
 export function refreshJobBoard() {
-  renderCompanies();
+  applyBoardView();
 }
 
 export function finalizeCompanyBoard(company) {
   recomputeCounts(company);
-  const idx = state.allCompanies.indexOf(company);
-  if (idx >= 0 && shouldDropCompany(company)) {
-    state.allCompanies.splice(idx, 1);
-  }
-  refreshJobBoard();
+  applyBoardView();
 }
 
-export function syncAppliedVisibility(company, url, applied, idempotencyKey = "") {
-  const jobs = ensureList(company, "jobs");
-  if (applied && filterOn("hidePositionApplied")) {
-    removeFromList(jobs, url, idempotencyKey);
-  } else if (!applied && filterOn("positionAppliedOnly")) {
-    removeFromList(jobs, url, idempotencyKey);
-  }
+export function syncAppliedVisibility(company) {
   finalizeCompanyBoard(company);
 }
 
@@ -121,10 +94,7 @@ export function restoreJobToOpen(company, url, idempotencyKey) {
   finalizeCompanyBoard(company);
 }
 
-export function syncLookingToApplyVisibility(company, url, lookingToApply, idempotencyKey = "") {
-  if (!lookingToApply && filterOn("positionLookingToApplyOnly")) {
-    removeFromList(ensureList(company, "jobs"), url, idempotencyKey);
-  }
+export function syncLookingToApplyVisibility(company) {
   finalizeCompanyBoard(company);
 }
 

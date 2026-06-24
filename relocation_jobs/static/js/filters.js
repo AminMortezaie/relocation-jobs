@@ -3,20 +3,20 @@
 import { $, isNarrowViewport, lockBodyScroll, unlockBodyScroll } from "./utils.js";
 import { saveFilterPreferences, saveSortPreference } from "./storage.js";
 import { renderCompanies, releaseCompanyOrder } from "./render.js";
-import { loadJobs } from "./data.js";
+import { applyBoardView } from "./board.js";
 
 const FILTER_DEFS = [
-  { id: "hidePositionApplied", label: "Hide applied positions", reload: true },
-  { id: "positionAppliedOnly", label: "Applied positions only", reload: true },
-  { id: "positionRejectedOnly", label: "Rejections only", reload: true },
-  { id: "positionLookingToApplyOnly", label: "Looking to apply only", reload: true },
-  { id: "hideApplied", label: "Hide applied companies", reload: true },
-  { id: "hideEmpty", label: "Hide companies with no jobs", reload: true },
-  { id: "hideCollapsedCompanies", label: "Hide collapsed companies", reload: false },
-  { id: "notAppliedOnly", label: "Not applied, has openings", reload: true },
-  { id: "fetchOkOnly", label: "Fetch OK only", reload: true },
-  { id: "fetchProblemOnly", label: "Fetch problems", reload: true },
-  { id: "visaOnly", label: "Visa / relocation", reload: true },
+  { id: "hidePositionApplied", label: "Hide applied positions" },
+  { id: "positionAppliedOnly", label: "Applied positions only" },
+  { id: "positionRejectedOnly", label: "Rejections only" },
+  { id: "positionLookingToApplyOnly", label: "Looking to apply only" },
+  { id: "hideApplied", label: "Hide applied companies" },
+  { id: "hideEmpty", label: "Hide companies with no jobs" },
+  { id: "hideCollapsedCompanies", label: "Hide collapsed companies" },
+  { id: "notAppliedOnly", label: "Not applied, has openings" },
+  { id: "fetchOkOnly", label: "Fetch OK only" },
+  { id: "fetchProblemOnly", label: "Fetch problems" },
+  { id: "visaOnly", label: "Visa / relocation" },
 ];
 
 function syncSortFromSelect() {
@@ -107,11 +107,7 @@ async function applyFilterChange(def, checked) {
   $(def.id).checked = checked;
   saveFilterPreferences();
   updateFilterUI();
-  if (def.reload) {
-    await loadJobs();
-  } else {
-    renderCompanies();
-  }
+  applyBoardView();
 }
 
 export function bindFilterBar() {
@@ -132,21 +128,13 @@ export function bindFilterBar() {
 
   $("filterBackdrop")?.addEventListener("click", closeFilterPopover);
 
-  $("clearFilters").addEventListener("click", async () => {
-    let needsReload = false;
+  $("clearFilters").addEventListener("click", () => {
     for (const f of FILTER_DEFS) {
-      if ($(f.id).checked) {
-        $(f.id).checked = false;
-        if (f.reload) needsReload = true;
-      }
+      $(f.id).checked = false;
     }
     saveFilterPreferences();
     updateFilterUI();
-    if (needsReload) {
-      await loadJobs();
-    } else {
-      renderCompanies();
-    }
+    applyBoardView();
   });
 
   $("filterPopover").addEventListener("click", (e) => e.stopPropagation());
@@ -160,13 +148,13 @@ export function bindFilterBar() {
   });
 
   for (const def of FILTER_DEFS) {
-    $(def.id).addEventListener("change", async () => {
+    $(def.id).addEventListener("change", () => {
       saveFilterPreferences();
       updateFilterUI();
-      if (def.reload) {
-        await loadJobs();
-      } else {
+      if (def.id === "hideCollapsedCompanies") {
         renderCompanies();
+      } else {
+        applyBoardView();
       }
     });
   }

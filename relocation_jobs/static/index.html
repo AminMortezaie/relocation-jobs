@@ -78,23 +78,7 @@
         </div>
 
         <div class="header-action-group">
-          <div class="header-fetch-slot">
-            <button type="button" class="header-secondary-btn" id="fetchCountryBtn" hidden title="Fetch jobs for the selected country and ATS filter">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>
-              </svg>
-              <span class="header-btn-text">Fetch</span>
-            </button>
-            <button type="button" class="header-secondary-btn fetch-progress-chip" id="fetchProgressChip" hidden title="View fetch progress">
-              <span class="fetch-progress-chip-meter" aria-hidden="true">
-                <span class="fetch-progress-chip-fill" id="fetchProgressChipFill"></span>
-              </span>
-              <span class="header-btn-text" id="fetchProgressChipMeta">Fetching…</span>
-              <svg class="fetch-progress-chip-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </button>
-          </div>
+          <div class="header-fetch-slot" id="fetch-header-root"></div>
           <a href="/admin" class="header-secondary-btn admin-header-btn" id="adminPanelBtn" hidden>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -415,96 +399,7 @@
     </form>
   </div>
 
-  <div class="dialog-backdrop fetch-panel-backdrop" id="fetchPanelBackdrop" aria-hidden="true">
-    <div
-      class="fetch-panel"
-      id="fetchPanel"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="fetchTitle"
-    >
-      <div class="fetch-panel-top">
-        <div class="fetch-panel-title-wrap">
-          <h2 class="fetch-panel-title" id="fetchTitle">Fetching companies</h2>
-          <p class="fetch-panel-subtitle" id="fetchSubtitle">Starting…</p>
-          <div class="fetch-completion" id="fetchCompletion" hidden>
-            <p class="fetch-completion-label" id="fetchCompletionLabel">Current run</p>
-            <dl class="fetch-completion-grid">
-              <div><dt>Started</dt><dd id="fetchCompletionStarted">—</dd></div>
-              <div><dt>Finished</dt><dd id="fetchCompletionFinished">—</dd></div>
-              <div><dt>Duration</dt><dd id="fetchCompletionDuration">—</dd></div>
-              <div><dt>New roles</dt><dd id="fetchCompletionNewJobs">—</dd></div>
-            </dl>
-          </div>
-        </div>
-        <div class="fetch-panel-actions">
-          <button type="button" class="fetch-cancel-btn" id="fetchCancelBtn" hidden>Cancel</button>
-          <button type="button" class="fetch-close-btn" id="fetchCloseBtn" aria-label="Close panel">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="fetch-panel-body">
-        <div class="fetch-progress-wrap" id="fetchProgressWrap" hidden>
-          <div class="fetch-progress-meta">
-            <span id="fetchProgressLabel">0 / 0 companies</span>
-            <span id="fetchProgressPct">0%</span>
-          </div>
-          <div class="fetch-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="fetchProgressTrack">
-            <div class="fetch-progress-bar" id="fetchProgressBar"></div>
-          </div>
-          <p class="fetch-current-company" id="fetchCurrentCompany"></p>
-        </div>
-
-        <div class="fetch-activity" id="fetchActivity" hidden>
-          <div class="fetch-activity-current">
-            <span class="fetch-activity-pulse" aria-hidden="true"></span>
-            <div class="fetch-activity-copy">
-              <p class="fetch-activity-step" id="fetchActivityStep">Starting…</p>
-              <p class="fetch-activity-detail" id="fetchActivityDetail" hidden></p>
-            </div>
-          </div>
-          <ol class="fetch-activity-log" id="fetchActivityLog"></ol>
-        </div>
-
-        <div class="fetch-review" id="fetchReview" hidden>
-          <p class="fetch-review-hint" id="fetchReviewHint">
-            Roles on the careers page that did not match your filters. Select any to add manually.
-          </p>
-          <div class="fetch-review-section" id="fetchReviewFiltered">
-            <div class="fetch-review-section-head">
-              <h3 class="fetch-review-heading" id="fetchReviewFilteredTitle">Filtered out</h3>
-              <button type="button" class="fetch-review-add-btn" id="fetchReviewAddBtn" hidden>Add selected</button>
-            </div>
-            <ul class="fetch-review-list fetch-review-checklist" id="fetchReviewFilteredList"></ul>
-            <button type="button" class="fetch-review-expand-btn" id="fetchReviewExpandBtn" hidden>Show more</button>
-          </div>
-          <div class="fetch-review-section" id="fetchReviewIncluded" hidden>
-            <h3 class="fetch-review-heading" id="fetchReviewIncludedTitle">Matched</h3>
-            <ul class="fetch-review-list" id="fetchReviewIncludedList"></ul>
-          </div>
-        </div>
-
-        <pre class="fetch-log" id="fetchLog"></pre>
-      </div>
-
-      <div class="fetch-panel-footer" id="fetchPanelFooter" hidden>
-        <div class="fetch-review-feedback" id="fetchReviewFeedback">
-          <div class="fetch-review-feedback-prompt" id="fetchReviewFeedbackPrompt">
-            <span class="fetch-review-feedback-label" id="fetchReviewFeedbackLabel">Did the fetch work correctly?</span>
-            <div class="fetch-review-feedback-actions" id="fetchReviewFeedbackActions">
-              <button type="button" class="fetch-review-ok-btn" id="fetchReviewOkBtn">Yes, looks good</button>
-              <button type="button" class="fetch-review-problem-btn" id="fetchReviewProblemBtn">No, fetch problem</button>
-            </div>
-          </div>
-          <div class="fetch-review-feedback-result" id="fetchReviewFeedbackResult" hidden></div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="fetch-panel-root"></div>
 
   <div class="dialog-backdrop" id="editCompanyNameDialog" aria-hidden="true">
     <form class="dialog dialog-edit-careers" id="editCompanyNameForm">
@@ -660,6 +555,7 @@
     </form>
   </div>
 
-  <script type="module" src="/static/js/main.js?v=78"></script>
+  <script type="module" crossorigin src="/static/dist/board.js"></script>
+  <script type="module" src="/static/js/main.js?v=88"></script>
 </body>
 </html>

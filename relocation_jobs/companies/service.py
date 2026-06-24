@@ -15,9 +15,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from relocation_jobs.core.slug import slug_from_name
-from relocation_jobs.catalog_db import (
+from relocation_jobs.catalog.repo import get_company
+from relocation_jobs.catalog.writes import (
     delete_company,
-    get_company,
     insert_jobs,
     rename_company_in_catalog,
     update_company_fields,
@@ -25,7 +25,7 @@ from relocation_jobs.catalog_db import (
     upsert_company as upsert_company_catalog,
 )
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
-from relocation_jobs.companies.repo import (
+from relocation_jobs.db.companies import (
     clear_company_tracking,
     rename_company_tracking,
     set_company_applied_db,
@@ -41,7 +41,8 @@ from relocation_jobs.core.location_tags import (
     normalize_location,
     sync_company_location_fields,
 )
-from relocation_jobs.services.catalog_service import now_iso, today
+from relocation_jobs.catalog.util import today
+from relocation_jobs.scrape.merge import now_iso
 from relocation_jobs.schemas import CompanyCreateInput, CompanyResponse
 
 from relocation_jobs.core.ats_constants import ATS_TYPE_CHOICES, KNOWN_ATS

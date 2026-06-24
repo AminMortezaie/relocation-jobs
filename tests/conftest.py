@@ -1,4 +1,4 @@
-"""Shared fixtures: in-memory Postgres mock, catalog seed data, Flask test client."""
+"""Shared fixtures: in-memory Postgres mock and catalog seed data."""
 
 from __future__ import annotations
 
@@ -20,15 +20,6 @@ _SESSION_ENV_KEYS = (
     "PANEL_ALLOW_REGISTER",
     "PANEL_SCRAPE_ENABLED",
 )
-
-
-def _reset_db_connections() -> None:
-    import relocation_jobs.core.db as core
-
-    if core._pg_conn is not None and not core._pg_conn.closed:
-        core._pg_conn.close()
-    core._pg_conn = None
-    core.reset_db_initialized()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -54,7 +45,6 @@ def _session_env():
 
 @pytest.fixture(scope="session")
 def _session_postgres(_session_env):
-    """One in-memory DB for the session; schema migrated once, rows cleared per test."""
     import relocation_jobs.core.db as core
     from relocation_jobs.core.auth import bootstrap_admin
     from relocation_jobs.db import init_db
@@ -77,40 +67,10 @@ def _session_postgres(_session_env):
         os.environ["DATABASE_URL"] = saved_url
 
 
-@pytest.fixture(scope="session")
-def _flask_app(_session_postgres):
-    """Bootstrap the panel Flask app once per session (expensive import + init_auth)."""
-    from unittest.mock import patch
-
-    import relocation_jobs.panel_server as panel_server
-
-    panel_server._bootstrapped = False
-    with patch("relocation_jobs.core.auth.init_db"), patch(
-        "relocation_jobs.core.auth.bootstrap_admin"
-    ):
-        panel_server.bootstrap_app()
-    panel_server.app.config["TESTING"] = True
-
-    yield panel_server.app
-
-    panel_server._bootstrapped = False
-
-
-@pytest.fixture(scope="session")
-def _session_test_client(_flask_app):
-    client = _flask_app.test_client()
-    client.post(
-        "/api/auth/login",
-        json={"username": "admin", "password": "adminpass123"},
-    )
-    return client
-
-
 @pytest.fixture(autouse=True)
 def reset_custom_cities_cache():
-    """Custom city loader caches by path; clear between tests."""
+    from relocation_jobs.catalog.cache import invalidate_country_cache
     from relocation_jobs.core.location_tags import _invalidate_custom_cities_cache
-    from relocation_jobs.catalog_db import invalidate_country_cache
 
     _invalidate_custom_cities_cache()
     invalidate_country_cache()
@@ -119,9 +79,20 @@ def reset_custom_cities_cache():
     invalidate_country_cache()
 
 
+@pytest.fixture(autouse=True)
+def _app_schema(db):
+    from relocation_jobs.core.db import get_connection
+    from relocation_jobs.db.migrate import apply_v2_migrations
+    from relocation_jobs.fetch.repo import clear_running_fetch_runs_for_tests
+
+    apply_v2_migrations(get_connection())
+    get_connection().execute("DELETE FROM company_fetch_attempts")
+    clear_running_fetch_runs_for_tests()
+    yield
+
+
 @pytest.fixture
 def tmp_data_dir(tmp_path, monkeypatch):
-    """Point panel storage at a temp directory."""
     data_dir = tmp_path / "data"
     data_dir.mkdir()
     monkeypatch.setenv("PANEL_DATA_DIR", str(data_dir))
@@ -130,7 +101,6 @@ def tmp_data_dir(tmp_path, monkeypatch):
 
 @pytest.fixture
 def db(tmp_data_dir, _session_postgres, request):
-    """Reset per-user rows between tests; full wipe only for ``fresh_db`` tests."""
     import relocation_jobs.core.auth as auth_mod
     import relocation_jobs.core.db as core
 
@@ -154,9 +124,59 @@ def db(tmp_data_dir, _session_postgres, request):
         _session_postgres.clear_tracking()
 
 
+@pytest.fixture(scope="session")
+def app(_session_postgres):
+    from unittest.mock import patch
+
+    import relocation_jobs.web.server as panel
+
+    panel._bootstrapped = False
+    with patch("relocation_jobs.db.init_db"), patch(
+        "relocation_jobs.core.auth.bootstrap_admin"
+    ):
+        panel.bootstrap_app()
+    panel.app.config["TESTING"] = True
+    yield panel.app
+    panel._bootstrapped = False
+
+
 @pytest.fixture
-def panel_db(db):
-    yield
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture
+def auth_client(client, db):
+    import relocation_jobs.core.auth as auth_mod
+    import relocation_jobs.core.db as core
+    from relocation_jobs.db import get_user_by_username
+
+    core._pg_conn = core.get_connection()
+    if get_user_by_username("admin") is None:
+        auth_mod.bootstrap_admin()
+    with client.session_transaction() as sess:
+        sess.clear()
+    resp = client.post(
+        "/api/auth/login",
+        json={"username": "admin", "password": "adminpass123"},
+    )
+    assert resp.status_code == 200
+    yield client
+
+
+@pytest.fixture
+def v2_app(app):
+    return app
+
+
+@pytest.fixture
+def v2_client(client):
+    return client
+
+
+@pytest.fixture
+def v2_auth_client(auth_client):
+    return auth_client
 
 
 @pytest.fixture
@@ -167,11 +187,18 @@ def sample_country_data():
 
 @pytest.fixture
 def seeded_catalog(db, sample_country_data):
-    from relocation_jobs.catalog_db import save_country_catalog
+    from relocation_jobs.catalog.writes import save_country_catalog
 
     data = copy.deepcopy(sample_country_data)
     save_country_catalog("uk", data)
     return data
+
+
+@pytest.fixture
+def seeded_catalog_v2(db):
+    from tests.helpers.seed import seed_country
+
+    return seed_country("uk", FIXTURES / "country_uk_minimal.json")
 
 
 @pytest.fixture
@@ -180,63 +207,3 @@ def test_user(db):
     from tests.helpers.passwords import hash_test_password
 
     return create_user("testuser", hash_test_password("testpass123"))
-
-
-@pytest.fixture
-def app_client(_session_test_client):
-    with _session_test_client.session_transaction() as sess:
-        sess.clear()
-    yield _session_test_client
-
-
-@pytest.fixture
-def pg_db(db):
-    """Alias for db — all tests now use the Postgres mock."""
-    yield
-
-
-@pytest.fixture
-def auth_client(_session_test_client, _session_postgres):
-    import relocation_jobs.core.auth as auth_mod
-    import relocation_jobs.core.db as core
-    from relocation_jobs.db import get_user_by_username
-
-    core._pg_conn = _session_postgres
-    if get_user_by_username("admin") is None:
-        auth_mod.bootstrap_admin()
-    with _session_test_client.session_transaction() as sess:
-        sess.clear()
-    resp = _session_test_client.post(
-        "/api/auth/login",
-        json={"username": "admin", "password": "adminpass123"},
-    )
-    assert resp.status_code == 200
-    yield _session_test_client
-
-
-_SCRAPE_ONLY_TESTS = frozenset({
-    "test_discover_careers_playwright_button_click",
-    "test_discover_careers_playwright_button_inner_text_error",
-    "test_discover_from_relocate_paths",
-    "test_discover_careers_static_non_http_href",
-    "test_discover_careers_url_playwright_fallback",
-    "test_build_companies_main_module_entry",
-    "test_build_companies_resolve_country_alias",
-    "test_panel_server_scrape_helpers",
-    "test_panel_server_scrape_exception",
-    "test_panel_fetch_endpoints",
-    "test_run_scrape_mocked_subprocess",
-    "test_detect_ats_and_enrich",
-})
-
-
-def pytest_collection_modifyitems(items):
-    """Tag scraper tests so default CI runs business logic only."""
-    for item in items:
-        nodeid = item.nodeid
-        if (
-            "/test_scrape_" in nodeid
-            or "/test_build_companies.py" in nodeid
-            or item.name in _SCRAPE_ONLY_TESTS
-        ):
-            item.add_marker(pytest.mark.scrape)

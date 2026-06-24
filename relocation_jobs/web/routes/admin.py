@@ -1,19 +1,20 @@
-"""Admin API routes."""
-
 from __future__ import annotations
+
+import os
 
 from flask import jsonify, request
 
+from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import admin_required
-from relocation_jobs.web import deps
-from relocation_jobs.db import list_all_fetch_runs, list_users_with_stats
-from relocation_jobs.services.admin_service import (
-    get_admin_dashboard,
-    get_admin_overview,
-    get_catalog_overview,
-    get_system_config,
-)
-from relocation_jobs.web.helpers import admin_fetch_snapshot, scrape_enabled
+from relocation_jobs.db import list_users_with_stats
+from relocation_jobs.admin import service as admin_service
+from relocation_jobs.catalog.stats import get_catalog_overview
+from relocation_jobs.fetch import repo as fetch_repo
+from relocation_jobs.fetch.runner import build_fetch_status
+
+
+def scrape_enabled() -> bool:
+    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
 
 
 def register(app):
@@ -29,10 +30,10 @@ def register(app):
                 except ValueError:
                     limit = 50
             return jsonify(
-                get_admin_dashboard(
-                    fetch_state=admin_fetch_snapshot(),
+                admin_service.get_admin_dashboard(
+                    fetch_state=build_fetch_status(),
                     scrape_enabled=scrape_enabled(),
-                    httpx_available=deps.HTTPX_AVAILABLE,
+                    httpx_available=HTTPX_AVAILABLE,
                     fetch_runs_limit=limit,
                 )
             )
@@ -40,16 +41,16 @@ def register(app):
             app.logger.exception("admin dashboard failed")
             return jsonify({"error": str(exc)}), 500
 
-
     @app.get("/api/admin/overview")
     @admin_required
     def api_admin_overview():
         try:
-            return jsonify(get_admin_overview(fetch_state=admin_fetch_snapshot()))
+            return jsonify(
+                admin_service.get_admin_overview(fetch_state=build_fetch_status())
+            )
         except Exception as exc:
             app.logger.exception("admin overview failed")
             return jsonify({"error": str(exc)}), 500
-
 
     @app.get("/api/admin/catalog")
     @admin_required
@@ -60,7 +61,6 @@ def register(app):
             app.logger.exception("admin catalog failed")
             return jsonify({"error": str(exc)}), 500
 
-
     @app.get("/api/admin/users")
     @admin_required
     def api_admin_users():
@@ -69,7 +69,6 @@ def register(app):
         except Exception as exc:
             app.logger.exception("admin users failed")
             return jsonify({"error": str(exc)}), 500
-
 
     @app.get("/api/admin/fetch-runs")
     @admin_required
@@ -80,22 +79,21 @@ def register(app):
         except ValueError:
             limit = 50
         try:
-            return jsonify(
-                {"runs": list_all_fetch_runs(country=country, limit=limit)}
-            )
+            return jsonify({
+                "runs": fetch_repo.list_all_fetch_runs(country=country, limit=limit),
+            })
         except Exception as exc:
             app.logger.exception("admin fetch-runs failed")
             return jsonify({"error": str(exc)}), 500
-
 
     @app.get("/api/admin/config")
     @admin_required
     def api_admin_config():
         try:
             return jsonify(
-                get_system_config(
+                admin_service.get_system_config(
                     scrape_enabled=scrape_enabled(),
-                    httpx_available=deps.HTTPX_AVAILABLE,
+                    httpx_available=HTTPX_AVAILABLE,
                 )
             )
         except Exception as exc:

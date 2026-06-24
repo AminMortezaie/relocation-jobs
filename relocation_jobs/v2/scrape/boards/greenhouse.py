@@ -12,8 +12,8 @@ def greenhouse_jobs_api_url(slug: str) -> str:
     return f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs"
 
 
-async def fetch_greenhouse_board(client, ats_url: str) -> list[dict]:
-    slug = greenhouse_board_slug(ats_url)
+async def fetch_greenhouse_board(client, board_url: str, company: dict) -> list[dict]:
+    slug = greenhouse_board_slug(board_url)
     if not slug or slug in ("embed", "jobs", ""):
         return []
     response = await client.get(

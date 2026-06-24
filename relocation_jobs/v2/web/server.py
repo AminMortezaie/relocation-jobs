@@ -48,6 +48,13 @@ def _static_no_cache(response):
     return response
 
 
+@app.route("/admin")
+def admin_page():
+    resp = send_from_directory(STATIC, "admin.html")
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
 @app.route("/")
 def index():
     resp = send_from_directory(STATIC, "index.html")

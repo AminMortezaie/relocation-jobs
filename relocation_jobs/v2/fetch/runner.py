@@ -4,12 +4,12 @@ import asyncio
 import threading
 from datetime import datetime, timezone
 
-from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
+import httpx
+
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES
 from relocation_jobs.v2.fetch import repo as fetch_repo
 from relocation_jobs.v2.fetch.country_runner import run_country_fetch
 from relocation_jobs.v2.fetch.pipeline import fetch_and_persist_company
-from relocation_jobs.v2.scrape.board import fetch_ats_board
 
 _fetch_lock = threading.Lock()
 _fetch_thread: threading.Thread | None = None
@@ -303,10 +303,6 @@ def _country_fetch_worker(
     new_jobs_total = 0
     companies_done = 0
     try:
-        if not HTTPX_AVAILABLE:
-            raise RuntimeError("httpx is not installed")
-        import httpx
-
         async def _run():
             nonlocal new_jobs_total, companies_done, cancelled
             async with httpx.AsyncClient() as client:
@@ -395,16 +391,11 @@ async def run_single_company_fetch_async(
     *,
     fetch_run_id: int | None = None,
 ) -> tuple[str, int]:
-    if not HTTPX_AVAILABLE:
-        raise RuntimeError("httpx is not installed")
-    import httpx
-
     async with httpx.AsyncClient() as client:
         return await fetch_and_persist_company(
             client,
             country_key,
             company_name,
-            fetch_board=fetch_ats_board,
             fetch_run_id=fetch_run_id,
         )
 

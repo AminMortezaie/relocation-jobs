@@ -218,6 +218,32 @@ def list_user_fetch_runs(
     return [_fetch_run_row_to_dict(row) for row in rows]
 
 
+def list_all_fetch_runs(
+    *,
+    country: str | None = None,
+    limit: int = 50,
+) -> list[dict]:
+    limit = max(1, min(int(limit), 200))
+    sql = """
+        SELECT f.*, u.username
+        FROM fetch_runs f
+        JOIN users u ON u.id = f.user_id
+        WHERE f.status != 'running'
+    """
+    params: list = []
+    if country:
+        sql += " AND f.country = %s"
+        params.append(country)
+    sql += f" ORDER BY f.started_at DESC, f.id DESC LIMIT {limit}"
+    rows = get_connection().execute(sql, tuple(params)).fetchall()
+    out: list[dict] = []
+    for row in rows:
+        data = _fetch_run_row_to_dict(row)
+        data["username"] = row.get("username")
+        out.append(data)
+    return out
+
+
 def get_running_fetch_run() -> dict | None:
     row = get_connection().execute(
         """

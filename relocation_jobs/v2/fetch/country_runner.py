@@ -6,7 +6,6 @@ from relocation_jobs.core.scrape_cancel import FetchCancelled, clear_cancel_chec
 from relocation_jobs.v2.catalog.repo import get_company, load_country_catalog, patch_country_catalog_meta
 from relocation_jobs.v2.fetch import repo as fetch_repo
 from relocation_jobs.v2.fetch.pipeline import fetch_and_persist_company
-from relocation_jobs.v2.scrape.board import fetch_ats_board
 from relocation_jobs.v2.scrape.merge import now_iso
 
 
@@ -84,7 +83,6 @@ async def run_country_fetch(
                     client,
                     country_key,
                     name,
-                    fetch_board=fetch_ats_board,
                     fetch_run_id=run_id,
                 )
                 new_jobs_total += new_count

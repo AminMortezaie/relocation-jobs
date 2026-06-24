@@ -34,6 +34,7 @@ async def test_fetch_greenhouse_board_parses_jobs():
         jobs = await fetch_greenhouse_board(
             client,
             "https://boards.greenhouse.io/acmebackend",
+            {},
         )
     assert len(jobs) == 1
     assert jobs[0]["title"] == "Senior Backend Engineer"
@@ -80,8 +81,8 @@ async def test_fetch_ats_board_rejects_unknown_type():
 
     company = {
         "name": "X",
-        "ats_type": "lever",
-        "ats_url": "https://jobs.lever.co/x",
+        "ats_type": "unknown_vendor",
+        "ats_url": "https://example.personio.de",
     }
     async with httpx.AsyncClient() as client:
         with pytest.raises(UnsupportedAtsTypeError):

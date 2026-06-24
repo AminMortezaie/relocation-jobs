@@ -4,16 +4,17 @@ import os
 
 from flask import g, jsonify, request
 
+from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import admin_required, login_required
 from relocation_jobs.core.location_tags import COUNTRY_LABELS
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
-from relocation_jobs.v2.catalog.repo import get_company
+from relocation_jobs.db import is_user_admin
+from relocation_jobs.v2.web import deps
 from relocation_jobs.v2.fetch import repo as fetch_repo
 from relocation_jobs.v2.fetch.runner import (
     build_fetch_status,
     fetch_is_running,
     request_fetch_cancel,
-    run_single_company_fetch,
     start_country_fetch,
 )
 from relocation_jobs.v2.fetch.types import AttemptStatus
@@ -35,10 +36,26 @@ def register(app):
         status = build_fetch_status()
         if not status.get("running"):
             return jsonify({"error": "No fetch is running"}), 400
+        if not status.get("company") and not is_user_admin(g.user_id):
+            return jsonify({"error": "Admin access required"}), 403
         ok, err = request_fetch_cancel()
         if not ok:
             return jsonify({"error": err or "No fetch is running"}), 400
         return jsonify({"ok": True})
+
+    @app.get("/api/fetch/history")
+    @admin_required
+    def api_fetch_history():
+        country = (request.args.get("country") or "").strip().lower() or None
+        if country and country not in SUPPORTED_COUNTRIES:
+            return jsonify({"error": f"Unknown country: {country}"}), 400
+        try:
+            limit = int(request.args.get("limit", 20))
+        except (TypeError, ValueError):
+            limit = 20
+        return jsonify({
+            "runs": fetch_repo.list_user_fetch_runs(g.user_id, country=country, limit=limit),
+        })
 
     @app.post("/api/fetch")
     @admin_required
@@ -49,6 +66,11 @@ def register(app):
                     "Scraping is disabled on this host. "
                     "Run scrapes locally, then sync catalog to Postgres."
                 ),
+            }), 503
+
+        if not HTTPX_AVAILABLE:
+            return jsonify({
+                "error": "httpx is not installed. Run: pip install httpx",
             }), 503
 
         body = request.get_json(silent=True) or {}
@@ -65,6 +87,10 @@ def register(app):
             return jsonify({"error": "Select a single country to fetch (not 'all')"}), 400
         if country not in SUPPORTED_COUNTRIES:
             return jsonify({"error": f"Unknown country: {country}"}), 400
+
+        valid_ats = {item["id"] for item in deps.list_ats_types()} | {"generic"}
+        if ats_type and ats_type not in valid_ats:
+            return jsonify({"error": f"Unknown ATS type: {ats_type}"}), 400
 
         if fetch_is_running():
             return jsonify({"error": "A fetch is already running"}), 409
@@ -116,56 +142,3 @@ def register(app):
             limit=limit,
         )
         return jsonify({"attempts": [row.model_dump() for row in rows]})
-
-    @app.post("/api/companies/fetch")
-    @login_required
-    def api_companies_fetch():
-        if not scrape_enabled():
-            return jsonify({
-                "error": (
-                    "Scraping is disabled on this host. "
-                    "Run scrapes locally, then sync catalog to Postgres."
-                ),
-            }), 503
-
-        body = request.get_json(silent=True) or {}
-        country = (body.get("country") or "").strip().lower()
-        company = (body.get("company") or "").strip()
-
-        if not country or country == "all":
-            return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
-            return jsonify({"error": f"Unknown country: {country}"}), 400
-        if not company:
-            return jsonify({"error": "company is required"}), 400
-
-        if get_company(country, company) is None:
-            return jsonify({"error": f"Company not found: {company}"}), 404
-
-        try:
-            message, new_jobs = run_single_company_fetch(country, company)
-        except RuntimeError as exc:
-            return jsonify({"error": str(exc)}), 503
-        except LookupError as exc:
-            return jsonify({"error": str(exc)}), 400
-
-        return jsonify({
-            "ok": True,
-            "country": country,
-            "company": company,
-            "file": COUNTRY_ARCHIVE_FILENAMES.get(country, ""),
-            "new_jobs": new_jobs,
-            "message": message,
-            "label": COUNTRY_LABELS.get(country, country),
-        })
-
-    @app.get("/api/companies/<country>/<path:company_name>")
-    @login_required
-    def api_company_detail(country: str, company_name: str):
-        country = country.strip().lower()
-        if country not in SUPPORTED_COUNTRIES:
-            return jsonify({"error": f"Unknown country: {country}"}), 400
-        company = get_company(country, company_name)
-        if company is None:
-            return jsonify({"error": f"Company not found: {company_name}"}), 404
-        return jsonify({"company": company})

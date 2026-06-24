@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import date
+from typing import Optional
 
 from relocation_jobs.core.location_tags import filter_jobs_by_expected_locations
 from relocation_jobs.core.scrape_cancel import FetchCancelled, raise_if_cancelled
@@ -12,6 +13,7 @@ from relocation_jobs.v2.shared.predicates import any_of
 
 FetchBoard = Callable[..., Awaitable[list[dict]]]
 EnrichBoard = Callable[..., Awaitable[list[dict]]]
+PersistBoard = Optional[Callable[[], None]]
 
 
 @dataclass(frozen=True)
@@ -75,9 +77,9 @@ def _company_line(company: dict, index: int, total: int) -> str:
     return f"[{index}/{total}] {name} ({city})"
 
 
-def _persist_board(save_fn) -> None:
-    if save_fn:
-        save_fn()
+def _call_persist_board(persist_board: PersistBoard) -> None:
+    if persist_board:
+        persist_board()
 
 
 def _sponsored_count(jobs: list[dict]) -> int:
@@ -131,9 +133,8 @@ async def _filter_board_listings(
     *,
     fetch_board: FetchBoard,
     catalog_country: str,
-    save_fn,
 ) -> list[dict]:
-    raw = await fetch_board(client, company, save_fn=save_fn)
+    raw = await fetch_board(client, company)
     title_matched = filter_relevant_jobs(raw, True)
     matched, _skipped = filter_jobs_by_expected_locations(
         title_matched, company, catalog_country=catalog_country,
@@ -166,7 +167,7 @@ async def enrich_company_board(
     enrich_board: EnrichBoard | None,
     skip_enriched: bool,
     enrich_concurrency: int,
-    save_fn,
+    persist_board: PersistBoard,
 ) -> tuple[str, int]:
     ctx = _EnrichContext(
         prefix=prefix,
@@ -184,7 +185,7 @@ async def enrich_company_board(
     )
     company["matching_jobs"] = jobs
     company["updated"] = now_iso()
-    _persist_board(save_fn)
+    _call_persist_board(persist_board)
     sponsored = _sponsored_count(jobs)
     return (
         f"{prefix} — enriched {len(jobs)} job(s) ({sponsored} with visa/relocation support)",
@@ -201,7 +202,7 @@ async def scrape_company_board(
     enrich_board: EnrichBoard | None,
     enrich_concurrency: int,
     catalog_country: str,
-    save_fn,
+    persist_board: PersistBoard,
 ) -> tuple[str, int]:
     raise_if_cancelled()
     existing = list(company.get("matching_jobs") or [])
@@ -209,7 +210,6 @@ async def scrape_company_board(
         client, company,
         fetch_board=fetch_board,
         catalog_country=catalog_country,
-        save_fn=save_fn,
     )
     raise_if_cancelled()
     jobs, preserved, new_count, stale_kept = merge_matching_jobs(existing, scraped)
@@ -221,7 +221,7 @@ async def scrape_company_board(
     company["matching_jobs"] = jobs
     company["updated"] = now_iso()
     _mark_fetch_ok(company)
-    _persist_board(save_fn)
+    _call_persist_board(persist_board)
     return _scrape_success_line(
         prefix, jobs,
         preserved=preserved,
@@ -238,7 +238,7 @@ async def process_company(
     *,
     fetch_board: FetchBoard,
     enrich_board: EnrichBoard | None = None,
-    save_fn=None,
+    persist_board: PersistBoard = None,
     enrich_only: bool = False,
     skip_enriched: bool = False,
     enrich_concurrency: int = 4,
@@ -254,7 +254,7 @@ async def process_company(
             enrich_board=enrich_board,
             skip_enriched=skip_enriched,
             enrich_concurrency=enrich_concurrency,
-            save_fn=save_fn,
+            persist_board=persist_board,
         )
 
     try:
@@ -264,11 +264,11 @@ async def process_company(
             enrich_board=enrich_board,
             enrich_concurrency=enrich_concurrency,
             catalog_country=catalog_country,
-            save_fn=save_fn,
+            persist_board=persist_board,
         )
     except FetchCancelled:
         raise
     except Exception as exc:
         _mark_fetch_failed(company)
-        _persist_board(save_fn)
+        _call_persist_board(persist_board)
         return f"{prefix} — Error: {exc}", 0

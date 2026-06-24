@@ -5,7 +5,9 @@ from collections.abc import Awaitable, Callable
 from relocation_jobs.v2.catalog.repo import get_company
 from relocation_jobs.v2.catalog.repo import sync_company_board_to_catalog
 from relocation_jobs.v2.fetch import service as fetch_service
+from relocation_jobs.v2.scrape.board import fetch_ats_board
 from relocation_jobs.v2.scrape.company import process_company
+from relocation_jobs.v2.scrape.enrich import enrich_jobs
 
 FetchBoard = Callable[..., Awaitable[list[dict]]]
 EnrichBoard = Callable[..., Awaitable[list[dict]]]
@@ -16,7 +18,7 @@ async def fetch_and_persist_company(
     country_key: str,
     company_name: str,
     *,
-    fetch_board: FetchBoard,
+    fetch_board: FetchBoard | None = None,
     enrich_board: EnrichBoard | None = None,
     enrich_only: bool = False,
     skip_enriched: bool = False,
@@ -30,6 +32,17 @@ async def fetch_and_persist_company(
     def persist_board() -> None:
         sync_company_board_to_catalog(country_key, company)
 
+    board_fetch = fetch_board or fetch_ats_board
+    board_enrich = enrich_board if enrich_board is not None else enrich_jobs
+
+    async def _fetch_board(proc_client, proc_company: dict, **kwargs) -> list[dict]:
+        return await board_fetch(
+            proc_client,
+            proc_company,
+            persist_board=persist_board,
+            **kwargs,
+        )
+
     async def process(
         proc_client,
         proc_company: dict,
@@ -42,9 +55,9 @@ async def fetch_and_persist_company(
             proc_company,
             index,
             total,
-            fetch_board=fetch_board,
-            enrich_board=enrich_board,
-            save_fn=persist_board,
+            fetch_board=_fetch_board,
+            enrich_board=board_enrich,
+            persist_board=persist_board,
             enrich_only=enrich_only,
             skip_enriched=skip_enriched,
             enrich_concurrency=enrich_concurrency,
@@ -58,7 +71,7 @@ async def fetch_and_persist_company(
         1,
         country_key=country_key,
         process_company=process,
-        save_fn=persist_board,
+        persist_board=persist_board,
         enrich_only=enrich_only,
         skip_enriched=skip_enriched,
         enrich_concurrency=enrich_concurrency,

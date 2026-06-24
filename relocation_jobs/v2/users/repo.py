@@ -3,6 +3,32 @@ from __future__ import annotations
 from relocation_jobs.core.db import _normalize_url, get_connection
 
 
+def _empty_status_history() -> dict[str, list]:
+    return {
+        "applied": [],
+        "rejected": [],
+        "applied_events": [],
+        "rejected_events": [],
+    }
+
+
+def _append_status_event_row(bucket: dict[str, list], row: dict) -> None:
+    event_type = row.get("event_type", "")
+    event_date = (row.get("event_date") or "").strip()
+    created_at = (row.get("created_at") or "").strip()
+    if event_type not in ("applied", "rejected") or not event_date:
+        return
+    bucket[event_type].append(event_date)
+    bucket[f"{event_type}_events"].append({"date": event_date, "at": created_at})
+
+
+def shape_status_history(rows: list[dict]) -> dict[str, list]:
+    bucket = _empty_status_history()
+    for row in rows:
+        _append_status_event_row(bucket, row)
+    return bucket
+
+
 def load_job_tracking(user_id: int) -> dict[tuple[str, str, str], dict]:
     rows = get_connection().execute(
         """
@@ -46,15 +72,97 @@ def load_job_status_history(user_id: int) -> dict[tuple[str, str, str], dict[str
         key = (row["country"], row["company_name"], _normalize_url(row.get("job_url", "")))
         if not key[2]:
             continue
-        bucket = out.setdefault(
-            key,
-            {"applied": [], "rejected": [], "applied_events": [], "rejected_events": []},
-        )
-        event_type = row.get("event_type", "")
-        event_date = (row.get("event_date") or "").strip()
-        created_at = (row.get("created_at") or "").strip()
-        if event_type not in ("applied", "rejected") or not event_date:
-            continue
-        bucket[event_type].append(event_date)
-        bucket[f"{event_type}_events"].append({"date": event_date, "at": created_at})
+        bucket = out.setdefault(key, _empty_status_history())
+        _append_status_event_row(bucket, row)
     return out
+
+
+def insert_status_event(
+    conn,
+    user_id: int,
+    country: str,
+    company_name: str,
+    job_url: str,
+    event_type: str,
+    event_date: str,
+    created_at: str,
+) -> None:
+    conn.execute(
+        """
+        INSERT INTO job_status_events (
+            user_id, country, company_name, job_url,
+            event_type, event_date, created_at
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """,
+        (user_id, country, company_name, job_url, event_type, event_date, created_at),
+    )
+
+
+def fetch_status_events_for_job(
+    conn,
+    user_id: int,
+    country: str,
+    company_name: str,
+    job_url: str,
+) -> list[dict]:
+    return conn.execute(
+        """
+        SELECT event_type, event_date, created_at
+        FROM job_status_events
+        WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+        ORDER BY event_date ASC, id ASC
+        """,
+        (user_id, country, company_name, job_url),
+    ).fetchall()
+
+
+def count_applied_jobs(user_id: int, *, country: str | None = None) -> int:
+    conn = get_connection()
+    if country:
+        row = conn.execute(
+            "SELECT COUNT(*) AS n FROM job_tracking WHERE user_id = %s AND applied = 1 AND country = %s",
+            (user_id, country),
+        ).fetchone()
+    else:
+        row = conn.execute(
+            "SELECT COUNT(*) AS n FROM job_tracking WHERE user_id = %s AND applied = 1",
+            (user_id,),
+        ).fetchone()
+    return int((row or {}).get("n") or 0)
+
+
+def fetch_applied_events_in_range(
+    user_id: int,
+    start_utc: str,
+    end_utc: str,
+    *,
+    country: str | None = None,
+) -> list[dict]:
+    conn = get_connection()
+    if country:
+        return conn.execute(
+            """
+            SELECT e.country, e.company_name, e.job_url, e.event_date, e.created_at, t.job_title
+            FROM job_status_events e
+            LEFT JOIN job_tracking t
+              ON t.user_id = e.user_id AND t.country = e.country
+             AND t.company_name = e.company_name AND t.job_url = e.job_url
+            WHERE e.user_id = %s AND e.event_type = 'applied' AND e.country = %s
+              AND e.created_at >= %s AND e.created_at < %s
+            ORDER BY e.created_at DESC
+            """,
+            (user_id, country, start_utc, end_utc),
+        ).fetchall()
+    return conn.execute(
+        """
+        SELECT e.country, e.company_name, e.job_url, e.event_date, e.created_at, t.job_title
+        FROM job_status_events e
+        LEFT JOIN job_tracking t
+          ON t.user_id = e.user_id AND t.country = e.country
+         AND t.company_name = e.company_name AND t.job_url = e.job_url
+        WHERE e.user_id = %s AND e.event_type = 'applied'
+          AND e.created_at >= %s AND e.created_at < %s
+        ORDER BY e.created_at DESC
+        """,
+        (user_id, start_utc, end_utc),
+    ).fetchall()

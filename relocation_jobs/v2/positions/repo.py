@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction
+from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction, get_connection
 from relocation_jobs.v2.users.history import append_status_event, status_history_for_job
 
 
@@ -405,8 +405,6 @@ def set_company_awaiting_response(
 
 
 def load_wrong_location_hides(user_id: int, country_key: str | None = None) -> list[dict]:
-    from relocation_jobs.core.db import get_connection
-
     if country_key:
         rows = get_connection().execute(
             """

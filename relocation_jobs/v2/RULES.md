@@ -2,6 +2,8 @@
 
 How we build `relocation_jobs/v2/`. v1 (`services/`, `catalog/`, `scrape/`, `web/` shims) is **reference only** — read for behavior, do not import or bulk-copy.
 
+Also read: `.claude/V2_CODING_VERDICT.md` (handoff + known violations), `.cursor/rules/v2-coding.mdc` (agent rule).
+
 ## Boundaries
 
 | Layer | Role | SQL? | May import |
@@ -15,18 +17,27 @@ How we build `relocation_jobs/v2/`. v1 (`services/`, `catalog/`, `scrape/`, `web
 
 **Do not** put `conn.execute`, `db_transaction`, or `get_connection` outside a domain’s `repo.py` (and `v2/db/migrate.py` for v2-only schema).
 
+**Known violation:** `users/history.py` and `users/applied.py` still contain SQL — move into `users/repo.py`.
+
 **Do not** import v1 application code (`services.*`, `catalog.*`, `catalog_db`, `scrape_jobs`, v1 `web.*`).
 
 **OK to import** `relocation_jobs.core.*` (DB helpers, auth, `job_identity`, `location_tags`, `ats_constants`, paths) and `relocation_jobs.db.init_db` from the app entry/bootstrap only.
 
+## Imports
+
+- Top of module, unconditionally.
+- No `try/except ImportError` for optional dependencies.
+- No imports inside function bodies — fix structure instead of lazy imports.
+- **Known violations:** `fetch/runner.py` (`httpx`), `positions/repo.py` (`get_connection` in one function), bootstrap lazy imports in `web/server.py`.
+
 ## File and module shape
 
 - **Few files per domain**, not a mirror of v1’s tree.
-- **~30–40 lines per repo function** where practical; split when a function mixes concerns.
+- **~30–40 lines per function** where practical; split when a function mixes concerns or steps.
 - **`types.py` per domain** for enums and API/DB boundary models (`BaseSchema` from `shared/schema.py`).
-- **No re-export facades** — e.g. no `board_sync.py` that only imports from `repo`. The contract is **function name + docstring + tests**, not an extra module.
+- **No re-export facades** — contract is **function name + tests**, not an extra module.
 - **No `cp -r` from v1.** Copy one reviewed module at a time when porting scrape logic.
-- **Delete dead code** — no shims, no “just in case” files.
+- **Delete dead code** — no shims, no “just in case” files (e.g. empty `web/routes/catalog.py`).
 
 ### Section order (within a module)
 
@@ -38,7 +49,17 @@ Keep **declarations before behavior** — do not interleave predicate tables wit
 4. **Private helpers** — `_`-prefixed functions  
 5. **Public API** — functions routes and other domains call  
 
-Predicate lambdas may call helpers defined later (runtime); still keep the **tuple definitions** above all functions. No section-divider comments in source — see `.claude/skills/module-layout/SKILL.md`.
+Predicate lambdas may call helpers defined later (runtime); still keep the **tuple definitions** above all functions.
+
+### No comments in v2 source
+
+- No section-divider comments (`# --- types ---`, `# --- rules ---`, etc.).
+- No narrating comments on blocks (“first match wins”, “public API”).
+- No docstrings by default — behavior should be clear from names and `tests/v2`.
+
+### Readable flow
+
+Prefer a **clear linear story** in orchestration code over many small wrappers and result dataclasses. Good reference: `scrape/merge.py` (index → walk scrape → keep stale → stamp).
 
 ## Naming
 
@@ -47,10 +68,10 @@ Names should state **what** and **when**, not generic verbs.
 | Avoid | Prefer |
 |-------|--------|
 | `writes.py`, `save_company` | `repo.sync_company_board_to_catalog` |
-| `persist()`, `save_fn` in cross-layer APIs | `sync_company_board_to_catalog`, `on_board_persisted` at scrape boundary |
+| `persist()`, `save_fn` in cross-layer APIs | `sync_company_board_to_catalog` at scrape/fetch boundaries |
 | `touch_*` without context | `patch_country_catalog_meta` |
 
-Document non-obvious preconditions in the **repo function docstring** (e.g. `matching_jobs` must be the full post-merge board).
+**Known violation:** `save_fn` still used in `scrape/company.py`, `fetch/pipeline.py`, `fetch/service.py`.
 
 ## Control flow (branching)
 
@@ -68,8 +89,10 @@ Document non-obvious preconditions in the **repo function docstring** (e.g. `mat
 ## Scrape and fetch
 
 - **`process_company(..., fetch_board=...)`** — `fetch_board` is required and injected; v2 scrape must not default-import v1 ATS code.
-- **Fetch HTTP / country runner** waits until v2 scrape + runner exist; until then use `fetch/pipeline.py` with a fake or test `fetch_board`.
-- **Attempt logging** lives in `fetch/repo.py` (`company_fetch_attempts`).
+- **Country fetch:** in-process runner (`fetch/country_runner.py`, `fetch/runner.py`), DB-backed status/cancel via `fetch_runs`. Serial per company for now; concurrency stored on run, parallel workers not yet implemented.
+- **Single-company fetch:** `fetch/runner.py` + `POST /api/companies/fetch`.
+- **Attempt logging** and **fetch run persistence** in `fetch/repo.py`.
+- **ATS boards:** only Greenhouse under `scrape/boards/` so far.
 
 ## HTTP (`v2/web/`)
 
@@ -94,8 +117,24 @@ Document non-obvious preconditions in the **repo function docstring** (e.g. `mat
 
 - New domain folder or moving logic across domains.
 - Importing anything from v1 into v2.
-- Country-fetch runner, ATS port order, or cutover from `panel_server`.
-- Anything that changes module boundaries (see project `engineering-standards` skill).
+- ATS port order, or cutover from `panel_server`.
+- Anything that changes module boundaries (see `.claude/skills/engineering-standards/SKILL.md`).
+
+## Known violations (fix in this order)
+
+1. SQL outside repo: `users/history.py`, `users/applied.py`
+2. Long functions: `panel/flatten.py`, `fetch/runner.py`, `fetch/repo.py`, `web/routes/jobs.py`, `web/routes/fetch.py`
+3. `save_fn` naming in scrape/fetch stack
+4. Lazy imports in `fetch/runner.py`, `positions/repo.py`
+5. Empty shim: `web/routes/catalog.py`
+
+## Roadmap
+
+1. Fix violations above  
+2. More ATS boards (lever, ashby, …)  
+3. Country fetch parallel workers (if needed)  
+4. Company CRUD / admin routes  
+5. v2 entry replaces `panel_server` (cutover)
 
 ## Target layout (living)
 
@@ -106,10 +145,17 @@ v2/
   users/        repo, history, applied
   positions/    types, state, service, repo
   panel/        types, flatten, tracking, service, stats
-  fetch/        types, repo, service, pipeline, runner
+  fetch/        types, repo, service, pipeline, runner, country_runner
   scrape/       relevance, filter, merge, listing, company, board, boards/
   web/          server, routes, deps, query, validators
   db/           migrate.py (v2-only tables)
 ```
 
 Add files only when the domain gains a clear responsibility — not ahead of need.
+
+## Run locally
+
+```bash
+pytest tests/v2 -o addopts=
+PANEL_SCRAPE_ENABLED=1 python3 -c "from relocation_jobs.v2.web.server import app; app.run(port=5051)"
+```

@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from relocation_jobs.core.db import _normalize_url, get_connection
+from relocation_jobs.core.db import _normalize_url
+from relocation_jobs.v2.users.repo import count_applied_jobs, fetch_applied_events_in_range
 
 
 def _timezone(name: str | None) -> ZoneInfo:
@@ -24,18 +25,7 @@ def _local_day_utc_bounds(tz: ZoneInfo) -> tuple[str, str]:
 
 
 def count_jobs_applied(user_id: int, *, country: str | None = None) -> int:
-    conn = get_connection()
-    if country:
-        row = conn.execute(
-            "SELECT COUNT(*) AS n FROM job_tracking WHERE user_id = %s AND applied = 1 AND country = %s",
-            (user_id, country),
-        ).fetchone()
-    else:
-        row = conn.execute(
-            "SELECT COUNT(*) AS n FROM job_tracking WHERE user_id = %s AND applied = 1",
-            (user_id,),
-        ).fetchone()
-    return int((row or {}).get("n") or 0)
+    return count_applied_jobs(user_id, country=country)
 
 
 def count_jobs_applied_today(
@@ -55,35 +45,9 @@ def list_jobs_applied_today(
 ) -> list[dict]:
     tz = _timezone(timezone_name)
     start_utc, end_utc = _local_day_utc_bounds(tz)
-    conn = get_connection()
-    if country:
-        rows = conn.execute(
-            """
-            SELECT e.country, e.company_name, e.job_url, e.event_date, e.created_at, t.job_title
-            FROM job_status_events e
-            LEFT JOIN job_tracking t
-              ON t.user_id = e.user_id AND t.country = e.country
-             AND t.company_name = e.company_name AND t.job_url = e.job_url
-            WHERE e.user_id = %s AND e.event_type = 'applied' AND e.country = %s
-              AND e.created_at >= %s AND e.created_at < %s
-            ORDER BY e.created_at DESC
-            """,
-            (user_id, country, start_utc, end_utc),
-        ).fetchall()
-    else:
-        rows = conn.execute(
-            """
-            SELECT e.country, e.company_name, e.job_url, e.event_date, e.created_at, t.job_title
-            FROM job_status_events e
-            LEFT JOIN job_tracking t
-              ON t.user_id = e.user_id AND t.country = e.country
-             AND t.company_name = e.company_name AND t.job_url = e.job_url
-            WHERE e.user_id = %s AND e.event_type = 'applied'
-              AND e.created_at >= %s AND e.created_at < %s
-            ORDER BY e.created_at DESC
-            """,
-            (user_id, start_utc, end_utc),
-        ).fetchall()
+    rows = fetch_applied_events_in_range(
+        user_id, start_utc, end_utc, country=country,
+    )
     seen: set[tuple[str, str, str]] = set()
     out: list[dict] = []
     for row in rows:

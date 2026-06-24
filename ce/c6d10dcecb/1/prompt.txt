@@ -1,0 +1,32 @@
+the process of changing state for a position is completely broken it changes the other positions state.
+i think its a real bug there.
+
+---
+
+the process of changing state for a position is completely broken it changes the other positions state.
+i think its a real bug there.
+
+---
+
+the process of changing state for a position is completely broken it changes the other positions state.
+i think its a real bug there.
+
+---
+
+how to run the v2 separately?
+
+---
+
+how to run the v2 separately?
+
+---
+
+write down everything you did to handoff to another agent
+
+---
+
+write down everything you did to handoff to another agent
+
+---
+
+did you write it down there?

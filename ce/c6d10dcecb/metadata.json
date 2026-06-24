@@ -3,9 +3,21 @@
   "checkpoint_id": "cec6d10dcecb",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 2,
+  "checkpoints_count": 8,
   "files_touched": [
-    "relocation_jobs/v2/panel/flatten.py"
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/job-board.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/v2/catalog/lookup.py",
+    "relocation_jobs/v2/catalog/repo.py",
+    "relocation_jobs/v2/panel/flatten.py",
+    "relocation_jobs/v2/panel/tracking.py",
+    "relocation_jobs/v2/positions/repo.py",
+    "relocation_jobs/v2/positions/service.py",
+    "relocation_jobs/v2/positions/tracking_resolve.py",
+    "tests/v2/catalog/test_repo.py",
+    "tests/v2/positions/test_workflows.py"
   ],
   "sessions": [
     {
@@ -13,6 +25,12 @@
       "transcript": "/ce/c6d10dcecb/0/full.jsonl",
       "content_hash": "/ce/c6d10dcecb/0/content_hash.txt",
       "prompt": "/ce/c6d10dcecb/0/prompt.txt"
+    },
+    {
+      "metadata": "/ce/c6d10dcecb/1/metadata.json",
+      "transcript": "/ce/c6d10dcecb/1/full.jsonl",
+      "content_hash": "/ce/c6d10dcecb/1/content_hash.txt",
+      "prompt": "/ce/c6d10dcecb/1/prompt.txt"
     }
   ]
 }

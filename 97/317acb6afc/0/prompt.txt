@@ -38,3 +38,15 @@ you just copied all the stuff from v1 not reviewing anything just put all the th
 you were on a great track before this copy but you started to make the code spagetty again.
 
 long functions , wrong flow and everything copied here and till now you work was great but now you ruined everything you done before in v2.
+
+---
+
+write down your roadmap you're working.
+what we completed and what we need to complete the whole application.
+write down here to have better insight.
+
+---
+
+1- new
+2- block until it exists
+3- i dont understand what you say, skip for now you have other jobs to do.

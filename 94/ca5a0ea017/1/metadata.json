@@ -1,0 +1,88 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "94ca5a0ea017",
+  "session_id": "c75710af-3a30-49c4-ba2c-795861f890cf",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T15:38:28.562489Z",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "save_step_count": 3,
+  "files_touched": [
+    "relocation_jobs/v2/PARITY.md",
+    "relocation_jobs/v2/RULES.md",
+    "relocation_jobs/v2/companies/service.py",
+    "relocation_jobs/v2/db/migrate.py",
+    "relocation_jobs/v2/fetch/runner.py",
+    "relocation_jobs/v2/scrape/board.py",
+    "relocation_jobs/v2/web/deps.py",
+    "relocation_jobs/v2/web/routes/companies.py",
+    "relocation_jobs/v2/web/routes/fetch.py",
+    "tests/v2/helpers/route_manifest.py",
+    "tests/v2/test_route_manifest.py",
+    "tests/v2/web/test_fetch_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "dd8b4d5a23dc",
+  "checkpoint_transcript_start": 162,
+  "transcript_lines_at_start": 162,
+  "session_metrics": {
+    "turn_count": 12,
+    "context_tokens": 190219,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T15:38:28.553759Z",
+    "agent_lines": 479,
+    "agent_removed": 22,
+    "human_added": 59,
+    "human_modified": 15,
+    "human_removed": 0,
+    "total_committed": 548,
+    "total_lines_changed": 601,
+    "agent_percentage": 83.36106489184692,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 259,
+      "agent_lines_removed": 3
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 5,
+      "user_lines_removed": 5,
+      "agent_lines_added": 497,
+      "agent_lines_removed": 30,
+      "user_added_per_file": {
+        "relocation_jobs/v2/PARITY.md": 5
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/PARITY.md": 5
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 5,
+      "user_lines_removed": 5,
+      "agent_lines_added": 499,
+      "agent_lines_removed": 32,
+      "user_added_per_file": {
+        "relocation_jobs/v2/PARITY.md": 5
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/PARITY.md": 5
+      }
+    }
+  ]
+}

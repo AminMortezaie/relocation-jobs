@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "85666c935485",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "files_touched": [
+    "relocation_jobs/v2/catalog/writes.py",
+    "relocation_jobs/v2/fetch/pipeline.py",
+    "relocation_jobs/v2/fetch/service.py",
+    "relocation_jobs/v2/panel/flatten.py",
+    "relocation_jobs/v2/positions/repo.py",
+    "relocation_jobs/v2/positions/state.py",
+    "relocation_jobs/v2/positions/types.py",
+    "relocation_jobs/v2/scrape/__init__.py",
+    "relocation_jobs/v2/scrape/company.py",
+    "relocation_jobs/v2/scrape/filter.py",
+    "relocation_jobs/v2/scrape/merge.py",
+    "relocation_jobs/v2/scrape/relevance.py",
+    "relocation_jobs/v2/shared/predicates.py",
+    "relocation_jobs/v2/web/routes/__init__.py",
+    "relocation_jobs/v2/web/routes/catalog.py",
+    "relocation_jobs/v2/web/validators.py",
+    "tests/helpers/postgres_mock.py",
+    "tests/v2/catalog/test_writes.py",
+    "tests/v2/conftest.py",
+    "tests/v2/fetch/test_pipeline.py",
+    "tests/v2/helpers/seed.py",
+    "tests/v2/positions/test_workflows.py",
+    "tests/v2/scrape/test_company.py",
+    "tests/v2/scrape/test_merge.py",
+    "tests/v2/scrape/test_relevance.py",
+    "tests/v2/web/test_catalog_api.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/85/666c935485/0/metadata.json",
+      "transcript": "/85/666c935485/0/full.jsonl",
+      "content_hash": "/85/666c935485/0/content_hash.txt",
+      "prompt": "/85/666c935485/0/prompt.txt"
+    }
+  ]
+}

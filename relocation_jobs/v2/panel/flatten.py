@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from collections.abc import Callable
 
 from relocation_jobs.core.job_identity import normalize_job_url
 from relocation_jobs.core.location_tags import (
@@ -19,6 +20,7 @@ from relocation_jobs.v2.panel.types import FlattenFilters
 from relocation_jobs.v2.positions.state import derive_bucket, passes_position_filters, position_view_from_row
 from relocation_jobs.v2.positions.types import PositionBucket, PositionFilters, TrackingFlags
 from relocation_jobs.v2.shared.coerce import as_bool
+from relocation_jobs.v2.shared.predicates import any_of
 from relocation_jobs.v2.shared.timestamps import company_activity_ts, job_activity_ts
 
 
@@ -28,6 +30,93 @@ class PanelContext:
     job_tracking: dict = field(default_factory=dict)
     company_tracking: dict = field(default_factory=dict)
     status_history: dict = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class _OrphanTrackContext:
+    country_key: str
+    company_name: str
+    t_country: str
+    t_company: str
+    t_url: str
+    track: dict
+    listed_urls: set[str]
+
+
+@dataclass(frozen=True)
+class _CompanySkipContext:
+    company: dict
+    filters: FlattenFilters
+    country_key: str
+    country_filter: str | None
+    location_filter: str | None
+    header: dict
+
+
+@dataclass(frozen=True)
+class _CompanySkipAfterContext:
+    filters: FlattenFilters
+    jobs: list[dict]
+    not_for_me_jobs: list[dict]
+    rejected_jobs: list[dict]
+    header: dict
+
+
+_ORPHAN_TRACK_SKIP_RULES: tuple[Callable[[_OrphanTrackContext], bool], ...] = (
+    lambda ctx: ctx.t_country != ctx.country_key or ctx.t_company != ctx.company_name,
+    lambda ctx: bool(ctx.track.get("not_for_me")),
+    lambda ctx: not (
+        ctx.track.get("applied")
+        or as_bool(ctx.track.get("rejected"))
+        or ctx.track.get("looking_to_apply")
+    ),
+    lambda ctx: ctx.t_url in ctx.listed_urls,
+)
+
+
+_COMPANY_SKIP_BEFORE_RULES: tuple[Callable[[_CompanySkipContext], bool], ...] = (
+    lambda ctx: bool(
+        ctx.country_filter
+        and ctx.country_filter != "all"
+        and not company_visible_for_country_filter(
+            ctx.company, ctx.country_filter, catalog_country=ctx.country_key,
+        )
+    ),
+    lambda ctx: bool(
+        ctx.location_filter
+        and not company_matches_location_filter(
+            ctx.company, ctx.location_filter, catalog_country=ctx.country_key,
+        )
+    ),
+    lambda ctx: bool(ctx.filters.ats_type and _company_ats_type(ctx.company) != ctx.filters.ats_type),
+    lambda ctx: bool(ctx.filters.hide_applied and ctx.header["company_applied"]),
+    lambda ctx: bool(
+        ctx.filters.fetch_ok_only
+        and not (ctx.company.get("fetch_ok") and not ctx.company.get("fetch_problem"))
+    ),
+    lambda ctx: bool(ctx.filters.fetch_problem_only and not ctx.company.get("fetch_problem")),
+)
+
+
+_COMPANY_SKIP_AFTER_RULES: tuple[Callable[[_CompanySkipAfterContext], bool], ...] = (
+    lambda ctx: bool(ctx.filters.visa_only and not ctx.jobs and not ctx.rejected_jobs),
+    lambda ctx: bool(ctx.filters.position_filters.rejected_only and not ctx.rejected_jobs),
+    lambda ctx: bool(
+        (ctx.filters.position_filters.applied_only or ctx.filters.position_filters.looking_to_apply_only)
+        and not ctx.jobs
+    ),
+    lambda ctx: bool(
+        ctx.filters.hide_empty
+        and not ctx.jobs
+        and not ctx.not_for_me_jobs
+        and not ctx.rejected_jobs
+    ),
+    lambda ctx: bool(ctx.filters.not_applied_only and (ctx.header["company_applied"] or not ctx.jobs)),
+)
+
+
+def _company_ats_type(company: dict) -> str:
+    return (company.get("ats_type") or "").strip() or "generic"
 
 
 def _not_for_me_entry(
@@ -152,13 +241,16 @@ def _append_tracked_orphans(
     listed_urls = {normalize_job_url(j.get("url", "")) for j in jobs}
     listed_urls.update(normalize_job_url(j.get("url", "")) for j in rejected_jobs)
     for (t_country, t_company, t_url), track in job_tracking.items():
-        if t_country != country_key or t_company != company_name:
-            continue
-        if track.get("not_for_me"):
-            continue
-        if not (track.get("applied") or as_bool(track.get("rejected")) or track.get("looking_to_apply")):
-            continue
-        if t_url in listed_urls:
+        ctx = _OrphanTrackContext(
+            country_key=country_key,
+            company_name=company_name,
+            t_country=t_country,
+            t_company=t_company,
+            t_url=t_url,
+            track=track,
+            listed_urls=listed_urls,
+        )
+        if any_of(ctx, _ORPHAN_TRACK_SKIP_RULES):
             continue
         job_entry = tracked_job_dict(
             track,
@@ -177,10 +269,6 @@ def _append_tracked_orphans(
         if not passes_position_filters(flags, position_filters):
             continue
         jobs.append(job_entry)
-
-
-def _company_ats_type(company: dict) -> str:
-    return (company.get("ats_type") or "").strip() or "generic"
 
 
 def _derive_company_applied(
@@ -260,22 +348,15 @@ def _skip_company_before_jobs(
     location_filter: str | None,
     header: dict,
 ) -> bool:
-    if country_filter and country_filter != "all":
-        if not company_visible_for_country_filter(company, country_filter, catalog_country=country_key):
-            return True
-    if location_filter and not company_matches_location_filter(
-        company, location_filter, catalog_country=country_key,
-    ):
-        return True
-    if filters.ats_type and _company_ats_type(company) != filters.ats_type:
-        return True
-    if filters.hide_applied and header["company_applied"]:
-        return True
-    if filters.fetch_ok_only and not (company.get("fetch_ok") and not company.get("fetch_problem")):
-        return True
-    if filters.fetch_problem_only and not company.get("fetch_problem"):
-        return True
-    return False
+    ctx = _CompanySkipContext(
+        company=company,
+        filters=filters,
+        country_key=country_key,
+        country_filter=country_filter,
+        location_filter=location_filter,
+        header=header,
+    )
+    return any_of(ctx, _COMPANY_SKIP_BEFORE_RULES)
 
 
 def _skip_company_after_jobs(
@@ -286,18 +367,14 @@ def _skip_company_after_jobs(
     rejected_jobs: list[dict],
     header: dict,
 ) -> bool:
-    if filters.visa_only and not jobs and not rejected_jobs:
-        return True
-    if filters.position_filters.rejected_only and not rejected_jobs:
-        return True
-    pf = filters.position_filters
-    if (pf.applied_only or pf.looking_to_apply_only) and not jobs:
-        return True
-    if filters.hide_empty and not jobs and not not_for_me_jobs and not rejected_jobs:
-        return True
-    if filters.not_applied_only and (header["company_applied"] or not jobs):
-        return True
-    return False
+    ctx = _CompanySkipAfterContext(
+        filters=filters,
+        jobs=jobs,
+        not_for_me_jobs=not_for_me_jobs,
+        rejected_jobs=rejected_jobs,
+        header=header,
+    )
+    return any_of(ctx, _COMPANY_SKIP_AFTER_RULES)
 
 
 def _build_company_row(

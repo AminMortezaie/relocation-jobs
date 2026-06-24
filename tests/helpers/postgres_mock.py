@@ -126,6 +126,7 @@ class FakePgConnection:
     _TRACKING_TABLES = (
         "job_status_events",
         "fetch_runs",
+        "company_fetch_attempts",
         "job_tracking",
         "company_tracking",
     )
@@ -143,7 +144,10 @@ class FakePgConnection:
         """Clear per-user state but keep catalog companies/jobs."""
         self._conn.execute("PRAGMA foreign_keys = OFF")
         for table in self._TRACKING_TABLES:
-            self._conn.execute(f"DELETE FROM {table}")
+            try:
+                self._conn.execute(f"DELETE FROM {table}")
+            except sqlite3.OperationalError:
+                pass
         self._conn.execute(
             "DELETE FROM users WHERE LOWER(username) != LOWER(?)",
             (keep_admin,),

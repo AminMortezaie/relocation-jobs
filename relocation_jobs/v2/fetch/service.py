@@ -58,7 +58,6 @@ async def fetch_company(
     enrich_only: bool,
     skip_enriched: bool,
     enrich_concurrency: int,
-    review_mode: bool = False,
     fetch_run_id: int | None = None,
 ) -> tuple[str, int]:
     name = company.get("name") or ""
@@ -79,7 +78,6 @@ async def fetch_company(
             enrich_only=enrich_only,
             skip_enriched=skip_enriched,
             enrich_concurrency=enrich_concurrency,
-            review_mode=review_mode,
             catalog_country=country_key,
         )
     except FetchCancelled:

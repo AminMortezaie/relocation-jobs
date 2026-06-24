@@ -57,7 +57,16 @@ def set_applied(
             append_status_event(
                 conn, user_id, country, company_name, job_url, "applied", event_date=now[:10],
             )
+            row = conn.execute(
+                """
+                SELECT looking_to_apply_date FROM job_tracking
+                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                """,
+                (user_id, country, company_name, job_url),
+            ).fetchone()
+            preserved_lta = (row or {}).get("looking_to_apply_date") or ""
         else:
+            preserved_lta = ""
             conn.execute(
                 """
                 UPDATE job_tracking SET applied = 0, applied_date = NULL, updated_at = %s
@@ -68,6 +77,8 @@ def set_applied(
     result = _base_result(company_name, job_url, country, applied=applied)
     if applied:
         result["looking_to_apply"] = False
+        if preserved_lta:
+            result["looking_to_apply_date"] = preserved_lta
     return _with_status_history(result, user_id, country, company_name, job_url)
 
 

@@ -5,6 +5,9 @@ from pathlib import Path
 
 from relocation_jobs.core.db import db_transaction
 from relocation_jobs.core.job_identity import job_idempotency_key, stamp_job_identity
+from relocation_jobs.v2.catalog.repo import get_company
+from relocation_jobs.v2.catalog.writes import save_company
+from relocation_jobs.v2.scrape.merge import merge_matching_jobs
 
 
 def seed_country(country_key: str, fixture_path: Path) -> dict:
@@ -13,8 +16,9 @@ def seed_country(country_key: str, fixture_path: Path) -> dict:
     with db_transaction() as conn:
         conn.execute(
             """
-            INSERT INTO country_meta (country, source, fetched, updated, jobs_fetched, total, last_fetch_new_jobs)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO country_meta (
+                country, source, fetched, updated, jobs_fetched, total, last_fetch_new_jobs
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (country) DO UPDATE SET
                 source = EXCLUDED.source,
                 fetched = EXCLUDED.fetched,
@@ -33,52 +37,31 @@ def seed_country(country_key: str, fixture_path: Path) -> dict:
                 int(data.get("last_fetch_new_jobs") or 0),
             ),
         )
-        for company in companies:
-            name = (company.get("name") or "").strip()
-            if not name:
-                continue
-            row = conn.execute(
-                """
-                INSERT INTO companies (
-                    country, name, city, size, careers_url, ats_type, ats_url, updated
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (country, name) DO UPDATE SET
-                    city = EXCLUDED.city,
-                    size = EXCLUDED.size,
-                    careers_url = EXCLUDED.careers_url,
-                    ats_type = EXCLUDED.ats_type,
-                    ats_url = EXCLUDED.ats_url,
-                    updated = EXCLUDED.updated
-                RETURNING id
-                """,
-                (
-                    country_key,
-                    name,
-                    company.get("city") or "",
-                    company.get("size") or "",
-                    company.get("careers_url") or "",
-                    company.get("ats_type") or "",
-                    company.get("ats_url") or "",
-                    company.get("updated") or data.get("updated") or "",
-                ),
-            ).fetchone()
-            company_id = int(row["id"])
-            conn.execute("DELETE FROM matching_jobs WHERE company_id = %s", (company_id,))
-            for job in company.get("matching_jobs") or []:
-                stamp_job_identity(job)
-                conn.execute(
-                    """
-                    INSERT INTO matching_jobs (
-                        company_id, title, url, idempotency_key, fetched, last_seen
-                    ) VALUES (%s, %s, %s, %s, %s, %s)
-                    """,
-                    (
-                        company_id,
-                        job.get("title") or "",
-                        job.get("url") or "",
-                        job.get("idempotency_key") or job_idempotency_key(job.get("url", "")),
-                        job.get("fetched") or "",
-                        job.get("last_seen") or "",
-                    ),
-                )
+    for company in companies:
+        name = (company.get("name") or "").strip()
+        if not name:
+            continue
+        blob = dict(company)
+        for job in blob.get("matching_jobs") or []:
+            stamp_job_identity(job)
+            job.setdefault("idempotency_key", job_idempotency_key(job.get("url", "")))
+        save_company(country_key, blob)
     return data
+
+
+def replace_matching_jobs(country_key: str, company_name: str, jobs: list[dict]) -> None:
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
+    company["matching_jobs"] = jobs
+    save_company(country_key, company)
+
+
+def merge_and_save_jobs(country_key: str, company_name: str, scraped: list[dict]) -> list[dict]:
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
+    merged, _, _, _ = merge_matching_jobs(company.get("matching_jobs") or [], scraped)
+    company["matching_jobs"] = merged
+    save_company(country_key, company)
+    return merged

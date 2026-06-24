@@ -5,6 +5,7 @@ from enum import Enum
 from pydantic import Field
 
 from relocation_jobs.v2.shared.coerce import as_bool
+from relocation_jobs.v2.shared.predicates import any_of
 from relocation_jobs.v2.shared.schema import BaseSchema
 
 
@@ -68,7 +69,14 @@ class TrackingFlags(BaseSchema):
     def has_active_tracking(self) -> bool:
         if self.not_for_me:
             return False
-        return self.applied or self.rejected or self.looking_to_apply
+        return any_of(self, _ACTIVE_TRACKING_RULES)
+
+
+_ACTIVE_TRACKING_RULES: tuple = (
+    lambda flags: flags.applied,
+    lambda flags: flags.rejected,
+    lambda flags: flags.looking_to_apply,
+)
 
 
 class PositionFilters(BaseSchema):

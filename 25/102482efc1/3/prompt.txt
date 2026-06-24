@@ -1,0 +1,20 @@
+read the skills.
+i think its time to remove version 1 completely or keep it in a single folder named v1 and just use v2 after refactoring.
+
+---
+
+dont think of render or production it doesnt matter at all its not production yet.
+just complete the PARITY and remove the whole v1, 
+i know that we're using core and something else on v2 so they should copied in v2 and then completely just keep 1 version.
+
+---
+
+you can remove v2 and just have this on root.
+
+---
+
+you can remove v2 and just have this on root.
+
+---
+
+restart the service

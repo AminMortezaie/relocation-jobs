@@ -1,24 +1,17 @@
 /** Local job-board updates after tracking mutations (avoid full /api/jobs reload). */
 
 import { state } from "./state.js";
+import { findJobInCompany } from "./state.js";
 import { renderCompanies } from "./render.js";
 
 function filterOn(id) {
   return Boolean(document.getElementById(id)?.checked);
 }
 
-function looseUrl(url) {
-  return (url || "").trim().replace(/\/$/, "");
-}
-
 function jobMatches(job, url, idempotencyKey = "") {
   if (!job) return false;
-  if (job.url === url) return true;
-  const key = (idempotencyKey || job.idempotency_key || "").trim();
-  if (key && job.idempotency_key === key) return true;
-  const a = looseUrl(url);
-  const b = looseUrl(job.url);
-  return Boolean(a && b && a === b);
+  const probe = { jobs: [job] };
+  return findJobInCompany(probe, url, idempotencyKey) === job;
 }
 
 function bucketLists(company) {

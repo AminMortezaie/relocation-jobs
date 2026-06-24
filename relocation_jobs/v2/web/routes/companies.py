@@ -9,7 +9,12 @@ from relocation_jobs.core.auth import login_required
 from relocation_jobs.core.location_tags import COUNTRY_LABELS
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
 from relocation_jobs.v2.catalog.repo import get_company
-from relocation_jobs.v2.fetch.runner import fetch_is_running, start_company_fetch
+from relocation_jobs.v2.fetch.runner import (
+    _fetch_lock,
+    _reap_zombie_fetch,
+    fetch_is_running,
+    start_company_fetch,
+)
 from relocation_jobs.v2.web import deps
 
 
@@ -364,8 +369,10 @@ def register(app):
         except LookupError as exc:
             return jsonify({"error": str(exc)}), 404
 
-        if fetch_is_running():
-            return jsonify({"error": "A fetch is already running"}), 409
+        with _fetch_lock:
+            _reap_zombie_fetch()
+            if fetch_is_running():
+                return jsonify({"error": "A fetch is already running"}), 409
 
         try:
             deps.touch_company_fetch_time(country, company)

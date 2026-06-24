@@ -1,16 +1,13 @@
 /** HTTP client and backend API calls. */
 
-import { findCompany, findJobInCompany, onUnauthorized } from "./state.js";
-import {
-  hideJobAsNotForMe,
-  moveJobBetweenBuckets,
-  reapplyJobLocally,
-  refreshJobBoard,
-  restoreJobToOpen,
-  syncAppliedVisibility,
-  syncLookingToApplyVisibility,
-} from "./job-board.js";
+import { findCompany, onUnauthorized } from "./state.js";
+import { refreshJobBoard } from "./job-board.js";
 import { toast, browserTimezone } from "./utils.js";
+
+async function reloadBoard() {
+  const { loadJobs } = await import("./data.js");
+  await loadJobs({ silent: true });
+}
 
 export async function apiFetch(url, options = {}) {
   const res = await fetch(url, {
@@ -170,14 +167,7 @@ export async function setNotForMe(country, company, url, notForMe, reason = null
     toast(msg);
     return false;
   }
-  const co = findCompany(country, company);
-  if (co) {
-    if (notForMe) {
-      hideJobAsNotForMe(co, url, data.idempotency_key, reason || data.not_for_me_reason);
-    } else {
-      restoreJobToOpen(co, url, data.idempotency_key);
-    }
-  }
+  await reloadBoard();
   return true;
 }
 
@@ -235,29 +225,20 @@ export async function toggleApplied(country, company, url, applied, idempotencyK
   const res = await apiFetch("/api/jobs/applied", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ country, company, url, applied }),
+    body: JSON.stringify({
+      country,
+      company,
+      url,
+      applied,
+      ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
+    }),
   });
   const data = await res.json();
   if (!res.ok) {
     toast(data.error || "Could not save");
     return null;
   }
-  const key = data.idempotency_key || idempotencyKey;
-  const co = findCompany(country, company);
-  const job = co ? findJobInCompany(co, url, key) : null;
-  if (job) {
-    job.applied = data.applied;
-    job.applied_date = data.applied_date || "";
-    job.applied_at = data.applied_at || "";
-    if (Array.isArray(data.applied_events)) {
-      job.applied_events = data.applied_events;
-    }
-    if (data.applied) {
-      job.looking_to_apply = false;
-    }
-    if (co) co.positions_applied = (co.jobs || []).filter((j) => j.applied).length;
-  }
-  if (co) syncAppliedVisibility(co, url, data.applied, key);
+  await reloadBoard();
   return data;
 }
 
@@ -280,12 +261,7 @@ export async function saveAtsScore(country, company, url, atsScore) {
     toast(msg);
     return null;
   }
-  const co = findCompany(country, company);
-  const job = co ? findJobInCompany(co, url) : null;
-  if (job) {
-    job.ats_score = data.ats_score ?? null;
-  }
-  if (co) refreshJobBoard();
+  await reloadBoard();
   return data;
 }
 
@@ -306,14 +282,7 @@ export async function saveWaitingReferral(country, company, url, waitingReferral
     toast(data.error || "Could not save waiting referral");
     return null;
   }
-  const co = findCompany(country, company);
-  const job = co ? findJobInCompany(co, url) : null;
-  if (job) {
-    job.waiting_referral = data.waiting_referral;
-    job.waiting_referral_date = data.waiting_referral_date || "";
-    job.referral_linkedin_url = data.referral_linkedin_url || "";
-  }
-  if (co) refreshJobBoard();
+  await reloadBoard();
   return data;
 }
 
@@ -331,8 +300,7 @@ export async function reapplyJob(country, company, url) {
     toast(msg);
     return null;
   }
-  const co = findCompany(country, company);
-  if (co) reapplyJobLocally(co, url, data.idempotency_key, data);
+  await reloadBoard();
   return data;
 }
 
@@ -340,7 +308,13 @@ export async function toggleRejected(country, company, url, rejected, idempotenc
   const res = await apiFetch("/api/jobs/rejected", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ country, company, url, rejected }),
+    body: JSON.stringify({
+      country,
+      company,
+      url,
+      rejected,
+      ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
+    }),
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
@@ -350,22 +324,7 @@ export async function toggleRejected(country, company, url, rejected, idempotenc
     toast(msg);
     return null;
   }
-  const key = data.idempotency_key || idempotencyKey;
-  const co = findCompany(country, company);
-  if (co) {
-    if (data.rejected) {
-      moveJobBetweenBuckets(co, url, key, "rejected_jobs", {
-        rejected: true,
-        rejected_date: data.rejected_date || "",
-        rejected_events: data.rejected_events,
-      });
-    } else {
-      moveJobBetweenBuckets(co, url, key, "jobs", {
-        rejected: false,
-        rejected_date: "",
-      });
-    }
-  }
+  await reloadBoard();
   return data;
 }
 
@@ -373,21 +332,20 @@ export async function toggleLookingToApply(country, company, url, lookingToApply
   const res = await apiFetch("/api/jobs/looking-to-apply", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ country, company, url, looking_to_apply: lookingToApply }),
+    body: JSON.stringify({
+      country,
+      company,
+      url,
+      looking_to_apply: lookingToApply,
+      ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
+    }),
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     toast(data.error || "Could not save");
     return null;
   }
-  const key = data.idempotency_key || idempotencyKey;
-  const co = findCompany(country, company);
-  const job = co ? findJobInCompany(co, url, key) : null;
-  if (job) {
-    job.looking_to_apply = data.looking_to_apply;
-    job.looking_to_apply_date = data.looking_to_apply_date || "";
-  }
-  if (co) syncLookingToApplyVisibility(co, url, data.looking_to_apply, key);
+  await reloadBoard();
   return data;
 }
 
@@ -395,22 +353,20 @@ export async function toggleSeen(country, company, url, seen, idempotencyKey = "
   const res = await apiFetch("/api/jobs/seen", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ country, company, url, seen }),
+    body: JSON.stringify({
+      country,
+      company,
+      url,
+      seen,
+      ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
+    }),
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     toast(data.error || "Could not update saw-before tag");
     return null;
   }
-  const co = findCompany(country, company);
-  const job = co
-    ? findJobInCompany(co, url, data.idempotency_key || idempotencyKey)
-    : null;
-  if (job) {
-    job.seen = data.seen;
-    job.seen_date = data.seen_date || "";
-    refreshJobBoard();
-  }
+  await reloadBoard();
   return data;
 }
 

@@ -12,7 +12,7 @@ from relocation_jobs.v2.fetch import repo as fetch_repo
 from relocation_jobs.v2.fetch.country_runner import run_country_fetch
 from relocation_jobs.v2.fetch.pipeline import fetch_and_persist_company
 
-_fetch_lock = threading.Lock()
+_fetch_lock = threading.RLock()
 _fetch_thread: threading.Thread | None = None
 _fetch_state: dict = {
     "running": False,
@@ -153,7 +153,9 @@ def _reap_zombie_fetch() -> None:
     with _fetch_lock:
         if _fetch_state.get("running"):
             thread = _fetch_thread
-            if thread is not None and thread.is_alive():
+            if thread is None:
+                return
+            if thread.is_alive():
                 return
             _fetch_state["running"] = False
             if _fetch_state.get("exit_code") is None:
@@ -209,6 +211,7 @@ def build_fetch_status() -> dict:
 
 
 def fetch_is_running() -> bool:
+    _reap_zombie_fetch()
     with _fetch_lock:
         if _fetch_state.get("running"):
             return True

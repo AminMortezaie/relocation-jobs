@@ -12,6 +12,8 @@ from relocation_jobs.db import is_user_admin
 from relocation_jobs.v2.web import deps
 from relocation_jobs.v2.fetch import repo as fetch_repo
 from relocation_jobs.v2.fetch.runner import (
+    _fetch_lock,
+    _reap_zombie_fetch,
     build_fetch_status,
     fetch_is_running,
     request_fetch_cancel,
@@ -92,8 +94,10 @@ def register(app):
         if ats_type and ats_type not in valid_ats:
             return jsonify({"error": f"Unknown ATS type: {ats_type}"}), 400
 
-        if fetch_is_running():
-            return jsonify({"error": "A fetch is already running"}), 409
+        with _fetch_lock:
+            _reap_zombie_fetch()
+            if fetch_is_running():
+                return jsonify({"error": "A fetch is already running"}), 409
 
         try:
             run_id = start_country_fetch(

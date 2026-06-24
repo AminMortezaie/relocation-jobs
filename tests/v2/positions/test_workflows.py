@@ -111,6 +111,33 @@ class TestRejectAndReapply:
 
 
 @pytest.mark.integration
+class TestPositionIsolation:
+    def test_apply_one_job_does_not_mark_sibling(self, seeded_catalog_v2, test_user):
+        uid = test_user["id"]
+        company, url_a, url_b = _company_and_jobs(seeded_catalog_v2)
+
+        positions.set_job_applied("uk", company, url_b, True, user_id=uid)
+        acme = _acme(_flatten(uid))
+
+        job_a = next(j for j in acme["jobs"] if j["url"] == url_a)
+        job_b = next(j for j in acme["jobs"] if j["url"] == url_b)
+
+        assert job_a["applied"] is False
+        assert job_b["applied"] is True
+
+    def test_reject_one_job_does_not_mark_sibling(self, seeded_catalog_v2, test_user):
+        uid = test_user["id"]
+        company, url_a, url_b = _company_and_jobs(seeded_catalog_v2)
+
+        positions.set_job_rejected("uk", company, url_a, True, user_id=uid)
+        acme = _acme(_flatten(uid))
+
+        assert url_a in {j["url"] for j in acme["rejected_jobs"]}
+        assert url_b in _urls(acme["jobs"])
+        assert url_b not in {j["url"] for j in acme["rejected_jobs"]}
+
+
+@pytest.mark.integration
 class TestPositionFilters:
     def test_looking_to_apply_only_filter(self, seeded_catalog_v2, test_user):
         uid = test_user["id"]

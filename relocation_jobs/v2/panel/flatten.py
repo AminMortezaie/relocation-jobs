@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from collections.abc import Callable
 
-from relocation_jobs.core.job_identity import normalize_job_url
+from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
 from relocation_jobs.core.location_tags import (
     company_matches_location_filter,
     company_visible_for_country_filter,
@@ -41,6 +41,7 @@ class _OrphanTrackContext:
     t_url: str
     track: dict
     listed_urls: set[str]
+    listed_keys: set[str]
 
 
 @dataclass(frozen=True)
@@ -71,6 +72,7 @@ _ORPHAN_TRACK_SKIP_RULES: tuple[Callable[[_OrphanTrackContext], bool], ...] = (
         or ctx.track.get("looking_to_apply")
     ),
     lambda ctx: ctx.t_url in ctx.listed_urls,
+    lambda ctx: bool(ctx.t_url and job_idempotency_key(ctx.t_url) in ctx.listed_keys),
 )
 
 
@@ -240,6 +242,11 @@ def _append_tracked_orphans(
 ) -> None:
     listed_urls = {normalize_job_url(j.get("url", "")) for j in jobs}
     listed_urls.update(normalize_job_url(j.get("url", "")) for j in rejected_jobs)
+    listed_keys = {job_idempotency_key(j.get("url", "")) for j in jobs if j.get("url")}
+    listed_keys.update(
+        job_idempotency_key(j.get("url", "")) for j in rejected_jobs if j.get("url")
+    )
+    listed_keys.discard("")
     for (t_country, t_company, t_url), track in job_tracking.items():
         ctx = _OrphanTrackContext(
             country_key=country_key,
@@ -249,6 +256,7 @@ def _append_tracked_orphans(
             t_url=t_url,
             track=track,
             listed_urls=listed_urls,
+            listed_keys=listed_keys,
         )
         if any_of(ctx, _ORPHAN_TRACK_SKIP_RULES):
             continue

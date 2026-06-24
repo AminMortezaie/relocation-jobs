@@ -25,40 +25,41 @@ def resolve_track(
     direct_key = tracking_key(country, company_name, job.get("url", ""))
     direct = job_tracking.get(direct_key)
     job_key = job_idempotency_key_for_job(job)
-    if not job_key:
-        return direct or {}
 
-    siblings: list[dict] = []
-    fallback: dict = {}
-    for (t_country, t_company, t_url), track in job_tracking.items():
-        if t_country != country or t_company != company_name:
-            continue
-        if job_idempotency_key(t_url) != job_key:
-            continue
-        siblings.append(track)
-        if tracking_key(t_country, t_company, t_url) != direct_key:
-            if (not fallback) or (
-                as_bool(track.get("seen")) and not as_bool(fallback.get("seen"))
-            ):
-                fallback = track
-
-    if direct:
+    if direct is not None:
         merged = dict(direct)
-    elif fallback:
-        merged = dict(fallback)
-    elif siblings:
-        merged = dict(siblings[0])
+    elif job_key:
+        alias: dict | None = None
+        catalog_norm = normalize_job_url(job.get("url", ""))
+        for (t_country, t_company, t_url), track in job_tracking.items():
+            if t_country != country or t_company != company_name:
+                continue
+            if job_idempotency_key(t_url) != job_key:
+                continue
+            if catalog_norm and normalize_job_url(t_url) == catalog_norm:
+                alias = track
+                break
+            if alias is None:
+                alias = track
+        if alias is None:
+            return {}
+        merged = dict(alias)
     else:
         return {}
 
     seen_track: dict | None = None
-    for track in siblings:
-        if not as_bool(track.get("seen")):
-            continue
-        if not seen_track or (
-            (track.get("seen_date") or "") and not (seen_track.get("seen_date") or "")
-        ):
-            seen_track = track
+    if job_key:
+        for (t_country, t_company, t_url), track in job_tracking.items():
+            if t_country != country or t_company != company_name:
+                continue
+            if job_idempotency_key(t_url) != job_key:
+                continue
+            if not as_bool(track.get("seen")):
+                continue
+            if not seen_track or (
+                (track.get("seen_date") or "") and not (seen_track.get("seen_date") or "")
+            ):
+                seen_track = track
     if seen_track:
         merged["seen"] = True
         merged["seen_date"] = seen_track.get("seen_date", "") or ""

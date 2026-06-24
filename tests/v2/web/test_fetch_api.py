@@ -196,6 +196,21 @@ def test_company_fetch_worker_integration(seeded_catalog_v2, db, monkeypatch):
 
 
 def test_companies_fetch_409_when_busy(v2_auth_client, seeded_catalog_v2, monkeypatch):
+    monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
+    monkeypatch.setattr(
+        "relocation_jobs.v2.web.routes.companies.fetch_is_running",
+        lambda: True,
+    )
+
+    resp = v2_auth_client.post(
+        "/api/companies/fetch",
+        json={"country": "uk", "company": "Acme Backend Ltd"},
+    )
+    assert resp.status_code == 409
+    assert "already running" in resp.get_json()["error"].lower()
+
+
+def test_country_fetch_reaps_orphan_running_row(v2_auth_client, seeded_catalog_v2, monkeypatch):
     from relocation_jobs.db import get_user_by_username
     from relocation_jobs.v2.fetch import repo as fetch_repo
 
@@ -209,13 +224,24 @@ def test_companies_fetch_409_when_busy(v2_auth_client, seeded_catalog_v2, monkey
         concurrency=1,
         started_at="2025-06-01T12:00:00+00:00",
     )
+    assert fetch_repo.get_running_fetch_run() is not None
 
-    resp = v2_auth_client.post(
-        "/api/companies/fetch",
-        json={"country": "uk", "company": "Acme Backend Ltd"},
+    started: list[int] = []
+
+    def fake_start(**kwargs):
+        started.append(int(kwargs["user_id"]))
+        return 77
+
+    monkeypatch.setattr(
+        "relocation_jobs.v2.web.routes.fetch.start_country_fetch",
+        fake_start,
     )
-    assert resp.status_code == 409
-    assert "already running" in resp.get_json()["error"].lower()
+
+    resp = v2_auth_client.post("/api/fetch", json={"country": "uk"})
+    assert resp.status_code == 200
+    assert resp.get_json()["run_id"] == 77
+    assert started == [user_id]
+    assert fetch_repo.get_running_fetch_run() is None
 
 
 def test_country_fetch_disabled(v2_auth_client, monkeypatch):

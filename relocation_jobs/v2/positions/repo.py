@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction, get_connection
+from relocation_jobs.v2.positions.tracking_resolve import (
+    resolve_tracking_url,
+    tracking_urls_for_job,
+)
 from relocation_jobs.v2.users.history import append_status_event, status_history_for_job
 
 
@@ -43,9 +47,13 @@ def set_applied(
     *,
     job_title: str = "",
 ) -> dict:
-    job_url = _normalize_url(job_url)
+    canonical_url = _normalize_url(job_url)
     now = _utc_now()
+    preserved_lta = ""
     with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
         if applied:
             conn.execute(
                 """
@@ -59,34 +67,40 @@ def set_applied(
                     job_title = COALESCE(NULLIF(EXCLUDED.job_title, ''), job_tracking.job_title),
                     updated_at = EXCLUDED.updated_at
                 """,
-                (user_id, country, company_name, job_url, (job_title or "").strip(), now[:10], now),
+                (
+                    user_id, country, company_name, storage_url, (job_title or "").strip(),
+                    now[:10], now,
+                ),
             )
             append_status_event(
-                conn, user_id, country, company_name, job_url, "applied", event_date=now[:10],
+                conn, user_id, country, company_name, storage_url, "applied",
+                event_date=now[:10],
             )
             row = conn.execute(
                 """
                 SELECT looking_to_apply_date FROM job_tracking
                 WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
                 """,
-                (user_id, country, company_name, job_url),
+                (user_id, country, company_name, storage_url),
             ).fetchone()
             preserved_lta = (row or {}).get("looking_to_apply_date") or ""
         else:
-            preserved_lta = ""
-            conn.execute(
-                """
-                UPDATE job_tracking SET applied = 0, applied_date = NULL, updated_at = %s
-                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
-                """,
-                (now, user_id, country, company_name, job_url),
-            )
-    result = _base_result(company_name, job_url, country, applied=applied)
+            for url in tracking_urls_for_job(
+                conn, user_id, country, company_name, canonical_url,
+            ):
+                conn.execute(
+                    """
+                    UPDATE job_tracking SET applied = 0, applied_date = NULL, updated_at = %s
+                    WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                    """,
+                    (now, user_id, country, company_name, url),
+                )
+    result = _base_result(company_name, storage_url, country, applied=applied)
     if applied:
         result["looking_to_apply"] = False
         if preserved_lta:
             result["looking_to_apply_date"] = preserved_lta
-    return _with_status_history(result, user_id, country, company_name, job_url)
+    return _with_status_history(result, user_id, country, company_name, storage_url)
 
 
 def set_rejected(
@@ -98,9 +112,12 @@ def set_rejected(
     *,
     job_title: str = "",
 ) -> dict:
-    job_url = _normalize_url(job_url)
+    canonical_url = _normalize_url(job_url)
     now = _utc_now()
     with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
         if rejected:
             conn.execute(
                 """
@@ -113,22 +130,29 @@ def set_rejected(
                     job_title = COALESCE(NULLIF(EXCLUDED.job_title, ''), job_tracking.job_title),
                     updated_at = EXCLUDED.updated_at
                 """,
-                (user_id, country, company_name, job_url, (job_title or "").strip(), now[:10], now),
+                (
+                    user_id, country, company_name, storage_url, (job_title or "").strip(),
+                    now[:10], now,
+                ),
             )
             append_status_event(
-                conn, user_id, country, company_name, job_url, "rejected", event_date=now[:10],
+                conn, user_id, country, company_name, storage_url, "rejected",
+                event_date=now[:10],
             )
         else:
-            conn.execute(
-                """
-                UPDATE job_tracking SET rejected = 0, rejected_date = NULL, updated_at = %s
-                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
-                """,
-                (now, user_id, country, company_name, job_url),
-            )
+            for url in tracking_urls_for_job(
+                conn, user_id, country, company_name, canonical_url,
+            ):
+                conn.execute(
+                    """
+                    UPDATE job_tracking SET rejected = 0, rejected_date = NULL, updated_at = %s
+                    WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                    """,
+                    (now, user_id, country, company_name, url),
+                )
     return _with_status_history(
-        _base_result(company_name, job_url, country, rejected=rejected),
-        user_id, country, company_name, job_url,
+        _base_result(company_name, storage_url, country, rejected=rejected),
+        user_id, country, company_name, storage_url,
     )
 
 
@@ -145,11 +169,14 @@ def set_not_for_me(
     not_for_me: bool = True,
     reason: str | None = None,
 ) -> dict:
-    job_url = _normalize_url(job_url)
+    canonical_url = _normalize_url(job_url)
     now = _utc_now()
     date_only = now[:10]
     hide_reason = (reason or "not_for_me").strip() or "not_for_me"
     with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
         if not_for_me:
             conn.execute(
                 """
@@ -161,21 +188,24 @@ def set_not_for_me(
                     not_for_me = 1, not_for_me_date = EXCLUDED.not_for_me_date,
                     not_for_me_reason = EXCLUDED.not_for_me_reason, updated_at = EXCLUDED.updated_at
                 """,
-                (user_id, country, company_name, job_url, date_only, hide_reason, now),
+                (user_id, country, company_name, storage_url, date_only, hide_reason, now),
             )
             return _base_result(
-                company_name, job_url, country,
+                company_name, storage_url, country,
                 not_for_me=True, not_for_me_date=date_only, not_for_me_reason=hide_reason,
             )
-        conn.execute(
-            """
-            UPDATE job_tracking
-            SET not_for_me = 0, not_for_me_date = NULL, not_for_me_reason = NULL, updated_at = %s
-            WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
-            """,
-            (now, user_id, country, company_name, job_url),
-        )
-    return _base_result(company_name, job_url, country, not_for_me=False)
+        for url in tracking_urls_for_job(
+            conn, user_id, country, company_name, canonical_url,
+        ):
+            conn.execute(
+                """
+                UPDATE job_tracking
+                SET not_for_me = 0, not_for_me_date = NULL, not_for_me_reason = NULL, updated_at = %s
+                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                """,
+                (now, user_id, country, company_name, url),
+            )
+    return _base_result(company_name, storage_url, country, not_for_me=False)
 
 
 def set_looking_to_apply(
@@ -187,9 +217,12 @@ def set_looking_to_apply(
     *,
     job_title: str = "",
 ) -> dict:
-    job_url = _normalize_url(job_url)
+    canonical_url = _normalize_url(job_url)
     now = _utc_now()
     with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
         if looking_to_apply:
             conn.execute(
                 """
@@ -201,19 +234,25 @@ def set_looking_to_apply(
                     looking_to_apply = 1, looking_to_apply_date = EXCLUDED.looking_to_apply_date,
                     updated_at = EXCLUDED.updated_at
                 """,
-                (user_id, country, company_name, job_url, (job_title or "").strip(), now[:10], now),
+                (
+                    user_id, country, company_name, storage_url, (job_title or "").strip(),
+                    now[:10], now,
+                ),
             )
         else:
-            conn.execute(
-                """
-                UPDATE job_tracking
-                SET looking_to_apply = 0, looking_to_apply_date = NULL, updated_at = %s
-                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
-                """,
-                (now, user_id, country, company_name, job_url),
-            )
+            for url in tracking_urls_for_job(
+                conn, user_id, country, company_name, canonical_url,
+            ):
+                conn.execute(
+                    """
+                    UPDATE job_tracking
+                    SET looking_to_apply = 0, looking_to_apply_date = NULL, updated_at = %s
+                    WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                    """,
+                    (now, user_id, country, company_name, url),
+                )
     return _base_result(
-        company_name, job_url, country,
+        company_name, storage_url, country,
         looking_to_apply=looking_to_apply,
         looking_to_apply_date=now[:10] if looking_to_apply else "",
     )
@@ -228,9 +267,12 @@ def set_seen(
     *,
     job_title: str = "",
 ) -> dict:
-    job_url = _normalize_url(job_url)
+    canonical_url = _normalize_url(job_url)
     now = _utc_now()
     with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
         if seen:
             conn.execute(
                 """
@@ -242,17 +284,25 @@ def set_seen(
                     seen = 1, seen_date = COALESCE(job_tracking.seen_date, EXCLUDED.seen_date),
                     updated_at = EXCLUDED.updated_at
                 """,
-                (user_id, country, company_name, job_url, (job_title or "").strip(), now[:10], now),
+                (
+                    user_id, country, company_name, storage_url, (job_title or "").strip(),
+                    now[:10], now,
+                ),
             )
         else:
-            conn.execute(
-                """
-                UPDATE job_tracking SET seen = 0, seen_date = NULL, updated_at = %s
-                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
-                """,
-                (now, user_id, country, company_name, job_url),
-            )
-    return _base_result(company_name, job_url, country, seen=seen, seen_date=now[:10] if seen else "")
+            for url in tracking_urls_for_job(
+                conn, user_id, country, company_name, canonical_url,
+            ):
+                conn.execute(
+                    """
+                    UPDATE job_tracking SET seen = 0, seen_date = NULL, updated_at = %s
+                    WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                    """,
+                    (now, user_id, country, company_name, url),
+                )
+    return _base_result(
+        company_name, storage_url, country, seen=seen, seen_date=now[:10] if seen else "",
+    )
 
 
 def set_waiting_referral(
@@ -265,9 +315,12 @@ def set_waiting_referral(
     linkedin_url: str = "",
     job_title: str = "",
 ) -> dict:
-    job_url = _normalize_url(job_url)
+    canonical_url = _normalize_url(job_url)
     now = _utc_now()
     with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
         if waiting_referral:
             if not linkedin_url.strip():
                 raise ValueError("LinkedIn profile URL is required")
@@ -284,25 +337,28 @@ def set_waiting_referral(
                     updated_at = EXCLUDED.updated_at
                 """,
                 (
-                    user_id, country, company_name, job_url, (job_title or "").strip(),
+                    user_id, country, company_name, storage_url, (job_title or "").strip(),
                     now[:10], linkedin_url.strip(), now,
                 ),
             )
             return _base_result(
-                company_name, job_url, country,
+                company_name, storage_url, country,
                 waiting_referral=True, waiting_referral_date=now[:10],
                 referral_linkedin_url=linkedin_url.strip(),
             )
-        conn.execute(
-            """
-            UPDATE job_tracking
-            SET waiting_referral = 0, waiting_referral_date = NULL,
-                referral_linkedin_url = NULL, updated_at = %s
-            WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
-            """,
-            (now, user_id, country, company_name, job_url),
-        )
-    return _base_result(company_name, job_url, country, waiting_referral=False)
+        for url in tracking_urls_for_job(
+            conn, user_id, country, company_name, canonical_url,
+        ):
+            conn.execute(
+                """
+                UPDATE job_tracking
+                SET waiting_referral = 0, waiting_referral_date = NULL,
+                    referral_linkedin_url = NULL, updated_at = %s
+                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                """,
+                (now, user_id, country, company_name, url),
+            )
+    return _base_result(company_name, storage_url, country, waiting_referral=False)
 
 
 def set_ats_score(
@@ -314,9 +370,12 @@ def set_ats_score(
     *,
     job_title: str = "",
 ) -> dict:
-    job_url = _normalize_url(job_url)
+    canonical_url = _normalize_url(job_url)
     now = _utc_now()
     with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
         conn.execute(
             """
             INSERT INTO job_tracking (
@@ -325,9 +384,12 @@ def set_ats_score(
             ON CONFLICT (user_id, country, company_name, job_url) DO UPDATE SET
                 ats_score = EXCLUDED.ats_score, updated_at = EXCLUDED.updated_at
             """,
-            (user_id, country, company_name, job_url, (job_title or "").strip(), ats_score, now),
+            (
+                user_id, country, company_name, storage_url, (job_title or "").strip(),
+                ats_score, now,
+            ),
         )
-    return _base_result(company_name, job_url, country, ats_score=ats_score)
+    return _base_result(company_name, storage_url, country, ats_score=ats_score)
 
 
 def sync_company_applied(user_id: int, country: str, company_name: str) -> dict:

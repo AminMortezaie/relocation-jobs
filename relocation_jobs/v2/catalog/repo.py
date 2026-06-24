@@ -5,7 +5,11 @@ from collections import defaultdict
 from datetime import date
 
 from relocation_jobs.core.db import db_read, db_transaction
-from relocation_jobs.core.job_identity import job_idempotency_key, stamp_job_identity
+from relocation_jobs.core.job_identity import (
+    job_idempotency_key,
+    normalize_job_url,
+    stamp_job_identity,
+)
 from relocation_jobs.core.location_tags import sync_company_location_fields
 
 _COUNTRY_META_FIELDS = frozenset({
@@ -163,16 +167,17 @@ def get_job_by_url(
     company_name: str | None = None,
     country_key: str | None = None,
 ) -> dict | None:
+    norm = normalize_job_url(job_url)
     key = job_idempotency_key(job_url)
-    if not key:
+    if not norm and not key:
         return None
     sql = """
         SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
         FROM matching_jobs j
         JOIN companies c ON c.id = j.company_id
-        WHERE j.idempotency_key = %s
+        WHERE 1=1
     """
-    params: list = [key]
+    params: list = []
     if company_name:
         sql += " AND c.name = %s"
         params.append(company_name.strip())
@@ -180,8 +185,18 @@ def get_job_by_url(
         sql += " AND c.country = %s"
         params.append(country_key.strip().lower())
     with db_read() as conn:
-        row = conn.execute(sql, tuple(params)).fetchone()
-    return _row(row) or None
+        rows = conn.execute(sql, tuple(params)).fetchall()
+    for row in rows:
+        if norm and normalize_job_url(row.get("url", "")) == norm:
+            return _row(row)
+    if key:
+        for row in rows:
+            if (row.get("idempotency_key") or "") == key:
+                return _row(row)
+        for row in rows:
+            if job_idempotency_key(row.get("url", "")) == key:
+                return _row(row)
+    return None
 
 
 def _upsert_company_catalog_row(

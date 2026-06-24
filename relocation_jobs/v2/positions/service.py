@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from urllib.parse import urlparse
 
+from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.core.location_tags import (
     city_match_keys,
     company_expected_locations,
@@ -25,6 +26,14 @@ def _normalize_linkedin_url(url: str) -> str:
     return raw
 
 
+def _with_catalog_url(result: dict, catalog_url: str) -> dict:
+    url = (catalog_url or "").strip() or (result.get("url") or "")
+    if url:
+        result["url"] = url
+        result["idempotency_key"] = job_idempotency_key(url)
+    return result
+
+
 def _require_catalog_job(country_key: str, company_name: str, job_url: str) -> dict:
     job = get_job_by_url(job_url, company_name=company_name, country_key=country_key)
     if job is None:
@@ -37,6 +46,10 @@ def _validated(result: dict) -> dict:
     return result
 
 
+def _catalog_url(job: dict, job_url: str) -> str:
+    return (job.get("url") or "").strip() or job_url
+
+
 def set_job_applied(
     country_key: str,
     company_name: str,
@@ -46,8 +59,9 @@ def set_job_applied(
     user_id: int,
 ) -> dict:
     job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
     result = repo.set_applied(
-        user_id, country_key, company_name, job_url, applied,
+        user_id, country_key, company_name, storage_url, applied,
         job_title=job.get("title", ""),
     )
     repo.sync_company_applied(user_id, country_key, company_name)
@@ -55,7 +69,7 @@ def set_job_applied(
         repo.set_company_awaiting_response(
             user_id, country_key, company_name, True, preserve_date=True,
         )
-    return _validated(result)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def set_job_rejected(
@@ -67,11 +81,12 @@ def set_job_rejected(
     user_id: int,
 ) -> dict:
     job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
     result = repo.set_rejected(
-        user_id, country_key, company_name, job_url, rejected,
+        user_id, country_key, company_name, storage_url, rejected,
         job_title=job.get("title", ""),
     )
-    return _validated(result)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def set_job_reapply(
@@ -81,8 +96,10 @@ def set_job_reapply(
     *,
     user_id: int,
 ) -> dict:
-    _require_catalog_job(country_key, company_name, job_url)
-    return _validated(repo.reapply(user_id, country_key, company_name, job_url))
+    job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
+    result = repo.reapply(user_id, country_key, company_name, storage_url)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def set_job_waiting_referral(
@@ -95,12 +112,13 @@ def set_job_waiting_referral(
     linkedin_url: str = "",
 ) -> dict:
     job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
     normalized = _normalize_linkedin_url(linkedin_url) if waiting_referral else ""
     result = repo.set_waiting_referral(
-        user_id, country_key, company_name, job_url, waiting_referral,
+        user_id, country_key, company_name, storage_url, waiting_referral,
         linkedin_url=normalized, job_title=job.get("title", ""),
     )
-    return _validated(result)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def set_job_ats_score(
@@ -111,15 +129,13 @@ def set_job_ats_score(
     *,
     user_id: int,
 ) -> dict:
-    company = get_company(country_key, company_name)
-    if company is None:
-        raise LookupError(f"Company not found: {company_name}")
-    job = get_job_by_url(job_url)
+    job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
     result = repo.set_ats_score(
-        user_id, country_key, company_name, job_url, ats_score,
-        job_title=job.get("title", "") if job else "",
+        user_id, country_key, company_name, storage_url, ats_score,
+        job_title=job.get("title", ""),
     )
-    return _validated(result)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def set_job_looking_to_apply(
@@ -131,11 +147,12 @@ def set_job_looking_to_apply(
     user_id: int,
 ) -> dict:
     job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
     result = repo.set_looking_to_apply(
-        user_id, country_key, company_name, job_url, looking_to_apply,
+        user_id, country_key, company_name, storage_url, looking_to_apply,
         job_title=job.get("title", ""),
     )
-    return _validated(result)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def set_job_seen(
@@ -146,12 +163,13 @@ def set_job_seen(
     *,
     user_id: int,
 ) -> dict:
-    job = get_job_by_url(job_url)
+    job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
     result = repo.set_seen(
-        user_id, country_key, company_name, job_url, seen,
-        job_title=job.get("title", "") if job else "",
+        user_id, country_key, company_name, storage_url, seen,
+        job_title=job.get("title", ""),
     )
-    return _validated(result)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def set_job_not_for_me(
@@ -163,12 +181,13 @@ def set_job_not_for_me(
     not_for_me: bool = True,
     reason: str | None = None,
 ) -> dict:
-    _require_catalog_job(country_key, company_name, job_url)
+    job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
     result = repo.set_not_for_me(
-        user_id, country_key, company_name, job_url,
+        user_id, country_key, company_name, storage_url,
         not_for_me=not_for_me, reason=reason,
     )
-    return _validated(result)
+    return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
 def reconcile_wrong_location_hides(

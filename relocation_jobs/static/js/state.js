@@ -44,29 +44,50 @@ export function findCompany(country, company) {
   );
 }
 
-function looseJobUrl(url) {
+export function looseJobUrl(url) {
   return (url || "").trim().replace(/\/$/, "");
 }
 
-export function findJobInCompany(company, url, idempotencyKey = "") {
-  const buckets = [
+function companyJobLists(company) {
+  return [
     company.jobs || [],
     company.rejected_jobs || [],
     company.not_for_me_jobs || [],
     company.hidden_jobs || [],
-  ];
-  for (const jobs of buckets) {
-    const direct = jobs.find((j) => j.url === url);
-    if (direct) return direct;
-    const key = (idempotencyKey || "").trim();
-    if (key) {
-      const byKey = jobs.find((j) => j.idempotency_key === key);
-      if (byKey) return byKey;
+  ].filter(Array.isArray);
+}
+
+export function findJobInCompany(company, url, idempotencyKey = "") {
+  const jobs = companyJobLists(company).flat();
+  const raw = (url || "").trim();
+  const loose = looseJobUrl(raw);
+  const key = (idempotencyKey || "").trim();
+
+  if (raw) {
+    const exact = jobs.find((j) => j.url === raw);
+    if (exact) return exact;
+  }
+  if (loose) {
+    const looseMatches = jobs.filter((j) => looseJobUrl(j.url) === loose);
+    if (looseMatches.length === 1) return looseMatches[0];
+    if (looseMatches.length > 1 && key) {
+      const keyed = looseMatches.find((j) => j.idempotency_key === key);
+      if (keyed) return keyed;
     }
-    const loose = looseJobUrl(url);
-    if (!loose) continue;
-    const match = jobs.find((j) => looseJobUrl(j.url) === loose);
-    if (match) return match;
+  }
+  if (key) {
+    const keyMatches = jobs.filter((j) => j.idempotency_key === key);
+    if (keyMatches.length === 1) return keyMatches[0];
+    if (keyMatches.length > 1) {
+      if (raw) {
+        const exactAmong = keyMatches.find((j) => j.url === raw);
+        if (exactAmong) return exactAmong;
+      }
+      if (loose) {
+        const looseAmong = keyMatches.find((j) => looseJobUrl(j.url) === loose);
+        if (looseAmong) return looseAmong;
+      }
+    }
   }
   return undefined;
 }

@@ -1,0 +1,18 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "94ca5a0ea017",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "relocation_jobs/static/js/api.js"
+  ],
+  "sessions": [
+    {
+      "metadata": "/94/ca5a0ea017/0/metadata.json",
+      "transcript": "/94/ca5a0ea017/0/full.jsonl",
+      "content_hash": "/94/ca5a0ea017/0/content_hash.txt",
+      "prompt": "/94/ca5a0ea017/0/prompt.txt"
+    }
+  ]
+}

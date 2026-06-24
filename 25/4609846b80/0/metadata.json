@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "254609846b80",
+  "session_id": "c0f06ef3-942f-441b-a2a2-712eaae56c10",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T14:41:31.625743Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/v2/RULES.md"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "3cf29d5eb463",
+  "session_metrics": {
+    "duration_ms": 9633336,
+    "turn_count": 44,
+    "context_tokens": 191562,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T14:41:31.608762Z",
+    "agent_lines": 57,
+    "agent_removed": 11,
+    "human_added": 3838,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 3895,
+    "total_lines_changed": 4099,
+    "agent_percentage": 1.6589412051719932,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

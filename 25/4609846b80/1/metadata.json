@@ -1,0 +1,202 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "254609846b80",
+  "session_id": "c75710af-3a30-49c4-ba2c-795861f890cf",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T14:41:31.791173Z",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "save_step_count": 8,
+  "files_touched": [
+    "relocation_jobs/v2/RULES.md",
+    "relocation_jobs/v2/admin/__init__.py",
+    "relocation_jobs/v2/admin/service.py",
+    "relocation_jobs/v2/catalog/locations.py",
+    "relocation_jobs/v2/catalog/stats.py",
+    "relocation_jobs/v2/companies/__init__.py",
+    "relocation_jobs/v2/companies/service.py",
+    "relocation_jobs/v2/fetch/country_runner.py",
+    "relocation_jobs/v2/fetch/pipeline.py",
+    "relocation_jobs/v2/fetch/repo.py",
+    "relocation_jobs/v2/fetch/runner.py",
+    "relocation_jobs/v2/fetch/service.py",
+    "relocation_jobs/v2/positions/repo.py",
+    "relocation_jobs/v2/scrape/ats_resolve.py",
+    "relocation_jobs/v2/scrape/board.py",
+    "relocation_jobs/v2/scrape/boards/__init__.py",
+    "relocation_jobs/v2/scrape/boards/_async.py",
+    "relocation_jobs/v2/scrape/boards/ashby.py",
+    "relocation_jobs/v2/scrape/boards/bol.py",
+    "relocation_jobs/v2/scrape/boards/deel.py",
+    "relocation_jobs/v2/scrape/boards/generic.py",
+    "relocation_jobs/v2/scrape/boards/greenhouse.py",
+    "relocation_jobs/v2/scrape/boards/http_sync.py",
+    "relocation_jobs/v2/scrape/boards/job_shop.py",
+    "relocation_jobs/v2/scrape/boards/join.py",
+    "relocation_jobs/v2/scrape/boards/lever.py",
+    "relocation_jobs/v2/scrape/boards/personio.py",
+    "relocation_jobs/v2/scrape/boards/playwright_ats.py",
+    "relocation_jobs/v2/scrape/boards/recruitee.py",
+    "relocation_jobs/v2/scrape/boards/smartrecruiters.py",
+    "relocation_jobs/v2/scrape/boards/teamtailor.py",
+    "relocation_jobs/v2/scrape/boards/workable.py",
+    "relocation_jobs/v2/scrape/boards/workday.py",
+    "relocation_jobs/v2/scrape/company.py",
+    "relocation_jobs/v2/scrape/descriptions.py",
+    "relocation_jobs/v2/scrape/dom_listing.py",
+    "relocation_jobs/v2/scrape/enrich.py",
+    "relocation_jobs/v2/scrape/job_text.py",
+    "relocation_jobs/v2/scrape/playwright_board.py",
+    "relocation_jobs/v2/users/applied.py",
+    "relocation_jobs/v2/users/history.py",
+    "relocation_jobs/v2/users/repo.py",
+    "relocation_jobs/v2/web/deps.py",
+    "relocation_jobs/v2/web/routes/__init__.py",
+    "relocation_jobs/v2/web/routes/admin.py",
+    "relocation_jobs/v2/web/routes/catalog.py",
+    "relocation_jobs/v2/web/routes/companies.py",
+    "relocation_jobs/v2/web/routes/fetch.py",
+    "relocation_jobs/v2/web/server.py",
+    "tests/v2/fetch/test_service.py",
+    "tests/v2/scrape/test_ashby_board.py",
+    "tests/v2/scrape/test_board_coverage.py",
+    "tests/v2/scrape/test_dom_listing.py",
+    "tests/v2/scrape/test_enrich.py",
+    "tests/v2/scrape/test_generic_board.py",
+    "tests/v2/scrape/test_greenhouse_board.py",
+    "tests/v2/scrape/test_lever_board.py",
+    "tests/v2/scrape/test_recruitee_board.py",
+    "tests/v2/scrape/test_smartrecruiters_board.py",
+    "tests/v2/scrape/test_workable_board.py",
+    "tests/v2/web/test_catalog_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "66623ac2c7eb",
+  "session_metrics": {
+    "turn_count": 8,
+    "context_tokens": 185935,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T14:41:31.785747Z",
+    "agent_lines": 3599,
+    "agent_removed": 159,
+    "human_added": 79,
+    "human_modified": 72,
+    "human_removed": 0,
+    "total_committed": 3733,
+    "total_lines_changed": 3909,
+    "agent_percentage": 96.1371194678946,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 117,
+      "user_lines_removed": 11,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".cursor/rules/v2-coding.mdc": 60,
+        "relocation_jobs/v2/RULES.md": 57
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/RULES.md": 11
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 117,
+      "agent_lines_removed": 11
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 277,
+      "agent_lines_removed": 16
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 622,
+      "agent_lines_removed": 16
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 921,
+      "agent_lines_removed": 126
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1574,
+      "agent_lines_removed": 193
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 47,
+      "user_lines_removed": 17,
+      "agent_lines_added": 2548,
+      "agent_lines_removed": 196,
+      "user_added_per_file": {
+        "relocation_jobs/v2/scrape/boards/lever.py": 4,
+        "relocation_jobs/v2/scrape/boards/recruitee.py": 3,
+        "relocation_jobs/v2/scrape/boards/smartrecruiters.py": 2,
+        "relocation_jobs/v2/scrape/boards/workable.py": 2,
+        "relocation_jobs/v2/scrape/dom_listing.py": 28,
+        "tests/v2/scrape/test_ashby_board.py": 3,
+        "tests/v2/scrape/test_lever_board.py": 2,
+        "tests/v2/scrape/test_recruitee_board.py": 1,
+        "tests/v2/scrape/test_smartrecruiters_board.py": 1,
+        "tests/v2/scrape/test_workable_board.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/scrape/boards/lever.py": 4,
+        "relocation_jobs/v2/scrape/boards/recruitee.py": 3,
+        "relocation_jobs/v2/scrape/boards/smartrecruiters.py": 2,
+        "relocation_jobs/v2/scrape/boards/workable.py": 2,
+        "tests/v2/scrape/test_ashby_board.py": 2,
+        "tests/v2/scrape/test_lever_board.py": 2,
+        "tests/v2/scrape/test_recruitee_board.py": 1,
+        "tests/v2/scrape/test_workable_board.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 47,
+      "user_lines_removed": 17,
+      "agent_lines_added": 2826,
+      "agent_lines_removed": 196,
+      "user_added_per_file": {
+        "relocation_jobs/v2/scrape/boards/lever.py": 4,
+        "relocation_jobs/v2/scrape/boards/recruitee.py": 3,
+        "relocation_jobs/v2/scrape/boards/smartrecruiters.py": 2,
+        "relocation_jobs/v2/scrape/boards/workable.py": 2,
+        "relocation_jobs/v2/scrape/dom_listing.py": 28,
+        "tests/v2/scrape/test_ashby_board.py": 3,
+        "tests/v2/scrape/test_lever_board.py": 2,
+        "tests/v2/scrape/test_recruitee_board.py": 1,
+        "tests/v2/scrape/test_smartrecruiters_board.py": 1,
+        "tests/v2/scrape/test_workable_board.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/v2/scrape/boards/lever.py": 4,
+        "relocation_jobs/v2/scrape/boards/recruitee.py": 3,
+        "relocation_jobs/v2/scrape/boards/smartrecruiters.py": 2,
+        "relocation_jobs/v2/scrape/boards/workable.py": 2,
+        "tests/v2/scrape/test_ashby_board.py": 2,
+        "tests/v2/scrape/test_lever_board.py": 2,
+        "tests/v2/scrape/test_recruitee_board.py": 1,
+        "tests/v2/scrape/test_workable_board.py": 1
+      }
+    }
+  ]
+}

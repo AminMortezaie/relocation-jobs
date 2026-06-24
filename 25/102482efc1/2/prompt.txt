@@ -1,0 +1,231 @@
+do you think that hexagonal can be better for this whole application?
+its just a question, it could be not practical at all.
+
+---
+
+ok skip this continue the v2, 
+before it i wanted to ask what's your idea if i tell you if we keep the pydatic types in a separated files it can be better.
+
+what's your idea about it?
+
+---
+
+ok skip this continue the v2, 
+before it i wanted to ask what's your idea if i tell you if we keep the pydatic types in a separated files it can be better.
+
+what's your idea about it?
+
+---
+
+nothing should be depend on v1 in v2.
+v2 is all the things need to run the application.
+we just copy some lines from v1 and also understanding the flow from v1 not anymore.
+
+continue by own decision i will review strictly your code like what i told you till now.
+
+---
+
+oh no!
+you just copied all the stuff from v1 not reviewing anything just put all the things there.
+you were on a great track before this copy but you started to make the code spagetty again.
+
+long functions , wrong flow and everything copied here and till now you work was great but now you ruined everything you done before in v2.
+
+---
+
+oh no!
+you just copied all the stuff from v1 not reviewing anything just put all the things there.
+you were on a great track before this copy but you started to make the code spagetty again.
+
+long functions , wrong flow and everything copied here and till now you work was great but now you ruined everything you done before in v2.
+
+---
+
+write down your roadmap you're working.
+what we completed and what we need to complete the whole application.
+write down here to have better insight.
+
+---
+
+1- new
+2- block until it exists
+3- i dont understand what you say, skip for now you have other jobs to do.
+
+---
+
+go ahead
+
+---
+
+go ahead
+
+---
+
+we have lots of if else in the code, its not a good practice what pattern do you think can be appliable instead of this amount of if else blocks?
+
+---
+
+we have lots of if else in the code, its not a good practice what pattern do you think can be appliable instead of this amount of if else blocks?
+
+---
+
+yes apply your best practice on a file to see what you say then we decide to move forward or not.
+
+---
+
+also use split practice on this same file to see what happens i will tell you my final decision.
+
+---
+
+no it makes the code verbose.
+keep ur previous approach independent predicates and apply them all in v2.
+
+---
+
+no it makes the code verbose.
+keep ur previous approach independent predicates and apply them all in v2.
+
+---
+
+feel better now.
+continue your roadmap.
+
+---
+
+feel better now.
+continue your roadmap.
+
+---
+
+review Catalog.writes.py file.
+why this is like this?
+
+---
+
+review Catalog.writes.py file.
+why this is like this?
+
+---
+
+something that i need to think about now, its bad practice and can be a disaster later.
+the name is unclear and also the job is also unclear before your explaination.
+rewrite and rename it to something meaningful.
+
+---
+
+in this part we can add a simple redis to have this data there not in memory but we should think of render also.
+what do you think?
+also based on our previous agreement we should not put any db layer codes in any other files except repo.
+
+---
+
+in this part we can add a simple redis to have this data there not in memory but we should think of render also.
+what do you think?
+also based on our previous agreement we should not put any db layer codes in any other files except repo.
+
+---
+
+3
+
+---
+
+3
+
+---
+
+why we kept board_sync till we dont have any usage also its not like a real contract, also i cannot understand this pattern in python codes though.
+
+---
+
+why we kept board_sync till we dont have any usage also its not like a real contract, also i cannot understand this pattern in python codes though.
+
+---
+
+can you write down the rules you're doing based on them to have this for later approaches.
+put it in v2 folder.
+
+---
+
+ok continue your job.
+
+---
+
+ok continue your job.
+
+---
+
+process_company is too long bro.
+
+---
+
+again you forget to apply our strategy on if else.
+
+---
+
+you need to organized code snippets more carefully, 
+you put the functions and conditions mixed up you need to keep them aparted, for example first conditions and then functions.
+first conditions and dataclasses and then other functions.
+i prefer to put in another file but by your choice, we put in single file.
+please apply on any files have this problem.
+
+---
+
+no comments bro.
+
+---
+
+no comments bro.
+
+---
+
+also merge_matching_jobs too long, can you write down to your skills to remember these principles and not telling you again?
+no comments in every single parts.
+
+---
+
+also merge_matching_jobs too long, can you write down to your skills to remember these principles and not telling you again?
+no comments in every single parts.
+
+---
+
+the flow is not readable and its hard to understand make it simpler in this file. i mean merge file.
+
+---
+
+the flow is not readable and its hard to understand make it simpler in this file. i mean merge file.
+
+---
+
+ok continue your roadmap.
+
+---
+
+ok continue your roadmap.
+
+---
+
+remove any comments on any of v2 files.
+also compare the files and codes with principles we had and tell me what are them are avoided there in which file.
+
+---
+
+remove any comments on any of v2 files.
+also compare the files and codes with principles we had and tell me what are them are avoided there in which file.
+
+---
+
+write down what you understand from coding verdit i have to apply later.
+i'm going to sleap cause its about more than 20 hours that i havent sleep.
+
+---
+
+write down what you understand from coding verdit i have to apply later.
+i'm going to sleap cause its about more than 20 hours that i havent sleep.
+
+---
+
+write down in your rules file somewhere to be used later by others.
+
+---
+
+write down in your rules file somewhere to be used later by others.

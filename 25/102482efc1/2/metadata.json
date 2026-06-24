@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "25102482efc1",
+  "session_id": "c0f06ef3-942f-441b-a2a2-712eaae56c10",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-24T23:11:10.308858Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/catalog_db.py",
+    "relocation_jobs/db/__init__.py",
+    "relocation_jobs/panel_server.py",
+    "relocation_jobs/scrape/_compat.py",
+    "relocation_jobs/scrape/runner.py",
+    "relocation_jobs/services/catalog_service.py",
+    "relocation_jobs/services/job_service.py",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/web/routes/jobs.py",
+    "tests/test_integration.py",
+    "tests/test_panel_api_full.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "3cf29d5eb463",
+  "session_metrics": {
+    "duration_ms": 9633336,
+    "turn_count": 44,
+    "context_tokens": 191562,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-24T23:11:10.292147Z",
+    "agent_lines": 146,
+    "agent_removed": 3953,
+    "human_added": 15480,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 15626,
+    "total_lines_changed": 44913,
+    "agent_percentage": 9.126533520361587,
+    "metric_version": 2
+  }
+}

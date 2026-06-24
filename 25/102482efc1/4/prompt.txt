@@ -1,0 +1,72 @@
+why it was gone?
+
+---
+
+i cannot also connect to it with ssh
+
+---
+
+i stopped it and now with new ip started and it says its running.
+
+3.70.28.142
+new ip
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i've added AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY in  env can we do something with this?
+
+---
+
+i think that we should quickly fix the problem was created this disaster for my aws
+
+---
+
+the first fetch is taking long why?
+
+---
+
+it uses 24 parallel workers which may create problems with aws
+
+---
+
+not for me which should be a simple db call takes more than expected what do you think?
+
+---
+
+not for me which should be a simple db call takes more than expected what do you think?
+
+---
+
+update the skills and all the documents we have for the other people to start coding here in this basecode

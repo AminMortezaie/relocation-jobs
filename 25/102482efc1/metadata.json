@@ -3,10 +3,11 @@
   "checkpoint_id": "25102482efc1",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 24,
+  "checkpoints_count": 50,
   "files_touched": [
     ".env.example",
     ".gitignore",
+    "AGENTS.md",
     "README.md",
     "docker-entrypoint.sh",
     "frontend/package-lock.json",
@@ -260,6 +261,7 @@
     "relocation_jobs/web/scrape_runner.py",
     "relocation_jobs/web/server.py",
     "relocation_jobs/web/validators.py",
+    "scripts/aws_postgres_migrate.sh",
     "scripts/panel_server.py",
     "scripts/scrape_jobs.py",
     "tests/catalog/test_repo.py",
@@ -376,6 +378,12 @@
       "transcript": "/25/102482efc1/3/full.jsonl",
       "content_hash": "/25/102482efc1/3/content_hash.txt",
       "prompt": "/25/102482efc1/3/prompt.txt"
+    },
+    {
+      "metadata": "/25/102482efc1/4/metadata.json",
+      "transcript": "/25/102482efc1/4/full.jsonl",
+      "content_hash": "/25/102482efc1/4/content_hash.txt",
+      "prompt": "/25/102482efc1/4/prompt.txt"
     }
   ]
 }

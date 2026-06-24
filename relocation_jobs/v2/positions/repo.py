@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction, get_connection
 from relocation_jobs.v2.users.history import append_status_event, status_history_for_job
 
 
 def _base_result(company_name: str, job_url: str, country: str, **extra) -> dict:
-    return {"company": company_name, "url": job_url, "country": country, **extra}
+    return {
+        "company": company_name,
+        "url": job_url,
+        "country": country,
+        "idempotency_key": job_idempotency_key(job_url),
+        **extra,
+    }
 
 
 def _with_status_history(

@@ -37,8 +37,8 @@ BoardFetcher = Callable[..., Awaitable[list[dict]]]
 _BOARD_FETCHERS: dict[str, BoardFetcher] = {
     "ashby": fetch_ashby_board,
     "atlassian": fetch_atlassian_board,
-    "applicably": fetch_applytojob_board,
-    "bamboo": fetch_bamboo_board,
+    "applytojob": fetch_applytojob_board,
+    "bamboohr": fetch_bamboo_board,
     "bol": fetch_bol_board,
     "deel": fetch_deel_board,
     "epam": fetch_epam_board,

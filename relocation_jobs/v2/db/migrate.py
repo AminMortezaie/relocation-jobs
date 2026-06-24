@@ -7,7 +7,7 @@ def _company_fetch_attempts_v1(conn) -> None:
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS company_fetch_attempts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             fetch_run_id INTEGER,
             country TEXT NOT NULL,
             company_name TEXT NOT NULL,
@@ -21,7 +21,7 @@ def _company_fetch_attempts_v1(conn) -> None:
             jobs_new INTEGER,
             jobs_preserved INTEGER,
             message TEXT,
-            duration_seconds REAL
+            duration_seconds DOUBLE PRECISION
         )
         """
     )

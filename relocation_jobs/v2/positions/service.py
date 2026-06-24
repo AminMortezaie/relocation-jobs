@@ -25,8 +25,8 @@ def _normalize_linkedin_url(url: str) -> str:
     return raw
 
 
-def _require_catalog_job(company_name: str, job_url: str) -> dict:
-    job = get_job_by_url(job_url)
+def _require_catalog_job(country_key: str, company_name: str, job_url: str) -> dict:
+    job = get_job_by_url(job_url, company_name=company_name, country_key=country_key)
     if job is None:
         raise LookupError(f"Job not found: {company_name} — {job_url[:80]}")
     return job
@@ -45,7 +45,7 @@ def set_job_applied(
     *,
     user_id: int,
 ) -> dict:
-    job = _require_catalog_job(company_name, job_url)
+    job = _require_catalog_job(country_key, company_name, job_url)
     result = repo.set_applied(
         user_id, country_key, company_name, job_url, applied,
         job_title=job.get("title", ""),
@@ -66,7 +66,7 @@ def set_job_rejected(
     *,
     user_id: int,
 ) -> dict:
-    job = _require_catalog_job(company_name, job_url)
+    job = _require_catalog_job(country_key, company_name, job_url)
     result = repo.set_rejected(
         user_id, country_key, company_name, job_url, rejected,
         job_title=job.get("title", ""),
@@ -81,7 +81,7 @@ def set_job_reapply(
     *,
     user_id: int,
 ) -> dict:
-    _require_catalog_job(company_name, job_url)
+    _require_catalog_job(country_key, company_name, job_url)
     return _validated(repo.reapply(user_id, country_key, company_name, job_url))
 
 
@@ -94,7 +94,7 @@ def set_job_waiting_referral(
     user_id: int,
     linkedin_url: str = "",
 ) -> dict:
-    job = _require_catalog_job(company_name, job_url)
+    job = _require_catalog_job(country_key, company_name, job_url)
     normalized = _normalize_linkedin_url(linkedin_url) if waiting_referral else ""
     result = repo.set_waiting_referral(
         user_id, country_key, company_name, job_url, waiting_referral,
@@ -130,7 +130,7 @@ def set_job_looking_to_apply(
     *,
     user_id: int,
 ) -> dict:
-    job = _require_catalog_job(company_name, job_url)
+    job = _require_catalog_job(country_key, company_name, job_url)
     result = repo.set_looking_to_apply(
         user_id, country_key, company_name, job_url, looking_to_apply,
         job_title=job.get("title", ""),
@@ -163,7 +163,7 @@ def set_job_not_for_me(
     not_for_me: bool = True,
     reason: str | None = None,
 ) -> dict:
-    _require_catalog_job(company_name, job_url)
+    _require_catalog_job(country_key, company_name, job_url)
     result = repo.set_not_for_me(
         user_id, country_key, company_name, job_url,
         not_for_me=not_for_me, reason=reason,

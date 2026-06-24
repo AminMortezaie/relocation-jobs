@@ -157,20 +157,30 @@ def get_company(country_key: str, company_name: str) -> dict | None:
     return _company_row(data, jobs)
 
 
-def get_job_by_url(job_url: str) -> dict | None:
+def get_job_by_url(
+    job_url: str,
+    *,
+    company_name: str | None = None,
+    country_key: str | None = None,
+) -> dict | None:
     key = job_idempotency_key(job_url)
     if not key:
         return None
+    sql = """
+        SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
+        FROM matching_jobs j
+        JOIN companies c ON c.id = j.company_id
+        WHERE j.idempotency_key = %s
+    """
+    params: list = [key]
+    if company_name:
+        sql += " AND c.name = %s"
+        params.append(company_name.strip())
+    if country_key:
+        sql += " AND c.country = %s"
+        params.append(country_key.strip().lower())
     with db_read() as conn:
-        row = conn.execute(
-            """
-            SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
-            FROM matching_jobs j
-            JOIN companies c ON c.id = j.company_id
-            WHERE j.idempotency_key = %s
-            """,
-            (key,),
-        ).fetchone()
+        row = conn.execute(sql, tuple(params)).fetchone()
     return _row(row) or None
 
 

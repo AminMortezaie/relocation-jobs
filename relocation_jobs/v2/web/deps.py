@@ -21,5 +21,6 @@ set_company_applied = companies.set_company_applied
 set_company_awaiting_response = companies.set_company_awaiting_response
 set_company_fetch_ok = companies.set_company_fetch_ok
 set_company_fetch_problem = companies.set_company_fetch_problem
+touch_company_fetch_time = companies.touch_company_fetch_time
 update_company_careers = companies.update_company_careers
 update_company_city = companies.update_company_city

@@ -111,6 +111,20 @@ class TestRejectAndReapply:
 
 
 @pytest.mark.integration
+class TestPositionFilters:
+    def test_looking_to_apply_only_filter(self, seeded_catalog_v2, test_user):
+        uid = test_user["id"]
+        company, url, other = _company_and_jobs(seeded_catalog_v2)
+
+        positions.set_job_looking_to_apply("uk", company, url, True, user_id=uid)
+        companies = _flatten(uid, position_looking_to_apply_only=True)
+        acme = _acme(companies)
+
+        assert url in _urls(acme["jobs"])
+        assert other not in _urls(acme["jobs"])
+
+
+@pytest.mark.integration
 class TestNotForMe:
     def test_not_for_me_removed_from_main_jobs_bucket(self, seeded_catalog_v2, test_user):
         uid = test_user["id"]

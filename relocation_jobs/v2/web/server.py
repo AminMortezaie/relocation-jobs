@@ -27,9 +27,11 @@ def bootstrap_app() -> None:
         pass
     from relocation_jobs.core.db import get_connection
     from relocation_jobs.db import init_db
+    from relocation_jobs.v2.fetch import repo as fetch_repo
 
     init_db()
     apply_v2_migrations(get_connection())
+    fetch_repo.reap_orphan_running_fetch_runs()
     init_auth(app)
     _bootstrapped = True
 

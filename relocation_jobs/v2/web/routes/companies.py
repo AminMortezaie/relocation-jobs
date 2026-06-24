@@ -4,11 +4,12 @@ import os
 
 from flask import g, jsonify, request
 
+from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import login_required
 from relocation_jobs.core.location_tags import COUNTRY_LABELS
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
 from relocation_jobs.v2.catalog.repo import get_company
-from relocation_jobs.v2.fetch.runner import run_single_company_fetch
+from relocation_jobs.v2.fetch.runner import fetch_is_running, start_company_fetch
 from relocation_jobs.v2.web import deps
 
 
@@ -342,6 +343,11 @@ def register(app):
                 ),
             }), 503
 
+        if not HTTPX_AVAILABLE:
+            return jsonify({
+                "error": "httpx is not installed. Run: pip install httpx",
+            }), 503
+
         body = request.get_json(silent=True) or {}
         country = (body.get("country") or "").strip().lower()
         company = (body.get("company") or "").strip()
@@ -353,20 +359,33 @@ def register(app):
         if not company:
             return jsonify({"error": "company is required"}), 400
 
-        if get_company(country, company) is None:
-            return jsonify({"error": f"Company not found: {company}"}), 404
+        try:
+            company = deps.resolve_company_name(country, company)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+
+        if fetch_is_running():
+            return jsonify({"error": "A fetch is already running"}), 409
 
         try:
-            message, new_jobs = run_single_company_fetch(country, company)
-        except LookupError as exc:
-            return jsonify({"error": str(exc)}), 400
+            deps.touch_company_fetch_time(country, company)
+        except (LookupError, ValueError) as exc:
+            return jsonify({"error": str(exc)}), 404
+
+        try:
+            run_id = start_company_fetch(
+                user_id=g.user_id,
+                country_key=country,
+                company_name=company,
+            )
+        except RuntimeError as exc:
+            return jsonify({"error": str(exc)}), 409
 
         return jsonify({
             "ok": True,
+            "run_id": run_id,
             "country": country,
             "company": company,
             "file": COUNTRY_ARCHIVE_FILENAMES.get(country, ""),
-            "new_jobs": new_jobs,
-            "message": message,
-            "label": COUNTRY_LABELS.get(country, country),
+            "message": f"Fetching jobs for {company} ({COUNTRY_LABELS.get(country, country)})",
         })

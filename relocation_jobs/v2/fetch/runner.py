@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 import httpx
 
+from relocation_jobs.core.scrape_cancel import FetchCancelled, clear_cancel_checker, set_cancel_checker
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES
 from relocation_jobs.v2.fetch import repo as fetch_repo
 from relocation_jobs.v2.fetch.country_runner import run_country_fetch
@@ -169,10 +170,10 @@ def _reap_zombie_fetch() -> None:
         fetch_repo.reap_orphan_running_fetch_runs()
 
 
-def _persist_fetch_run() -> None:
+def _persist_fetch_run(run_id: int | None = None) -> None:
     with _fetch_lock:
-        run_id = _fetch_state.get("run_id")
-        if not run_id:
+        rid = run_id or _fetch_state.get("run_id")
+        if not rid:
             return
         payload = {
             "finished_at": _fetch_state.get("finished_at") or _utc_now(),
@@ -188,7 +189,7 @@ def _persist_fetch_run() -> None:
             "activity_log": list(_fetch_state.get("activity_log") or []),
             "log": list(_fetch_state.get("log") or []),
         }
-    row = fetch_repo.finalize_fetch_run(int(run_id), **payload)
+    row = fetch_repo.finalize_fetch_run(int(rid), **payload)
     with _fetch_lock:
         _fetch_state["last_fetch_run"] = row
         _fetch_state["run_id"] = None
@@ -346,7 +347,120 @@ def _country_fetch_worker(
             _fetch_state["running"] = False
             _fetch_state["finished_at"] = _utc_now()
         _sync_live_to_db()
-        _persist_fetch_run()
+        _persist_fetch_run(run_id)
+
+
+def _company_fetch_worker(
+    country_key: str,
+    company_name: str,
+    *,
+    run_id: int,
+) -> None:
+    exit_code = 1
+    cancelled = False
+    new_jobs_total = 0
+    result_message = ""
+    set_cancel_checker(lambda: fetch_repo.fetch_run_cancel_requested(run_id))
+    try:
+        with _fetch_lock:
+            _fetch_state["progress"] = {
+                "current": 0,
+                "total": 1,
+                "company": company_name,
+                "status": "fetching",
+            }
+        _sync_live_to_db()
+        _append_log(f"Fetching {company_name}")
+
+        async def _run() -> tuple[str, int]:
+            async with httpx.AsyncClient() as client:
+                return await fetch_and_persist_company(
+                    client,
+                    country_key,
+                    company_name,
+                    fetch_run_id=run_id,
+                )
+
+        result_message, new_jobs_total = asyncio.run(_run())
+        _append_log(result_message)
+        if fetch_repo.fetch_run_cancel_requested(run_id):
+            cancelled = True
+            exit_code = 130
+        else:
+            exit_code = 0
+    except FetchCancelled:
+        cancelled = True
+        exit_code = 130
+    except Exception as exc:
+        _append_log(f"Error: {exc}")
+        exit_code = 1
+    finally:
+        clear_cancel_checker()
+        finish_line = None
+        with _fetch_lock:
+            if cancelled:
+                _fetch_state["cancelled"] = True
+                _fetch_state["exit_code"] = 130
+                finish_line = "Cancelled by user"
+            else:
+                _fetch_state["exit_code"] = exit_code
+                finish_line = "Finished (exit 0)" if exit_code == 0 else f"Finished (exit {exit_code})"
+            _fetch_state["new_jobs_total"] = new_jobs_total
+            if exit_code == 0 and not cancelled:
+                _fetch_state["progress"] = {
+                    "current": 1,
+                    "total": 1,
+                    "company": company_name,
+                    "status": "done",
+                }
+            if finish_line:
+                _fetch_state["log"].append(finish_line)
+            _fetch_state["result_line"] = (
+                result_message
+                if exit_code == 0 and result_message
+                else finish_line
+            )
+            _fetch_state["running"] = False
+            _fetch_state["finished_at"] = _utc_now()
+        _sync_live_to_db()
+        _persist_fetch_run(run_id)
+
+
+def start_company_fetch(
+    *,
+    user_id: int,
+    country_key: str,
+    company_name: str,
+) -> int:
+    global _fetch_thread
+    _reap_zombie_fetch()
+    if fetch_is_running():
+        raise RuntimeError("A fetch is already running")
+    file_name = COUNTRY_ARCHIVE_FILENAMES[country_key]
+    with _fetch_lock:
+        run_id = _reset_fetch_state(
+            user_id=user_id,
+            country=country_key,
+            file_name=file_name,
+            concurrency=1,
+            company=company_name,
+        )
+        _fetch_state["progress"] = {
+            "current": 0,
+            "total": 1,
+            "company": company_name,
+            "status": "starting",
+        }
+        thread = threading.Thread(
+            target=_company_fetch_worker,
+            args=(country_key, company_name),
+            kwargs={"run_id": run_id},
+            daemon=True,
+        )
+        _fetch_thread = thread
+    _sync_live_to_db()
+    thread.start()
+    return run_id
 
 
 def start_country_fetch(
@@ -371,7 +485,7 @@ def start_country_fetch(
             concurrency=workers,
             ats_type=ats_type,
         )
-        _fetch_thread = threading.Thread(
+        thread = threading.Thread(
             target=_country_fetch_worker,
             args=(country_key,),
             kwargs={
@@ -381,7 +495,8 @@ def start_country_fetch(
             },
             daemon=True,
         )
-        _fetch_thread.start()
+        _fetch_thread = thread
+    thread.start()
     return run_id
 
 

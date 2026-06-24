@@ -110,7 +110,7 @@ def flatten_companies(
         hide_position_rejected=hide_position_rejected,
         position_applied_only=position_applied_only,
         position_rejected_only=position_rejected_only,
-        looking_to_apply_only=position_looking_to_apply_only,
+        position_looking_to_apply_only=position_looking_to_apply_only,
     )
     return flatten_with_filters(filters)
 

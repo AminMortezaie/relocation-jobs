@@ -231,7 +231,7 @@ export async function toggleCompanyAwaitingResponse(country, company, awaiting) 
   return data;
 }
 
-export async function toggleApplied(country, company, url, applied) {
+export async function toggleApplied(country, company, url, applied, idempotencyKey = "") {
   const res = await apiFetch("/api/jobs/applied", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -242,8 +242,9 @@ export async function toggleApplied(country, company, url, applied) {
     toast(data.error || "Could not save");
     return null;
   }
+  const key = data.idempotency_key || idempotencyKey;
   const co = findCompany(country, company);
-  const job = co ? findJobInCompany(co, url) : null;
+  const job = co ? findJobInCompany(co, url, key) : null;
   if (job) {
     job.applied = data.applied;
     job.applied_date = data.applied_date || "";
@@ -256,7 +257,7 @@ export async function toggleApplied(country, company, url, applied) {
     }
     if (co) co.positions_applied = (co.jobs || []).filter((j) => j.applied).length;
   }
-  if (co) syncAppliedVisibility(co, url, data.applied, data.idempotency_key);
+  if (co) syncAppliedVisibility(co, url, data.applied, key);
   return data;
 }
 
@@ -335,7 +336,7 @@ export async function reapplyJob(country, company, url) {
   return data;
 }
 
-export async function toggleRejected(country, company, url, rejected) {
+export async function toggleRejected(country, company, url, rejected, idempotencyKey = "") {
   const res = await apiFetch("/api/jobs/rejected", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -349,16 +350,17 @@ export async function toggleRejected(country, company, url, rejected) {
     toast(msg);
     return null;
   }
+  const key = data.idempotency_key || idempotencyKey;
   const co = findCompany(country, company);
   if (co) {
     if (data.rejected) {
-      moveJobBetweenBuckets(co, url, data.idempotency_key, "rejected_jobs", {
+      moveJobBetweenBuckets(co, url, key, "rejected_jobs", {
         rejected: true,
         rejected_date: data.rejected_date || "",
         rejected_events: data.rejected_events,
       });
     } else {
-      moveJobBetweenBuckets(co, url, data.idempotency_key, "jobs", {
+      moveJobBetweenBuckets(co, url, key, "jobs", {
         rejected: false,
         rejected_date: "",
       });
@@ -367,7 +369,7 @@ export async function toggleRejected(country, company, url, rejected) {
   return data;
 }
 
-export async function toggleLookingToApply(country, company, url, lookingToApply) {
+export async function toggleLookingToApply(country, company, url, lookingToApply, idempotencyKey = "") {
   const res = await apiFetch("/api/jobs/looking-to-apply", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -378,13 +380,14 @@ export async function toggleLookingToApply(country, company, url, lookingToApply
     toast(data.error || "Could not save");
     return null;
   }
+  const key = data.idempotency_key || idempotencyKey;
   const co = findCompany(country, company);
-  const job = co ? findJobInCompany(co, url) : null;
+  const job = co ? findJobInCompany(co, url, key) : null;
   if (job) {
     job.looking_to_apply = data.looking_to_apply;
     job.looking_to_apply_date = data.looking_to_apply_date || "";
   }
-  if (co) syncLookingToApplyVisibility(co, url, data.looking_to_apply, data.idempotency_key);
+  if (co) syncLookingToApplyVisibility(co, url, data.looking_to_apply, key);
   return data;
 }
 

@@ -700,10 +700,10 @@ function bindJobsListEvents() {
     if (appliedBtn) {
       const card = appliedBtn.closest(".position-card");
       if (!card) return;
-      const { country, company, url } = card.dataset;
+      const { country, company, url, idempotencyKey } = card.dataset;
       const applied = appliedBtn.dataset.applied !== "1";
       appliedBtn.disabled = true;
-      const result = await toggleApplied(country, company, url, applied);
+      const result = await toggleApplied(country, company, url, applied, idempotencyKey);
       appliedBtn.disabled = false;
       if (!result) return;
       return;
@@ -762,10 +762,10 @@ function bindJobsListEvents() {
     if (rejectedBtn) {
       const card = rejectedBtn.closest(".position-card");
       if (!card) return;
-      const { country, company, url } = card.dataset;
+      const { country, company, url, idempotencyKey } = card.dataset;
       const rejected = rejectedBtn.dataset.rejected !== "1";
       rejectedBtn.disabled = true;
-      const result = await toggleRejected(country, company, url, rejected);
+      const result = await toggleRejected(country, company, url, rejected, idempotencyKey);
       rejectedBtn.disabled = false;
       if (!result) return;
       if (rejected) {
@@ -779,10 +779,10 @@ function bindJobsListEvents() {
     if (lookingToApplyBtn) {
       const card = lookingToApplyBtn.closest(".position-card");
       if (!card) return;
-      const { country, company, url } = card.dataset;
+      const { country, company, url, idempotencyKey } = card.dataset;
       const lookingToApply = lookingToApplyBtn.dataset.looking !== "1";
       lookingToApplyBtn.disabled = true;
-      const result = await toggleLookingToApply(country, company, url, lookingToApply);
+      const result = await toggleLookingToApply(country, company, url, lookingToApply, idempotencyKey);
       lookingToApplyBtn.disabled = false;
       if (!result) return;
       return;

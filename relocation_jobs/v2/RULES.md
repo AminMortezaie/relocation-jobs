@@ -2,7 +2,7 @@
 
 How we build `relocation_jobs/v2/`. v1 (`services/`, `catalog/`, `scrape/`, `web/` shims) is **reference only** — read for behavior, do not import or bulk-copy.
 
-Also read: `.claude/V2_CODING_VERDICT.md` (handoff + known violations), `.cursor/rules/v2-coding.mdc` (agent rule).
+Also read: [`PARITY.md`](PARITY.md) (v1 vs v2 checklist), [`RULES.md`](RULES.md).
 
 ## Boundaries
 

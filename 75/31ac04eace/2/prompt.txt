@@ -1,0 +1,124 @@
+can you transfer the fetch button and the fetch process to react cause it has slow loading
+
+---
+
+restart panel
+
+---
+
+restart panel
+
+---
+
+its not going up
+
+---
+
+its not going up
+
+---
+
+nothing is happening when i click on fetch button can you see it?
+
+---
+
+whats happening now?
+it didnt start again
+
+---
+
+fetch is completely off and not working at all. not for a single company not for a single country.
+
+---
+
+start the panel on your side see the front and test it, you can see the it didnt fix
+
+---
+
+can you see the slowing in panel?
+can you find why its happening?
+
+---
+
+can you see the slowing in panel?
+can you find why its happening?
+
+---
+
+do it now.
+
+---
+
+ok can you continue in making better performance?
+
+---
+
+ok can you continue in making better performance?
+
+---
+
+what do u mean by list virtualization?
+
+---
+
+what do u mean by list virtualization?
+
+---
+
+i think its better to call the db on aws by pagination its a better solution for what you say, for example just 25 companies for the first load it can be easily handled by just changing a single query on backend
+
+---
+
+ok go ahead and do what you think its better
+
+---
+
+something that blows in my mind is what happens on filters we have?
+for example if i filter hide companies with no jobs might be less than 25 companies left in page 1 what happens?
+
+---
+
+something that blows in my mind is what happens on filters we have?
+for example if i filter hide companies with no jobs might be less than 25 companies left in page 1 what happens?
+
+---
+
+sure and then restart the service to see what has been changed
+
+---
+
+monitor
+
+---
+
+no at all its not a good approach, it should not be an infinity scroll should a have a UI and select pages and page 1, 2 , 3
+
+---
+
+this part should be go to admin panel cause its dynamic and just have unusable data cause it just based on the jobs filtered.
+
+---
+
+the place of these two should be interchange.
+
+---
+
+the place of these two should be interchange.
+
+---
+
+no i meant the pages should be the first then search company name and also the UI should be the same with our design system.
+
+---
+
+no i meant the pages should be the first then search company name and also the UI should be the same with our design system.
+
+---
+
+all good, 
+update the documents and have a nice time.
+
+---
+
+all good, 
+update the documents and have a nice time.

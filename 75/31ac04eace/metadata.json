@@ -3,11 +3,12 @@
   "checkpoint_id": "7531ac04eace",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 10,
+  "checkpoints_count": 23,
   "files_touched": [
     "AGENTS.md",
     "README.md",
     "frontend/src/App.jsx",
+    "frontend/src/BoardPagination.jsx",
     "frontend/src/CompanyCard.jsx",
     "frontend/src/main.jsx",
     "frontend/src/widgets/ReferralWidget.jsx",
@@ -36,6 +37,7 @@
     "relocation_jobs/static/js/scrape.js",
     "relocation_jobs/static/js/screen-loader.js",
     "relocation_jobs/static/js/state.js",
+    "relocation_jobs/static/js/stats-dashboard.js",
     "relocation_jobs/static/js/storage.js",
     "relocation_jobs/static/js/utils.js",
     "relocation_jobs/static/styles.css",
@@ -60,6 +62,12 @@
       "transcript": "/75/31ac04eace/1/full.jsonl",
       "content_hash": "/75/31ac04eace/1/content_hash.txt",
       "prompt": "/75/31ac04eace/1/prompt.txt"
+    },
+    {
+      "metadata": "/75/31ac04eace/2/metadata.json",
+      "transcript": "/75/31ac04eace/2/full.jsonl",
+      "content_hash": "/75/31ac04eace/2/content_hash.txt",
+      "prompt": "/75/31ac04eace/2/prompt.txt"
     }
   ]
 }

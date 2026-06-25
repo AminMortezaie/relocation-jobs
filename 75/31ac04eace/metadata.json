@@ -3,9 +3,10 @@
   "checkpoint_id": "7531ac04eace",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 23,
+  "checkpoints_count": 26,
   "files_touched": [
     "AGENTS.md",
+    "BUCKET_LIST.md",
     "README.md",
     "frontend/src/App.jsx",
     "frontend/src/BoardPagination.jsx",
@@ -44,6 +45,7 @@
     "relocation_jobs/users/repo.py",
     "relocation_jobs/web/routes/admin.py",
     "relocation_jobs/web/routes/board.py",
+    "scripts/mark_wrong_location_jobs.py",
     "tests/BUSINESS_RULES.md",
     "tests/helpers/route_manifest.py",
     "tests/panel/test_hide_empty.py",
@@ -68,6 +70,12 @@
       "transcript": "/75/31ac04eace/2/full.jsonl",
       "content_hash": "/75/31ac04eace/2/content_hash.txt",
       "prompt": "/75/31ac04eace/2/prompt.txt"
+    },
+    {
+      "metadata": "/75/31ac04eace/3/metadata.json",
+      "transcript": "/75/31ac04eace/3/full.jsonl",
+      "content_hash": "/75/31ac04eace/3/content_hash.txt",
+      "prompt": "/75/31ac04eace/3/prompt.txt"
     }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "894c2772262f",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 5,
+  "files_touched": [
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/static/js/board-view.js",
+    "relocation_jobs/static/js/board.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/utils.js",
+    "scripts/exclude_stray_board_jobs.py",
+    "tests/core/test_location_gate.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/89/4c2772262f/0/metadata.json",
+      "transcript": "/89/4c2772262f/0/full.jsonl",
+      "content_hash": "/89/4c2772262f/0/content_hash.txt",
+      "prompt": "/89/4c2772262f/0/prompt.txt"
+    }
+  ]
+}

@@ -1,13 +1,1 @@
-not for me should be soft deleted and also now you run a on whole db, and remove any jobs with wrong location there.
-
-firstly find the positon that we have in board and they're in wrong location and shows in board.
-mark them as wrong location.
-
----
-
-no first mark the wrong location positions we have currently then write the refactor scenario to implement soft delete later.
-write in a new file which is like a bucket list for our application and can be filled later.
-
----
-
-delete 2 other users.
+see Navan companies it has lots of wrong location postions but you didnt take action on them why?

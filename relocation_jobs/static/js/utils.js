@@ -19,6 +19,8 @@ export function toast(msg) {
   setTimeout(() => el.classList.remove("show"), 3500);
 }
 
+export const SEARCH_DEBOUNCE_MS = 450;
+
 export function debounce(fn, waitMs = 200) {
   let timer = null;
   return (...args) => {

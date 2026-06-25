@@ -1,7 +1,7 @@
 /** DOM event listeners for the jobs panel. */
 
 import { state, companyKey } from "./state.js";
-import { $, toast, atsScoreTone, isNarrowViewport, debounce } from "./utils.js";
+import { $, toast, atsScoreTone, isNarrowViewport, debounce, SEARCH_DEBOUNCE_MS } from "./utils.js";
 import {
   removeCompany,
   setNotForMe,
@@ -807,8 +807,8 @@ function bindToolbarEvents() {
     void loadJobs({ force: true, overlayLabel: "Updating board…" });
   });
   $("search").addEventListener("input", debounce(() => {
-    void loadBoard({ force: true, overlayLabel: "Searching…" });
-  }, 300));
+    void loadBoard({ force: true, noOverlay: true, preserveContent: true });
+  }, SEARCH_DEBOUNCE_MS));
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if (fetchPanelState.open) {

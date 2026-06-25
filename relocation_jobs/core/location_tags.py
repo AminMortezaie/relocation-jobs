@@ -470,6 +470,21 @@ _REMOTE_ONLY_RE = re.compile(
     re.I,
 )
 
+_US_STATE_CODES = frozenset({
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC",
+})
+
+_TRAILING_REGION_RE = re.compile(r",\s*([A-Za-z]{2})\s*$")
+
+_INDIA_CITY_HINTS = frozenset({
+    "bengaluru", "bangalore", "mumbai", "delhi", "hyderabad", "pune", "chennai",
+    "gurgaon", "gurugram", "noida", "kolkata", "ahmedabad",
+})
+
 
 def _unsupported_country_key_from_text(text: str) -> str | None:
     hay = f" {text.casefold()} "
@@ -620,9 +635,99 @@ def _parse_listing_location(text: str) -> tuple[str | None, set[str], bool]:
     if unsupported:
         return f"unsupported:{unsupported}", set(), False
 
+    region_match = _TRAILING_REGION_RE.search(cleaned)
+    if region_match:
+        code = region_match.group(1).upper()
+        city_part = cleaned[:region_match.start()].strip()
+        city_keys = _city_keys_from_text(city_part, country_key=None)
+        city_hint = city_part.casefold()
+        if code == "IN" and (
+            city_keys
+            or any(hint in city_hint for hint in _INDIA_CITY_HINTS)
+        ):
+            return "unsupported:india", city_keys, False
+        if code in _US_STATE_CODES:
+            return "unsupported:usa", city_keys, False
+
     country_key = _country_key_from_text(cleaned)
     city_keys = _city_keys_from_text(cleaned, country_key=country_key)
     return country_key, city_keys, False
+
+
+def _text_matches_expected_offices(text: str, expected: list[dict]) -> bool:
+    cleaned = " ".join((text or "").split()).strip()
+    if not cleaned:
+        return True
+    if _REMOTE_ONLY_RE.match(cleaned):
+        return True
+
+    country_key, city_keys, is_remote_only = _parse_listing_location(cleaned)
+    if is_remote_only:
+        return True
+    if country_key and country_key.startswith("unsupported:"):
+        return False
+    if country_key and country_key not in SUPPORTED_COUNTRY_KEYS:
+        return False
+
+    supported_countries = {
+        normalize_country_key(loc["country"]) for loc in expected
+    }
+    if country_key and country_key not in supported_countries:
+        return False
+
+    if city_keys:
+        return any(
+            match_key in city_keys
+            for loc in expected
+            for match_key in city_match_keys(loc["city"])
+        )
+
+    hay = cleaned.casefold()
+    for loc in expected:
+        for match_key in city_match_keys(loc["city"]):
+            if match_key in hay:
+                return True
+    return False
+
+
+def _looks_like_location_text(text: str) -> bool:
+    cleaned = " ".join((text or "").split()).strip()
+    if not cleaned:
+        return False
+    if _REMOTE_ONLY_RE.match(cleaned):
+        return True
+    if _unsupported_country_key_from_text(cleaned):
+        return True
+    if _country_key_from_text(cleaned):
+        return True
+    if _city_keys_from_text(cleaned, country_key=None):
+        return True
+    if _TRAILING_REGION_RE.search(cleaned):
+        return True
+    if "," in cleaned:
+        return True
+    if "&" in cleaned:
+        return False
+    if re.search(
+        r"\b(engineer|engineering|manager|analyst|intern|services|platform|payments?|fraud)\b",
+        cleaned,
+        re.I,
+    ):
+        return False
+    tokens = cleaned.split()
+    return len(tokens) == 1
+
+
+def _listing_text_matches_expected_offices(text: str, expected: list[dict]) -> bool:
+    cleaned = " ".join((text or "").split()).strip()
+    if not cleaned:
+        return True
+    parts = re.split(r"\s+or\s+|\s*\|\s*", cleaned, flags=re.I)
+    return any(
+        _text_matches_expected_offices(part.strip(), expected)
+        for part in parts
+        if part.strip()
+    )
 
 
 def job_matches_expected_locations(
@@ -654,6 +759,7 @@ def job_matches_expected_locations(
     saw_actionable = False
     explicit_mismatch = False
     remote_only = True
+    unparsed_texts: list[str] = []
 
     for text in texts:
         country_key, city_keys, is_remote_only = _parse_listing_location(text)
@@ -661,6 +767,7 @@ def job_matches_expected_locations(
             continue
         remote_only = False
         if not country_key and not city_keys:
+            unparsed_texts.append(text)
             continue
         saw_actionable = True
 
@@ -691,11 +798,21 @@ def job_matches_expected_locations(
                 return True, None
             explicit_mismatch = True
 
-    if remote_only and not saw_actionable:
+    if remote_only and not saw_actionable and not unparsed_texts:
         return False, "remote only"
     if explicit_mismatch:
         return False, "city mismatch"
     if not saw_actionable:
+        if unparsed_texts:
+            actionable = [text for text in unparsed_texts if _looks_like_location_text(text)]
+            if not actionable:
+                return True, None
+            if any(
+                _listing_text_matches_expected_offices(text, expected)
+                for text in actionable
+            ):
+                return True, None
+            return False, "location mismatch"
         return True, None
     return False, "location mismatch"
 

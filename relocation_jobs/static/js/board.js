@@ -108,13 +108,18 @@ export async function loadBoard(options = {}) {
     page = 1;
   }
 
+  const preserveContent = options.preserveContent === true;
   const useOverlay = options.noOverlay !== true;
   if (useOverlay) {
     beginScreenLoad(overlayLabel(options, page, requestChanged));
   }
 
   releaseCompanyOrder();
-  showJobsLoading();
+  if (preserveContent) {
+    syncBoardView({ loading: true, preserveContent: true });
+  } else {
+    showJobsLoading();
+  }
 
   try {
     if (useOverlay) setScreenLoadProgress(20);

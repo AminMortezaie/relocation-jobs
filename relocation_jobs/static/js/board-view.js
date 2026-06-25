@@ -18,11 +18,12 @@ function paginationView(loading = false) {
   };
 }
 
-export function syncBoardView({ loading = false } = {}) {
+export function syncBoardView({ loading = false, preserveContent = false } = {}) {
+  const hideContent = loading && !preserveContent;
   publishBoardView({
-    loading,
+    loading: hideContent,
     pagination: paginationView(loading),
-    companies: loading ? [] : getDisplayCompanies(),
+    companies: hideContent ? [] : getDisplayCompanies(),
     ui: {
       collapsed: [...state.collapsedCompanies],
       showNotForMe: [...state.showNotForMeCompanies],

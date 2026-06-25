@@ -1,0 +1,49 @@
+what was the position you mark as not for me.
+list it down and tell me why.
+
+---
+
+these are wrong.
+Senior Python Engineer, Senior Python AI Engineer, Senior Python Engineer
+should not be excluded.
+
+---
+
+i just used the PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py
+to run the application is this correct?
+
+---
+
+we dont have v1 lagecy anymore it just v2.
+but when i changed the running command on render it shows anothe page.
+its not cached but not showing the latest version we created.
+why?
+
+---
+
+we dont have v1 lagecy anymore it just v2.
+but when i changed the running command on render it shows anothe page.
+its not cached but not showing the latest version we created.
+why?
+
+---
+
+yes the react is not loading 
+it shows this.
+
+---
+
+yes the react is not loading 
+it shows this.
+
+---
+
+Port scan timeout reached, no open ports detected on 0.0.0.0. Detected open ports on localhost -- did you mean to bind one of these to 0.0.0.0?
+
+---
+
+quickly fix it to push it later.
+
+---
+
+quickly fix it to push it later.

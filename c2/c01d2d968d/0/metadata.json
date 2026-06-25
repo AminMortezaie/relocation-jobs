@@ -1,0 +1,82 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "c2c01d2d968d",
+  "session_id": "b83205a4-aebe-44b3-a558-a3679ec441eb",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-25T01:36:19.557104Z",
+  "branch": "main",
+  "checkpoints_count": 7,
+  "save_step_count": 6,
+  "files_touched": [
+    "Dockerfile",
+    "relocation_jobs/core/ats_constants.py",
+    "render.yaml",
+    "scripts/panel_server.py",
+    "start.sh",
+    "tests/scrape/test_relevance.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "fbb0b42d488d",
+  "checkpoint_transcript_start": 95,
+  "transcript_lines_at_start": 95,
+  "session_metrics": {
+    "turn_count": 15
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-25T01:36:19.551851Z",
+    "agent_lines": 18,
+    "agent_removed": 7,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 18,
+    "total_lines_changed": 25,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 4,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 4,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 4,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 4,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 4,
+      "agent_lines_removed": 0
+    }
+  ]
+}

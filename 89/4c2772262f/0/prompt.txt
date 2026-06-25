@@ -1,19 +1,2 @@
-see Navan companies it has lots of wrong location postions but you didnt take action on them why?
-
----
-
-i set to it now run again and see you find or not.
-
----
-
-searching the companies just word by word, its good by it intrupt user to write what they want you need to wait to user stop typing then search for the company it will decrease the db roundtrip.
-
----
-
-why beckMarket and lots of other positions in other companies not filtering by the wrong location.
-
-your script is wrong exactly.
-
----
-
-also run a script to filter out any jobs that should be excluded but it went to our board unintentionally.
+what was the position you mark as not for me.
+list it down and tell me why.

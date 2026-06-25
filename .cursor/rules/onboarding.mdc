@@ -9,6 +9,7 @@ alwaysApply: true
 
 - **Code:** `relocation_jobs/` (domain folders: `catalog/`, `web/`, `fetch/`, `scrape/`, …)
 - **Local panel:** `PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py` (port **5051**)
+- **Board:** paginated `GET /api/board`; React pagination in `frontend/` → `npm run build`
 - **Tests:** `pytest tests -o addopts=`
 - **Postgres:** AWS EC2 Docker (not Neon)
 - **Do not commit** unless the user explicitly asks

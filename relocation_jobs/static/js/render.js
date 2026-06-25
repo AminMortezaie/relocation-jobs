@@ -1,6 +1,7 @@
 /** HTML rendering for stats, companies, and job rows. */
 
 import { state, findCompany } from "./state.js";
+import { applyPanelFilters } from "./board-filter.js";
 import { $, escapeHtml, escapeAttr, formatAppliedLabel, formatAppliedHistoryTitle, formatActivityBadge, formatFetchDuration, parseFetchTimestamp, elapsedSecondsBetween, elapsedSecondsSince, atsScoreTone } from "./utils.js";
 import {
   saveCollapsedCompanies,
@@ -22,7 +23,7 @@ export function normalizeTsForSort(ts) {
 }
 
 function companyActivityTs(company) {
-  return (company?.latest_fetched || company?.updated || "").trim();
+  return (company?.newest_job_fetched || company?.latest_fetched || company?.updated || "").trim();
 }
 
 function fetchRunScopeLabel(run) {
@@ -182,27 +183,14 @@ function formatCompanyCities(company) {
 }
 
 export function filterCompanies() {
-  const q = $("search").value.trim().toLowerCase();
   return state.allCompanies.filter((c) => {
-    if ($("hideEmpty")?.checked && companyHasNoVisibleJobs(c)) return false;
     if ($("hideCollapsedCompanies")?.checked && companyHasCollapsedPositions(c)) return false;
-    if (!q) return true;
-    const hay = [
-      c.name,
-      c.city,
-      ...companyCityLabels(c),
-      ...companyLocationLabels(c),
-      c.country_label,
-      ...(c.jobs || []).map((j) => j.title),
-      ...(c.not_for_me_jobs || c.hidden_jobs || []).map((j) => j.title),
-      ...(c.rejected_jobs || []).map((j) => j.title),
-    ].join(" ").toLowerCase();
-    return hay.includes(q);
+    return true;
   });
 }
 
 export function getDisplayCompanies() {
-  return sortCompaniesList(filterCompanies());
+  return sortCompaniesList(applyPanelFilters(filterCompanies()));
 }
 
 function hasAtsScore(job) {
@@ -223,59 +211,6 @@ export function sortJobsForDisplay(jobs) {
   scored.sort((a, b) => Number(b.ats_score) - Number(a.ats_score));
   return [...scored, ...unscored];
 }
-
-function statCard(value, label, { accent = false, muted = false } = {}) {
-  const valueCls = [
-    accent ? " stat-value--accent" : "",
-    muted ? " stat-value--muted" : "",
-  ].join("");
-  return `
-    <div class="stat">
-      <div class="value${valueCls}">${value}</div>
-      <div class="label">${escapeHtml(label)}</div>
-    </div>
-  `;
-}
-
-export function renderStats(stats) {
-  const appliedToday = stats.applied_today_jobs || [];
-  const appliedTodayDetail = appliedToday.length
-    ? `<ul class="stats-applied-today-list">${appliedToday.map((job) => `
-        <li>
-          <span class="stats-applied-today-company">${escapeHtml(job.company || "Company")}</span>
-          ${job.title ? `<span class="stats-applied-today-title">${escapeHtml(job.title)}</span>` : ""}
-        </li>`).join("")}</ul>`
-    : `<p class="stats-applied-today-empty">No applications recorded today.</p>`;
-
-  $("stats").innerHTML = `
-    <div class="stats-dashboard">
-      <section class="stats-group">
-        <div class="stats-row">
-          ${statCard(stats.total_jobs, "Open roles", { accent: true })}
-          ${statCard(stats.companies_with_jobs, "Companies")}
-          ${statCard(stats.latest_fetch_new_jobs ?? 0, "New last fetch")}
-          ${statCard(escapeHtml(formatActivityBadge(stats.latest_job_fetch || "")) || "—", "Last fetch", { muted: true })}
-        </div>
-      </section>
-      <section class="stats-group">
-        <div class="stats-row">
-          <div class="stat stat-applied-today">
-            <div class="value stat-value--accent">${stats.positions_applied_today ?? 0}</div>
-            <div class="label">Applied today</div>
-            ${appliedTodayDetail}
-          </div>
-          ${statCard(stats.positions_applied ?? 0, "Applied total")}
-          ${statCard(stats.applied ?? 0, "Companies applied")}
-          ${statCard(stats.positions_rejected ?? 0, "Rejections")}
-          ${statCard(stats.not_for_me ?? 0, "Hidden")}
-          ${statCard(stats.visa_sponsored, "Visa / relocation")}
-          ${statCard(stats.fetch_problems ?? 0, "Fetch issues")}
-        </div>
-      </section>
-    </div>
-  `;
-}
-
 
 export const HIDE_REASONS = [
   { id: "not_for_me", label: "Not for me", desc: "Role doesn't fit your goals", tone: "not-for-me" },

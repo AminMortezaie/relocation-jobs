@@ -7,6 +7,18 @@ import { loadBoard, showJobsLoading } from "./board.js";
 
 export { setLoadingProgress, finishLoadingProgress, showJobsLoading };
 
+let locationsLoaded = false;
+
+function savedLocationKey() {
+  return localStorage.getItem("panel_location")
+    || localStorage.getItem("panel_city")
+    || "all";
+}
+
+export function needsLocationsBeforeBoard() {
+  return savedLocationKey() !== "all";
+}
+
 export async function loadConfig() {
   state.scrapeConfig = await fetchConfig();
 }
@@ -18,7 +30,12 @@ export async function loadCountries() {
     `<option value="${c.id}">${c.label}</option>`
   ).join("");
   const saved = localStorage.getItem("panel_country");
-  if (saved) sel.value = saved;
+  if (saved && countries.some((c) => c.id === saved)) {
+    sel.value = saved;
+  } else {
+    const first = countries.find((c) => c.id !== "all");
+    if (first) sel.value = first.id;
+  }
 }
 
 export async function loadAtsTypes() {
@@ -37,15 +54,20 @@ export async function loadAtsTypes() {
   if (saved) sel.value = saved;
 }
 
-export async function loadCities() {
+export async function loadCities({ deferred = false } = {}) {
   const sel = $("location");
   if (!sel) return;
 
   const country = $("country")?.value || "all";
+  const saved = savedLocationKey();
+
+  if (deferred && country === "all" && saved === "all") {
+    sel.innerHTML = `<option value="all">All locations</option>`;
+    locationsLoaded = false;
+    return;
+  }
+
   const locations = await fetchLocations(country);
-  const saved = localStorage.getItem("panel_location")
-    || localStorage.getItem("panel_city")
-    || "all";
   const keys = new Set(locations.map((loc) => loc.key));
   sel.innerHTML = [
     `<option value="all">All locations</option>`,
@@ -59,10 +81,25 @@ export async function loadCities() {
     sel.value = "all";
     localStorage.setItem("panel_location", "all");
   }
+  locationsLoaded = true;
+}
+
+export async function ensureLocationsLoaded() {
+  if (locationsLoaded) return;
+  await loadCities();
 }
 
 export async function loadJobs(options = {}) {
   return loadBoard(options);
+}
+
+export async function loadBoardWithLocations(options = {}) {
+  if (needsLocationsBeforeBoard()) {
+    await loadCities();
+    return loadBoard(options);
+  }
+  await loadBoard(options);
+  void loadCities({ deferred: true });
 }
 
 export { refreshJobBoard } from "./job-board.js";

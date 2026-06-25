@@ -5,6 +5,8 @@ export const state = {
   boardMeta: {},
   boardUserStats: {},
   boardScopeKey: "",
+  boardRequestKey: "",
+  boardPage: 1,
   allCompanies: [],
   pollTimer: null,
   fetchVisibilityHandler: null,

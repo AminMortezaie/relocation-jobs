@@ -127,16 +127,27 @@ export function atsScoreTone(score) {
   return "ats-low";
 }
 
+import { beginScreenLoad, endScreenLoad, isScreenLoadActive, setScreenLoadProgress } from "./screen-loader.js";
+
 export function setLoadingProgress(pct) {
+  if (isScreenLoadActive()) {
+    setScreenLoadProgress(pct);
+    return;
+  }
   const fill = document.getElementById("loadingBarFill");
   const bar = document.getElementById("loadingBar");
   if (!fill || !bar) return;
   bar.classList.remove("done");
   fill.style.opacity = "1";
-  fill.style.width = `${pct}%`;
+  const current = parseFloat(fill.style.width) || 0;
+  fill.style.width = `${Math.max(current, pct)}%`;
 }
 
 export function finishLoadingProgress() {
+  if (isScreenLoadActive()) {
+    endScreenLoad();
+    return;
+  }
   const fill = document.getElementById("loadingBarFill");
   const bar = document.getElementById("loadingBar");
   if (!fill || !bar) return;

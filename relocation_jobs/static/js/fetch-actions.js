@@ -48,7 +48,7 @@ export function registerFetchActions() {
         state.fetchReviewFeedback = { country, company, status: action === "ok" ? "ok" : "problem" };
         setFetchReviewFeedbackDone(state.fetchReviewFeedback.status);
         toast(action === "ok" ? `Fetch OK — ${company}` : `Fetch problem — ${company}`);
-        await loadJobs({ silent: true });
+        await loadJobs({ overlayLabel: "Updating board…" });
         if (
           state.fetchReviewFeedback?.country === country
           && state.fetchReviewFeedback?.company === company

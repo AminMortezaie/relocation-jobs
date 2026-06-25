@@ -9,7 +9,7 @@ export default function App({ view }) {
   if (!view.companies?.length) {
     return (
       <div className="empty">
-        No companies match your filters. Try another country or click <strong>Fetch new jobs</strong>.
+        No companies match your filters on this page. Try another page or adjust filters.
       </div>
     );
   }

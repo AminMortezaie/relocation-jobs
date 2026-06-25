@@ -29,44 +29,50 @@ def shape_status_history(rows: list[dict]) -> dict[str, list]:
     return bucket
 
 
-def load_job_tracking(user_id: int) -> dict[tuple[str, str, str], dict]:
-    rows = get_connection().execute(
-        """
+def load_job_tracking(user_id: int, *, country: str | None = None) -> dict[tuple[str, str, str], dict]:
+    sql = """
         SELECT country, company_name, job_url, job_title, ats_score, applied, applied_date,
                not_for_me, not_for_me_date, not_for_me_reason, rejected, rejected_date,
                waiting_referral, waiting_referral_date, referral_linkedin_url,
                seen, seen_date, looking_to_apply, looking_to_apply_date, updated_at
         FROM job_tracking WHERE user_id = %s
-        """,
-        (user_id,),
-    ).fetchall()
+    """
+    params: list = [user_id]
+    if country and country != "all":
+        sql += " AND country = %s"
+        params.append(country)
+    rows = get_connection().execute(sql, tuple(params)).fetchall()
     return {
         (r["country"], r["company_name"], _normalize_url(r["job_url"])): dict(r)
         for r in rows
     }
 
 
-def load_company_tracking(user_id: int) -> dict[tuple[str, str], dict]:
-    rows = get_connection().execute(
-        """
+def load_company_tracking(user_id: int, *, country: str | None = None) -> dict[tuple[str, str], dict]:
+    sql = """
         SELECT country, company_name, company_applied, company_applied_date,
                awaiting_response, awaiting_response_date
         FROM company_tracking WHERE user_id = %s
-        """,
-        (user_id,),
-    ).fetchall()
+    """
+    params: list = [user_id]
+    if country and country != "all":
+        sql += " AND country = %s"
+        params.append(country)
+    rows = get_connection().execute(sql, tuple(params)).fetchall()
     return {(r["country"], r["company_name"]): dict(r) for r in rows}
 
 
-def load_job_status_history(user_id: int) -> dict[tuple[str, str, str], dict[str, list]]:
-    rows = get_connection().execute(
-        """
+def load_job_status_history(user_id: int, *, country: str | None = None) -> dict[tuple[str, str, str], dict[str, list]]:
+    sql = """
         SELECT country, company_name, job_url, event_type, event_date, created_at
         FROM job_status_events WHERE user_id = %s
-        ORDER BY event_date ASC, id ASC
-        """,
-        (user_id,),
-    ).fetchall()
+    """
+    params: list = [user_id]
+    if country and country != "all":
+        sql += " AND country = %s"
+        params.append(country)
+    sql += " ORDER BY event_date ASC, id ASC"
+    rows = get_connection().execute(sql, tuple(params)).fetchall()
     out: dict[tuple[str, str, str], dict[str, list]] = {}
     for row in rows:
         key = (row["country"], row["company_name"], _normalize_url(row.get("job_url", "")))

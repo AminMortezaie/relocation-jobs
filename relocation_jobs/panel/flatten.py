@@ -110,8 +110,7 @@ _COMPANY_SKIP_AFTER_RULES: tuple[Callable[[_CompanySkipAfterContext], bool], ...
     lambda ctx: bool(
         ctx.filters.hide_empty
         and not ctx.jobs
-        and not ctx.not_for_me_jobs
-        and not ctx.rejected_jobs
+        and not (ctx.filters.position_filters.rejected_only and ctx.rejected_jobs)
     ),
     lambda ctx: bool(ctx.filters.not_applied_only and (ctx.header["company_applied"] or not ctx.jobs)),
 )

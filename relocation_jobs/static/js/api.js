@@ -1,13 +1,33 @@
 /** HTTP client and backend API calls. */
 
 import { findCompany, state, onUnauthorized } from "./state.js";
-import { hideJobAsNotForMe, restoreJobToOpen, refreshJobBoard } from "./job-board.js";
-import { renderStats } from "./render.js";
+import {
+  hideJobAsNotForMe,
+  patchJobOnBoard,
+  reapplyJobLocally,
+  restoreJobToOpen,
+  refreshJobBoard,
+} from "./job-board.js";
 import { toast, browserTimezone } from "./utils.js";
 
-async function reloadBoard() {
+async function reloadBoardFallback() {
   const { loadBoard } = await import("./board.js");
-  await loadBoard({ silent: true, force: true, refreshUserStats: true });
+  await loadBoard({ force: true, refreshUserStats: true, noOverlay: true });
+}
+
+async function refreshUserStatsQuiet() {
+  const { refreshBoardUserStats } = await import("./board.js");
+  await refreshBoardUserStats();
+}
+
+function applyJobMutation(country, company, url, idempotencyKey, data) {
+  const key = data.idempotency_key || idempotencyKey || "";
+  if (patchJobOnBoard(country, company, url, key, data)) {
+    void refreshUserStatsQuiet();
+    return true;
+  }
+  void reloadBoardFallback();
+  return false;
 }
 
 export async function apiFetch(url, options = {}) {
@@ -176,13 +196,9 @@ export async function setNotForMe(country, company, url, notForMe, reason = null
     } else {
       restoreJobToOpen(co, url, idempotencyKey);
     }
-    if (state.boardStats) {
-      const delta = notForMe ? 1 : -1;
-      state.boardStats.not_for_me = Math.max(0, (state.boardStats.not_for_me ?? 0) + delta);
-      renderStats(state.boardStats);
-    }
+    void refreshUserStatsQuiet();
   } else {
-    await reloadBoard();
+    await reloadBoardFallback();
   }
   return true;
 }
@@ -254,7 +270,7 @@ export async function toggleApplied(country, company, url, applied, idempotencyK
     toast(data.error || "Could not save");
     return null;
   }
-  await reloadBoard();
+  applyJobMutation(country, company, url, idempotencyKey, data);
   return data;
 }
 
@@ -277,7 +293,7 @@ export async function saveAtsScore(country, company, url, atsScore) {
     toast(msg);
     return null;
   }
-  await reloadBoard();
+  applyJobMutation(country, company, url, "", data);
   return data;
 }
 
@@ -298,7 +314,8 @@ export async function saveWaitingReferral(country, company, url, waitingReferral
     toast(data.error || "Could not save waiting referral");
     return null;
   }
-  await reloadBoard();
+  applyJobMutation(country, company, url, "", data);
+  toast(waitingReferral ? "Waiting for referral" : "Referral status cleared");
   return data;
 }
 
@@ -316,7 +333,13 @@ export async function reapplyJob(country, company, url) {
     toast(msg);
     return null;
   }
-  await reloadBoard();
+  const co = findCompany(country, company);
+  if (co) {
+    reapplyJobLocally(co, url, data.idempotency_key || "", data);
+    void refreshUserStatsQuiet();
+  } else {
+    await reloadBoardFallback();
+  }
   return data;
 }
 
@@ -340,7 +363,7 @@ export async function toggleRejected(country, company, url, rejected, idempotenc
     toast(msg);
     return null;
   }
-  await reloadBoard();
+  applyJobMutation(country, company, url, idempotencyKey, data);
   return data;
 }
 
@@ -361,7 +384,7 @@ export async function toggleLookingToApply(country, company, url, lookingToApply
     toast(data.error || "Could not save");
     return null;
   }
-  await reloadBoard();
+  applyJobMutation(country, company, url, idempotencyKey, data);
   return data;
 }
 
@@ -382,7 +405,7 @@ export async function toggleSeen(country, company, url, seen, idempotencyKey = "
     toast(data.error || "Could not update saw-before tag");
     return null;
   }
-  await reloadBoard();
+  applyJobMutation(country, company, url, idempotencyKey, data);
   return data;
 }
 
@@ -491,9 +514,34 @@ export function catalogQueryParams() {
   return params.toString();
 }
 
+export function boardQueryParams({ page = 1, pageSize = 25 } = {}) {
+  const params = new URLSearchParams(catalogQueryParams());
+  params.set("timezone", browserTimezone());
+  params.set("page", String(page));
+  params.set("page_size", String(pageSize));
+  params.set("visa_only", filterQueryFlag("visaOnly"));
+  params.set("hide_applied", filterQueryFlag("hideApplied"));
+  params.set("hide_empty", filterQueryFlag("hideEmpty"));
+  params.set("not_applied_only", filterQueryFlag("notAppliedOnly"));
+  params.set("hide_position_applied", filterQueryFlag("hidePositionApplied"));
+  params.set("hide_position_rejected", filterQueryFlag("hidePositionRejected"));
+  params.set("position_applied_only", filterQueryFlag("positionAppliedOnly"));
+  params.set("position_rejected_only", filterQueryFlag("positionRejectedOnly"));
+  params.set("position_looking_to_apply_only", filterQueryFlag("positionLookingToApplyOnly"));
+  params.set("fetch_ok_only", filterQueryFlag("fetchOkOnly"));
+  params.set("fetch_problem_only", filterQueryFlag("fetchProblemOnly"));
+  const q = document.getElementById("search")?.value.trim();
+  if (q) params.set("q", q);
+  return params;
+}
+
 export async function fetchBoard(options = {}) {
+  const params = boardQueryParams({
+    page: options.page ?? 1,
+    pageSize: options.pageSize ?? 25,
+  });
   const bust = options.bustCache ? `&_=${Date.now()}` : "";
-  const res = await apiFetch(`/api/board?${catalogQueryParams()}${bust}`, {
+  const res = await apiFetch(`/api/board?${params.toString()}${bust}`, {
     cache: "no-store",
   });
   const data = await parseJsonResponse(res);
@@ -508,6 +556,10 @@ export async function fetchBoard(options = {}) {
 export async function fetchBoardUserStats() {
   const params = new URLSearchParams(catalogQueryParams());
   params.set("timezone", browserTimezone());
+  const latest = state.boardMeta?.latest_fetch_new_jobs;
+  if (latest != null) {
+    params.set("latest_fetch_new_jobs", String(latest));
+  }
   const res = await apiFetch(`/api/board/stats?${params.toString()}`, {
     cache: "no-store",
   });

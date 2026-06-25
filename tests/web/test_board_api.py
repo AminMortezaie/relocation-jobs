@@ -12,10 +12,21 @@ def test_board_returns_catalog_without_panel_filters(v2_auth_client, seeded_cata
     assert len(companies[0]["jobs"]) == 2
     assert meta["country"] == "uk"
     assert "fetch_problem_total" in meta
+    assert meta["page"] == 1
+    assert meta["page_size"] == 25
+    assert meta["total_companies"] == 1
+    assert meta["total_pages"] == 1
+    assert meta["has_more"] is False
+    assert "positions_applied" in payload["user_stats"]
+    assert "recent_fetch_runs" in payload["user_stats"]
 
 
 def test_board_stats_returns_user_metrics(v2_auth_client, seeded_catalog_v2):
-    resp = v2_auth_client.get("/api/board/stats?country=uk&timezone=UTC")
+    board = v2_auth_client.get("/api/board?country=uk&timezone=UTC").get_json()
+    resp = v2_auth_client.get(
+        "/api/board/stats?country=uk&timezone=UTC"
+        f"&latest_fetch_new_jobs={board['meta']['latest_fetch_new_jobs']}"
+    )
     assert resp.status_code == 200
     payload = resp.get_json()
     assert "positions_applied" in payload

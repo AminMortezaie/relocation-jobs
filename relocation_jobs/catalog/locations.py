@@ -37,7 +37,12 @@ def list_company_locations(
             for city in picker_cities_for_country(key):
                 add(key, city)
 
-    for key in sorted(SUPPORTED_COUNTRIES):
+    country_keys = (
+        [filter_country]
+        if filter_country
+        else sorted(SUPPORTED_COUNTRIES)
+    )
+    for key in country_keys:
         data = load_country_catalog(key)
         if not data:
             continue

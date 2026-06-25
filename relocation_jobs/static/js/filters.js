@@ -3,7 +3,7 @@
 import { $, isNarrowViewport, lockBodyScroll, unlockBodyScroll } from "./utils.js";
 import { saveFilterPreferences, saveSortPreference } from "./storage.js";
 import { renderCompanies, releaseCompanyOrder } from "./render.js";
-import { applyBoardView } from "./board.js";
+import { applyBoardView, loadBoard } from "./board.js";
 
 const FILTER_DEFS = [
   { id: "hidePositionApplied", label: "Hide applied positions" },
@@ -11,7 +11,7 @@ const FILTER_DEFS = [
   { id: "positionRejectedOnly", label: "Rejections only" },
   { id: "positionLookingToApplyOnly", label: "Looking to apply only" },
   { id: "hideApplied", label: "Hide applied companies" },
-  { id: "hideEmpty", label: "Hide companies with no jobs" },
+  { id: "hideEmpty", label: "Hide companies with no open roles" },
   { id: "hideCollapsedCompanies", label: "Hide collapsed companies" },
   { id: "notAppliedOnly", label: "Not applied, has openings" },
   { id: "fetchOkOnly", label: "Fetch OK only" },
@@ -107,7 +107,11 @@ async function applyFilterChange(def, checked) {
   $(def.id).checked = checked;
   saveFilterPreferences();
   updateFilterUI();
-  applyBoardView();
+  if (def.id === "hideCollapsedCompanies") {
+    applyBoardView();
+    return;
+  }
+  await loadBoard({ force: true, overlayLabel: "Applying filters…" });
 }
 
 export function bindFilterBar() {
@@ -128,13 +132,13 @@ export function bindFilterBar() {
 
   $("filterBackdrop")?.addEventListener("click", closeFilterPopover);
 
-  $("clearFilters").addEventListener("click", () => {
+  $("clearFilters").addEventListener("click", async () => {
     for (const f of FILTER_DEFS) {
-      $(f.id).checked = false;
+      $(f.id).checked = f.id === "hideEmpty";
     }
     saveFilterPreferences();
     updateFilterUI();
-    applyBoardView();
+    await loadBoard({ force: true, overlayLabel: "Applying filters…" });
   });
 
   $("filterPopover").addEventListener("click", (e) => e.stopPropagation());
@@ -148,14 +152,14 @@ export function bindFilterBar() {
   });
 
   for (const def of FILTER_DEFS) {
-    $(def.id).addEventListener("change", () => {
+    $(def.id).addEventListener("change", async () => {
       saveFilterPreferences();
       updateFilterUI();
       if (def.id === "hideCollapsedCompanies") {
-        renderCompanies();
-      } else {
         applyBoardView();
+        return;
       }
+      await loadBoard({ force: true, overlayLabel: "Applying filters…" });
     });
   }
 

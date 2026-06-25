@@ -54,3 +54,12 @@ def test_admin_dashboard(v2_auth_client, seeded_catalog_v2):
     assert "users" in payload
     assert "runs" in payload
     assert "config" in payload
+
+
+def test_admin_panel_stats(v2_auth_client, seeded_catalog_v2):
+    resp = v2_auth_client.get("/api/admin/panel-stats?country=uk&timezone=UTC")
+    assert resp.status_code == 200
+    stats = resp.get_json()
+    assert stats["total_jobs"] == 2
+    assert stats["companies_with_jobs"] == 1
+    assert "positions_applied" in stats

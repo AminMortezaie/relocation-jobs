@@ -1,12 +1,83 @@
 /** Local job-board updates after tracking mutations (avoid full /api/jobs reload). */
 
 import { applyBoardView } from "./board.js";
-import { findJobInCompany } from "./state.js";
+import { shouldShowCompanyOnBoard } from "./board-filter.js";
+import { findCompany, findJobInCompany, state } from "./state.js";
+
+const JOB_PATCH_FIELDS = [
+  "applied",
+  "applied_date",
+  "applied_at",
+  "rejected",
+  "rejected_date",
+  "looking_to_apply",
+  "looking_to_apply_date",
+  "seen",
+  "seen_date",
+  "waiting_referral",
+  "waiting_referral_date",
+  "referral_linkedin_url",
+  "ats_score",
+  "not_for_me",
+  "not_for_me_reason",
+  "not_for_me_date",
+  "applied_history",
+  "applied_events",
+  "rejected_history",
+  "url",
+  "idempotency_key",
+];
 
 function jobMatches(job, url, idempotencyKey = "") {
   if (!job) return false;
   const probe = { jobs: [job] };
   return findJobInCompany(probe, url, idempotencyKey) === job;
+}
+
+function mergeJobPatch(job, data) {
+  const next = { ...job };
+  for (const key of JOB_PATCH_FIELDS) {
+    if (data[key] !== undefined) next[key] = data[key];
+  }
+  if (data.applied === true) {
+    next.looking_to_apply = false;
+    if (data.looking_to_apply_date === undefined) {
+      next.looking_to_apply_date = "";
+    }
+  }
+  if (data.applied === false) {
+    if (data.applied_date === undefined) next.applied_date = "";
+    if (data.applied_at === undefined) next.applied_at = "";
+  }
+  if (data.rejected === false && data.rejected_date === undefined) {
+    next.rejected_date = "";
+  }
+  if (data.seen === false && data.seen_date === undefined) {
+    next.seen_date = "";
+  }
+  if (data.waiting_referral === false) {
+    if (data.waiting_referral_date === undefined) next.waiting_referral_date = "";
+    if (data.referral_linkedin_url === undefined) next.referral_linkedin_url = "";
+  }
+  return next;
+}
+
+function syncCompanyHeaderFromJobs(company, data = {}) {
+  const openApplied = (company.jobs || []).filter((job) => job.applied).length;
+  const rejectedApplied = (company.rejected_jobs || []).filter((job) => job.applied).length;
+  const appliedTotal = openApplied + rejectedApplied;
+  company.positions_applied = openApplied;
+  company.positions_applied_all = appliedTotal;
+  if (appliedTotal > 0) {
+    company.company_applied = true;
+    if (data.applied_date) company.company_applied_date = data.applied_date;
+  } else if (!company.company_applied) {
+    company.company_applied_date = "";
+    company.company_applied_at = "";
+  }
+  if (data.applied === true) {
+    company.awaiting_response = true;
+  }
 }
 
 function bucketLists(company) {
@@ -44,12 +115,31 @@ function recomputeCounts(company) {
   company.positions_not_for_me = (company.not_for_me_jobs || []).length;
 }
 
+function evictCompanyIfHidden(company) {
+  if (shouldShowCompanyOnBoard(company)) return;
+  const idx = state.boardCatalog.findIndex(
+    (row) => row.country === company.country && row.name === company.name,
+  );
+  if (idx < 0) return;
+  state.boardCatalog.splice(idx, 1);
+  if (state.boardMeta.total_companies != null) {
+    state.boardMeta.total_companies = Math.max(0, state.boardMeta.total_companies - 1);
+  }
+  if (state.boardMeta.total_pages != null && state.boardMeta.page_size) {
+    state.boardMeta.total_pages = Math.max(
+      1,
+      Math.ceil(state.boardMeta.total_companies / state.boardMeta.page_size),
+    );
+  }
+}
+
 export function refreshJobBoard() {
   applyBoardView();
 }
 
 export function finalizeCompanyBoard(company) {
   recomputeCounts(company);
+  evictCompanyIfHidden(company);
   applyBoardView();
 }
 
@@ -113,4 +203,43 @@ export function reapplyJobLocally(company, url, idempotencyKey, patch = {}) {
   };
   ensureList(company, "jobs").push(next);
   finalizeCompanyBoard(company);
+}
+
+export function patchJobOnBoard(country, companyName, url, idempotencyKey, data) {
+  const company = findCompany(country, companyName);
+  if (!company) return false;
+  const key = data.idempotency_key || idempotencyKey || "";
+
+  if (data.rejected === true) {
+    const found = findJobBucket(company, url, key);
+    if (!found) return false;
+    removeFromList(found.list, url, key);
+    ensureList(company, "rejected_jobs").push(mergeJobPatch(found.job, data));
+    syncCompanyHeaderFromJobs(company, data);
+    finalizeCompanyBoard(company);
+    return true;
+  }
+
+  if (data.rejected === false) {
+    const found = findJobBucket(company, url, key);
+    if (!found) return false;
+    removeFromList(found.list, url, key);
+    ensureList(company, "jobs").push(mergeJobPatch({
+      ...found.job,
+      rejected: false,
+      rejected_date: "",
+    }, data));
+    syncCompanyHeaderFromJobs(company, data);
+    finalizeCompanyBoard(company);
+    return true;
+  }
+
+  const found = findJobBucket(company, url, key);
+  if (!found) return false;
+  const idx = found.list.indexOf(found.job);
+  if (idx < 0) return false;
+  found.list[idx] = mergeJobPatch(found.job, data);
+  syncCompanyHeaderFromJobs(company, data);
+  finalizeCompanyBoard(company);
+  return true;
 }

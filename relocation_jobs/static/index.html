@@ -6,10 +6,22 @@
   <title>Relocation Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=35" />
+  <link rel="stylesheet" href="/static/styles.css?v=38" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
+  <div id="screenLoader" class="screen-loader" hidden aria-hidden="true" aria-live="polite">
+    <div class="screen-loader-panel">
+      <div id="screenLoaderRing" class="screen-loader-ring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <svg class="screen-loader-svg" viewBox="0 0 56 56" aria-hidden="true">
+          <circle class="screen-loader-track" cx="28" cy="28" r="24" />
+          <circle id="screenLoaderArc" class="screen-loader-arc" cx="28" cy="28" r="24" />
+        </svg>
+        <span id="screenLoaderPct" class="screen-loader-pct" aria-hidden="true"></span>
+      </div>
+      <p id="screenLoaderLabel" class="screen-loader-label">Loading…</p>
+    </div>
+  </div>
   <div class="layout">
     <div id="loginPanel" class="login-panel" hidden>
       <h2 id="loginTitle">Sign in</h2>
@@ -96,14 +108,15 @@
       </div>
     </header>
 
-    <div class="stats" id="stats"></div>
+    <div class="board-toolbar" id="board-toolbar">
+      <div id="board-pagination-root" class="board-pagination-root"></div>
 
-    <div class="filter-bar">
+      <div class="filter-bar board-search-bar">
       <div class="search-field">
         <svg class="search-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/>
         </svg>
-        <input type="search" id="search" placeholder="Search title or company…" autocomplete="off" />
+        <input type="search" id="search" placeholder="Search company name…" autocomplete="off" />
       </div>
 
       <div class="filter-bar-actions">
@@ -172,8 +185,8 @@
               </li>
               <li>
                 <label class="filter-toggle" for="hideEmpty">
-                  <span class="filter-toggle-label">Hide companies with no jobs</span>
-                  <input type="checkbox" id="hideEmpty" class="filter-toggle-input" />
+                  <span class="filter-toggle-label">Hide companies with no open roles</span>
+                  <input type="checkbox" id="hideEmpty" class="filter-toggle-input" checked />
                   <span class="filter-toggle-track" aria-hidden="true"></span>
                 </label>
               </li>
@@ -222,6 +235,7 @@
       </div>
 
       <div class="filter-chips" id="filterChips" hidden></div>
+      </div>
     </div>
 
     <div class="job-list" id="jobs"></div>
@@ -556,6 +570,6 @@
   </div>
 
   <script type="module" crossorigin src="/static/dist/board.js"></script>
-  <script type="module" src="/static/js/main.js?v=88"></script>
+  <script type="module" src="/static/js/main.js?v=98"></script>
 </body>
 </html>

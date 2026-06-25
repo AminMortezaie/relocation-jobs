@@ -2,7 +2,9 @@
 
 import { state } from "./state.js";
 import { $ } from "./utils.js";
-import { loadConfig, loadCountries, loadAtsTypes, loadCities, loadJobs, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
+import { loadConfig, loadCountries, loadAtsTypes, loadBoardWithLocations, showJobsLoading, setLoadingProgress, finishLoadingProgress } from "./data.js";
+import { beginScreenLoad } from "./screen-loader.js";
+import { refreshFilterBar } from "./filters.js";
 import { updateFetchHeaderUI } from "./render.js";
 
 export function showLogin(message = "") {
@@ -85,14 +87,14 @@ export async function submitAuth(e) {
     $("loginPassword").value = "";
     $("loginError").textContent = "";
     showApp();
+    beginScreenLoad("Loading panel…");
     showJobsLoading();
     setLoadingProgress(10);
     await Promise.all([loadConfig(), loadCountries(), loadAtsTypes()]);
     setAdminNavVisible(Boolean(state.authState.user?.is_admin));
     setLoadingProgress(40);
-    await loadCities();
-    setLoadingProgress(60);
-    await loadJobs();
+    refreshFilterBar();
+    await loadBoardWithLocations();
     finishLoadingProgress();
   } catch {
     $("loginError").textContent = "Network error";

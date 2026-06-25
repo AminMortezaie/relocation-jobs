@@ -10,13 +10,13 @@ import {
   toggleRejected,
   reapplyJob,
   saveAtsScore,
-  saveWaitingReferral,
   markJobSeen,
   toggleSeen,
   toggleLookingToApply,
   toggleCompanyAwaitingResponse,
 } from "./api.js";
-import { loadJobs, loadCities } from "./data.js";
+import { loadJobs, loadCities, ensureLocationsLoaded } from "./data.js";
+import { loadBoard } from "./board.js";
 import {
   renderCompanies,
   toggleCompanyCollapse,
@@ -156,20 +156,23 @@ function positionAtsPopover(wrap) {
   });
 }
 
-function showReferralBackdrop() {
-  const backdrop = $("referralBackdrop");
-  if (backdrop) {
-    backdrop.hidden = false;
-    backdrop.setAttribute("aria-hidden", "false");
-  }
-}
-
 function hideReferralBackdrop() {
   const backdrop = $("referralBackdrop");
   if (backdrop) {
     backdrop.hidden = true;
     backdrop.setAttribute("aria-hidden", "true");
   }
+}
+
+function closeReferralPopovers() {
+  document.dispatchEvent(new CustomEvent("referral-popover-close"));
+  hideReferralBackdrop();
+}
+
+export function closePanelPopovers() {
+  closeReferralPopovers();
+  closeHideReasonPopovers();
+  closeAtsPopovers();
 }
 
 function ensureHideReasonWrapId(wrap) {
@@ -374,51 +377,6 @@ async function submitHideReasonFromCard(card, reason) {
   closeHideReasonPopovers();
   const { label } = notForMeReasonMeta(reason);
   toast(currentReason ? `Category changed · ${label}` : `Hidden · ${label}`);
-  return true;
-}
-
-function closeReferralPopovers(exceptWrap = null) {
-  document.querySelectorAll(".referral-wrap").forEach((wrap) => {
-    if (wrap === exceptWrap) return;
-    const popover = wrap.querySelector(".referral-popover");
-    const trigger = wrap.querySelector(".referral-btn");
-    if (popover) popover.hidden = true;
-    if (trigger) trigger.setAttribute("aria-expanded", "false");
-  });
-  if (!exceptWrap) hideReferralBackdrop();
-}
-
-function toggleReferralPopover(wrap) {
-  const popover = wrap.querySelector(".referral-popover");
-  const trigger = wrap.querySelector(".referral-btn");
-  if (!popover || !trigger) return;
-  const open = popover.hidden;
-  closeReferralPopovers(open ? wrap : null);
-  closeHideReasonPopovers();
-  closeAtsPopovers();
-  trigger.setAttribute("aria-expanded", open ? "true" : "false");
-  popover.hidden = !open;
-  if (open) {
-    showReferralBackdrop();
-    wrap.querySelector(".referral-linkedin-input")?.focus();
-  } else {
-    hideReferralBackdrop();
-  }
-}
-
-async function submitWaitingReferralFromCard(card, waitingReferral, linkedinUrl = "") {
-  const { country, company, url } = card.dataset;
-  const wrap = card.querySelector(".referral-wrap");
-  const saveBtn = wrap?.querySelector(".referral-save-btn");
-  const clearBtn = wrap?.querySelector(".referral-clear-btn");
-  if (saveBtn) saveBtn.disabled = true;
-  if (clearBtn) clearBtn.disabled = true;
-  const result = await saveWaitingReferral(country, company, url, waitingReferral, linkedinUrl);
-  if (saveBtn) saveBtn.disabled = false;
-  if (clearBtn) clearBtn.disabled = false;
-  if (!result) return false;
-  closeReferralPopovers();
-  toast(waitingReferral ? "Waiting for referral" : "Referral status cleared");
   return true;
 }
 
@@ -630,25 +588,6 @@ function bindAtsPopoverEvents() {
 }
 
 function bindJobsListEvents() {
-  $("jobs").addEventListener("keydown", async (e) => {
-    if (e.key !== "Enter") return;
-    const linkedinInput = e.target.closest(".referral-linkedin-input");
-    if (linkedinInput) {
-      e.preventDefault();
-      const card = linkedinInput.closest(".position-card");
-      const wrap = linkedinInput.closest(".referral-wrap");
-      if (!card || !wrap) return;
-      const linkedinUrl = (linkedinInput.value || "").trim();
-      if (!linkedinUrl) {
-        toast("Paste the referrer's LinkedIn profile URL");
-        linkedinInput.focus();
-        return;
-      }
-      await submitWaitingReferralFromCard(card, true, linkedinUrl);
-      return;
-    }
-  });
-
   $("jobs").addEventListener("click", async (e) => {
     const collapseBtn = e.target.closest(".collapse-company-btn");
     if (collapseBtn) {
@@ -706,48 +645,7 @@ function bindJobsListEvents() {
       return;
     }
 
-    const referralBtn = e.target.closest(".referral-btn");
-    if (referralBtn) {
-      e.stopPropagation();
-      const wrap = referralBtn.closest(".referral-wrap");
-      if (wrap) toggleReferralPopover(wrap);
-      return;
-    }
-
-    const referralCloseBtn = e.target.closest(".referral-close");
-    if (referralCloseBtn) {
-      e.stopPropagation();
-      closeReferralPopovers();
-      return;
-    }
-
-    const referralSaveBtn = e.target.closest(".referral-save-btn");
-    if (referralSaveBtn) {
-      e.stopPropagation();
-      const card = referralSaveBtn.closest(".position-card");
-      const wrap = referralSaveBtn.closest(".referral-wrap");
-      if (!card || !wrap) return;
-      const linkedinUrl = (wrap.querySelector(".referral-linkedin-input")?.value || "").trim();
-      if (!linkedinUrl) {
-        toast("Paste the referrer's LinkedIn profile URL");
-        wrap.querySelector(".referral-linkedin-input")?.focus();
-        return;
-      }
-      await submitWaitingReferralFromCard(card, true, linkedinUrl);
-      return;
-    }
-
-    const referralClearBtn = e.target.closest(".referral-clear-btn");
-    if (referralClearBtn) {
-      e.stopPropagation();
-      const card = referralClearBtn.closest(".position-card");
-      if (!card) return;
-      await submitWaitingReferralFromCard(card, false);
-      return;
-    }
-
-    if (e.target.closest(".referral-popover")) {
-      e.stopPropagation();
+    if (e.target.closest(".referral-wrap, .referral-popover")) {
       return;
     }
 
@@ -897,11 +795,20 @@ function bindToolbarEvents() {
   $("country").addEventListener("change", async () => {
     updateFetchHeaderUI();
     await loadCities();
-    await loadJobs();
+    await loadJobs({ force: true, overlayLabel: "Updating board…" });
   });
-  $("ats")?.addEventListener("change", loadJobs);
-  $("location")?.addEventListener("change", loadJobs);
-  $("search").addEventListener("input", debounce(() => renderCompanies(), 200));
+  $("ats")?.addEventListener("change", () => {
+    void loadJobs({ force: true, overlayLabel: "Updating board…" });
+  });
+  $("location")?.addEventListener("focus", () => {
+    void ensureLocationsLoaded();
+  });
+  $("location")?.addEventListener("change", () => {
+    void loadJobs({ force: true, overlayLabel: "Updating board…" });
+  });
+  $("search").addEventListener("input", debounce(() => {
+    void loadBoard({ force: true, overlayLabel: "Searching…" });
+  }, 300));
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if (fetchPanelState.open) {
@@ -914,7 +821,6 @@ function bindToolbarEvents() {
   });
 
   $("atsScoreBackdrop")?.addEventListener("click", () => closeAtsPopovers());
-  $("referralBackdrop")?.addEventListener("click", () => closeReferralPopovers());
 
   $("logoutBtn").addEventListener("click", () => {
     closeAllHeaderPopovers();

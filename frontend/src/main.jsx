@@ -2,11 +2,12 @@ import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import BoardPagination from "./BoardPagination";
 import FetchHeader from "./FetchHeader";
 import FetchPanel from "./FetchPanel";
 
 function BoardRoot() {
-  const [view, setView] = useState({ loading: true, companies: [], ui: {} });
+  const [view, setView] = useState({ loading: true, companies: [], ui: {}, pagination: null });
 
   const setBoardView = useCallback((next) => {
     setView(next);
@@ -21,7 +22,16 @@ function BoardRoot() {
     }
   }, [setBoardView]);
 
-  return <App view={view} />;
+  const paginationMount = document.getElementById("board-pagination-root");
+
+  return (
+    <>
+      {paginationMount
+        ? createPortal(<BoardPagination pagination={view.pagination} />, paginationMount)
+        : null}
+      <App view={view} />
+    </>
+  );
 }
 
 function FetchRoot() {

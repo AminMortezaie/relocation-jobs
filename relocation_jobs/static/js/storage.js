@@ -123,6 +123,9 @@ export function loadFilterPreferences() {
       if (!el || saved[id] === undefined) continue;
       el.checked = Boolean(saved[id]);
     }
+    if ($("hideEmpty") && saved.hideEmpty === undefined) {
+      $("hideEmpty").checked = true;
+    }
   } catch {
     /* ignore */
   }

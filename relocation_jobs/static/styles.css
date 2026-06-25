@@ -1056,6 +1056,75 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .job-list { display: flex; flex-direction: column; gap: 0.75rem; }
 
+.board-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.board-pagination-root:not(:empty) {
+  padding: 0.55rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+}
+
+.board-pagination-root:empty {
+  display: none;
+}
+
+.board-search-bar {
+  margin-bottom: 0;
+}
+
+.board-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+}
+
+.board-pagination-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.board-pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-btn.board-page-num {
+  min-width: 2.25rem;
+  justify-content: center;
+  padding-inline: 0.65rem;
+}
+
+.filter-btn.board-page-num.is-active {
+  border-color: var(--accent);
+  background: rgba(91, 141, 239, 0.1);
+  color: var(--accent-hover);
+}
+
+.filter-btn.board-page-nav:disabled,
+.filter-btn.board-page-num:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.board-page-gap {
+  padding: 0 0.1rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  user-select: none;
+}
+
 .company-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -4144,7 +4213,7 @@ body.fetch-modal-open {
   left: 0;
   right: 0;
   height: 3px;
-  z-index: 9999;
+  z-index: 10001;
   pointer-events: none;
   overflow: hidden;
 }
@@ -4161,6 +4230,118 @@ body.fetch-modal-open {
 
 #loadingBar.done #loadingBarFill {
   opacity: 0;
+}
+
+body.screen-loading #loadingBar {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.screen-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(9, 11, 16, 0.78);
+  backdrop-filter: blur(18px) saturate(125%);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.36s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+}
+
+.screen-loader.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.screen-loader.is-done {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.screen-loader-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: min(320px, 100%);
+  padding: 32px 28px 28px;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+  box-shadow:
+    0 28px 88px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  transform: translateY(12px) scale(0.97);
+  opacity: 0;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.28, 0.64, 1),
+    opacity 0.34s ease;
+}
+
+.screen-loader.is-visible .screen-loader-panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.screen-loader-ring {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.screen-loader-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.screen-loader-track,
+.screen-loader-arc {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.screen-loader-track {
+  stroke: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.screen-loader-arc {
+  stroke: var(--accent);
+  stroke-dasharray: 150.8;
+  stroke-dashoffset: 150.8;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 45%, transparent));
+}
+
+.screen-loader-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.screen-loader-label {
+  margin: 0;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+  max-width: 22ch;
 }
 
 /* ── Skeleton loaders ──────────────────────────────────── */
@@ -4426,6 +4607,21 @@ body.scroll-locked {
     align-items: stretch;
     gap: 0.5rem;
     padding: 0.5rem;
+  }
+
+  .board-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .board-pagination-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(2.5rem, 1fr));
+    width: 100%;
+  }
+
+  .filter-btn.board-page-nav {
+    grid-column: span 1;
   }
 
   .search-field {

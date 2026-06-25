@@ -38,7 +38,7 @@ Plain-language contracts extracted from the code (`catalog_service`, `db`, `cata
 
 13. **Company vs position filters** — `hide_applied` drops entire companies that have any applied activity (derived from positions). `hide_position_applied` hides only applied rows in the main `jobs` list. `position_rejected_only` shows companies that have rejected jobs (main `jobs` may be empty). Rejected rows are routed to `rejected_jobs` before position filters, so `hide_position_rejected` does not empty that bucket.
 
-14. **Other list filters** — `visa_only` drops jobs without `visa_sponsorship === true`. `hide_empty` drops companies with no visible jobs, not-for-me, or rejected rows. `not_applied_only` drops companies already applied at company level or with no visible jobs.
+14. **Other list filters** — `visa_only` drops jobs without `visa_sponsorship === true`. `hide_empty` drops companies with no open roles in the main `jobs` list (not-for-me and rejected buckets do not keep a company visible unless `position_rejected_only` is active). `not_applied_only` drops companies already applied at company level or with no visible jobs.
 
 ## Scrape / relevance (what enters the catalog)
 

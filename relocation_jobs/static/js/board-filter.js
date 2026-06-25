@@ -80,8 +80,7 @@ function includeCompany(view, flags) {
   if (
     flags.hideEmpty
     && !view.jobs.length
-    && !view.not_for_me_jobs.length
-    && !view.rejected_jobs.length
+    && !(flags.positionRejectedOnly && view.rejected_jobs.length)
   ) {
     return false;
   }
@@ -93,6 +92,10 @@ export function applyPanelFilters(catalog, flags = panelFilterFlags()) {
   return (catalog || [])
     .map((company) => companyViewRow(company, flags))
     .filter((view) => includeCompany(view, flags));
+}
+
+export function shouldShowCompanyOnBoard(company, flags = panelFilterFlags()) {
+  return includeCompany(companyViewRow(company, flags), flags);
 }
 
 export function computeViewStats(companies, meta = {}) {

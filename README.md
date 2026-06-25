@@ -10,7 +10,7 @@ A job-search tool for backend and software engineering roles at tech companies t
 
 - **ATS auto-detection** — Greenhouse, Lever, Ashby, Personio, Workable, Recruitee, SmartRecruiters, TeamTailor, and a generic Playwright fallback
 - **Relevance filtering** — include/exclude keyword rules for backend and software roles
-- **Web panel** — browse jobs by country, mark applied / not-for-me, trigger scrapes, add companies
+- **Web panel** — paginated company board (25 per page), filters and search, mark applied / not-for-me, trigger scrapes, add companies
 - **Per-user tracking** — applied state and rejections stored in Postgres, merged with the catalog at read time
 - **Concurrent scraping** — asyncio + httpx for ATS API calls (default 16 workers); Playwright in a thread pool for detection
 
@@ -58,7 +58,11 @@ PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py
 # → http://127.0.0.1:5051
 ```
 
-Sign in with the admin credentials. Select a single country, then use **Fetch** (admin) to scrape. Per-company fetch, skip-filled, visa-only filter, and search are in the toolbar and company cards.
+Sign in with the admin credentials. Select a single country, then use **Fetch** (admin) to scrape. The main board loads one page at a time via `GET /api/board` (default 25 companies per page, filter-aware). Toolbar order: **pagination → search → sort/filters**. Per-company fetch, skip-filled, and visa-only are in the toolbar and company cards.
+
+Your aggregate stats (applied counts, fetch summary) live on the **admin** page (`GET /api/admin/panel-stats`), not on the main board — the board response only includes lightweight `user_stats` for the header chip.
+
+After changing React UI (`frontend/`), run `cd frontend && npm run build` (outputs `relocation_jobs/static/dist/board.js`). Hard refresh after JS/CSS changes (`Cmd+Shift+R`).
 
 Tracking (applied, not-for-me, company-level applied) is stored per user in Postgres. Re-scrapes merge jobs by URL — existing `fetched` dates and tracking state are preserved; jobs removed from an ATS stay in the catalog as orphans and reappear if you have tracking for them.
 
@@ -121,7 +125,7 @@ web/server.py         ← Flask API (catalog + per-user tracking)
 relocation_jobs/
 ├── catalog/      # Postgres catalog repo + writes
 ├── positions/    # Job tracking (apply, reject, not-for-me)
-├── panel/        # flatten_companies, stats, filters
+├── panel/        # flatten_companies, paginated board, stats, filters
 ├── fetch/        # In-process country + company fetch
 ├── scrape/       # ATS boards, merge, enrich
 ├── web/          # Flask server + routes
@@ -131,11 +135,15 @@ relocation_jobs/
 ├── core/         # db helpers, auth, ATS constants, paths
 ├── db/           # User tracking, fetch runs, migrations
 ├── schemas/      # Pydantic contracts
-├── static/       # UI (JS, CSS)
+├── static/       # UI (JS, CSS; `dist/board.js` from `frontend/`)
 └── build_companies.py  # Careers URL discovery CLI
 ```
 
 Rules: [`relocation_jobs/RULES.md`](relocation_jobs/RULES.md).
+
+### Panel board API
+
+`GET /api/board` returns one page of companies plus metadata. Query params: `page`, `page_size` (max 100, default 25), `country`, `q` (company name search), and the same filter flags as the toolbar (`visa_only`, `hide_applied`, `fetch_problem_only`, etc.). Response includes `companies`, `meta` (`page`, `total_companies`, `total_pages`, `has_more`, …), and lightweight `user_stats`. Pagination is **visible-offset**: the server scans the scoped country catalog, applies flatten + panel filters, skips to the page offset, then fills up to `page_size` rows — so filters affect which companies appear on each page.
 
 ### ATS detection (first run per company)
 

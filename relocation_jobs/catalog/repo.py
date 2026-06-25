@@ -142,6 +142,151 @@ def load_country_catalog(country_key: str) -> dict | None:
     return _load_country_from_db(country_key)
 
 
+def load_country_meta(country_key: str) -> dict | None:
+    with db_read() as conn:
+        meta_row = conn.execute(
+            "SELECT * FROM country_meta WHERE country = %s",
+            (country_key,),
+        ).fetchone()
+        if meta_row is None:
+            return None
+        meta = _row(meta_row)
+    return {
+        "source": meta.get("source") or "",
+        "fetched": meta.get("fetched") or "",
+        "updated": meta.get("updated") or "",
+        "jobs_fetched": meta.get("jobs_fetched") or "",
+        "total": meta.get("total") or 0,
+        "last_fetch_new_jobs": int(meta.get("last_fetch_new_jobs") or 0),
+        "companies": [],
+    }
+
+
+def _catalog_company_filters(
+    *,
+    ats_type: str | None,
+    search: str | None,
+) -> tuple[str, list]:
+    clauses: list[str] = []
+    params: list = []
+    if ats_type == "generic":
+        clauses.append(
+            "(c.ats_type IS NULL OR TRIM(c.ats_type) = '' OR LOWER(TRIM(c.ats_type)) = 'generic')"
+        )
+    elif ats_type:
+        clauses.append("LOWER(TRIM(c.ats_type)) = LOWER(%s)")
+        params.append(ats_type)
+    if search:
+        pattern = f"%{search.strip().lower()}%"
+        clauses.append(
+            """(
+                LOWER(c.name) LIKE %s
+                OR LOWER(COALESCE(c.city, '')) LIKE %s
+                OR EXISTS (
+                    SELECT 1 FROM matching_jobs mj
+                    WHERE mj.company_id = c.id AND LOWER(mj.title) LIKE %s
+                )
+            )"""
+        )
+        params.extend([pattern, pattern, pattern])
+    if not clauses:
+        return "", []
+    return " AND " + " AND ".join(clauses), params
+
+
+def _country_in_clause(country_keys: list[str]) -> tuple[str, list[str]]:
+    if not country_keys:
+        return "FALSE", []
+    placeholders = ", ".join("%s" for _ in country_keys)
+    return f"c.country IN ({placeholders})", list(country_keys)
+
+
+def count_catalog_companies(
+    country_keys: list[str],
+    *,
+    ats_type: str | None = None,
+    search: str | None = None,
+) -> int:
+    if not country_keys:
+        return 0
+    country_sql, country_params = _country_in_clause(country_keys)
+    filter_sql, filter_params = _catalog_company_filters(ats_type=ats_type, search=search)
+    with db_read() as conn:
+        row = conn.execute(
+            f"""
+            SELECT COUNT(*) AS total
+            FROM companies c
+            WHERE {country_sql}{filter_sql}
+            """,
+            (*country_params, *filter_params),
+        ).fetchone()
+    return int(_row(row).get("total") or 0)
+
+
+def count_fetch_problems(country_keys: list[str]) -> int:
+    if not country_keys:
+        return 0
+    country_sql, country_params = _country_in_clause(country_keys)
+    with db_read() as conn:
+        row = conn.execute(
+            f"""
+            SELECT COUNT(*) AS total
+            FROM companies c
+            WHERE {country_sql} AND COALESCE(c.fetch_problem, 0) <> 0
+            """,
+            tuple(country_params),
+        ).fetchone()
+    return int(_row(row).get("total") or 0)
+
+
+def load_catalog_companies_page(
+    country_keys: list[str],
+    *,
+    offset: int,
+    limit: int,
+    ats_type: str | None = None,
+    search: str | None = None,
+) -> list[tuple[str, dict]]:
+    if not country_keys or limit <= 0:
+        return []
+    country_sql, country_params = _country_in_clause(country_keys)
+    filter_sql, filter_params = _catalog_company_filters(ats_type=ats_type, search=search)
+    with db_read() as conn:
+        company_rows = conn.execute(
+            f"""
+            SELECT c.*
+            FROM companies c
+            WHERE {country_sql}{filter_sql}
+            ORDER BY c.country, c.name
+            LIMIT %s OFFSET %s
+            """,
+            (*country_params, *filter_params, limit, max(offset, 0)),
+        ).fetchall()
+        if not company_rows:
+            return []
+        ids = [int(_row(c)["id"]) for c in company_rows]
+        jobs_by_id: dict[int, list[dict]] = defaultdict(list)
+        id_placeholders = ", ".join("%s" for _ in ids)
+        for job_row in conn.execute(
+            f"""
+            SELECT * FROM matching_jobs
+            WHERE company_id IN ({id_placeholders})
+            ORDER BY company_id, fetched DESC, title
+            """,
+            tuple(ids),
+        ).fetchall():
+            data = _row(job_row)
+            jobs_by_id[int(data["company_id"])].append(_job_row(job_row))
+    out: list[tuple[str, dict]] = []
+    for crow in company_rows:
+        data = _row(crow)
+        country_key = data["country"]
+        company = _company_row(data, jobs_by_id[int(data["id"])])
+        sync_company_location_fields(company, catalog_country=country_key)
+        out.append((country_key, company))
+    return out
+
+
 def list_country_company_stubs(country_key: str) -> list[dict]:
     with db_read() as conn:
         if conn.execute(

@@ -225,12 +225,12 @@ function CompanyCard({ company, ui }) {
         </div>
       </div>
       <div className="positions">
-        {openJobs.length ? (
+        {!isCollapsed && openJobs.length ? (
           openJobs.map((job) => <JobCard key={job.idempotency_key || job.url} job={job} variant="open" />)
-        ) : (
+        ) : !isCollapsed ? (
           <div className="position-card"><span className="job-meta">{emptyMessage(company, ui)}</span></div>
-        )}
-        {showingRejected && rejectedCount > 0 ? (
+        ) : null}
+        {!isCollapsed && showingRejected && rejectedCount > 0 ? (
           <>
             <div className="rejected-jobs-heading">Rejected jobs</div>
             {sortJobsForDisplay(company.rejected_jobs || []).map((job) => (
@@ -238,7 +238,7 @@ function CompanyCard({ company, ui }) {
             ))}
           </>
         ) : null}
-        {showingNotForMe && notForMeCount > 0 ? (
+        {!isCollapsed && showingNotForMe && notForMeCount > 0 ? (
           <>
             <div className="not-for-me-jobs-heading">Not for me jobs</div>
             {sortJobsForDisplay(notForMeJobs).map((job) => (

@@ -1,7 +1,8 @@
 /** Admin dashboard — catalog ops, users, fetch history, system config. */
 
 import { initAdminFetch } from "./admin-scrape.js";
-import { $, escapeHtml, escapeAttr, setLoadingProgress, finishLoadingProgress } from "./utils.js";
+import { buildStatsDashboardHtml } from "./stats-dashboard.js";
+import { $, escapeHtml, escapeAttr, setLoadingProgress, finishLoadingProgress, formatActivityBadge } from "./utils.js";
 
 function skeletonRows(n = 4) {
   return Array(n).fill(0).map(() =>
@@ -17,10 +18,12 @@ function skeletonStatCards(n = 4) {
 
 function showAdminSkeletons() {
   const overview = $("adminOverview");
+  const panelStats = $("adminPanelStats");
   const catalog = $("adminCatalog");
   const users = $("adminUsers");
   const runs = $("adminFetchRuns");
   const config = $("adminConfig");
+  if (panelStats) panelStats.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(4)}</div>`;
   if (overview) overview.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(6)}</div>`;
   if (catalog) catalog.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(5)}</div>`;
   if (users)   users.innerHTML   = `<div class="skeleton-admin-table">${skeletonRows(3)}</div>`;
@@ -101,6 +104,18 @@ function showAdmin() {
   $("adminLoginPanel").hidden = true;
   $("adminDenied").hidden = true;
   $("adminContent").classList.remove("hidden");
+}
+
+function renderPanelStats(stats) {
+  const mount = $("adminPanelStats");
+  if (!mount) return;
+  mount.innerHTML = `
+    <section class="admin-panel">
+      <h2 class="admin-panel-title">Your panel stats</h2>
+      <p class="hint">Full-catalog totals for your account (not limited to the current board page or filters).</p>
+      ${buildStatsDashboardHtml(stats, { escapeHtml, formatActivityBadge })}
+    </section>
+  `;
 }
 
 function renderOverview(data) {
@@ -367,11 +382,20 @@ function renderConfig(data) {
   `;
 }
 
+async function loadPanelStats() {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const stats = await apiGet(`/api/admin/panel-stats?timezone=${encodeURIComponent(tz)}`);
+  renderPanelStats(stats);
+}
+
 async function loadDashboard() {
   $("adminError").hidden = true;
   showAdminSkeletons();
   setLoadingProgress(15);
-  const data = await apiGet("/api/admin/dashboard?limit=50");
+  const [data] = await Promise.all([
+    apiGet("/api/admin/dashboard?limit=50"),
+    loadPanelStats(),
+  ]);
   setLoadingProgress(80);
   renderOverview(data.overview);
   renderCatalog(data.catalog);

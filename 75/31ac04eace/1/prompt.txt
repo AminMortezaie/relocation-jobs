@@ -1,0 +1,40 @@
+i have filtered by the hide positions with no jobs but it still shows me some companies with no jobs, i think pagination created this bug.
+
+because of small pages problem we need to query again to handle the filters correctly with no problem on them.
+whats the best practice industrial solution for this?
+
+---
+
+what do you think is the best practice here?
+
+---
+
+do it
+
+---
+
+run the panel and see that the filters not doing correctly anymore after pagination.
+fix the real bug.
+
+---
+
+when filter is applying should be a loading bar shows on the whole screen with modern design, and the transtion should be shown.
+also when a fetch is complete the board should be refresh automatically to apply the new changes there also every transition should be shown by loading bar in whole screen.
+
+---
+
+when i'm clicking on a job position, its updating the whole panel.
+the appliabe states on the each position cannot change the whole board, we need to separate the appliable state that can change the board with something just applying on a job position.
+
+with this strategy every db calls might shows the loading bar in whole board which is not needed.
+
+---
+
+when i'm clicking on a job position, its updating the whole panel.
+the appliabe states on the each position cannot change the whole board, we need to separate the appliable state that can change the board with something just applying on a job position.
+
+with this strategy every db calls might shows the loading bar in whole board which is not needed.
+
+---
+
+i dont like the design of loading bar it should be circular and not going back it should going forward for some filters it goes back, i havent seen this pattern before.

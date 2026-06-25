@@ -3,7 +3,7 @@
   "checkpoint_id": "7531ac04eace",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 3,
+  "checkpoints_count": 10,
   "files_touched": [
     "AGENTS.md",
     "README.md",
@@ -34,6 +34,7 @@
     "relocation_jobs/static/js/main.js",
     "relocation_jobs/static/js/render.js",
     "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/screen-loader.js",
     "relocation_jobs/static/js/state.js",
     "relocation_jobs/static/js/storage.js",
     "relocation_jobs/static/js/utils.js",
@@ -43,6 +44,7 @@
     "relocation_jobs/web/routes/board.py",
     "tests/BUSINESS_RULES.md",
     "tests/helpers/route_manifest.py",
+    "tests/panel/test_hide_empty.py",
     "tests/web/test_board_api.py",
     "tests/web/test_catalog_api.py"
   ],
@@ -52,6 +54,12 @@
       "transcript": "/75/31ac04eace/0/full.jsonl",
       "content_hash": "/75/31ac04eace/0/content_hash.txt",
       "prompt": "/75/31ac04eace/0/prompt.txt"
+    },
+    {
+      "metadata": "/75/31ac04eace/1/metadata.json",
+      "transcript": "/75/31ac04eace/1/full.jsonl",
+      "content_hash": "/75/31ac04eace/1/content_hash.txt",
+      "prompt": "/75/31ac04eace/1/prompt.txt"
     }
   ]
 }

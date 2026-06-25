@@ -1,8 +1,8 @@
-# Render Blueprint — free web tier
+# Deployment (Render)
 #
-# Free plan has no persistent disk. Use:
-# - DATABASE_URL → free Neon Postgres (catalog + auth + tracking)
-# - PANEL_SCRAPE_ENABLED=0 → scraping runs locally (512MB RAM limit on free)
+# Free plan: PANEL_SCRAPE_ENABLED=0 — scrape locally, panel reads Postgres.
+# Do NOT set start command to scripts/panel_server.py (binds localhost in dev).
+# Docker services use docker-entrypoint.sh → gunicorn on 0.0.0.0:$PORT
 
 services:
   - type: web
@@ -10,6 +10,8 @@ services:
     runtime: docker
     plan: free
     region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerCommand: ./docker-entrypoint.sh
     healthCheckPath: /api/auth/status
     envVars:
       - key: PANEL_DATA_DIR

@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && playwright install --with-deps chromium
 
 COPY . .
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh start.sh
 
 RUN mkdir -p /tmp/panel-data
 

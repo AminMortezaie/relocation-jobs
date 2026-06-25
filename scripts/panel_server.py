@@ -13,6 +13,8 @@ if __name__ == "__main__":
 
     from relocation_jobs.web.server import app
 
-    host = os.environ.get("PANEL_HOST", "127.0.0.1")
-    port = int(os.environ.get("PANEL_PORT", "5051"))
+    port = int(os.environ.get("PORT") or os.environ.get("PANEL_PORT", "5051"))
+    host = os.environ.get("PANEL_HOST")
+    if not host:
+        host = "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1"
     app.run(host=host, port=port)

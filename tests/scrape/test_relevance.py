@@ -15,6 +15,9 @@ class TestIsRelevant:
             ("Chief Technology Officer", False),
             ("Marketing Manager", False),
             ("Staff Software Engineer", False),
+            ("Senior Python Engineer", True),
+            ("Senior Python AI Engineer", True),
+            ("Senior Python Engineer- GenAI", True),
         ],
     )
     def test_title_gate(self, title: str, expected: bool):

@@ -13,6 +13,7 @@ INCLUDE_KEYWORDS = [
     "golang", "go engineer", "go developer", "go backend",
     "java ", "java,", "java/", "java-", "javascript", "typescript",
     "kotlin", "spring boot",
+    "python engineer", "python developer", "python ai engineer",
     "microservice", "distributed",
     "fullstack", "full-stack", "full stack",
     "product engineer",

@@ -1,0 +1,15 @@
+the newest filter is not working correctly on panel, also the default mode for the panel is having just the companies with jobs if someone wants can remove this filter.
+
+find the bug and apply that fix.
+
+---
+
+waiting referal has issue and not showing it goes hidden when i click on and cannot do anything
+
+---
+
+no it didnt
+
+---
+
+no it didnt

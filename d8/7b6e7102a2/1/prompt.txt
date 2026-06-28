@@ -1,0 +1,53 @@
+write down in docs, why it has been failed scenario.
+
+---
+
+no write article about it
+
+---
+
+add a button to update the job status and pin to top in its company.
+
+---
+
+add a button to update the job status and pin to top in its company.
+
+---
+
+a bug found that is about, when i click on a position currently its not marking as a seen job, can you find why?
+
+---
+
+pin to top should be a little different in front
+
+---
+
+the state should be kept in db not in client side
+
+---
+
+the state should be kept in db not in client side
+
+---
+
+restart the server then we need to run the migration
+
+---
+
+restart the server then we need to run the migration
+
+---
+
+Until this part of application, we didn't care about any user management and something like this. But for pinning a job position, it's necessary to add the ID of the user to this position. But firstly, we need to think more about the design system for this Position because we have lots of people, we have lots of users in our system that maybe they have the same positions, okay? So the users, the positions, and pinning a job, okay? So most of them having the same positions but someone wants to, for example pin one job. And some other one wants to be in other, other job, okay? and another thing is here is about the company, okay? We have a company and with lo with several positions here, and we need to Ten, for example, one or more positions for that company for a user, okay? So if we Want to have a good design for this scenario, I think that We have to A user. Company And Maybe we, we need another table for putting this data on. For example a, a middle table which is, which have user, company, and The third Column might be the pinned you know, positions by the sort of these pinned positions. How about do you think about this? Is there any better options for us? Also think about that just we have designing this database, we needed to use a database with f-free like Neon, but we have changed this database to AWS, and we have EC2 of AWS now, and we can you know, start up MongoDB on our AWS, just because we don't need to have migrations more, because this application has lots of you know changes during the, the schema of the database and the schema, like for example, this feature we have added, it's pinning to top. We are changing several times, and maybe it's a, you know, it's not a constant application. And maybe something no SQL can be better solution for this application. What do you think about this? Also answer this question.
+
+---
+
+Until this part of application, we didn't care about any user management and something like this. But for pinning a job position, it's necessary to add the ID of the user to this position. But firstly, we need to think more about the design system for this Position because we have lots of people, we have lots of users in our system that maybe they have the same positions, okay? So the users, the positions, and pinning a job, okay? So most of them having the same positions but someone wants to, for example pin one job. And some other one wants to be in other, other job, okay? and another thing is here is about the company, okay? We have a company and with lo with several positions here, and we need to Ten, for example, one or more positions for that company for a user, okay? So if we Want to have a good design for this scenario, I think that We have to A user. Company And Maybe we, we need another table for putting this data on. For example a, a middle table which is, which have user, company, and The third Column might be the pinned you know, positions by the sort of these pinned positions. How about do you think about this? Is there any better options for us? Also think about that just we have designing this database, we needed to use a database with f-free like Neon, but we have changed this database to AWS, and we have EC2 of AWS now, and we can you know, start up MongoDB on our AWS, just because we don't need to have migrations more, because this application has lots of you know changes during the, the schema of the database and the schema, like for example, this feature we have added, it's pinning to top. We are changing several times, and maybe it's a, you know, it's not a constant application. And maybe something no SQL can be better solution for this application. What do you think about this? Also answer this question.
+
+---
+
+write down an article about your design on Catalog which is a known pattern in designing these type of systems.
+
+---
+
+how to run the tests completely on pipeline?

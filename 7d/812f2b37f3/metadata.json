@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "7d812f2b37f3",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "files_touched": [
+    ".env.example",
+    "AGENTS.md",
+    "BUCKET_LIST.md",
+    "README.md",
+    "SCHEMAS.md",
+    "docs/README.md",
+    "docs/archive/refactor-handoff.md",
+    "docs/archive/v2-bugfix-handoff.md",
+    "docs/archive/v2-coding-verdict.md",
+    "docs/backlog.md",
+    "docs/contributing.md",
+    "docs/operations/aws-postgres.md",
+    "docs/reference/architecture.md",
+    "docs/reference/board.md",
+    "docs/reference/business-rules.md",
+    "docs/reference/parity.md",
+    "docs/reference/rules.md",
+    "docs/reference/schemas.md",
+    "relocation_jobs/PARITY.md",
+    "relocation_jobs/RULES.md",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/panel/board.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/board.js",
+    "relocation_jobs/static/js/filters.js",
+    "relocation_jobs/web/routes/board.py",
+    "tests/BUSINESS_RULES.md",
+    "tests/README.md",
+    "tests/web/test_board_api.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/7d/812f2b37f3/0/metadata.json",
+      "transcript": "/7d/812f2b37f3/0/full.jsonl",
+      "content_hash": "/7d/812f2b37f3/0/content_hash.txt",
+      "prompt": "/7d/812f2b37f3/0/prompt.txt"
+    }
+  ]
+}

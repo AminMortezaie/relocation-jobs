@@ -1,0 +1,143 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "7d812f2b37f3",
+  "session_id": "617c3328-b1b1-4412-a17d-2c3f6344eff6",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-28T09:40:02.294078Z",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "save_step_count": 5,
+  "files_touched": [
+    ".env.example",
+    "AGENTS.md",
+    "BUCKET_LIST.md",
+    "README.md",
+    "SCHEMAS.md",
+    "docs/README.md",
+    "docs/archive/refactor-handoff.md",
+    "docs/archive/v2-bugfix-handoff.md",
+    "docs/archive/v2-coding-verdict.md",
+    "docs/backlog.md",
+    "docs/contributing.md",
+    "docs/operations/aws-postgres.md",
+    "docs/reference/architecture.md",
+    "docs/reference/board.md",
+    "docs/reference/business-rules.md",
+    "docs/reference/parity.md",
+    "docs/reference/rules.md",
+    "docs/reference/schemas.md",
+    "relocation_jobs/PARITY.md",
+    "relocation_jobs/RULES.md",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/panel/board.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/board.js",
+    "relocation_jobs/static/js/filters.js",
+    "relocation_jobs/web/routes/board.py",
+    "tests/BUSINESS_RULES.md",
+    "tests/README.md",
+    "tests/web/test_board_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "b4b3036677f1",
+  "session_metrics": {
+    "turn_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-28T09:40:02.29051Z",
+    "agent_lines": 1790,
+    "agent_removed": 317,
+    "human_added": 12,
+    "human_modified": 124,
+    "human_removed": 0,
+    "total_committed": 1926,
+    "total_lines_changed": 2247,
+    "agent_percentage": 93.76947040498442,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 152,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 4,
+      "user_lines_removed": 150,
+      "agent_lines_added": 782,
+      "agent_lines_removed": 148,
+      "user_added_per_file": {
+        ".cursor/rules/onboarding.mdc": 1,
+        ".cursor/rules/v2-coding.mdc": 1,
+        "relocation_jobs/panel/BOARD.md": 2
+      },
+      "user_removed_per_file": {
+        ".cursor/rules/onboarding.mdc": 1,
+        ".cursor/rules/v2-coding.mdc": 1,
+        "relocation_jobs/panel/BOARD.md": 148
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 67,
+      "user_lines_removed": 61,
+      "agent_lines_added": 1873,
+      "agent_lines_removed": 428,
+      "user_added_per_file": {
+        ".cursor/rules/onboarding.mdc": 1,
+        ".cursor/rules/v2-coding.mdc": 3,
+        "docs/README.md": 49,
+        "docs/backlog.md": 1,
+        "docs/contributing.md": 10,
+        "docs/reference/architecture.md": 2,
+        "docs/reference/board.md": 1
+      },
+      "user_removed_per_file": {
+        ".cursor/rules/onboarding.mdc": 1,
+        ".cursor/rules/v2-coding.mdc": 3,
+        "docs/README.md": 41,
+        "docs/backlog.md": 1,
+        "docs/contributing.md": 12,
+        "docs/reference/architecture.md": 2,
+        "docs/reference/board.md": 1
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 67,
+      "user_lines_removed": 61,
+      "agent_lines_added": 1873,
+      "agent_lines_removed": 428,
+      "user_added_per_file": {
+        ".cursor/rules/onboarding.mdc": 1,
+        ".cursor/rules/v2-coding.mdc": 3,
+        "docs/README.md": 49,
+        "docs/backlog.md": 1,
+        "docs/contributing.md": 10,
+        "docs/reference/architecture.md": 2,
+        "docs/reference/board.md": 1
+      },
+      "user_removed_per_file": {
+        ".cursor/rules/onboarding.mdc": 1,
+        ".cursor/rules/v2-coding.mdc": 3,
+        "docs/README.md": 41,
+        "docs/backlog.md": 1,
+        "docs/contributing.md": 12,
+        "docs/reference/architecture.md": 2,
+        "docs/reference/board.md": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+check for newest companies and tell me whats the logic behind
+
+---
+
+firstly write it down this diagram into documents we have for this project.
+then i will tell you, there is a bug in this flow.
+
+---
+
+make the documets something organized, they're to much and hard to follow.
+Readme is neccasary but others are too diverse and lots of docs there make them oragnized.
+
+---
+
+remove unused docs, also transfer to a folder to make it organized.
+
+---
+
+ok, the problem in newest filter is that, they will not sort correctly to what fetched lastly.

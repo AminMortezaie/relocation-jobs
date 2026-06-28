@@ -1,0 +1,74 @@
+check for newest companies and tell me whats the logic behind
+
+---
+
+firstly write it down this diagram into documents we have for this project.
+then i will tell you, there is a bug in this flow.
+
+---
+
+make the documets something organized, they're to much and hard to follow.
+Readme is neccasary but others are too diverse and lots of docs there make them oragnized.
+
+---
+
+remove unused docs, also transfer to a folder to make it organized.
+
+---
+
+ok, the problem in newest filter is that, they will not sort correctly to what fetched lastly.
+
+---
+
+this statistics are completely wrong, for example i know that today we have fetched more than 3 new jobs but it shows wrongly.
+about the open positions also, when we mark something that not for me, it means that its not open position anymore and cannot be applied but it calculates wrongly.
+
+the hidden roles are not neccassary in statics and no need to show.
+i think the statistics are a full domain and we need to make them better later and need to be apart from manual data.
+
+---
+
+i can see that there are at least 3 new jobs today but it still shows 1 new
+
+---
+
+i think you made the flow wrong and its crucial now.
+lots of jobs was fetched before but now taged as today fetched.
+
+---
+
+i think you made the flow wrong and its crucial now.
+lots of jobs was fetched before but now taged as today fetched.
+
+---
+
+run it
+
+---
+
+the newest sort still not working correctly.
+the logic is this:
+you will compare companies and sort them by the latest job fetched of each one.
+for example:
+flixbus, scout24
+the latest job fetched for flixbus is in 2026-06-24 22:49
+for scout 24 is 2026-06-25 00:45
+so scout 24 should be upper than flixbus.
+simple easy.
+
+---
+
+no you dont attention that the position was fetched for flixbus today marked as not for me so it cannot be upper.
+
+---
+
+no its not.
+flix bus is the first which is wrong.
+
+---
+
+again its wrong open it up here and find the real bug
+
+---
+
+fix the run tests problem

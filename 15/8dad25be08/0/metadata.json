@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "158dad25be08",
+  "session_id": "617c3328-b1b1-4412-a17d-2c3f6344eff6",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-28T11:28:31.702323Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 2,
+  "files_touched": [
+    "tests/helpers/seed.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "a8b8ba9c4791",
+  "session_metrics": {
+    "turn_count": 15,
+    "context_tokens": 185346,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-28T11:28:31.695115Z",
+    "agent_lines": 6,
+    "agent_removed": 34,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 6,
+    "total_lines_changed": 40,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 6,
+      "agent_lines_removed": 34
+    }
+  ]
+}

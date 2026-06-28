@@ -1,0 +1,17 @@
+why this file exists?
+[@__init__.py](file:///Users/amin/dev/p-projects/armenia/resume/relocation_jobs/positions/__init__.py)
+__init__.py
+
+<context ref="__init__.py">
+{"description":"Offsets of selected text in the currently opened file.\nUse these offsets to read selected text if it is required.\nstartOffset is inclusive, endOffset is exclusive.","offsetEncoding":"utf16","selections":[{"startOffset":0,"endOffset":1141}]}
+</context>
+
+---
+
+its not dependency injection whats this pattern name?
+[@__init__.py](file:///Users/amin/dev/p-projects/armenia/resume/relocation_jobs/positions/__init__.py)
+__init__.py
+
+<context ref="__init__.py">
+{"description":"Offsets of selected text in the currently opened file.\nUse these offsets to read selected text if it is required.\nstartOffset is inclusive, endOffset is exclusive.","offsetEncoding":"utf16","selections":[{"startOffset":0,"endOffset":1141}]}
+</context>

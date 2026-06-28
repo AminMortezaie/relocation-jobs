@@ -1,0 +1,59 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "d87b6e7102a2",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "docs/README.md",
+    "docs/contributing.md",
+    "docs/reference/architecture.md",
+    "docs/reference/catalog-pattern.md",
+    "docs/reference/catalog-seed-test-failure.md",
+    "docs/reference/rules.md",
+    "docs/reference/schemas.md",
+    "frontend/src/CompanyCard.jsx",
+    "frontend/src/JobCard.jsx",
+    "frontend/src/sort.js",
+    "frontend/src/widgets/PinJobButton.jsx",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/panel/flatten.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/panel/tracking.py",
+    "relocation_jobs/positions/__init__.py",
+    "relocation_jobs/positions/repo.py",
+    "relocation_jobs/positions/service.py",
+    "relocation_jobs/positions/types.py",
+    "relocation_jobs/schemas/job_response.py",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/job-board.js",
+    "relocation_jobs/static/js/main.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/users/repo.py",
+    "relocation_jobs/web/deps.py",
+    "relocation_jobs/web/routes/jobs.py",
+    "tests/helpers/route_manifest.py",
+    "tests/web/test_job_pin.py",
+    "tests/web/test_seen_click.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/d8/7b6e7102a2/0/metadata.json",
+      "transcript": "/d8/7b6e7102a2/0/full.jsonl",
+      "content_hash": "/d8/7b6e7102a2/0/content_hash.txt",
+      "prompt": "/d8/7b6e7102a2/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 28,
+    "cache_creation_tokens": 31034,
+    "cache_read_tokens": 59849,
+    "output_tokens": 910,
+    "api_call_count": 3
+  }
+}

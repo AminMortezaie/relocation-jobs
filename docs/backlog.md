@@ -60,12 +60,12 @@ Soft delete means every hide that affects the board should have a durable `job_t
 6. **Migration / ops**
    - One-shot: `python scripts/mark_wrong_location_jobs.py` (all users).
    - Dry run: `python scripts/mark_wrong_location_jobs.py --dry-run`.
-   - Document in `CLAUDE.md` commands section when shipped.
+   - Document in `docs/README.md` commands section when shipped.
 
 ### Out of scope (for later buckets)
 
 - Hard-deleting catalog `matching_jobs` rows for wrong location (scrape merge already excludes new ones; stale rows kept by design).
-- Changing orphan reinjection for wrong-location applied jobs (product decision — see `tests/BUSINESS_RULES.md` “Not specified”).
+- Changing orphan reinjection for wrong-location applied jobs (product decision — see [business-rules.md](reference/business-rules.md) “Not specified”).
 - Per-user vs global wrong-location policy (today: per-user tracking, shared catalog).
 
 ---

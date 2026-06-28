@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Relocation Jobs — onboarding
 
-**Read first:** [`.claude/ONBOARDING.md`](../../.claude/ONBOARDING.md) and [`AGENTS.md`](../../AGENTS.md)
+**Read first:** [`docs/README.md`](../../docs/README.md) and [`AGENTS.md`](../../AGENTS.md)
 
 - **Code:** `relocation_jobs/` (domain folders: `catalog/`, `web/`, `fetch/`, `scrape/`, …)
 - **Local panel:** `PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py` (port **5051**)

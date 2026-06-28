@@ -18,6 +18,7 @@ def load_catalog_board_page(
     search: str | None = None,
     panel_flags: dict | None = None,
     count_total: bool = False,
+    sort: str | None = "newest",
 ) -> tuple[list[dict], list[dict], int, int | None, bool]:
     flags = panel_flags or {}
     filters = FlattenFilters.from_kwargs(
@@ -43,4 +44,5 @@ def load_catalog_board_page(
         limit=limit,
         search=search,
         count_total=count_total,
+        sort=sort,
     )

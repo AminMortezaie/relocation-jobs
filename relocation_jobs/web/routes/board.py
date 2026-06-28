@@ -46,6 +46,9 @@ def register(app):
         page_size = request.args.get("page_size", DEFAULT_BOARD_PAGE_SIZE, type=int) or DEFAULT_BOARD_PAGE_SIZE
         page_size = max(1, min(page_size, MAX_BOARD_PAGE_SIZE))
         visible_offset = (page - 1) * page_size
+        sort = (request.args.get("sort") or "newest").strip().lower()
+        if sort not in ("newest", "name"):
+            sort = "newest"
 
         companies, file_meta, fetch_problem_count, total_visible, has_more = load_catalog_board_page(
             scope["country_key"],
@@ -57,6 +60,7 @@ def register(app):
             search=search,
             panel_flags=_panel_flags(),
             count_total=(page == 1),
+            sort=sort,
         )
         latest_fetch_new_jobs = _latest_fetch_new_jobs(file_meta)
         total_pages = None
@@ -75,6 +79,7 @@ def register(app):
                 "total_companies": total_visible,
                 "total_pages": total_pages,
                 "has_more": has_more,
+                "sort": sort,
             },
             "user_stats": compute_user_board_stats(
                 user_id=g.user_id,

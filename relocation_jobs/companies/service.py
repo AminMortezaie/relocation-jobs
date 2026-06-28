@@ -3,7 +3,7 @@
 No raw SQL here — all DB access goes through catalog_db or companies.repo.
 Service layer: uses Pydantic schemas for input validation and response validation.
 All public functions return dicts complying with the schemas documented in their docstrings.
-See SCHEMAS.md for full schema definitions.
+See docs/reference/schemas.md for full schema definitions.
 """
 
 from __future__ import annotations

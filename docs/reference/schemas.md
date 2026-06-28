@@ -17,13 +17,13 @@ Pydantic models live in `relocation_jobs/schemas/`. Postgres JSON/JSONB columns 
 
 | Store | Tables / files | Schema usage |
 |-------|----------------|--------------|
-| Catalog (Postgres) | `companies`, `matching_jobs`, `country_meta` | `CompanyInDB`, `MatchingJob`, `Location` on read/write in `catalog_db.py` |
-| User tracking (Postgres) | `job_tracking`, `company_tracking`, `users`, `fetch_runs` | Plain SQL in `db/`; panel overlay at read time |
+| Catalog (Postgres) | `companies`, `matching_jobs`, `country_meta` | `CompanyInDB`, `MatchingJob`, `Location` on read/write in `catalog/` |
+| User tracking (Postgres) | `job_tracking`, `company_tracking`, `users`, `fetch_runs` | SQL in `users/repo.py`, `positions/`; panel overlay at read time |
 | Custom cities (disk) | `data/custom_cities.json` via `PANEL_DATA_DIR` | `Location`-shaped dicts in `location_tags.py` |
 
 ## Catalog read path
 
-`catalog_db.load_country_catalog(country_key)` returns a dict matching `CountryCatalog` shape:
+`catalog/repo.load_country_catalog(country_key)` returns a dict matching `CountryCatalog` shape:
 
 ```text
 {
@@ -32,11 +32,11 @@ Pydantic models live in `relocation_jobs/schemas/`. Postgres JSON/JSONB columns 
 }
 ```
 
-`services/catalog_service.flatten_companies()` merges catalog jobs with per-user tracking from `db/` and routes each job into exactly one bucket: `jobs`, `rejected_jobs`, or `not_for_me_jobs`.
+`panel/flatten.py` merges catalog jobs with per-user tracking and routes each job into exactly one bucket: `jobs`, `rejected_jobs`, or `not_for_me_jobs`.
 
 ## Service inputs
 
-- `CompanyCreateInput` — validated in `company_service.add_company()` and related mutations
+- `CompanyCreateInput` — validated in `companies/service.add_company()` and related mutations
 - `CompanyResponse` — return type for company CRUD operations
 
 ## Naming note

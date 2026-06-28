@@ -37,7 +37,8 @@ function boardRequestKey() {
     "fetchProblemOnly",
   ];
   const flags = filterIds.map((id) => `${id}:${Boolean($(id)?.checked)}`).join("|");
-  return `${catalogScopeKey()}|${flags}|${search}`;
+  const sort = $("sortSelect")?.value === "name" ? "name" : "newest";
+  return `${catalogScopeKey()}|${flags}|${search}|sort:${sort}`;
 }
 
 function boardPageSize() {

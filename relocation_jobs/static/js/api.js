@@ -532,6 +532,8 @@ export function boardQueryParams({ page = 1, pageSize = 25 } = {}) {
   params.set("fetch_problem_only", filterQueryFlag("fetchProblemOnly"));
   const q = document.getElementById("search")?.value.trim();
   if (q) params.set("q", q);
+  const sort = document.getElementById("sortSelect")?.value === "name" ? "name" : "newest";
+  params.set("sort", sort);
   return params;
 }
 

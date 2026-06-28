@@ -1,6 +1,6 @@
 # Coding rules
 
-How we build `relocation_jobs/`. Also read [`PARITY.md`](PARITY.md).
+How we build `relocation_jobs/`. Also read [`parity.md`](parity.md).
 
 ## Boundaries
 
@@ -75,7 +75,7 @@ Names should state **what** and **when**, not generic verbs.
 
 - **Independent guards** (filters, skip rules): predicate tuples + `shared/predicates.any_of` / `all_of`, or a first-match priority table. Keep lambdas in the tuple; avoid a named function per rule unless it’s reused.
 - **Different workflows** (apply vs unapply, scrape vs enrich): separate functions or top-level branches, not one boolean that changes everything.
-- **Do not** add Strategy/State patterns for simple job-tracking rules — tests + `BUSINESS_RULES.md` are the spec.
+- **Do not** add Strategy/State patterns for simple job-tracking rules — tests + [`business-rules.md`](business-rules.md) are the spec.
 
 ## Data rules (catalog)
 
@@ -102,7 +102,7 @@ Names should state **what** and **when**, not generic verbs.
 
 - **`pytest tests`** during application work.
 - **`tests/<domain>/`** mirrors domains; seed via `tests/helpers/seed.py`.
-- Map position/panel behavior to `tests/BUSINESS_RULES.md`.
+- Map position/panel behavior to [`business-rules.md`](business-rules.md).
 - Business rules for catalog board sync: `tests/catalog/test_repo.py`.
 
 ## Render / deploy
@@ -158,4 +158,4 @@ pytest tests -o addopts=
 PANEL_SCRAPE_ENABLED=1 python3 -c "from relocation_jobs.web.server import app; app.run(host='127.0.0.1', port=5051)"
 ```
 
-**Onboarding:** [`.claude/ONBOARDING.md`](../../.claude/ONBOARDING.md)
+**Onboarding:** [`docs/contributing.md`](../../docs/contributing.md) · [`docs/README.md`](../../docs/README.md)

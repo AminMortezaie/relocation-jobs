@@ -4,7 +4,7 @@ A job-search tool for backend and software engineering roles at tech companies t
 
 **Supported countries:** Germany, Netherlands, UK, Portugal.
 
-> **Contributors:** start with [`.claude/ONBOARDING.md`](.claude/ONBOARDING.md).
+> **Contributors:** [`docs/contributing.md`](docs/contributing.md) · [`docs/`](docs/README.md)
 
 ## Features
 
@@ -45,7 +45,7 @@ Copy `.env.example` to `.env` before running locally.
 | `PANEL_DATA_DIR` | Local data dir for `custom_cities.json` (default: `data/`) |
 | `PANEL_ALLOW_REGISTER` | Allow self-service registration after first user |
 
-AWS Postgres ops: `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes. See [`.claude/AWS_POSTGRES_MIGRATION_HANDOFF.md`](.claude/AWS_POSTGRES_MIGRATION_HANDOFF.md).
+AWS Postgres ops: `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes. See [docs index § Operations](docs/README.md#5-operations).
 
 For local dev, a local Postgres instance is faster than remote AWS (~150 ms/query). See comments in `.env.example`.
 
@@ -139,11 +139,13 @@ relocation_jobs/
 └── build_companies.py  # Careers URL discovery CLI
 ```
 
-Rules: [`relocation_jobs/RULES.md`](relocation_jobs/RULES.md).
+Rules: [`docs/reference/rules.md`](docs/reference/rules.md).
 
 ### Panel board API
 
 `GET /api/board` returns one page of companies plus metadata. Query params: `page`, `page_size` (max 100, default 25), `country`, `q` (company name search), and the same filter flags as the toolbar (`visa_only`, `hide_applied`, `fetch_problem_only`, etc.). Response includes `companies`, `meta` (`page`, `total_companies`, `total_pages`, `has_more`, …), and lightweight `user_stats`. Pagination is **visible-offset**: the server scans the scoped country catalog, applies flatten + panel filters, skips to the page offset, then fills up to `page_size` rows — so filters affect which companies appear on each page.
+
+**Sort (“Newest first”)** is applied **client-side on the current page only**; the server returns catalog DB order (`country`, `name`). Full flow: [`docs/reference/board.md`](docs/reference/board.md).
 
 ### ATS detection (first run per company)
 
@@ -183,7 +185,7 @@ pytest tests/test_route_manifest.py -o addopts=   # fast route check
 pytest --cov --cov-report=term-missing   # coverage (90% gate on business modules)
 ```
 
-Tests use an in-memory Postgres mock — no live ATS or Postgres in CI. Business rules: `tests/BUSINESS_RULES.md`.
+Tests use an in-memory Postgres mock — no live ATS or Postgres in CI. Business rules: [`docs/reference/business-rules.md`](docs/reference/business-rules.md).
 
 ## Deployment (Render)
 
@@ -212,13 +214,7 @@ docker run --rm -p 8080:10000 \
 
 ## Development
 
-Contributor docs:
-
-- [`.claude/ONBOARDING.md`](.claude/ONBOARDING.md) — **start here** (setup, v2 architecture, skills)
-- [`relocation_jobs/RULES.md`](relocation_jobs/RULES.md) — v2 coding standards
-- [`CLAUDE.md`](CLAUDE.md) — agent-oriented architecture + commands
-- [`tests/BUSINESS_RULES.md`](tests/BUSINESS_RULES.md) — panel job-state rules
-- [`relocation_jobs/PARITY.md`](relocation_jobs/PARITY.md) — parity checklist (complete)
+All contributor docs: **[`docs/README.md`](docs/README.md)**
 
 ## Troubleshooting
 

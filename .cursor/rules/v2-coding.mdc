@@ -6,9 +6,9 @@ alwaysApply: false
 
 # Coding standards
 
-**Start here for new contributors:** [`.claude/ONBOARDING.md`](../../.claude/ONBOARDING.md)  
-**Canonical doc:** `relocation_jobs/RULES.md`  
-**Handoff / violations backlog:** `.claude/V2_CODING_VERDICT.md`
+**Start here for new contributors:** [`docs/contributing.md`](../../docs/contributing.md) · [`docs/README.md`](../../docs/README.md)  
+**Canonical doc:** `docs/reference/rules.md`  
+**Violations backlog:** `docs/archive/v2-coding-verdict.md`
 
 Tests: `pytest tests -o addopts=`. Do not commit unless the user asks.
 

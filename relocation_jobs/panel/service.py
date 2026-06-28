@@ -16,6 +16,29 @@ from relocation_jobs.users.repo import (
 )
 from relocation_jobs.panel.flatten import PanelContext, flatten_company
 from relocation_jobs.panel.types import FlattenFilters
+from relocation_jobs.shared.timestamps import normalize_ts_for_sort
+
+
+def _board_activity_sort_key(row: dict) -> str:
+    ts = (
+        row.get("newest_job_fetched")
+        or row.get("latest_fetched")
+        or row.get("updated")
+        or ""
+    )
+    return normalize_ts_for_sort(str(ts).strip())
+
+
+def _board_name_sort_key(row: dict) -> tuple[str, str]:
+    return (
+        (row.get("country_label") or row.get("country") or "").casefold(),
+        (row.get("name") or "").casefold(),
+    )
+
+
+def _normalize_board_sort(sort: str | None) -> str:
+    key = (sort or "newest").strip().lower()
+    return key if key in ("newest", "name") else "newest"
 
 
 def load_context(user_id: int | None, country_key: str | None = None) -> PanelContext:
@@ -147,6 +170,32 @@ def flatten_companies_page(
     limit: int,
     search: str | None = None,
     count_total: bool = False,
+    sort: str | None = "newest",
+) -> tuple[list[dict], list[dict], int, int | None, bool]:
+    sort_key = _normalize_board_sort(sort)
+    if sort_key == "newest":
+        return _flatten_companies_page_by_activity(
+            filters,
+            visible_offset=visible_offset,
+            limit=limit,
+            search=search,
+        )
+    return _flatten_companies_page_streaming(
+        filters,
+        visible_offset=visible_offset,
+        limit=limit,
+        search=search,
+        count_total=count_total,
+    )
+
+
+def _flatten_companies_page_streaming(
+    filters: FlattenFilters,
+    *,
+    visible_offset: int,
+    limit: int,
+    search: str | None,
+    count_total: bool,
 ) -> tuple[list[dict], list[dict], int, int | None, bool]:
     ctx = load_context(filters.user_id, filters.country_key)
     country_keys = _country_keys_for_filters(filters)
@@ -207,6 +256,58 @@ def flatten_companies_page(
     elif count_total:
         has_more = start + len(companies_out) < visible_index
 
+    return companies_out, file_meta, fetch_problem_count, total_visible, has_more
+
+
+def _flatten_companies_page_by_activity(
+    filters: FlattenFilters,
+    *,
+    visible_offset: int,
+    limit: int,
+    search: str | None,
+) -> tuple[list[dict], list[dict], int, int | None, bool]:
+    ctx = load_context(filters.user_id, filters.country_key)
+    country_keys = _country_keys_for_filters(filters)
+    file_meta = _collect_file_meta(country_keys)
+    search_key = (search or "").strip().lower() or None
+    total_catalog = count_catalog_companies(
+        country_keys,
+        ats_type=filters.ats_type,
+        search=search_key,
+    )
+    fetch_problem_count = count_fetch_problems(country_keys)
+    visible_rows: list[dict] = []
+    catalog_offset = 0
+    batch_size = 50
+
+    while catalog_offset < total_catalog:
+        batch = load_catalog_companies_page(
+            country_keys,
+            offset=catalog_offset,
+            limit=batch_size,
+            ats_type=filters.ats_type,
+            search=search_key,
+        )
+        if not batch:
+            break
+        for country_key, company in batch:
+            label = COUNTRY_LABELS.get(country_key, country_key)
+            row = flatten_company(
+                company,
+                country_key=country_key,
+                country_label=label,
+                filters=filters,
+                ctx=ctx,
+            )
+            if row:
+                visible_rows.append(row)
+        catalog_offset += len(batch)
+
+    visible_rows.sort(key=_board_activity_sort_key, reverse=True)
+    start = max(visible_offset, 0)
+    companies_out = visible_rows[start:start + limit]
+    total_visible = len(visible_rows)
+    has_more = start + len(companies_out) < total_visible
     return companies_out, file_meta, fetch_problem_count, total_visible, has_more
 
 

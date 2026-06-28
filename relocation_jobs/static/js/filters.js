@@ -118,11 +118,11 @@ export function bindFilterBar() {
   syncSelectFromSortCheckbox();
   updateFilterUI();
 
-  $("sortSelect").addEventListener("change", () => {
+  $("sortSelect").addEventListener("change", async () => {
     syncSortFromSelect();
     saveSortPreference();
     releaseCompanyOrder();
-    renderCompanies();
+    await loadBoard({ force: true, page: 1, overlayLabel: "Sorting…" });
   });
 
   $("filterBtn").addEventListener("click", (e) => {

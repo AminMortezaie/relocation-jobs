@@ -11,7 +11,7 @@ import { bindHeaderBar } from "./header.js";
 import { registerFetchActions } from "./fetch-actions.js";
 import { publishFetchUi } from "./fetch-ui.js";
 import { goToBoardPage } from "./board.js";
-import { saveWaitingReferral } from "./api.js";
+import { saveWaitingReferral, markJobSeen } from "./api.js";
 import { toast } from "./utils.js";
 import { resumeFetchIfRunning, syncFetchStateFromServer } from "./scrape.js";
 import {
@@ -25,6 +25,7 @@ import {
 window.relocationJobs = window.relocationJobs || {};
 window.relocationJobs.goToBoardPage = goToBoardPage;
 window.relocationJobs.saveWaitingReferral = saveWaitingReferral;
+window.relocationJobs.markJobSeen = markJobSeen;
 window.relocationJobs.closePanelPopovers = closePanelPopovers;
 window.relocationJobs.toast = toast;
 

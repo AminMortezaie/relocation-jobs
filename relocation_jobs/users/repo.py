@@ -34,7 +34,8 @@ def load_job_tracking(user_id: int, *, country: str | None = None) -> dict[tuple
         SELECT country, company_name, job_url, job_title, ats_score, applied, applied_date,
                not_for_me, not_for_me_date, not_for_me_reason, rejected, rejected_date,
                waiting_referral, waiting_referral_date, referral_linkedin_url,
-               seen, seen_date, looking_to_apply, looking_to_apply_date, updated_at
+               seen, seen_date, looking_to_apply, looking_to_apply_date,
+               pinned, pinned_at, updated_at
         FROM job_tracking WHERE user_id = %s
     """
     params: list = [user_id]
@@ -51,7 +52,8 @@ def load_job_tracking(user_id: int, *, country: str | None = None) -> dict[tuple
 def load_company_tracking(user_id: int, *, country: str | None = None) -> dict[tuple[str, str], dict]:
     sql = """
         SELECT country, company_name, company_applied, company_applied_date,
-               awaiting_response, awaiting_response_date
+               awaiting_response, awaiting_response_date,
+               board_pinned, board_pinned_at
         FROM company_tracking WHERE user_id = %s
     """
     params: list = [user_id]

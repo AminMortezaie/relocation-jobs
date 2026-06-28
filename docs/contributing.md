@@ -123,6 +123,8 @@ db/           v2-only migrations
 
 Job-state changes: read [reference/business-rules.md](reference/business-rules.md) first.
 
+Catalog seed pitfalls (why unrelated tests failed after board sort tests): [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md).
+
 ---
 
 ## Standards (agents)

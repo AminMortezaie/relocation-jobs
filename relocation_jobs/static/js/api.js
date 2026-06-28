@@ -4,6 +4,7 @@ import { findCompany, state, onUnauthorized } from "./state.js";
 import {
   hideJobAsNotForMe,
   patchJobOnBoard,
+  applyPinToCatalog,
   reapplyJobLocally,
   restoreJobToOpen,
   refreshJobBoard,
@@ -20,14 +21,36 @@ async function refreshUserStatsQuiet() {
   await refreshBoardUserStats();
 }
 
-function applyJobMutation(country, company, url, idempotencyKey, data) {
+function applyJobMutation(country, company, url, idempotencyKey, data, { pin = true } = {}) {
   const key = data.idempotency_key || idempotencyKey || "";
   if (patchJobOnBoard(country, company, url, key, data)) {
+    if (pin) void pinJob(country, company, url, key);
     void refreshUserStatsQuiet();
     return true;
   }
   void reloadBoardFallback();
   return false;
+}
+
+export async function pinJob(country, company, url, idempotencyKey = "") {
+  const res = await apiFetch("/api/jobs/pin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      country,
+      company,
+      url,
+      pinned: true,
+      ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
+    }),
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    toast(data.error || "Could not pin role");
+    return false;
+  }
+  applyPinToCatalog(country, company, url, idempotencyKey, data);
+  return true;
 }
 
 export async function apiFetch(url, options = {}) {
@@ -196,6 +219,7 @@ export async function setNotForMe(country, company, url, notForMe, reason = null
     } else {
       restoreJobToOpen(co, url, idempotencyKey);
     }
+    void pinJob(country, company, url, idempotencyKey);
     void refreshUserStatsQuiet();
   } else {
     await reloadBoardFallback();
@@ -336,6 +360,7 @@ export async function reapplyJob(country, company, url) {
   const co = findCompany(country, company);
   if (co) {
     reapplyJobLocally(co, url, data.idempotency_key || "", data);
+    void pinJob(country, company, url, data.idempotency_key || "");
     void refreshUserStatsQuiet();
   } else {
     await reloadBoardFallback();
@@ -388,7 +413,7 @@ export async function toggleLookingToApply(country, company, url, lookingToApply
   return data;
 }
 
-export async function toggleSeen(country, company, url, seen, idempotencyKey = "") {
+export async function toggleSeen(country, company, url, seen, idempotencyKey = "", { pin = true } = {}) {
   const res = await apiFetch("/api/jobs/seen", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -405,13 +430,12 @@ export async function toggleSeen(country, company, url, seen, idempotencyKey = "
     toast(data.error || "Could not update saw-before tag");
     return null;
   }
-  applyJobMutation(country, company, url, idempotencyKey, data);
+  applyJobMutation(country, company, url, idempotencyKey, data, { pin });
   return data;
 }
 
 export async function markJobSeen(country, company, url, idempotencyKey = "") {
-  const result = await toggleSeen(country, company, url, true, idempotencyKey);
-  return result;
+  return toggleSeen(country, company, url, true, idempotencyKey, { pin: false });
 }
 
 export async function addCompany(payload) {

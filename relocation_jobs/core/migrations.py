@@ -91,6 +91,7 @@ def _migrate_schema(conn) -> None:
     run_migration_once(conn, "job_status_events_table_v1", _ensure_status_events_table)
     run_migration_once(conn, "job_status_events_backfill_v1", _backfill_job_status_events)
     run_migration_once(conn, "company_tracking_columns_v1", _migrate_company_tracking_schema)
+    run_migration_once(conn, "board_pin_columns_v1", _migrate_board_pin_columns)
     run_migration_once(conn, "fetch_runs_table_v1", _ensure_fetch_runs_table)
     run_migration_once(conn, "fetch_runs_live_state_v1", _migrate_fetch_runs_live_state)
     run_migration_once(conn, "users_admin_column_v1", _ensure_users_admin_column)
@@ -169,6 +170,21 @@ def _migrate_company_tracking_schema(conn) -> None:
         ALTER TABLE company_tracking
         ADD COLUMN IF NOT EXISTS awaiting_response_date TEXT
         """
+    )
+
+
+def _migrate_board_pin_columns(conn) -> None:
+    conn.execute(
+        "ALTER TABLE job_tracking ADD COLUMN IF NOT EXISTS pinned INTEGER NOT NULL DEFAULT 0"
+    )
+    conn.execute(
+        "ALTER TABLE job_tracking ADD COLUMN IF NOT EXISTS pinned_at TEXT"
+    )
+    conn.execute(
+        "ALTER TABLE company_tracking ADD COLUMN IF NOT EXISTS board_pinned INTEGER NOT NULL DEFAULT 0"
+    )
+    conn.execute(
+        "ALTER TABLE company_tracking ADD COLUMN IF NOT EXISTS board_pinned_at TEXT"
     )
 
 

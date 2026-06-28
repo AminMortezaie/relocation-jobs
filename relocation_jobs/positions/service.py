@@ -172,6 +172,23 @@ def set_job_seen(
     return _validated(_with_catalog_url(result, job.get("url", "")))
 
 
+def set_job_pinned(
+    country_key: str,
+    company_name: str,
+    job_url: str,
+    pinned: bool = True,
+    *,
+    user_id: int,
+) -> dict:
+    job = _require_catalog_job(country_key, company_name, job_url)
+    storage_url = _catalog_url(job, job_url)
+    result = repo.set_job_pinned(
+        user_id, country_key, company_name, storage_url, pinned,
+        job_title=job.get("title", ""),
+    )
+    return _validated(_with_catalog_url(result, job.get("url", "")))
+
+
 def set_job_not_for_me(
     country_key: str,
     company_name: str,

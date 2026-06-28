@@ -115,11 +115,21 @@ function isFetchingCompany(company) {
   return state.fetchBusy && state.fetchingCompanyKey === companySortKey(company);
 }
 
+function isPinnedCompany(company) {
+  return Boolean(company.board_pinned);
+}
+
+function comparePriorityCompanies(a, b) {
+  const aPri = isFetchingCompany(a) || isPinnedCompany(a);
+  const bPri = isFetchingCompany(b) || isPinnedCompany(b);
+  if (aPri !== bPri) return aPri ? -1 : 1;
+  return 0;
+}
+
 function compareCompaniesDefault(a, b) {
+  const priority = comparePriorityCompanies(a, b);
+  if (priority !== 0) return priority;
   if ($("sortNewestFetch").checked) {
-    const aFetching = isFetchingCompany(a);
-    const bFetching = isFetchingCompany(b);
-    if (aFetching !== bFetching) return aFetching ? -1 : 1;
     return compareDateDesc(companyActivityTs(a), companyActivityTs(b));
   }
   const byCountry = (a.country_label || a.country || "").localeCompare(
@@ -138,9 +148,8 @@ function serverBoardOrderMap() {
 }
 
 function compareCompaniesNewest(a, b, serverOrder) {
-  const aFetching = isFetchingCompany(a);
-  const bFetching = isFetchingCompany(b);
-  if (aFetching !== bFetching) return aFetching ? -1 : 1;
+  const priority = comparePriorityCompanies(a, b);
+  if (priority !== 0) return priority;
   const ai = serverOrder.get(companySortKey(a));
   const bi = serverOrder.get(companySortKey(b));
   if (ai != null && bi != null) return ai - bi;
@@ -212,11 +221,17 @@ export function filterCompanies() {
 export function getDisplayCompanies() {
   const filtered = applyPanelFilters(filterCompanies());
   if (!$("sortNewestFetch")?.checked) {
-    return sortCompaniesList(filtered);
+    return [...filtered].sort((a, b) => {
+      const priority = comparePriorityCompanies(a, b);
+      if (priority !== 0) return priority;
+      return compareCompaniesDefault(a, b);
+    });
   }
   const serverOrder = serverBoardOrderMap();
   const frozen = state.frozenCompanyOrder;
   return [...filtered].sort((a, b) => {
+    const priority = comparePriorityCompanies(a, b);
+    if (priority !== 0) return priority;
     if (frozen) {
       const ai = frozen.get(companySortKey(a));
       const bi = frozen.get(companySortKey(b));

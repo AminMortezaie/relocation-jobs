@@ -1400,6 +1400,10 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .position-side {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
 }
 
 .position-card.position-applied {
@@ -1618,6 +1622,46 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border-color: rgba(148, 163, 184, 0.55);
   background: rgba(148, 163, 184, 0.18);
   color: #cbd5e1;
+}
+
+.pin-job-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+}
+
+.pin-job-btn:hover:not(:disabled) {
+  background: var(--surface2);
+  border-color: var(--border-strong);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.pin-job-btn.is-pinned {
+  border-color: rgba(251, 191, 36, 0.45);
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+
+.pin-job-btn.is-pinned:hover:not(:disabled) {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.55);
+  color: #fcd34d;
+}
+
+.pin-job-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .applied-btn:disabled,
@@ -4699,6 +4743,14 @@ body.scroll-locked {
 
   .position-side {
     align-self: flex-start;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .pin-job-btn {
+    width: 2rem;
+    height: 2rem;
   }
 
   .position-actions {

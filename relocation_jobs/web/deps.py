@@ -9,6 +9,7 @@ set_job_waiting_referral = positions.set_job_waiting_referral
 set_job_not_for_me = positions.set_job_not_for_me
 set_job_looking_to_apply = positions.set_job_looking_to_apply
 set_job_seen = positions.set_job_seen
+set_job_pinned = positions.set_job_pinned
 reconcile_wrong_location_hides = positions.reconcile_wrong_location_hides
 
 add_company = companies.add_company

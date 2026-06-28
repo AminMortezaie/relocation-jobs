@@ -32,7 +32,7 @@ Pydantic models live in `relocation_jobs/schemas/`. Postgres JSON/JSONB columns 
 }
 ```
 
-`panel/flatten.py` merges catalog jobs with per-user tracking and routes each job into exactly one bucket: `jobs`, `rejected_jobs`, or `not_for_me_jobs`.
+`panel/flatten.py` merges catalog jobs with per-user tracking and routes each job into exactly one bucket: `jobs`, `rejected_jobs`, or `not_for_me_jobs`. See [catalog-pattern.md](catalog-pattern.md) for why catalog and tracking are separate stores.
 
 ## Service inputs
 

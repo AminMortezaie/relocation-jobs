@@ -2,6 +2,13 @@ function hasAtsScore(job) {
   return job?.ats_score != null && job?.ats_score !== "";
 }
 
+function sortPinnedJobsFirst(jobs) {
+  if (!jobs?.length) return jobs || [];
+  const pinned = jobs.filter((job) => job.pinned);
+  const rest = jobs.filter((job) => !job.pinned);
+  return [...pinned, ...rest];
+}
+
 export function sortJobsForDisplay(jobs) {
   const list = jobs || [];
   if (!list.length) return list;
@@ -14,5 +21,5 @@ export function sortJobsForDisplay(jobs) {
   }
 
   scored.sort((a, b) => Number(b.ats_score) - Number(a.ats_score));
-  return [...scored, ...unscored];
+  return sortPinnedJobsFirst([...scored, ...unscored]);
 }

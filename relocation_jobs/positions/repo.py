@@ -305,6 +305,116 @@ def set_seen(
     )
 
 
+def set_job_pinned(
+    user_id: int,
+    country: str,
+    company_name: str,
+    job_url: str,
+    pinned: bool = True,
+    *,
+    job_title: str = "",
+) -> dict:
+    canonical_url = _normalize_url(job_url)
+    now = _utc_now()
+    with db_transaction() as conn:
+        storage_url = resolve_tracking_url(
+            conn, user_id, country, company_name, canonical_url,
+        )
+        if pinned:
+            conn.execute(
+                """
+                UPDATE company_tracking
+                SET board_pinned = 0, board_pinned_at = NULL, updated_at = %s
+                WHERE user_id = %s AND country = %s AND board_pinned = 1
+                """,
+                (now, user_id, country),
+            )
+            conn.execute(
+                """
+                INSERT INTO company_tracking (
+                    user_id, country, company_name, board_pinned, board_pinned_at, updated_at
+                ) VALUES (%s, %s, %s, 1, %s, %s)
+                ON CONFLICT (user_id, country, company_name) DO UPDATE SET
+                    board_pinned = 1,
+                    board_pinned_at = EXCLUDED.board_pinned_at,
+                    updated_at = EXCLUDED.updated_at
+                """,
+                (user_id, country, company_name, now, now),
+            )
+            conn.execute(
+                """
+                UPDATE job_tracking
+                SET pinned = 0, pinned_at = NULL, updated_at = %s
+                WHERE user_id = %s AND country = %s AND company_name = %s AND pinned = 1
+                """,
+                (now, user_id, country, company_name),
+            )
+            conn.execute(
+                """
+                INSERT INTO job_tracking (
+                    user_id, country, company_name, job_url, job_title,
+                    pinned, pinned_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, 1, %s, %s)
+                ON CONFLICT (user_id, country, company_name, job_url) DO UPDATE SET
+                    pinned = 1,
+                    pinned_at = COALESCE(job_tracking.pinned_at, EXCLUDED.pinned_at),
+                    job_title = COALESCE(NULLIF(EXCLUDED.job_title, ''), job_tracking.job_title),
+                    updated_at = EXCLUDED.updated_at
+                """,
+                (
+                    user_id, country, company_name, storage_url, (job_title or "").strip(),
+                    now, now,
+                ),
+            )
+            if storage_url != canonical_url:
+                conn.execute(
+                    """
+                    INSERT INTO job_tracking (
+                        user_id, country, company_name, job_url, job_title,
+                        pinned, pinned_at, updated_at
+                    ) VALUES (%s, %s, %s, %s, %s, 1, %s, %s)
+                    ON CONFLICT (user_id, country, company_name, job_url) DO UPDATE SET
+                        pinned = 1,
+                        pinned_at = COALESCE(job_tracking.pinned_at, EXCLUDED.pinned_at),
+                        job_title = COALESCE(NULLIF(EXCLUDED.job_title, ''), job_tracking.job_title),
+                        updated_at = EXCLUDED.updated_at
+                    """,
+                    (
+                        user_id, country, company_name, canonical_url, (job_title or "").strip(),
+                        now, now,
+                    ),
+                )
+        else:
+            for url in tracking_urls_for_job(
+                conn, user_id, country, company_name, canonical_url,
+            ):
+                conn.execute(
+                    """
+                    UPDATE job_tracking
+                    SET pinned = 0, pinned_at = NULL, updated_at = %s
+                    WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                    """,
+                    (now, user_id, country, company_name, url),
+                )
+            conn.execute(
+                """
+                UPDATE company_tracking
+                SET board_pinned = 0, board_pinned_at = NULL, updated_at = %s
+                WHERE user_id = %s AND country = %s AND company_name = %s
+                """,
+                (now, user_id, country, company_name),
+            )
+    return _base_result(
+        company_name,
+        storage_url,
+        country,
+        pinned=pinned,
+        pinned_at=now if pinned else "",
+        board_pinned=pinned,
+        board_pinned_at=now if pinned else "",
+    )
+
+
 def set_waiting_referral(
     user_id: int,
     country: str,

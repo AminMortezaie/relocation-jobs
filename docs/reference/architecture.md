@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-06-26
 
-v2 layout and data flow. Setup: [contributing.md](../contributing.md). Board details: [board.md](board.md).
+v2 layout and data flow. Setup: [contributing.md](../contributing.md). Board details: [board.md](board.md). Catalog vs user state: [catalog-pattern.md](catalog-pattern.md).
 
 ---
 

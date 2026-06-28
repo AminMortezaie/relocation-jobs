@@ -102,6 +102,8 @@ class JobStatusUpdate(BaseSchema):
     applied: bool | None = None
     rejected: bool | None = None
     seen: bool | None = None
+    pinned: bool | None = None
+    board_pinned: bool | None = None
     not_for_me: bool | None = None
     looking_to_apply: bool | None = None
     waiting_referral: bool | None = None

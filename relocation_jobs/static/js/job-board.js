@@ -27,6 +27,8 @@ const JOB_PATCH_FIELDS = [
   "rejected_history",
   "url",
   "idempotency_key",
+  "pinned",
+  "pinned_at",
 ];
 
 function jobMatches(job, url, idempotencyKey = "") {
@@ -137,6 +139,82 @@ function evictCompanyIfHidden(company) {
 
 export function refreshJobBoard() {
   applyBoardView();
+}
+
+const JOB_BUCKETS = ["jobs", "rejected_jobs", "not_for_me_jobs", "hidden_jobs"];
+
+function sortPinnedJobsFirst(jobs) {
+  if (!jobs?.length) return jobs || [];
+  const pinned = jobs.filter((job) => job.pinned);
+  const rest = jobs.filter((job) => !job.pinned);
+  return [...pinned, ...rest];
+}
+
+function jobMatchesPinTarget(job, url, idempotencyKey, data) {
+  const key = (data.idempotency_key || idempotencyKey || "").trim();
+  const jobKey = (job?.idempotency_key || "").trim();
+  if (key && jobKey && key === jobKey) return true;
+  const probe = { jobs: [job] };
+  if (findJobInCompany(probe, url, idempotencyKey) === job) return true;
+  if (data.url && findJobInCompany(probe, data.url, key) === job) return true;
+  return false;
+}
+
+function pinJobToTopOfCompany(company, url, idempotencyKey = "") {
+  const found = findJobBucket(company, url, idempotencyKey);
+  if (!found) return;
+  const idx = found.list.indexOf(found.job);
+  if (idx <= 0) return;
+  found.list.splice(idx, 1);
+  found.list.unshift(found.job);
+}
+
+/** Apply persisted pin state to the in-memory board catalog. */
+export function applyPinToCatalog(country, companyName, url, idempotencyKey, data) {
+  const scopeCountry = (data.country || country || "").trim();
+  const targetCompany = data.company || companyName;
+  const pinned = Boolean(data.pinned);
+  const boardPinned = Boolean(data.board_pinned);
+
+  for (const company of state.boardCatalog) {
+    if (company.country !== scopeCountry) continue;
+    const isTarget = company.name === targetCompany;
+    company.board_pinned = isTarget && boardPinned;
+    company.board_pinned_at = company.board_pinned ? (data.board_pinned_at || "") : "";
+    for (const bucket of JOB_BUCKETS) {
+      const list = company[bucket];
+      if (!Array.isArray(list)) continue;
+      for (const job of list) {
+        if (!isTarget) {
+          if (job.pinned) {
+            job.pinned = false;
+            job.pinned_at = "";
+          }
+          continue;
+        }
+        const isPinnedJob = pinned && jobMatchesPinTarget(job, url, idempotencyKey, data);
+        job.pinned = isPinnedJob;
+        job.pinned_at = isPinnedJob ? (data.pinned_at || "") : "";
+      }
+      company[bucket] = sortPinnedJobsFirst(list);
+    }
+    if (isTarget && pinned) {
+      pinJobToTopOfCompany(company, url, idempotencyKey);
+    }
+  }
+
+  if (boardPinned) {
+    const idx = state.boardCatalog.findIndex(
+      (c) => c.country === scopeCountry && c.name === targetCompany,
+    );
+    if (idx > 0) {
+      const [row] = state.boardCatalog.splice(idx, 1);
+      state.boardCatalog.unshift(row);
+    }
+  }
+  state.allCompanies = state.boardCatalog;
+  applyBoardView();
+  return true;
 }
 
 export function finalizeCompanyBoard(company) {

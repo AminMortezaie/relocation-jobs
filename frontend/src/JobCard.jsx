@@ -9,6 +9,7 @@ import {
 import { notForMeReasonMeta } from "./constants";
 import AtsScoreWidget from "./widgets/AtsScoreWidget";
 import HideReasonPicker from "./widgets/HideReasonPicker";
+import PinJobButton from "./widgets/PinJobButton";
 import ReferralWidget from "./widgets/ReferralWidget";
 
 function JobCityBadge({ job }) {
@@ -17,16 +18,46 @@ function JobCityBadge({ job }) {
   return <span className="badge job-city">{label}</span>;
 }
 
-function TitleRow({ job }) {
+function TitleRow({ job, onOpen }) {
   return (
     <div className="position-title-row">
-      <a className="job-title" href={job.url} target="_blank" rel="noopener noreferrer">{job.title}</a>
+      <a
+        className="job-title"
+        href={job.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => onOpen?.()}
+      >
+        {job.title}
+      </a>
       <JobCityBadge job={job} />
     </div>
   );
 }
 
-function OpenJobCard({ job }) {
+function PositionSide({ job }) {
+  return (
+    <div className="position-side">
+      <PinJobButton pinned={Boolean(job.pinned)} />
+      <AtsScoreWidget job={job} />
+    </div>
+  );
+}
+
+function markSeenOnOpen(job, company) {
+  const country = (job.country || company?.country || "").trim();
+  const companyName = (job.company || company?.name || "").trim();
+  const url = (job.url || "").trim();
+  if (!country || country === "all" || !companyName || !url) return;
+  void window.relocationJobs?.markJobSeen?.(
+    country,
+    companyName,
+    url,
+    job.idempotency_key || "",
+  );
+}
+
+function OpenJobCard({ job, company }) {
   const appliedHistory = job.applied_history || [];
   const appliedEvents = job.applied_events || [];
   const latestApplied = newestStatusDate(appliedHistory, job.applied_date || "");
@@ -49,7 +80,7 @@ function OpenJobCard({ job }) {
     >
       <div className="position-top">
         <div className="position-head">
-          <TitleRow job={job} />
+          <TitleRow job={job} onOpen={() => markSeenOnOpen(job, company)} />
           <div className="position-badges">
             {job.visa_sponsorship === true ? <span className="badge visa">Visa / relocation</span> : null}
             {job.applied ? (
@@ -81,7 +112,7 @@ function OpenJobCard({ job }) {
             <span className="badge date">{formatActivityBadge(jobActivityTs(job))}</span>
           </div>
         </div>
-        <div className="position-side"><AtsScoreWidget job={job} /></div>
+        <PositionSide job={job} />
       </div>
       <div className="position-actions">
         {job.applied ? (
@@ -115,7 +146,7 @@ function OpenJobCard({ job }) {
   );
 }
 
-function RejectedJobCard({ job }) {
+function RejectedJobCard({ job, company }) {
   const rejectedHistory = job.rejected_history || [];
   const appliedHistory = job.applied_history || [];
   const appliedEvents = job.applied_events || [];
@@ -135,7 +166,7 @@ function RejectedJobCard({ job }) {
     >
       <div className="position-top">
         <div className="position-head">
-          <TitleRow job={job} />
+          <TitleRow job={job} onOpen={() => markSeenOnOpen(job, company)} />
           <div className="position-badges">
             <span className="badge rejected" title={rejectedTitle ? `Rejected on: ${rejectedTitle}` : undefined}>{rejectedLabel}</span>
             {latestApplied ? (
@@ -146,7 +177,7 @@ function RejectedJobCard({ job }) {
             <span className="badge date">{formatActivityBadge(jobActivityTs(job))}</span>
           </div>
         </div>
-        <div className="position-side"><AtsScoreWidget job={job} /></div>
+        <PositionSide job={job} />
       </div>
       <div className="position-actions">
         <button type="button" className="reapply-btn" title="Return to open positions so you can apply again">Reapply</button>
@@ -155,7 +186,7 @@ function RejectedJobCard({ job }) {
   );
 }
 
-function NotForMeJobCard({ job }) {
+function NotForMeJobCard({ job, company }) {
   const taggedDate = job.not_for_me_date ? ` · ${job.not_for_me_date}` : "";
   const { label: hideLabel, badgeCls: hideBadgeCls } = notForMeReasonMeta(job.not_for_me_reason);
 
@@ -165,17 +196,18 @@ function NotForMeJobCard({ job }) {
       data-country={job.country}
       data-company={job.company}
       data-url={job.url}
+      data-idempotency-key={job.idempotency_key || ""}
     >
       <div className="position-top">
         <div className="position-head">
-          <TitleRow job={job} />
+          <TitleRow job={job} onOpen={() => markSeenOnOpen(job, company)} />
           <div className="position-badges">
             <span className={`badge ${hideBadgeCls}`}>{hideLabel}{taggedDate}</span>
             {job.visa_sponsorship === true ? <span className="badge visa">Visa / relocation</span> : null}
             <span className="badge date">{formatActivityBadge(jobActivityTs(job))}</span>
           </div>
         </div>
-        <div className="position-side"><AtsScoreWidget job={job} /></div>
+        <PositionSide job={job} />
       </div>
       <div className="position-actions">
         <HideReasonPicker currentReason={job.not_for_me_reason || "not_for_me"} />
@@ -185,10 +217,10 @@ function NotForMeJobCard({ job }) {
   );
 }
 
-function JobCard({ job, variant }) {
-  if (variant === "rejected") return <RejectedJobCard job={job} />;
-  if (variant === "not_for_me") return <NotForMeJobCard job={job} />;
-  return <OpenJobCard job={job} />;
+function JobCard({ job, company, variant }) {
+  if (variant === "rejected") return <RejectedJobCard job={job} company={company} />;
+  if (variant === "not_for_me") return <NotForMeJobCard job={job} company={company} />;
+  return <OpenJobCard job={job} company={company} />;
 }
 
 export default memo(JobCard);

@@ -181,3 +181,19 @@ def register(app):
             return jsonify({"ok": True, **result})
         except LookupError as e:
             return jsonify({"error": str(e)}), 404
+
+    @app.patch("/api/jobs/pin")
+    @app.post("/api/jobs/pin")
+    @login_required
+    def api_jobs_pin():
+        body = request.get_json(silent=True) or {}
+        if err := job_mutation_error(body):
+            return err
+        country, company, url = job_mutation_fields(body)
+        try:
+            result = deps.set_job_pinned(
+                country, company, url, bool(body.get("pinned", True)), user_id=g.user_id,
+            )
+            return jsonify({"ok": True, **result})
+        except LookupError as e:
+            return jsonify({"error": str(e)}), 404

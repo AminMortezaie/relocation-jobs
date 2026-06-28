@@ -14,6 +14,8 @@ class JobStatusUpdate(BaseSchema):
     applied: Optional[bool] = Field(None, description="Current applied status")
     rejected: Optional[bool] = Field(None, description="Current rejected status")
     seen: Optional[bool] = Field(None, description="Current seen status")
+    pinned: Optional[bool] = Field(None, description="Current pinned status")
+    board_pinned: Optional[bool] = Field(None, description="Company pinned on board")
     not_for_me: Optional[bool] = Field(None, description="Current not-for-me status")
     looking_to_apply: Optional[bool] = Field(None, description="Current looking-to-apply status")
     waiting_referral: Optional[bool] = Field(None, description="Current waiting-referral status")

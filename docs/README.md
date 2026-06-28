@@ -1,6 +1,6 @@
 # Documentation
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-06-28
 
 All project docs live under `docs/`. [README](../README.md) at the repo root covers product setup and usage only.
 
@@ -16,7 +16,9 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Change Python in `relocation_jobs/` | [reference/rules.md](reference/rules.md) |
 | Change job apply / reject / hide behavior | [reference/business-rules.md](reference/business-rules.md) |
 | Work on board sort, pagination, newest | [reference/board.md](reference/board.md) |
+| Catalog vs per-user tracking (design) | [reference/catalog-pattern.md](reference/catalog-pattern.md) |
 | Panel / admin statistics | [reference/stats.md](reference/stats.md) |
+| Test failures / catalog seed in tests | [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md) |
 | Agent commands cheat sheet | [CLAUDE.md](../CLAUDE.md) |
 
 ---
@@ -36,6 +38,8 @@ docs/
     rules.md                  v2 coding standards (SQL in repo.py)
     schemas.md                Pydantic models, catalog shape
     parity.md                 v1 vs v2 checklist (complete)
+    catalog-pattern.md        shared catalog + per-user overlay (design)
+    catalog-seed-test-failure.md  post-mortem: pytest pollution after board sort tests
   operations/
     aws-postgres.md           AWS EC2 Postgres, Render DATABASE_URL
   archive/                    historical handoffs — read only if debugging old work
@@ -72,6 +76,7 @@ Agent skills: `.claude/skills/` (`getting-started` → `collaboration-style` →
 | Doc | Purpose |
 |-----|---------|
 | [reference/schemas.md](reference/schemas.md) | Pydantic models and catalog envelope |
+| [reference/catalog-pattern.md](reference/catalog-pattern.md) | Shared catalog vs per-user overlay |
 | [reference/parity.md](reference/parity.md) | v1 removal / cutover status |
 
 ### Operations

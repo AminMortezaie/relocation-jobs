@@ -102,6 +102,7 @@ Names should state **what** and **when**, not generic verbs.
 
 - **`pytest tests`** during application work.
 - **`tests/<domain>/`** mirrors domains; seed via `tests/helpers/seed.py`.
+- **`seed_country()`** must sync the full fixture (`save_country_catalog`) — see [catalog-seed-test-failure.md](catalog-seed-test-failure.md).
 - Map position/panel behavior to [`business-rules.md`](business-rules.md).
 - Business rules for catalog board sync: `tests/catalog/test_repo.py`.
 

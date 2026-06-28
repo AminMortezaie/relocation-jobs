@@ -7,6 +7,7 @@ from relocation_jobs.positions.service import (
     set_job_reapply,
     set_job_rejected,
     set_job_seen,
+    set_job_pinned,
     set_job_waiting_referral,
 )
 from relocation_jobs.positions.state import (
@@ -43,5 +44,6 @@ __all__ = [
     "set_job_reapply",
     "set_job_rejected",
     "set_job_seen",
+    "set_job_pinned",
     "set_job_waiting_referral",
 ]

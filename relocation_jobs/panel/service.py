@@ -24,6 +24,14 @@ def _board_activity_sort_key(row: dict) -> str:
     return normalize_ts_for_sort(str(ts).strip())
 
 
+def _sort_board_page_rows(rows: list[dict]) -> None:
+    pinned = [row for row in rows if row.get("board_pinned")]
+    rest = [row for row in rows if not row.get("board_pinned")]
+    pinned.sort(key=lambda row: row.get("board_pinned_at") or "", reverse=True)
+    rest.sort(key=_board_activity_sort_key, reverse=True)
+    rows[:] = pinned + rest
+
+
 def _board_name_sort_key(row: dict) -> tuple[str, str]:
     return (
         (row.get("country_label") or row.get("country") or "").casefold(),
@@ -298,7 +306,7 @@ def _flatten_companies_page_by_activity(
                 visible_rows.append(row)
         catalog_offset += len(batch)
 
-    visible_rows.sort(key=_board_activity_sort_key, reverse=True)
+    _sort_board_page_rows(visible_rows)
     start = max(visible_offset, 0)
     companies_out = visible_rows[start:start + limit]
     total_visible = len(visible_rows)

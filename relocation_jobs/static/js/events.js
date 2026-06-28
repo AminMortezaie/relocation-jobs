@@ -15,6 +15,7 @@ import {
   toggleLookingToApply,
   toggleCompanyAwaitingResponse,
 } from "./api.js";
+import { pinJob } from "./api.js";
 import { loadJobs, loadCities, ensureLocationsLoaded } from "./data.js";
 import { loadBoard } from "./board.js";
 import {
@@ -324,6 +325,20 @@ function toggleHideReasonPopover(wrap) {
   }
 }
 
+function clickTargetElement(target) {
+  return target instanceof Element ? target : target?.parentElement ?? null;
+}
+
+function markSeenFromPositionCard(card) {
+  if (!card) return;
+  const companyCard = card.closest(".company-card");
+  let country = card.dataset.country || companyCard?.dataset.country || "";
+  let company = card.dataset.company || companyCard?.dataset.company || "";
+  const { url, idempotencyKey } = card.dataset;
+  if (!country || country === "all" || !company || !url) return;
+  void markJobSeen(country, company, url, idempotencyKey || "");
+}
+
 function bindHideReasonPopoverEvents() {
   document.addEventListener("click", async (e) => {
     const hideReasonTrigger = e.target.closest(".hide-reason-trigger");
@@ -622,13 +637,10 @@ function bindJobsListEvents() {
       return;
     }
 
-    const jobTitleLink = e.target.closest(".job-title");
+    const jobTitleLink = clickTargetElement(e.target)?.closest(".job-title");
     if (jobTitleLink) {
       const card = jobTitleLink.closest(".position-card");
-      if (card && card.dataset.country && card.dataset.country !== "all") {
-        const { country, company, url, idempotencyKey } = card.dataset;
-        markJobSeen(country, company, url, idempotencyKey);
-      }
+      if (card) markSeenFromPositionCard(card);
       return;
     }
 
@@ -693,6 +705,17 @@ function bindJobsListEvents() {
       const result = await toggleSeen(country, company, url, seen, idempotencyKey);
       sawBeforeBtn.disabled = false;
       if (!result) return;
+      return;
+    }
+
+    const pinJobBtn = e.target.closest(".pin-job-btn");
+    if (pinJobBtn) {
+      const card = pinJobBtn.closest(".position-card");
+      if (!card) return;
+      const { country, company, url, idempotencyKey } = card.dataset;
+      if (await pinJob(country, company, url, idempotencyKey)) {
+        toast("Pinned to top");
+      }
       return;
     }
 

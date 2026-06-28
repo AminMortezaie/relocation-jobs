@@ -226,6 +226,15 @@ def partition_stored_jobs(
     return jobs, not_for_me_jobs, rejected_jobs, positions_not_for_me, positions_hidden_by_visa
 
 
+def sort_pinned_jobs_first(jobs: list[dict]) -> list[dict]:
+    if not jobs:
+        return jobs
+    pinned = [job for job in jobs if job.get("pinned")]
+    rest = [job for job in jobs if not job.get("pinned")]
+    pinned.sort(key=lambda job: (job.get("pinned_at") or ""), reverse=True)
+    return pinned + rest
+
+
 def _append_tracked_orphans(
     jobs: list[dict],
     rejected_jobs: list[dict],
@@ -336,6 +345,8 @@ def _company_header_state(
     track = company_tracking.get((country_key, company_name), {})
     awaiting = bool(track.get("awaiting_response")) if user_id else False
     awaiting_date = (track.get("awaiting_response_date") or "").strip() if awaiting and user_id else ""
+    board_pinned = bool(track.get("board_pinned")) if user_id else False
+    board_pinned_at = (track.get("board_pinned_at") or "").strip() if board_pinned and user_id else ""
     return {
         "company_applied": applied,
         "company_applied_date": applied_date,
@@ -343,6 +354,8 @@ def _company_header_state(
         "company_applied_at": applied_at,
         "awaiting_response": awaiting,
         "awaiting_response_date": awaiting_date,
+        "board_pinned": board_pinned,
+        "board_pinned_at": board_pinned_at,
     }
 
 
@@ -421,9 +434,11 @@ def _build_company_row(
         "company_applied_at": header["company_applied_at"],
         "awaiting_response": header["awaiting_response"],
         "awaiting_response_date": header["awaiting_response_date"],
-        "jobs": jobs,
-        "not_for_me_jobs": not_for_me_jobs,
-        "rejected_jobs": rejected_jobs,
+        "board_pinned": header.get("board_pinned", False),
+        "board_pinned_at": header.get("board_pinned_at", ""),
+        "jobs": sort_pinned_jobs_first(jobs),
+        "not_for_me_jobs": sort_pinned_jobs_first(not_for_me_jobs),
+        "rejected_jobs": sort_pinned_jobs_first(rejected_jobs),
         "job_count": len(jobs),
         "stored_job_count": stored_job_count,
         "positions_applied": positions_applied,

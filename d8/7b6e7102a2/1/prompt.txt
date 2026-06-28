@@ -51,3 +51,7 @@ write down an article about your design on Catalog which is a known pattern in d
 ---
 
 how to run the tests completely on pipeline?
+
+---
+
+add a pipeline to run the tests before push and if failed reject the push

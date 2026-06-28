@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "542f9f673c23",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "files_touched": [
+    "docs/README.md",
+    "docs/reference/board.md",
+    "docs/reference/stats.md",
+    "frontend/src/format.js",
+    "relocation_jobs/fetch/repo.py",
+    "relocation_jobs/panel/flatten.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/panel/stats.py",
+    "relocation_jobs/scrape/enrich.py",
+    "relocation_jobs/scrape/merge.py",
+    "relocation_jobs/shared/timestamps.py",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/board-filter.js",
+    "relocation_jobs/static/js/job-board.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/stats-dashboard.js",
+    "relocation_jobs/users/applied.py",
+    "relocation_jobs/web/routes/board.py",
+    "tests/scrape/test_enrich.py",
+    "tests/scrape/test_merge.py",
+    "tests/shared/test_timestamps.py",
+    "tests/web/test_board_api.py",
+    "tests/web/test_catalog_api.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/54/2f9f673c23/0/metadata.json",
+      "transcript": "/54/2f9f673c23/0/full.jsonl",
+      "content_hash": "/54/2f9f673c23/0/content_hash.txt",
+      "prompt": "/54/2f9f673c23/0/prompt.txt"
+    }
+  ]
+}

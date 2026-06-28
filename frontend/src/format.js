@@ -71,5 +71,5 @@ export function jobActivityTs(job) {
 }
 
 export function companyActivityTs(company) {
-  return (company?.latest_fetched || company?.updated || "").trim();
+  return (company?.newest_job_fetched || company?.latest_fetched || "").trim();
 }

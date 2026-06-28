@@ -63,3 +63,79 @@ def test_admin_panel_stats(v2_auth_client, seeded_catalog_v2):
     assert stats["total_jobs"] == 2
     assert stats["companies_with_jobs"] == 1
     assert "positions_applied" in stats
+    assert "not_for_me" not in stats
+
+
+def test_admin_panel_stats_open_roles_exclude_applied_and_not_for_me(
+    v2_auth_client, seeded_catalog_v2,
+):
+    from relocation_jobs.positions import set_job_not_for_me
+
+    listing = v2_auth_client.get("/api/jobs?country=uk").get_json()
+    company = listing["companies"][0]["name"]
+    jobs = listing["companies"][0]["jobs"]
+
+    set_job_not_for_me("uk", company, jobs[0]["url"], user_id=1, not_for_me=True)
+    v2_auth_client.post(
+        "/api/jobs/applied",
+        json={
+            "country": "uk",
+            "company": company,
+            "url": jobs[1]["url"],
+            "applied": True,
+        },
+    )
+
+    stats = v2_auth_client.get("/api/admin/panel-stats?country=uk&timezone=UTC").get_json()
+    assert stats["total_jobs"] == 0
+    assert stats["companies_with_jobs"] == 0
+    assert stats["positions_applied"] == 1
+
+
+def test_admin_panel_stats_new_jobs_today_from_fetch_runs(v2_auth_client, seeded_catalog_v2):
+    from datetime import datetime, timezone
+
+    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.fetch import repo as fetch_repo
+
+    user_id = get_user_by_username("admin")["id"]
+    now = datetime.now(timezone.utc).replace(microsecond=0)
+    started = now.isoformat()
+    finished = now.isoformat()
+    run_id = int(fetch_repo.create_fetch_run(
+        user_id=user_id,
+        country="uk",
+        company_name=None,
+        file_name="uk.json",
+        concurrency=1,
+        started_at=started,
+    )["id"])
+    fetch_repo.finalize_fetch_run(
+        run_id,
+        finished_at=finished,
+        exit_code=0,
+        new_jobs=4,
+        companies_done=1,
+        companies_total=1,
+        result_line="Done",
+    )
+    run_id = int(fetch_repo.create_fetch_run(
+        user_id=user_id,
+        country="uk",
+        company_name="Acme Backend Ltd",
+        file_name="uk.json",
+        concurrency=1,
+        started_at=started,
+    )["id"])
+    fetch_repo.finalize_fetch_run(
+        run_id,
+        finished_at=finished,
+        exit_code=0,
+        new_jobs=2,
+        companies_done=1,
+        companies_total=1,
+        result_line="Done",
+    )
+
+    stats = v2_auth_client.get("/api/admin/panel-stats?country=uk&timezone=UTC").get_json()
+    assert stats["latest_fetch_new_jobs"] == 6

@@ -218,6 +218,31 @@ def list_user_fetch_runs(
     return [_fetch_run_row_to_dict(row) for row in rows]
 
 
+def sum_new_jobs_today(
+    user_id: int,
+    *,
+    country: str | None = None,
+    timezone_name: str | None = None,
+) -> int:
+    from relocation_jobs.users.applied import local_day_utc_bounds
+
+    start_utc, end_utc = local_day_utc_bounds(timezone_name)
+    sql = """
+        SELECT COALESCE(SUM(new_jobs), 0) AS total
+        FROM fetch_runs
+        WHERE user_id = %s
+          AND status != 'running'
+          AND finished_at >= %s
+          AND finished_at < %s
+    """
+    params: list = [int(user_id), start_utc, end_utc]
+    if country:
+        sql += " AND country = %s"
+        params.append(country)
+    row = get_connection().execute(sql, tuple(params)).fetchone()
+    return int((row or {}).get("total") or 0)
+
+
 def list_all_fetch_runs(
     *,
     country: str | None = None,

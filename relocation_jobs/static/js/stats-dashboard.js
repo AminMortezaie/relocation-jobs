@@ -29,7 +29,7 @@ export function buildStatsDashboardHtml(stats, { escapeHtml, formatActivityBadge
         <div class="stats-row">
           ${statCard(stats.total_jobs, "Open roles", { escapeHtml, accent: true })}
           ${statCard(stats.companies_with_jobs, "Companies", { escapeHtml })}
-          ${statCard(stats.latest_fetch_new_jobs ?? 0, "New last fetch", { escapeHtml })}
+          ${statCard(stats.latest_fetch_new_jobs ?? 0, "New today", { escapeHtml })}
           ${statCard(escapeHtml(formatActivityBadge(stats.latest_job_fetch || "")) || "—", "Last fetch", { escapeHtml, muted: true })}
         </div>
       </section>
@@ -43,7 +43,6 @@ export function buildStatsDashboardHtml(stats, { escapeHtml, formatActivityBadge
           ${statCard(stats.positions_applied ?? 0, "Applied total", { escapeHtml })}
           ${statCard(stats.applied ?? 0, "Companies applied", { escapeHtml })}
           ${statCard(stats.positions_rejected ?? 0, "Rejections", { escapeHtml })}
-          ${statCard(stats.not_for_me ?? 0, "Hidden", { escapeHtml })}
           ${statCard(stats.visa_sponsored, "Visa / relocation", { escapeHtml })}
           ${statCard(stats.fetch_problems ?? 0, "Fetch issues", { escapeHtml })}
         </div>

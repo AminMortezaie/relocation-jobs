@@ -45,7 +45,7 @@ def _update_from_scrape(old: dict, scraped: dict, key: str, seen_at: str) -> dic
         "url": old.get("url") or scraped.get("url", ""),
         "idempotency_key": key,
         "fetched": old.get("fetched") or scraped.get("fetched") or seen_at,
-        "last_seen": old.get("last_seen") or old.get("fetched") or seen_at,
+        "last_seen": seen_at,
     }
     if old.get("visa_sponsorship") is not None:
         out["visa_sponsorship"] = old["visa_sponsorship"]

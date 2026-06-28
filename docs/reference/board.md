@@ -41,9 +41,9 @@ Default sort is **Newest first** (`index.html` `#sortSelect`, mirrored by hidden
 | Layer | Behavior |
 |-------|----------|
 | **Server** | When `sort=newest` (default), flattens all filter-visible companies, sorts by activity timestamp, then paginates. |
-| **Client** | Sends `sort=newest|name` on `GET /api/board`; re-sorts the current page only as a fallback during local fetch UX. |
+| **Client** | Sends `sort=newest|name`; **renders companies in API order** for newest (no client timestamp re-sort). |
 
-Sort key (client): `newest_job_fetched` → `latest_fetched` → `updated` (`render.js` `companyActivityTs`).
+Sort key: **max `job.fetched`** per company (`newest_job_fetched`). `company.updated` is not used for sort order.
 
 During an active per-company fetch:
 
@@ -60,32 +60,24 @@ Alternative sort: **Company A–Z** (country label, then name).
 
 ## Activity timestamp flow
 
-What “newest” means for a company:
+What “newest” means for a company: **the latest `job.fetched` among open-board roles** (`jobs` bucket). Excludes not-for-me, rejected, and other non-main buckets.
 
 ```mermaid
 flowchart TD
-    A[Fetch or add company] --> B["company.updated = now"]
     C[Scrape jobs merge] --> D{Job new?}
     D -->|yes| E["job.fetched = seen_at"]
-    D -->|no, still on board| F["job.last_seen = seen_at"]
-    B --> G[company_activity_ts]
-    E --> G
+    D -->|no, still on board| F["job.fetched preserved; last_seen updated"]
+    E --> G["newest_job_fetched = max(job.fetched)"]
     F --> G
-    G --> H{company.updated set?}
-    H -->|yes| I["newest_job_fetched = updated"]
-    H -->|no| J["max(job.fetched, job.last_seen) or company.added"]
-    I --> K[API row fields]
-    J --> K
-    K --> L[Client sorts current page]
+    G --> K[API row + server sort]
 ```
 
-### `company_activity_ts` (server)
+### `company_newest_job_fetched` (server)
 
 `shared/timestamps.py` — used when flattening each company row:
 
-1. **`company.updated`** — if set, wins (highest priority).
-2. Else **max** of all stored jobs’ `job_activity_ts` (`fetched` or `last_seen`).
-3. Else **`company.added`** (date company entered catalog).
+1. **max** of `job.fetched` over the main `jobs` bucket (after per-user partition).
+2. Else **`company.added`** when the company has no open roles left.
 
 ### Job timestamps (scrape merge)
 
@@ -106,11 +98,11 @@ flowchart TD
 
 | Field | Source |
 |-------|--------|
-| `newest_job_fetched` | `company_activity_ts(company, stored_jobs)` |
-| `latest_fetched` | Max `job_activity_ts` over **visible** jobs after filters, else `newest_job_fetched` |
-| `updated` | Raw `company.updated` from catalog |
+| `newest_job_fetched` | `max(job.fetched)` over main-board `jobs` only |
+| `latest_fetched` | Same as `newest_job_fetched` |
+| `updated` | Raw `company.updated` from catalog (fetch metadata only; not used for newest sort) |
 
-After a country or per-company fetch, companies usually rise in sort order because **`company.updated` is bumped**, not because every job’s `fetched` changed.
+After a fetch, a company rises in sort order only when it has a **new or updated `job.fetched`** (typically a newly discovered role).
 
 ### When timestamps are written
 

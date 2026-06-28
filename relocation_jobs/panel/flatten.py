@@ -21,7 +21,7 @@ from relocation_jobs.positions.state import derive_bucket, passes_position_filte
 from relocation_jobs.positions.types import PositionBucket, PositionFilters, TrackingFlags
 from relocation_jobs.shared.coerce import as_bool
 from relocation_jobs.shared.predicates import any_of
-from relocation_jobs.shared.timestamps import company_activity_ts, job_activity_ts
+from relocation_jobs.shared.timestamps import company_newest_job_fetched
 
 
 @dataclass
@@ -399,10 +399,7 @@ def _build_company_row(
     positions_hidden_by_visa: int,
     user_id: int | None,
 ) -> dict:
-    stored_jobs = company.get("matching_jobs") or []
-    sort_ts = company_activity_ts(company, stored_jobs)
-    visible_ts = [job_activity_ts(j) for j in jobs if job_activity_ts(j)]
-    latest_fetch = max(visible_ts, default="") or sort_ts
+    sort_ts = company_newest_job_fetched(jobs, company)
     positions_applied = sum(1 for j in jobs if j.get("applied"))
     return {
         "name": company_name,
@@ -435,7 +432,7 @@ def _build_company_row(
         "positions_not_for_me": positions_not_for_me,
         "positions_hidden_by_visa": positions_hidden_by_visa,
         "updated": company.get("updated", ""),
-        "latest_fetched": latest_fetch,
+        "latest_fetched": sort_ts,
         "newest_job_fetched": sort_ts,
     }
 

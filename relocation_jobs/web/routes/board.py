@@ -10,12 +10,23 @@ from relocation_jobs.panel.board import (
     MAX_BOARD_PAGE_SIZE,
     load_catalog_board_page,
 )
-from relocation_jobs.panel.stats import compute_user_board_stats
+from relocation_jobs.panel.stats import compute_user_board_stats, resolve_new_jobs_count
 from relocation_jobs.web.query import catalog_scope_flags, query_flags
 
 
-def _latest_fetch_new_jobs(file_meta: list[dict]) -> int:
-    return sum(int(row.get("last_fetch_new_jobs") or 0) for row in file_meta)
+def _latest_fetch_new_jobs(
+    file_meta: list[dict],
+    *,
+    user_id: int | None,
+    country_key: str | None,
+    timezone_name: str | None,
+) -> int:
+    return resolve_new_jobs_count(
+        user_id=user_id,
+        country_key=country_key,
+        timezone_name=timezone_name,
+        file_meta=file_meta,
+    )
 
 
 def _panel_flags() -> dict:
@@ -62,7 +73,12 @@ def register(app):
             count_total=(page == 1),
             sort=sort,
         )
-        latest_fetch_new_jobs = _latest_fetch_new_jobs(file_meta)
+        latest_fetch_new_jobs = _latest_fetch_new_jobs(
+            file_meta,
+            user_id=g.user_id,
+            country_key=scope["country_key"],
+            timezone_name=timezone_name,
+        )
         total_pages = None
         if total_visible is not None:
             total_pages = max(1, math.ceil(total_visible / page_size))

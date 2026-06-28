@@ -2,6 +2,7 @@
 
 import { applyBoardView } from "./board.js";
 import { shouldShowCompanyOnBoard } from "./board-filter.js";
+import { recomputeNewestJobFetched } from "./render.js";
 import { findCompany, findJobInCompany, state } from "./state.js";
 
 const JOB_PATCH_FIELDS = [
@@ -113,6 +114,7 @@ function recomputeCounts(company) {
   company.positions_applied = (company.jobs || []).filter((j) => j.applied).length;
   company.positions_rejected = (company.rejected_jobs || []).length;
   company.positions_not_for_me = (company.not_for_me_jobs || []).length;
+  recomputeNewestJobFetched(company);
 }
 
 function evictCompanyIfHidden(company) {

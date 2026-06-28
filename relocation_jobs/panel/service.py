@@ -20,12 +20,7 @@ from relocation_jobs.shared.timestamps import normalize_ts_for_sort
 
 
 def _board_activity_sort_key(row: dict) -> str:
-    ts = (
-        row.get("newest_job_fetched")
-        or row.get("latest_fetched")
-        or row.get("updated")
-        or ""
-    )
+    ts = row.get("newest_job_fetched") or row.get("latest_fetched") or ""
     return normalize_ts_for_sort(str(ts).strip())
 
 

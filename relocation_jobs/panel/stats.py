@@ -10,18 +10,57 @@ def _list_recent_fetch_runs(user_id: int, country_key: str | None) -> list[dict]
     return fetch_repo.list_user_fetch_runs(user_id, limit=5)
 
 
+def _count_open_roles(companies: list[dict]) -> int:
+    return sum(
+        1
+        for company in companies
+        for job in company.get("jobs") or []
+        if not job.get("applied")
+    )
+
+
+def _count_companies_with_open_roles(companies: list[dict]) -> int:
+    return sum(
+        1
+        for company in companies
+        if any(not job.get("applied") for job in company.get("jobs") or [])
+    )
+
+
+def _count_visa_open_roles(companies: list[dict]) -> int:
+    return sum(
+        1
+        for company in companies
+        for job in company.get("jobs") or []
+        if job.get("visa_sponsorship") is True and not job.get("applied")
+    )
+
+
+def resolve_new_jobs_count(
+    *,
+    user_id: int | None,
+    country_key: str | None,
+    timezone_name: str | None,
+    file_meta: list[dict],
+) -> int:
+    if user_id:
+        return fetch_repo.sum_new_jobs_today(
+            user_id,
+            country=country_key,
+            timezone_name=timezone_name,
+        )
+    return sum(int(m.get("last_fetch_new_jobs") or 0) for m in file_meta)
+
+
 def compute_view_stats(
     companies: list[dict],
     *,
     fetch_problem_count: int = 0,
     latest_fetch_new_jobs: int = 0,
 ) -> dict:
-    total_jobs = sum(c.get("job_count", len(c.get("jobs", []))) for c in companies)
-    visa_count = sum(
-        1 for c in companies for j in c.get("jobs", []) if j.get("visa_sponsorship") is True
-    )
+    open_roles = _count_open_roles(companies)
+    visa_count = _count_visa_open_roles(companies)
     positions_rejected = sum(c.get("positions_rejected", 0) for c in companies)
-    not_for_me_count = sum(c.get("positions_not_for_me", 0) for c in companies)
     latest_fetch = max(
         (c.get("newest_job_fetched") or c.get("latest_fetched") or "" for c in companies),
         default="",
@@ -29,13 +68,14 @@ def compute_view_stats(
     by_country: dict[str, int] = {}
     for company in companies:
         key = company["country"]
-        by_country[key] = by_country.get(key, 0) + company.get("job_count", 0)
+        by_country[key] = by_country.get(key, 0) + sum(
+            1 for job in company.get("jobs") or [] if not job.get("applied")
+        )
     return {
-        "total_jobs": total_jobs,
-        "companies_with_jobs": len(companies),
+        "total_jobs": open_roles,
+        "companies_with_jobs": _count_companies_with_open_roles(companies),
         "visa_sponsored": visa_count,
         "positions_rejected": positions_rejected,
-        "not_for_me": not_for_me_count,
         "fetch_problems": fetch_problem_count,
         "latest_job_fetch": latest_fetch,
         "latest_fetch_new_jobs": latest_fetch_new_jobs,
@@ -89,10 +129,8 @@ def compute_stats(
     country_key: str | None = None,
     timezone_name: str | None = None,
 ) -> dict:
-    total_jobs = sum(c.get("job_count", len(c.get("jobs", []))) for c in companies)
-    visa_count = sum(
-        1 for c in companies for j in c.get("jobs", []) if j.get("visa_sponsorship") is True
-    )
+    open_roles = _count_open_roles(companies)
+    visa_count = _count_visa_open_roles(companies)
     positions_applied = (
         applied_queries.count_jobs_applied(user_id, country=country_key)
         if user_id
@@ -102,12 +140,16 @@ def compute_stats(
     company_applied_count = sum(
         1 for c in companies if c.get("company_applied") or c.get("positions_applied_all", 0) > 0
     )
-    not_for_me_count = sum(c.get("positions_not_for_me", 0) for c in companies)
     latest_fetch = max(
         (c.get("newest_job_fetched") or c.get("latest_fetched") or "" for c in companies),
         default="",
     )
-    latest_fetch_new_jobs = sum(int(m.get("last_fetch_new_jobs") or 0) for m in file_meta)
+    latest_fetch_new_jobs = resolve_new_jobs_count(
+        user_id=user_id,
+        country_key=country_key,
+        timezone_name=timezone_name,
+        file_meta=file_meta,
+    )
     positions_applied_today = (
         applied_queries.count_jobs_applied_today(
             user_id, country=country_key, timezone_name=timezone_name,
@@ -118,7 +160,7 @@ def compute_stats(
         applied_queries.list_jobs_applied_today(
             user_id, country=country_key, timezone_name=timezone_name,
         )
-        if user_id else []
+        if user_id else 0
     )
     recent_fetch_runs = (
         _list_recent_fetch_runs(user_id, country_key)
@@ -127,17 +169,18 @@ def compute_stats(
     by_country: dict[str, int] = {}
     for company in companies:
         key = company["country"]
-        by_country[key] = by_country.get(key, 0) + company.get("job_count", 0)
+        by_country[key] = by_country.get(key, 0) + sum(
+            1 for job in company.get("jobs") or [] if not job.get("applied")
+        )
     return {
-        "total_jobs": total_jobs,
-        "companies_with_jobs": len(companies),
+        "total_jobs": open_roles,
+        "companies_with_jobs": _count_companies_with_open_roles(companies),
         "visa_sponsored": visa_count,
         "applied": company_applied_count,
         "positions_applied": positions_applied,
         "positions_applied_today": positions_applied_today,
         "applied_today_jobs": applied_today_jobs,
         "positions_rejected": positions_rejected,
-        "not_for_me": not_for_me_count,
         "fetch_problems": fetch_problem_count,
         "latest_job_fetch": latest_fetch,
         "latest_fetch_new_jobs": latest_fetch_new_jobs,

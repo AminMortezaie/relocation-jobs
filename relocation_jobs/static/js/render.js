@@ -23,7 +23,25 @@ export function normalizeTsForSort(ts) {
 }
 
 function companyActivityTs(company) {
-  return (company?.newest_job_fetched || company?.latest_fetched || company?.updated || "").trim();
+  return (company?.newest_job_fetched || company?.latest_fetched || "").trim();
+}
+
+export function maxJobFetchedTs(jobs) {
+  let best = "";
+  for (const job of jobs || []) {
+    const ts = (job?.fetched || "").trim();
+    if (!ts) continue;
+    if (!best || compareDateDesc(ts, best) < 0) best = ts;
+  }
+  return best;
+}
+
+/** Match server sort: max job.fetched over open-board roles only. */
+export function recomputeNewestJobFetched(company) {
+  if (!company) return;
+  const ts = maxJobFetchedTs(company.jobs);
+  company.newest_job_fetched = ts;
+  company.latest_fetched = ts;
 }
 
 function fetchRunScopeLabel(run) {
@@ -113,35 +131,37 @@ function compareCompaniesDefault(a, b) {
   return (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
 }
 
+function serverBoardOrderMap() {
+  return new Map(
+    state.boardCatalog.map((company, index) => [companySortKey(company), index]),
+  );
+}
+
+function compareCompaniesNewest(a, b, serverOrder) {
+  const aFetching = isFetchingCompany(a);
+  const bFetching = isFetchingCompany(b);
+  if (aFetching !== bFetching) return aFetching ? -1 : 1;
+  const ai = serverOrder.get(companySortKey(a));
+  const bi = serverOrder.get(companySortKey(b));
+  if (ai != null && bi != null) return ai - bi;
+  if (ai != null) return -1;
+  if (bi != null) return 1;
+  return (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
+}
+
 export function sortCompaniesList(companies) {
   const list = [...companies];
-  const frozen = state.frozenCompanyOrder;
-  if (frozen) {
-    // While a fetch is active we keep the pre-fetch order so cards don't
-    // reshuffle as their fetch timestamps update. Companies absent from the
-    // frozen snapshot (newly added) sort normally after the frozen ones.
-    list.sort((a, b) => {
-      const ai = frozen.get(companySortKey(a));
-      const bi = frozen.get(companySortKey(b));
-      const aKnown = ai !== undefined;
-      const bKnown = bi !== undefined;
-      if (aKnown && bKnown) return ai - bi;
-      if (aKnown !== bKnown) return aKnown ? -1 : 1;
-      return compareCompaniesDefault(a, b);
-    });
-    return list;
-  }
   list.sort(compareCompaniesDefault);
   return list;
 }
 
-/** Snapshot the current display order so an active fetch can't reshuffle it. */
+/** Snapshot server page order before fetch UI reshuffles the board. */
 export function freezeCompanyOrder() {
   if (state.frozenCompanyOrder) return;
   const map = new Map();
-  [...state.allCompanies]
-    .sort(compareCompaniesDefault)
-    .forEach((company, index) => map.set(companySortKey(company), index));
+  state.boardCatalog.forEach((company, index) => {
+    map.set(companySortKey(company), index);
+  });
   state.frozenCompanyOrder = map;
 }
 
@@ -190,7 +210,23 @@ export function filterCompanies() {
 }
 
 export function getDisplayCompanies() {
-  return sortCompaniesList(applyPanelFilters(filterCompanies()));
+  const filtered = applyPanelFilters(filterCompanies());
+  if (!$("sortNewestFetch")?.checked) {
+    return sortCompaniesList(filtered);
+  }
+  const serverOrder = serverBoardOrderMap();
+  const frozen = state.frozenCompanyOrder;
+  return [...filtered].sort((a, b) => {
+    if (frozen) {
+      const ai = frozen.get(companySortKey(a));
+      const bi = frozen.get(companySortKey(b));
+      const aKnown = ai !== undefined;
+      const bKnown = bi !== undefined;
+      if (aKnown && bKnown) return ai - bi;
+      if (aKnown !== bKnown) return aKnown ? -1 : 1;
+    }
+    return compareCompaniesNewest(a, b, serverOrder);
+  });
 }
 
 function hasAtsScore(job) {
@@ -267,7 +303,6 @@ function touchFetchingCompanyTimestamp(companyKey) {
   if (!company) return;
   const ts = new Date().toISOString().replace(/\.\d{3}Z$/, "+00:00");
   company.updated = ts;
-  company.newest_job_fetched = ts;
 }
 
 export function setFetchBusy(busy, companyKey = null, { countryScope = false } = {}) {

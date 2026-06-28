@@ -132,7 +132,7 @@ function renderOverview(data) {
       <div class="stats-grid admin-stats-grid">
         ${statCard(data.users ?? 0, "Users", { accent: true })}
         ${statCard(catalog.companies ?? 0, "Companies")}
-        ${statCard(catalog.jobs ?? 0, "Open roles")}
+        ${statCard(catalog.jobs ?? 0, "Catalog roles")}
         ${statCard(catalog.fetch_problems ?? 0, "Fetch issues")}
         ${statCard(tracking.applied_positions ?? 0, "Applied (all users)")}
         ${statCard(tracking.tracking_rows ?? 0, "Tracking rows")}

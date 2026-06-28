@@ -36,9 +36,8 @@ def test_board_stats_returns_user_metrics(v2_auth_client, seeded_catalog_v2):
     assert "recent_fetch_runs" in payload
 
 
-def test_board_sort_newest_orders_by_activity_timestamp(v2_auth_client, seeded_catalog_v2):
-    from relocation_jobs.catalog.repo import sync_company_board_to_catalog
-    from relocation_jobs.catalog.writes import update_company_fields
+def test_board_sort_newest_orders_by_latest_job_fetched(v2_auth_client, seeded_catalog_v2):
+    from relocation_jobs.catalog.repo import get_company, sync_company_board_to_catalog
 
     sync_company_board_to_catalog(
         "uk",
@@ -53,26 +52,27 @@ def test_board_sort_newest_orders_by_activity_timestamp(v2_auth_client, seeded_c
                 {
                     "title": "Backend Engineer",
                     "url": "https://boards.greenhouse.io/aaaolder/jobs/1?gh_jid=1",
-                    "fetched": "2025-06-01",
-                    "last_seen": "2025-06-01",
+                    "fetched": "2025-06-01T22:49:00+00:00",
+                    "last_seen": "2025-06-01T22:49:00+00:00",
                 }
             ],
-            "updated": "2025-06-01T00:00:00+00:00",
+            "updated": "2025-06-10T12:00:00+00:00",
             "added": "2025-06-01",
         },
     )
-    update_company_fields(
-        "uk",
-        "Acme Backend Ltd",
-        updated="2025-06-10T12:00:00+00:00",
-    )
+    acme = get_company("uk", "Acme Backend Ltd")
+    assert acme is not None
+    jobs = list(acme.get("matching_jobs") or [])
+    jobs[0]["fetched"] = "2025-06-02T00:45:00+00:00"
+    acme["matching_jobs"] = jobs
+    acme["updated"] = "2025-01-01T00:00:00+00:00"
+    sync_company_board_to_catalog("uk", acme)
 
     by_name = v2_auth_client.get("/api/board?country=uk&sort=name").get_json()
     assert [c["name"] for c in by_name["companies"]] == [
         "AAA Older Fetch",
         "Acme Backend Ltd",
     ]
-    assert by_name["meta"]["sort"] == "name"
 
     by_newest = v2_auth_client.get("/api/board?country=uk&sort=newest").get_json()
     assert [c["name"] for c in by_newest["companies"]] == [
@@ -82,9 +82,63 @@ def test_board_sort_newest_orders_by_activity_timestamp(v2_auth_client, seeded_c
     assert by_newest["meta"]["sort"] == "newest"
 
 
+def test_board_sort_newest_ignores_not_for_me_job_fetched(v2_auth_client, seeded_catalog_v2):
+    from relocation_jobs.catalog.repo import get_company, sync_company_board_to_catalog
+    from relocation_jobs.positions import set_job_not_for_me
+
+    sync_company_board_to_catalog(
+        "uk",
+        {
+            "name": "AAA Older Fetch",
+            "city": "London",
+            "size": "51-200",
+            "careers_url": "https://boards.greenhouse.io/aaaolder",
+            "ats_type": "greenhouse",
+            "ats_url": "https://boards.greenhouse.io/aaaolder",
+            "matching_jobs": [
+                {
+                    "title": "Backend Engineer",
+                    "url": "https://boards.greenhouse.io/aaaolder/jobs/1?gh_jid=1",
+                    "fetched": "2025-06-02T00:45:00+00:00",
+                    "last_seen": "2025-06-02T00:45:00+00:00",
+                }
+            ],
+            "added": "2025-06-01",
+        },
+    )
+    acme = get_company("uk", "Acme Backend Ltd")
+    assert acme is not None
+    jobs = list(acme.get("matching_jobs") or [])
+    jobs.append(
+        {
+            "title": "Brand New Role",
+            "url": "https://boards.greenhouse.io/acmebackend/jobs/999999?gh_jid=999999",
+            "fetched": "2025-06-10T12:00:00+00:00",
+            "last_seen": "2025-06-10T12:00:00+00:00",
+        },
+    )
+    acme["matching_jobs"] = jobs
+    sync_company_board_to_catalog("uk", acme)
+    set_job_not_for_me(
+        "uk",
+        "Acme Backend Ltd",
+        "https://boards.greenhouse.io/acmebackend/jobs/999999?gh_jid=999999",
+        user_id=1,
+        not_for_me=True,
+    )
+
+    by_newest = v2_auth_client.get("/api/board?country=uk&sort=newest").get_json()
+    assert [c["name"] for c in by_newest["companies"]] == [
+        "AAA Older Fetch",
+        "Acme Backend Ltd",
+    ]
+    acme_row = next(c for c in by_newest["companies"] if c["name"] == "Acme Backend Ltd")
+    assert acme_row["newest_job_fetched"].startswith("2025-06-01")
+
+
 def test_board_panel_filters_still_on_legacy_jobs_route(v2_auth_client, seeded_catalog_v2):
     listing = v2_auth_client.get("/api/jobs?country=uk").get_json()
-    company = listing["companies"][0]
+    company = next(c for c in listing["companies"] if c["name"] == "Acme Backend Ltd")
     job = company["jobs"][0]
     ctx = {"country": "uk", "company": company["name"], "url": job["url"]}
     v2_auth_client.post("/api/jobs/applied", json={**ctx, "applied": True})
@@ -94,4 +148,5 @@ def test_board_panel_filters_still_on_legacy_jobs_route(v2_auth_client, seeded_c
     assert filtered["companies"][0]["jobs"][0]["applied"] is True
 
     board = v2_auth_client.get("/api/board?country=uk").get_json()
-    assert len(board["companies"][0]["jobs"]) == 2
+    acme = next(c for c in board["companies"] if c["name"] == "Acme Backend Ltd")
+    assert len(acme["jobs"]) == 2

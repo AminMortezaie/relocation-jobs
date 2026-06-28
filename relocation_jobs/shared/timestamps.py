@@ -10,15 +10,24 @@ def normalize_ts_for_sort(ts: str) -> str:
     return ts.replace("Z", "+00:00")
 
 
+def job_fetched_ts(job: dict) -> str:
+    return (job.get("fetched") or "").strip()
+
+
 def job_activity_ts(job: dict) -> str:
-    return (job.get("fetched") or job.get("last_seen") or "").strip()
+    return job_fetched_ts(job) or (job.get("last_seen") or "").strip()
+
+
+def company_newest_job_fetched(board_jobs: list[dict], company: dict | None = None) -> str:
+    """Newest-first board sort: max job.fetched over open-board roles only."""
+    job_ts = [job_fetched_ts(j) for j in board_jobs if job_fetched_ts(j)]
+    if job_ts:
+        return max(job_ts, key=normalize_ts_for_sort)
+    if company is not None:
+        return (company.get("added") or "").strip()
+    return ""
 
 
 def company_activity_ts(company: dict, stored_jobs: list[dict]) -> str:
-    updated = (company.get("updated") or "").strip()
-    if updated:
-        return updated
-    job_ts = [job_activity_ts(j) for j in stored_jobs if job_activity_ts(j)]
-    if job_ts:
-        return max(job_ts, key=normalize_ts_for_sort)
-    return (company.get("added") or "").strip()
+    """Catalog-wide max job.fetched (ignores per-user buckets). Prefer company_newest_job_fetched for board sort."""
+    return company_newest_job_fetched(stored_jobs, company)

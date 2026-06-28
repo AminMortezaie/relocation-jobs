@@ -16,6 +16,7 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Change Python in `relocation_jobs/` | [reference/rules.md](reference/rules.md) |
 | Change job apply / reject / hide behavior | [reference/business-rules.md](reference/business-rules.md) |
 | Work on board sort, pagination, newest | [reference/board.md](reference/board.md) |
+| Panel / admin statistics | [reference/stats.md](reference/stats.md) |
 | Agent commands cheat sheet | [CLAUDE.md](../CLAUDE.md) |
 
 ---
@@ -30,6 +31,7 @@ docs/
   reference/
     architecture.md           data flow, package layout, panel read path
     board.md                  pagination, “newest first” sort, timestamps
+    stats.md                  admin/user stats definitions
     business-rules.md         job buckets, orphans, apply/reject/not-for-me
     rules.md                  v2 coding standards (SQL in repo.py)
     schemas.md                Pydantic models, catalog shape
@@ -62,6 +64,7 @@ Agent skills: `.claude/skills/` (`getting-started` → `collaboration-style` →
 | Doc | Purpose |
 |-----|---------|
 | [reference/board.md](reference/board.md) | Board API, pagination, newest sort (mermaid) |
+| [reference/stats.md](reference/stats.md) | Admin/user stats definitions |
 | [reference/business-rules.md](reference/business-rules.md) | Job state contracts — read before tracking changes |
 
 ### Data

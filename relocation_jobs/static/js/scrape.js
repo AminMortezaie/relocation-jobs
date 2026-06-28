@@ -9,7 +9,6 @@ import {
   startFetchRequest,
 } from "./api.js";
 import { loadJobs } from "./data.js";
-import { applyBoardView } from "./board.js";
 import {
   setFetchBusy,
   showFetchPanel,
@@ -25,7 +24,6 @@ import {
   setFetchReviewFooterPending,
   setFetchLogMode,
   showFetchReviewFeedback,
-  normalizeTsForSort,
   syncFetchJobSummary,
   openFetchPanel,
   patchRunningFetchPanel,
@@ -398,21 +396,7 @@ export function pollFetchStatus() {
     clearInterval(state.pollTimer);
     state.pollTimer = null;
     const fetchingKey = state.fetchingCompanyKey;
-    const optimisticTs = fetchingKey
-      ? state.boardCatalog.find((c) => `${c.country}:${c.name}` === fetchingKey)?.updated
-      : null;
     await loadJobs({ force: true, overlayLabel: "Refreshing jobs…" });
-    if (fetchingKey && optimisticTs) {
-      const company = state.boardCatalog.find((c) => `${c.country}:${c.name}` === fetchingKey);
-      if (company) {
-        const serverTs = company.updated || company.newest_job_fetched || "";
-        if (!serverTs || normalizeTsForSort(optimisticTs).localeCompare(normalizeTsForSort(serverTs)) > 0) {
-          company.updated = optimisticTs;
-          company.newest_job_fetched = optimisticTs;
-        }
-      }
-      applyBoardView();
-    }
     setFetchBusy(false);
 
     if (state.lastFetchReview?.country && state.lastFetchReview?.company) {

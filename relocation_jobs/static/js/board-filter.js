@@ -102,19 +102,18 @@ export function computeViewStats(companies, meta = {}) {
   let totalJobs = 0;
   let visaSponsored = 0;
   let positionsRejected = 0;
-  let notForMe = 0;
   let companiesApplied = 0;
   let latestJobFetch = "";
 
   for (const company of companies || []) {
-    totalJobs += company.job_count ?? company.jobs?.length ?? 0;
+    for (const job of company.jobs || []) {
+      if (job.applied) continue;
+      totalJobs += 1;
+      if (job.visa_sponsorship === true) visaSponsored += 1;
+    }
     positionsRejected += company.positions_rejected ?? company.rejected_jobs?.length ?? 0;
-    notForMe += company.positions_not_for_me ?? company.not_for_me_jobs?.length ?? 0;
     if (company.company_applied || (company.positions_applied_all ?? company.positions_applied ?? 0) > 0) {
       companiesApplied += 1;
-    }
-    for (const job of company.jobs || []) {
-      if (job.visa_sponsorship === true) visaSponsored += 1;
     }
     const fetchTs = (company.newest_job_fetched || company.latest_fetched || "").trim();
     if (fetchTs && fetchTs.localeCompare(latestJobFetch) > 0) {
@@ -122,13 +121,16 @@ export function computeViewStats(companies, meta = {}) {
     }
   }
 
+  const companiesWithOpen = (companies || []).filter(
+    (company) => (company.jobs || []).some((job) => !job.applied)
+  ).length;
+
   return {
     total_jobs: totalJobs,
-    companies_with_jobs: companies.length,
+    companies_with_jobs: companiesWithOpen,
     visa_sponsored: visaSponsored,
     applied: companiesApplied,
     positions_rejected: positionsRejected,
-    not_for_me: notForMe,
     fetch_problems: meta.fetch_problem_total ?? 0,
     latest_job_fetch: latestJobFetch,
     latest_fetch_new_jobs: meta.latest_fetch_new_jobs ?? 0,

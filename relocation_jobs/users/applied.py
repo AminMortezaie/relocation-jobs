@@ -24,6 +24,10 @@ def _local_day_utc_bounds(tz: ZoneInfo) -> tuple[str, str]:
     return start_utc, end_utc
 
 
+def local_day_utc_bounds(timezone_name: str | None = None) -> tuple[str, str]:
+    return _local_day_utc_bounds(_timezone(timezone_name))
+
+
 def count_jobs_applied(user_id: int, *, country: str | None = None) -> int:
     return count_applied_jobs(user_id, country=country)
 

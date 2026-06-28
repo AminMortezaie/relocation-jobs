@@ -42,3 +42,53 @@ async def test_enrich_jobs_sets_visa_from_description():
 
     assert out[0]["visa_sponsorship"] is True
     assert out[0]["fetched"]
+
+
+@pytest.mark.asyncio
+async def test_enrich_only_missing_does_not_overwrite_fetched():
+    from relocation_jobs.scrape.enrich import enrich_jobs
+
+    jobs = [
+        {
+            "title": "Engineer",
+            "url": "https://example.com/jobs/1",
+            "visa_sponsorship": True,
+            "fetched": "2025-01-15",
+        },
+    ]
+    company = {"name": "Acme", "ats_type": "generic"}
+
+    import httpx
+
+    async with httpx.AsyncClient() as client:
+        out = await enrich_jobs(client, jobs, company, only_missing=True, concurrency=1)
+
+    assert out[0]["fetched"] == "2025-01-15"
+
+
+@pytest.mark.asyncio
+async def test_enrich_missing_fetched_sets_today_without_overwriting_existing():
+    from relocation_jobs.scrape.enrich import enrich_jobs
+
+    jobs = [{"title": "Engineer", "url": "https://example.com/jobs/1"}]
+    company = {"name": "Acme", "ats_type": "generic"}
+
+    async def fake_fetch(_client, url, ats_type=None):
+        return "visa sponsorship available"
+
+    import httpx
+
+    async with httpx.AsyncClient() as client:
+        import relocation_jobs.scrape.enrich as enrich_mod
+
+        original = enrich_mod.fetch_job_description_async
+        try:
+            enrich_mod.fetch_job_description_async = fake_fetch
+            out = await enrich_jobs(client, jobs, company, only_missing=False, concurrency=1)
+            assert out[0]["fetched"]
+            jobs[0]["fetched"] = "2025-03-01"
+            out2 = await enrich_jobs(client, jobs, company, only_missing=False, concurrency=1)
+        finally:
+            enrich_mod.fetch_job_description_async = original
+
+    assert out2[0]["fetched"] == "2025-03-01"

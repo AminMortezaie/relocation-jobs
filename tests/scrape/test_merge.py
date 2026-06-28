@@ -44,3 +44,19 @@ class TestMergeMatchingJobs:
         assert new_count == 1
         preserved = [j for j in merged if "j/1" in j["url"]][0]
         assert preserved["fetched"] == "2025-01-01"
+
+    def test_updates_last_seen_on_rescrape(self):
+        existing = [
+            {
+                "title": "Old",
+                "url": "https://example.com/j/1?gh_jid=1",
+                "fetched": "2025-01-01",
+                "last_seen": "2025-01-01T00:00:00+00:00",
+            },
+        ]
+        scraped = [{"title": "New Title", "url": "https://example.com/j/1?gh_jid=1"}]
+        merged, preserved, new_count, stale = merge_matching_jobs(existing, scraped)
+        assert preserved == 1
+        assert new_count == 0
+        assert merged[0]["fetched"] == "2025-01-01"
+        assert merged[0]["last_seen"] != "2025-01-01T00:00:00+00:00"

@@ -5,7 +5,7 @@ from datetime import date
 
 import httpx
 
-from relocation_jobs.core.ats_detection import HEADERS, PLAYWRIGHT_AVAILABLE
+from relocation_jobs.core.ats_detection import PLAYWRIGHT_AVAILABLE
 from relocation_jobs.core.scrape_cancel import FetchCancelled, raise_if_cancelled
 from relocation_jobs.fetch.log import log_event
 from relocation_jobs.scrape.boards._async import run_sync
@@ -43,21 +43,13 @@ async def enrich_one_job_async(
     ats_type: str | None,
     fetched: str,
     only_missing: bool,
-    *,
-    preserve_fetched: bool = False,
 ) -> None:
-    if preserve_fetched and job.get("fetched"):
-        if only_missing and job.get("visa_sponsorship") is not None:
-            return
-        if only_missing:
-            return
-    elif only_missing and job.get("visa_sponsorship") is not None:
-        if not preserve_fetched:
-            job["fetched"] = fetched
+    if only_missing and job.get("visa_sponsorship") is not None:
         return
+
     text = await fetch_job_description_async(client, job["url"], ats_type)
     job["visa_sponsorship"] = detect_visa_relocation(text)
-    if not preserve_fetched or not job.get("fetched"):
+    if not (job.get("fetched") or "").strip():
         job["fetched"] = fetched
 
 
@@ -68,7 +60,6 @@ async def enrich_jobs(
     *,
     only_missing: bool = False,
     concurrency: int = 8,
-    preserve_fetched: bool = False,
 ) -> list[dict]:
     if not jobs:
         return jobs
@@ -84,7 +75,6 @@ async def enrich_jobs(
             raise_if_cancelled()
             await enrich_one_job_async(
                 client, job, ats_type, fetched, only_missing,
-                preserve_fetched=preserve_fetched,
             )
 
     try:

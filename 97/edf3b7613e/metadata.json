@@ -1,0 +1,21 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "97edf3b7613e",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".githooks/pre-push",
+    ".github/workflows/ci.yml",
+    "scripts/install-git-hooks.sh",
+    "scripts/run_ci_tests.sh"
+  ],
+  "sessions": [
+    {
+      "metadata": "/97/edf3b7613e/0/metadata.json",
+      "transcript": "/97/edf3b7613e/0/full.jsonl",
+      "content_hash": "/97/edf3b7613e/0/content_hash.txt",
+      "prompt": "/97/edf3b7613e/0/prompt.txt"
+    }
+  ]
+}

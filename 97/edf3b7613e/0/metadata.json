@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "97edf3b7613e",
+  "session_id": "617c3328-b1b1-4412-a17d-2c3f6344eff6",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-29T14:45:13.864611Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 2,
+  "files_touched": [
+    ".githooks/pre-push",
+    ".github/workflows/ci.yml",
+    "scripts/install-git-hooks.sh",
+    "scripts/run_ci_tests.sh"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "00972e07eca6",
+  "session_metrics": {
+    "turn_count": 26,
+    "context_tokens": 185250,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-29T14:45:13.853705Z",
+    "agent_lines": 44,
+    "agent_removed": 5,
+    "human_added": 28,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 72,
+    "total_lines_changed": 77,
+    "agent_percentage": 63.63636363636363,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

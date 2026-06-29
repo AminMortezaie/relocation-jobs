@@ -1,0 +1,27 @@
+here we have a full website, now i want to create a automation here.
+
+i want to connect to claude desktop as a mcp and use claude to apply for me.
+
+what's your idea about?
+is this approachable, if no why?
+
+---
+
+what i think from mcp and connecting to claude desktop is to apply for me for the position i find.
+just i say apply for this position and it will apply for me and finish.
+during this process the resume reframing is the most important part so i will use cluade to do this for me after doing some checks.
+
+what's the best solution for this work?
+
+---
+
+i think that what i need is v0 just.
+can i connect to claude desktop because i dont want to pay more for claude API.?
+
+---
+
+can i put a local latex to pdf tool in my application to just claude create me .tex file and my application render to pdf?
+
+---
+
+create new domain in my application which is related to mcp and start to code, before this you need to create a complete plan and document it first then start to work, write down in docs folder to have the reference of it for later.

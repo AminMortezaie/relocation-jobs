@@ -20,8 +20,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Business tests
-        run: pytest -o addopts="-ra --strict-markers -m 'not scrape'"
-
-      - name: Coverage gate
-        run: pytest --cov --cov-report=term-missing -o addopts="-ra --strict-markers -m 'not scrape'"
+      - name: Tests and coverage
+        run: ./scripts/run_ci_tests.sh

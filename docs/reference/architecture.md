@@ -33,6 +33,7 @@ relocation_jobs/
 ├── scrape/       boards/, merge, enrich, ats_resolve
 ├── companies/    company CRUD
 ├── users/        history, applied
+├── mcp/          Claude Desktop MCP: application prep, tex → PDF (v0)
 ├── admin/        dashboard aggregates
 ├── web/          server, routes, deps
 ├── shared/       predicates, coerce, schema

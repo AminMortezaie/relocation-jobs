@@ -71,6 +71,7 @@ fetch/        Country + single-company fetch (in-process asyncio)
 scrape/       ATS boards, merge, enrich, relevance
 companies/    Company CRUD orchestration
 users/        User history, applied dates
+mcp/          Claude Desktop MCP — application prep, tex → PDF (v0)
 admin/        Dashboard aggregates
 web/          Flask server, routes, deps
 shared/       predicates, coerce, schema helpers

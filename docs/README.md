@@ -19,6 +19,7 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Catalog vs per-user tracking (design) | [reference/catalog-pattern.md](reference/catalog-pattern.md) |
 | Panel / admin statistics | [reference/stats.md](reference/stats.md) |
 | Test failures / catalog seed in tests | [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md) |
+| MCP apply assistant (Claude Desktop, v0) | [reference/mcp-application.md](reference/mcp-application.md) |
 | Agent commands cheat sheet | [CLAUDE.md](../CLAUDE.md) |
 
 ---
@@ -40,6 +41,7 @@ docs/
     parity.md                 v1 vs v2 checklist (complete)
     catalog-pattern.md        shared catalog + per-user overlay (design)
     catalog-seed-test-failure.md  post-mortem: pytest pollution after board sort tests
+    mcp-application.md          Claude Desktop MCP: resume tex → PDF, apply prep (v0)
   operations/
     aws-postgres.md           AWS EC2 Postgres, Render DATABASE_URL
   archive/                    historical handoffs — read only if debugging old work

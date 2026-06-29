@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Block push when tests fail. Bypass: git push --no-verify
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "pre-push: running CI tests..."
+"$ROOT/scripts/run_ci_tests.sh"

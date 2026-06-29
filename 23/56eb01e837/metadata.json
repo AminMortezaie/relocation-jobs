@@ -1,0 +1,20 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "2356eb01e837",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "docs/reference/mcp-application.md",
+    "tests/mcp/test_mcp_service.py",
+    "tests/mcp/test_service.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/23/56eb01e837/0/metadata.json",
+      "transcript": "/23/56eb01e837/0/full.jsonl",
+      "content_hash": "/23/56eb01e837/0/content_hash.txt",
+      "prompt": "/23/56eb01e837/0/prompt.txt"
+    }
+  ]
+}

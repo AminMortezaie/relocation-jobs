@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "bba534af31ae",
+  "session_id": "a108ae11-8403-4e42-b35d-c5b7335bf886",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-29T14:45:50.236787Z",
+  "branch": "main",
+  "checkpoints_count": 5,
+  "save_step_count": 1,
+  "files_touched": [
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/mcp/__init__.py",
+    "relocation_jobs/mcp/assets/master_resume.tex",
+    "relocation_jobs/mcp/assets/profile.example.json",
+    "relocation_jobs/mcp/paths.py",
+    "relocation_jobs/mcp/render.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/mcp/validate.py",
+    "requirements-dev.txt",
+    "scripts/mcp_server.py",
+    "tests/mcp/test_render.py",
+    "tests/mcp/test_service.py",
+    "tests/mcp/test_validate.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "b45cca63d780",
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-29T14:45:50.232661Z",
+    "agent_lines": 1118,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1118,
+    "total_lines_changed": 1118,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}

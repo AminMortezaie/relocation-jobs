@@ -205,7 +205,7 @@ pytest tests/mcp -o addopts=
 |------|-----------|
 | Tex validation | `tests/mcp/test_validate.py` |
 | PDF render (mocked compiler) | `tests/mcp/test_render.py` |
-| Job context + queue | `tests/mcp/test_service.py` |
+| Job context + queue | `tests/mcp/test_mcp_service.py` |
 
 ---
 
@@ -229,5 +229,5 @@ scripts/mcp_server.py
 tests/mcp/
   test_validate.py
   test_render.py
-  test_service.py
+  test_mcp_service.py
 ```

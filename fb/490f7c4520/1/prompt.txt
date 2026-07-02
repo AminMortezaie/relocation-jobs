@@ -1,0 +1,46 @@
+Prompt 1 : Act as a senior recruiter at this exact company. Give me a match score out of 100, the top 5 missing keywords, and the 3 things a hiring manager would notice in the first 10 seconds.
+
+Prompt 2 :Rewrite my experience section using the Google XYZ formula — accomplished X as measured by Y by doing Z. Include the missing keywords naturally and remove every red flag you found.
+
+Prompt 3:Now act as an ATS scanner and a hiring manager reviewing 200 resumes in one sitting. Tell me which sections would get skipped and rewrite them so they actually stop the scroll.
+Three prompts. One chat. A resume that actually gets responses.
+
+I want to write another prompt with this style and tell the claude firstly, based on the JD create an ideal profile resume for the JD with everykeywords and related experience that if hiring manager sees the resume without any doubts accept it to the first interview round and then now based on the info created, you need to reframe my resume before prompt 1, and at least add one project reframed with the real JD.
+
+write down a best prompt you can write.
+
+---
+
+you made something that its complete prompt am i right?
+its the mixure of all 4 prompts to just give the claude this instead of all 4 prompts?
+
+---
+
+you made something that its complete prompt am i right?
+its the mixure of all 4 prompts to just give the claude this instead of all 4 prompts?
+
+---
+
+Found it — you were right, I missed `get_reframe_pipeline` earlier. It confirms there's no `run_pipeline` tool: it just returns ordered prompts for me to run in chat manually. Let's fetch it.**Prompt 1 (Phases A+B) — condensed:**
+
+**Hiring thesis:** BlackLane needs a backend engineer who can own domain-driven microservices across a polyglot (Go/Java) event-driven stack, comfortable in Kubernetes/AWS/Terraform infra with Kafka+SQS messaging.
+
+**Top keyword gaps (master → JD):** Kubernetes (missing), Terraform (missing), SQS (missing), MySQL (missing), Elasticsearch (missing), DDD (missing, but implicit in your service design work).
+
+**Ideal flagship bullet blueprint:** microservice built with Go, deployed to K8s, using SQS/Kafka for domain events, DDD boundaries, Terraform-provisioned AWS infra.
+
+**Gap ledger (real evidence to bridge, no invention):**
+- K8s → not in your background; can't add without lying — flag, don't fabricate.
+- Terraform → not in your background — same.
+- SQS → Kafka experience is adjacent but not equivalent — don't claim SQS.
+- MySQL/Elasticsearch → Elasticsearch used at Mili Gold (logging) — can surface. MySQL not used — don't add.
+- DDD → your service-boundary/settlement-engine refactor work implies this — can reframe truthfully.
+
+**Match score: 68/100.** Missing keywords: Kubernetes, Terraform, SQS, MySQL, DDD (explicit).
+**3 things a HM notices in 10s:** (1) strong Go+Kafka fintech depth, (2) no visible K8s/Terraform ops exposure, (3) 20M-user scale is a strong signal.
+
+**Honest constraint:** Kubernetes, Terraform, SQS, MySQL aren't in your real experience — I can't inject them truthfully. I can only reframe "Domain-Driven Design" (from your service refactor) and surface Elasticsearch (already used).
+
+This is a **meaningfully weaker match** than BlackLane's core stack implies. Want me to still tailor the `.tex` with only the truthful reframes (DDD + Elasticsearch), or reconsider whether this job is worth prioritizing over a closer Go/Kafka-only fit?
+
+claude would answer like this to not happen again, what should be the prompt like?

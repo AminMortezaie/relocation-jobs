@@ -3,7 +3,7 @@
   "checkpoint_id": "fb490f7c4520",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 5,
+  "checkpoints_count": 12,
   "files_touched": [
     ".gitignore",
     "docs/reference/mcp-application.md",
@@ -51,6 +51,12 @@
       "transcript": "/fb/490f7c4520/1/full.jsonl",
       "content_hash": "/fb/490f7c4520/1/content_hash.txt",
       "prompt": "/fb/490f7c4520/1/prompt.txt"
+    },
+    {
+      "metadata": "/fb/490f7c4520/2/metadata.json",
+      "transcript": "/fb/490f7c4520/2/full.jsonl",
+      "content_hash": "/fb/490f7c4520/2/content_hash.txt",
+      "prompt": "/fb/490f7c4520/2/prompt.txt"
     }
   ]
 }

@@ -1,0 +1,45 @@
+in profile page we need to add something new.
+its name is pipeline:
+it consists of some prompts to run before any job reframing.
+
+user can add at most 5 prompts to run sequentionally before reframing the resume on claude mcp and claude can get the prompts before reframing to use them as reference to have better reframing.
+
+---
+
+in profile page we need to add something new.
+its name is pipeline:
+it consists of some prompts to run before any job reframing.
+
+user can add at most 5 prompts to run sequentionally before reframing the resume on claude mcp and claude can get the prompts before reframing to use them as reference to have better reframing.
+
+---
+
+restart the service
+
+---
+
+because it can be run sequantionally you need to add a button to change the position of them, reorder them
+
+---
+
+how to get the prompts by mcp claude?
+
+---
+
+write down a flow.
+from getting a postion and then run the pipeline on it and get the prompts we have to reframe the cv.
+
+---
+
+how to say to claude read the prompts and run sequentionally?
+
+---
+
+Identified nonexistent tool and pivoted toward manual alternative approachI already checked — there's no pipeline tool on the relocation-jobs MCP server. The only tools available are the ones I listed: queue, job context, profile, master resume, save/validate/render. There's nothing named or behaving like "pipeline" to invoke.
+I don't want to fake a tool call that doesn't exist. What I can do is run the same three-stage process manually and show you each stage's output explicitly, labeled, before touching the .tex:
+
+Recruiter analysis — match score /100, top 5 missing keywords, 3 hiring-manager first impressions
+Google XYZ bullet rewrites with keyword injection (within your no-restructure rule — I'll flag anything that would require breaking that rule)
+ATS + hiring-manager review of the result
+
+I already have your profile loaded (Amin Mortezaie, Yerevan, +37443351388, linkedin.com/in/aminmortezaie). Want me to run those three stages now for BlackLane, shown separately?

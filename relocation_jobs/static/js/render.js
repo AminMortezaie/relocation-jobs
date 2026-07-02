@@ -115,13 +115,9 @@ function isFetchingCompany(company) {
   return state.fetchBusy && state.fetchingCompanyKey === companySortKey(company);
 }
 
-function isPinnedCompany(company) {
-  return Boolean(company.board_pinned);
-}
-
 function comparePriorityCompanies(a, b) {
-  const aPri = isFetchingCompany(a) || isPinnedCompany(a);
-  const bPri = isFetchingCompany(b) || isPinnedCompany(b);
+  const aPri = isFetchingCompany(a);
+  const bPri = isFetchingCompany(b);
   if (aPri !== bPri) return aPri ? -1 : 1;
   return 0;
 }
@@ -240,7 +236,12 @@ export function getDisplayCompanies() {
       if (aKnown && bKnown) return ai - bi;
       if (aKnown !== bKnown) return aKnown ? -1 : 1;
     }
-    return compareCompaniesNewest(a, b, serverOrder);
+    const byActivity = compareDateDesc(companyActivityTs(a), companyActivityTs(b));
+    if (byActivity !== 0) return byActivity;
+    const ai = serverOrder.get(companySortKey(a));
+    const bi = serverOrder.get(companySortKey(b));
+    if (ai != null && bi != null) return ai - bi;
+    return (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
   });
 }
 

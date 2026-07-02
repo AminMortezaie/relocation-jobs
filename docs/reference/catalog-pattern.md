@@ -134,14 +134,13 @@ Current implementation (2026-06):
 | Concern | Table | Field |
 |---------|--------|--------|
 | Pin this role to top of its company card | `job_tracking` | `pinned`, `pinned_at` |
-| Pin this company to top of the board (per country) | `company_tracking` | `board_pinned`, `board_pinned_at` |
 
 Rules today:
 
-- One **board-pinned** company per user per **country** (pinning a new company clears the previous one in that country)
 - One **pinned job** per user per **company** (pinning a new role in the same company clears the previous pin there)
+- Pinning a job does **not** move the company on the board; company order stays on newest activity (`job.fetched`)
 
-API: `POST /api/jobs/pin`. Server sorts pinned companies/jobs on `GET /api/board` when `sort=newest`.
+API: `POST /api/jobs/pin`. Server sorts pinned jobs first within each company card on `GET /api/board`.
 
 ### If requirements grow
 

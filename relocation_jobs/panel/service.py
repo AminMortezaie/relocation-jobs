@@ -25,11 +25,7 @@ def _board_activity_sort_key(row: dict) -> str:
 
 
 def _sort_board_page_rows(rows: list[dict]) -> None:
-    pinned = [row for row in rows if row.get("board_pinned")]
-    rest = [row for row in rows if not row.get("board_pinned")]
-    pinned.sort(key=lambda row: row.get("board_pinned_at") or "", reverse=True)
-    rest.sort(key=_board_activity_sort_key, reverse=True)
-    rows[:] = pinned + rest
+    rows.sort(key=_board_activity_sort_key, reverse=True)
 
 
 def _board_name_sort_key(row: dict) -> tuple[str, str]:

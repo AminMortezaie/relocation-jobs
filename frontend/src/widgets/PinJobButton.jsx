@@ -3,8 +3,8 @@ export default function PinJobButton({ pinned = false }) {
     <button
       type="button"
       className={`pin-job-btn${pinned ? " is-pinned" : ""}`}
-      title={pinned ? "Pinned to top of board" : "Pin role and company to the top"}
-      aria-label={pinned ? "Pinned to top" : "Pin to top"}
+      title={pinned ? "Pinned to top of this company" : "Pin role to top of this company"}
+      aria-label={pinned ? "Pinned in company" : "Pin in company"}
       aria-pressed={pinned}
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

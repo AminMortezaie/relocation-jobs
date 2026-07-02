@@ -174,44 +174,26 @@ export function applyPinToCatalog(country, companyName, url, idempotencyKey, dat
   const scopeCountry = (data.country || country || "").trim();
   const targetCompany = data.company || companyName;
   const pinned = Boolean(data.pinned);
-  const boardPinned = Boolean(data.board_pinned);
 
-  for (const company of state.boardCatalog) {
-    if (company.country !== scopeCountry) continue;
-    const isTarget = company.name === targetCompany;
-    company.board_pinned = isTarget && boardPinned;
-    company.board_pinned_at = company.board_pinned ? (data.board_pinned_at || "") : "";
-    for (const bucket of JOB_BUCKETS) {
-      const list = company[bucket];
-      if (!Array.isArray(list)) continue;
-      for (const job of list) {
-        if (!isTarget) {
-          if (job.pinned) {
-            job.pinned = false;
-            job.pinned_at = "";
-          }
-          continue;
-        }
-        const isPinnedJob = pinned && jobMatchesPinTarget(job, url, idempotencyKey, data);
-        job.pinned = isPinnedJob;
-        job.pinned_at = isPinnedJob ? (data.pinned_at || "") : "";
-      }
-      company[bucket] = sortPinnedJobsFirst(list);
+  const company = state.boardCatalog.find(
+    (row) => row.country === scopeCountry && row.name === targetCompany,
+  );
+  if (!company) return false;
+
+  for (const bucket of JOB_BUCKETS) {
+    const list = company[bucket];
+    if (!Array.isArray(list)) continue;
+    for (const job of list) {
+      const isPinnedJob = pinned && jobMatchesPinTarget(job, url, idempotencyKey, data);
+      job.pinned = isPinnedJob;
+      job.pinned_at = isPinnedJob ? (data.pinned_at || "") : "";
     }
-    if (isTarget && pinned) {
-      pinJobToTopOfCompany(company, url, idempotencyKey);
-    }
+    company[bucket] = sortPinnedJobsFirst(list);
+  }
+  if (pinned) {
+    pinJobToTopOfCompany(company, url, idempotencyKey);
   }
 
-  if (boardPinned) {
-    const idx = state.boardCatalog.findIndex(
-      (c) => c.country === scopeCountry && c.name === targetCompany,
-    );
-    if (idx > 0) {
-      const [row] = state.boardCatalog.splice(idx, 1);
-      state.boardCatalog.unshift(row);
-    }
-  }
   state.allCompanies = state.boardCatalog;
   applyBoardView();
   return true;

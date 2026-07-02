@@ -64,6 +64,7 @@ function OpenJobCard({ job, company }) {
   const appliedLabel = formatAppliedLabel({ date: latestApplied, at: job.applied_at || "" });
   const appliedTitle = formatAppliedHistoryTitle(appliedEvents.length ? appliedEvents : appliedHistory);
   const posCls = [
+    job.pinned ? " position-pinned" : "",
     job.applied ? " position-applied" : "",
     job.waiting_referral ? " position-waiting-referral" : "",
     job.looking_to_apply && !job.applied ? " position-looking-to-apply" : "",
@@ -158,7 +159,7 @@ function RejectedJobCard({ job, company }) {
 
   return (
     <div
-      className={`position-card rejected-role${job.seen ? " position-seen" : ""}`}
+      className={`position-card rejected-role${job.pinned ? " position-pinned" : ""}${job.seen ? " position-seen" : ""}`}
       data-country={job.country}
       data-company={job.company}
       data-url={job.url}
@@ -192,7 +193,7 @@ function NotForMeJobCard({ job, company }) {
 
   return (
     <div
-      className="position-card not-for-me-role"
+      className={`position-card not-for-me-role${job.pinned ? " position-pinned" : ""}`}
       data-country={job.country}
       data-company={job.company}
       data-url={job.url}

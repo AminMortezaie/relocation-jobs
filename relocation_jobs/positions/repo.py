@@ -325,21 +325,9 @@ def set_job_pinned(
                 """
                 UPDATE company_tracking
                 SET board_pinned = 0, board_pinned_at = NULL, updated_at = %s
-                WHERE user_id = %s AND country = %s AND board_pinned = 1
+                WHERE user_id = %s AND country = %s AND company_name = %s
                 """,
-                (now, user_id, country),
-            )
-            conn.execute(
-                """
-                INSERT INTO company_tracking (
-                    user_id, country, company_name, board_pinned, board_pinned_at, updated_at
-                ) VALUES (%s, %s, %s, 1, %s, %s)
-                ON CONFLICT (user_id, country, company_name) DO UPDATE SET
-                    board_pinned = 1,
-                    board_pinned_at = EXCLUDED.board_pinned_at,
-                    updated_at = EXCLUDED.updated_at
-                """,
-                (user_id, country, company_name, now, now),
+                (now, user_id, country, company_name),
             )
             conn.execute(
                 """
@@ -410,8 +398,6 @@ def set_job_pinned(
         country,
         pinned=pinned,
         pinned_at=now if pinned else "",
-        board_pinned=pinned,
-        board_pinned_at=now if pinned else "",
     )
 
 

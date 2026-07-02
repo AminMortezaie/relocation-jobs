@@ -92,6 +92,7 @@ def _migrate_schema(conn) -> None:
     run_migration_once(conn, "job_status_events_backfill_v1", _backfill_job_status_events)
     run_migration_once(conn, "company_tracking_columns_v1", _migrate_company_tracking_schema)
     run_migration_once(conn, "board_pin_columns_v1", _migrate_board_pin_columns)
+    run_migration_once(conn, "clear_company_board_pins_v1", _clear_company_board_pins)
     run_migration_once(conn, "fetch_runs_table_v1", _ensure_fetch_runs_table)
     run_migration_once(conn, "fetch_runs_live_state_v1", _migrate_fetch_runs_live_state)
     run_migration_once(conn, "users_admin_column_v1", _ensure_users_admin_column)
@@ -249,6 +250,16 @@ def _migrate_board_pin_columns(conn) -> None:
     )
     conn.execute(
         "ALTER TABLE company_tracking ADD COLUMN IF NOT EXISTS board_pinned_at TEXT"
+    )
+
+
+def _clear_company_board_pins(conn) -> None:
+    conn.execute(
+        """
+        UPDATE company_tracking
+        SET board_pinned = 0, board_pinned_at = NULL
+        WHERE board_pinned = 1
+        """
     )
 
 

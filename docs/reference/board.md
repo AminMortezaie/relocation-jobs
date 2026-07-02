@@ -41,7 +41,7 @@ Default sort is **Newest first** (`index.html` `#sortSelect`, mirrored by hidden
 | Layer | Behavior |
 |-------|----------|
 | **Server** | When `sort=newest` (default), flattens all filter-visible companies, sorts by activity timestamp, then paginates. |
-| **Client** | Sends `sort=newest|name`; **renders companies in API order** for newest (no client timestamp re-sort). |
+| **Client** | Sends `sort=newest|name`; for newest, re-sorts the current page by `newest_job_fetched` (frozen during an active fetch). |
 
 Sort key: **max `job.fetched`** per company (`newest_job_fetched`). `company.updated` is not used for sort order.
 

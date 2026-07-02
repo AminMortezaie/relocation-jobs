@@ -1406,6 +1406,15 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   gap: 0.35rem;
 }
 
+.position-card.position-pinned {
+  border-color: color-mix(in srgb, rgba(251, 191, 36, 0.28) 32%, var(--border));
+  background: color-mix(in srgb, rgba(251, 191, 36, 0.07) 38%, var(--bg-elevated));
+}
+
+.position-card.position-pinned:hover {
+  border-color: color-mix(in srgb, rgba(251, 191, 36, 0.38) 40%, var(--border-strong));
+}
+
 .position-card.position-applied {
   border-color: color-mix(in srgb, var(--success) 35%, var(--border));
   background: color-mix(in srgb, var(--success-soft) 55%, var(--bg-elevated));

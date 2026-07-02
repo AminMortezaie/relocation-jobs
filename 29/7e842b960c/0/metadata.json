@@ -1,0 +1,122 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "297e842b960c",
+  "session_id": "e36bdd2b-1bce-4f60-8ffe-0623176d51f0",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-02T12:50:08.939549Z",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "save_step_count": 8,
+  "files_touched": [
+    "docs/README.md",
+    "docs/reference/board.md",
+    "docs/reference/company-workspace.md",
+    "docs/reference/mcp-application.md",
+    "frontend/src/CompanyCard.jsx",
+    "frontend/src/CvApplicationBadges.jsx",
+    "frontend/src/JobCard.jsx",
+    "frontend/src/companyWorkspace.js",
+    "relocation_jobs/mcp/render.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/panel/flatten.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/panel/tracking.py",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/js/company-workspace.js",
+    "relocation_jobs/static/js/company.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/mcp.py",
+    "relocation_jobs/web/server.py",
+    "tests/helpers/route_manifest.py",
+    "tests/mcp/test_render.py",
+    "tests/web/test_mcp_company_workspace.py",
+    "tests/web/test_mcp_panel.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "f76202498491",
+  "checkpoint_transcript_start": 18,
+  "transcript_lines_at_start": 18,
+  "session_metrics": {
+    "turn_count": 10
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-02T12:50:08.933692Z",
+    "agent_lines": 1546,
+    "agent_removed": 37,
+    "human_added": 40,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1586,
+    "total_lines_changed": 1623,
+    "agent_percentage": 97.53542821934688,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1447,
+      "agent_lines_removed": 17
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1447,
+      "agent_lines_removed": 17
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1447,
+      "agent_lines_removed": 17
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 20,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1448,
+      "agent_lines_removed": 17,
+      "user_added_per_file": {
+        "tests/web/test_mcp_company_workspace.py": 20
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 20,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1541,
+      "agent_lines_removed": 29,
+      "user_added_per_file": {
+        "tests/web/test_mcp_company_workspace.py": 20
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1561,
+      "agent_lines_removed": 29
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1561,
+      "agent_lines_removed": 29
+    }
+  ]
+}

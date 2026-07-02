@@ -1,0 +1,34 @@
+every thing you're doing needs to be documented.
+then start to work round by round.
+
+---
+
+restart the server to see what you didi
+
+---
+
+which job has the latex file to see how is working this feature.
+
+---
+
+check for one of them and see its working or not on panel.
+
+---
+
+rendering pdf is not working.
+
+---
+
+great its working now.
+
+---
+
+great its working now.
+
+---
+
+change the route path from c to company, apply everywhere and restart the server
+
+---
+
+though we have rendered pdf, it does show the No PDF yet — save tailored tex via MCP, then re-render. mark

@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "297e842b960c",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "files_touched": [
+    "docs/README.md",
+    "docs/reference/board.md",
+    "docs/reference/company-workspace.md",
+    "docs/reference/mcp-application.md",
+    "frontend/src/CompanyCard.jsx",
+    "frontend/src/CvApplicationBadges.jsx",
+    "frontend/src/JobCard.jsx",
+    "frontend/src/companyWorkspace.js",
+    "relocation_jobs/mcp/render.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/panel/flatten.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/panel/tracking.py",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/js/company-workspace.js",
+    "relocation_jobs/static/js/company.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/mcp.py",
+    "relocation_jobs/web/server.py",
+    "tests/helpers/route_manifest.py",
+    "tests/mcp/test_render.py",
+    "tests/web/test_mcp_company_workspace.py",
+    "tests/web/test_mcp_panel.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/29/7e842b960c/0/metadata.json",
+      "transcript": "/29/7e842b960c/0/full.jsonl",
+      "content_hash": "/29/7e842b960c/0/content_hash.txt",
+      "prompt": "/29/7e842b960c/0/prompt.txt"
+    }
+  ]
+}

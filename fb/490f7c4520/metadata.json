@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "fb490f7c4520",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    ".gitignore",
+    "docs/reference/mcp-application.md",
+    "frontend/src/FetchPanel.jsx",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/fetch/country_runner.py",
+    "relocation_jobs/fetch/pipeline.py",
+    "relocation_jobs/fetch/runner.py",
+    "relocation_jobs/mcp/__init__.py",
+    "relocation_jobs/mcp/assets/master_resume.tex",
+    "relocation_jobs/mcp/assets/profile.example.json",
+    "relocation_jobs/mcp/paths.py",
+    "relocation_jobs/mcp/render.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/scrape/company.py",
+    "relocation_jobs/scrape/merge.py",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/fetch-render.js",
+    "relocation_jobs/static/js/fetch-ui.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/__init__.py",
+    "relocation_jobs/web/server.py",
+    "scripts/mcp_server.py",
+    "tests/helpers/postgres_mock.py",
+    "tests/helpers/route_manifest.py",
+    "tests/helpers/seed.py",
+    "tests/mcp/test_mcp_service.py",
+    "tests/scrape/test_merge.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/fb/490f7c4520/0/metadata.json",
+      "transcript": "/fb/490f7c4520/0/full.jsonl",
+      "content_hash": "/fb/490f7c4520/0/content_hash.txt",
+      "prompt": "/fb/490f7c4520/0/prompt.txt"
+    }
+  ]
+}

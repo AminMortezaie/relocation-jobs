@@ -1,0 +1,6 @@
+is there any places to publish my mcp and then use the url link to connect to my claude desktop to talk with my application online?
+
+---
+
+i have render application for my whole service and mcp is a part of it.
+do you think that is this needed to run in another place just my mcp?

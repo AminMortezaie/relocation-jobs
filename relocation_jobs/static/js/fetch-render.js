@@ -253,6 +253,7 @@ export function showFetchPanel({
   state.fetchPanelSingle = Boolean(singleCompany);
   clearFetchReviewContent();
   hideFetchReviewFooter();
+  clearFetchCountryResults();
   state.fetchReviewFeedback = null;
   fetchPanelState.title = title || "Fetching companies";
   fetchPanelState.subtitle = subtitle || "Starting…";
@@ -290,6 +291,35 @@ export function openFetchPanel() {
 export function hideFetchPanel() {
   fetchPanelState.open = false;
   clearFetchReview();
+  clearFetchCountryResults();
+  publishFetchUi();
+}
+
+export function clearFetchCountryResults() {
+  fetchPanelState.countryResults = {
+    visible: false,
+    totalNewJobs: 0,
+    companies: [],
+  };
+  publishFetchUi();
+}
+
+export function updateFetchCountryResults(st) {
+  const results = st?.progress?.company_results || [];
+  const totalNewJobs = Math.max(0, Number(st?.new_jobs_total) || 0);
+  const isCountryFetch = !st?.company;
+  fetchPanelState.countryResults = {
+    visible: isCountryFetch && results.length > 0,
+    totalNewJobs,
+    companies: results.map((entry) => ({
+      company: entry.company || "",
+      new_count: Math.max(0, Number(entry.new_count) || 0),
+      jobs: (entry.jobs || []).map((job) => ({
+        title: job.title || job.url || "",
+        url: job.url || "",
+      })),
+    })),
+  };
   publishFetchUi();
 }
 

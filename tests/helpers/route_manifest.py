@@ -3,6 +3,7 @@ from __future__ import annotations
 PANEL_PAGE_ROUTES: dict[str, frozenset[str]] = {
     "/": frozenset({"GET"}),
     "/admin": frozenset({"GET"}),
+    "/apply": frozenset({"GET"}),
 }
 
 PANEL_API_ROUTES: dict[str, frozenset[str]] = {
@@ -51,6 +52,9 @@ PANEL_API_ROUTES: dict[str, frozenset[str]] = {
     "/api/admin/fetch-runs": frozenset({"GET"}),
     "/api/admin/panel-stats": frozenset({"GET"}),
     "/api/admin/config": frozenset({"GET"}),
+    "/api/mcp/profile": frozenset({"GET", "PUT"}),
+    "/api/mcp/master-resumes": frozenset({"GET"}),
+    "/api/mcp/master-resumes/<slug>": frozenset({"GET", "PUT"}),
 }
 
 V2_ONLY_ROUTES: frozenset[str] = frozenset({

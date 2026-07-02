@@ -402,4 +402,5 @@ export {
   setFetchCancelPending,
   patchRunningFetchPanel,
   showFetchNotice,
+  updateFetchCountryResults,
 } from "./fetch-render.js";

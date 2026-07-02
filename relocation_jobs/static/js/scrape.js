@@ -29,6 +29,7 @@ import {
   patchRunningFetchPanel,
   setFetchCancelPending,
   showFetchNotice,
+  updateFetchCountryResults,
 } from "./render.js";
 
 const FETCH_POLL_FAILURE_LIMIT = 3;
@@ -149,6 +150,7 @@ function applyFetchStatus(st, { replaceLog = false } = {}) {
       }
     } else {
       clearFetchReview();
+      updateFetchCountryResults(st);
     }
     state.fetchPanelSingle = singleFetch;
     if (singleFetch) {
@@ -188,6 +190,7 @@ function applyFetchStatus(st, { replaceLog = false } = {}) {
         cancelled: st.cancel_requested,
         newJobsTotal: st.new_jobs_total,
       });
+      updateFetchCountryResults(st);
     }
     syncFetchJobSummary(st);
     return { done: false };
@@ -251,6 +254,7 @@ function applyFetchStatus(st, { replaceLog = false } = {}) {
     }
   } else {
     clearFetchReview();
+    updateFetchCountryResults(st);
     state.lastFetchReview = null;
   }
   syncFetchJobSummary(st);

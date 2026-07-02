@@ -289,7 +289,7 @@ def _reset_fetch_state(
         "result_line": None,
         "cancel_requested": False,
         "cancelled": False,
-        "progress": {"current": 0, "total": 0, "company": None, "status": ""},
+        "progress": {"current": 0, "total": 0, "company": None, "status": "", "company_results": []},
         "activity": {"message": "", "detail": ""},
         "activity_log": [],
         "log": [],
@@ -303,7 +303,29 @@ def _reset_fetch_state(
 
 def _on_country_progress(progress: dict) -> None:
     with _fetch_lock:
-        _fetch_state["progress"] = dict(progress)
+        prev = dict(_fetch_state.get("progress") or {})
+        company_results = prev.get("company_results") or progress.get("company_results") or []
+        merged = dict(progress)
+        if company_results:
+            merged["company_results"] = list(company_results)
+        _fetch_state["progress"] = merged
+    _sync_live_to_db()
+
+
+def _on_company_result(company_name: str, new_count: int, jobs: list[dict]) -> None:
+    if new_count <= 0:
+        return
+    with _fetch_lock:
+        _fetch_state["new_jobs_total"] = int(_fetch_state.get("new_jobs_total") or 0) + int(new_count)
+        progress = dict(_fetch_state.get("progress") or {})
+        results = list(progress.get("company_results") or [])
+        results.append({
+            "company": company_name,
+            "new_count": int(new_count),
+            "jobs": list(jobs or []),
+        })
+        progress["company_results"] = results
+        _fetch_state["progress"] = progress
     _sync_live_to_db()
 
 
@@ -344,6 +366,7 @@ def _country_fetch_worker(
                     concurrency=concurrency,
                     on_progress=_on_country_progress,
                     on_log=_append_log,
+                    on_company_result=_on_company_result,
                 )
 
         new_jobs_total, companies_done, cancelled = asyncio.run(_run())

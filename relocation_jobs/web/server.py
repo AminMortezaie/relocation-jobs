@@ -62,6 +62,13 @@ def admin_page():
     return resp
 
 
+@app.route("/apply")
+def apply_page():
+    resp = send_from_directory(STATIC, "apply.html")
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
 @app.route("/")
 def index():
     resp = send_from_directory(STATIC, "index.html")

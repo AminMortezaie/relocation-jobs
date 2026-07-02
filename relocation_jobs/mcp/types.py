@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from relocation_jobs.shared.schema import BaseSchema
 
@@ -17,8 +17,15 @@ class ValidationResult(BaseSchema):
 
 class RenderResult(BaseSchema):
     ok: bool
-    pdf_path: str = ""
     log: str = ""
+    pdf_stored: bool = False
+    pdf_bytes: int = 0
+
+
+class MasterResumeSummary(BaseSchema):
+    slug: str
+    label: str = ""
+    updated_at: str = ""
 
 
 class ApplicationProfile(BaseSchema):
@@ -30,6 +37,15 @@ class ApplicationProfile(BaseSchema):
     work_authorization: str = ""
     notice_period: str = ""
     summary: str = ""
+    pipeline: list[str] = Field(default_factory=list)
+
+    @field_validator("pipeline")
+    @classmethod
+    def _pipeline_max_five(cls, value: list[str]) -> list[str]:
+        cleaned = [item.strip() for item in value if item.strip()]
+        if len(cleaned) > 5:
+            raise ValueError("pipeline may contain at most 5 prompts")
+        return cleaned
 
 
 class JobContext(BaseSchema):
@@ -47,9 +63,9 @@ class JobContext(BaseSchema):
     looking_to_apply: bool = False
     pinned: bool = False
     ats_score: int | None = None
-    application_dir: str = ""
-    tailored_tex_path: str = ""
-    pdf_path: str = ""
+    master_resume_slug: str = ""
+    has_tailored_tex: bool = False
+    has_pdf: bool = False
 
 
 class ApplicationQueueItem(BaseSchema):

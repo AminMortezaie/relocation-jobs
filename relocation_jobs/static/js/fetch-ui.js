@@ -46,6 +46,11 @@ export const fetchPanelState = {
     expandHidden: true,
     expandLabel: "",
   },
+  countryResults: {
+    visible: false,
+    totalNewJobs: 0,
+    companies: [],
+  },
   completion: {
     hidden: true,
     label: "Current run",
@@ -85,6 +90,13 @@ function snapshotPanelState() {
       ...fetchPanelState.review,
       included: [...fetchPanelState.review.included],
       filtered: [...fetchPanelState.review.filtered],
+    },
+    countryResults: {
+      ...fetchPanelState.countryResults,
+      companies: (fetchPanelState.countryResults.companies || []).map((entry) => ({
+        ...entry,
+        jobs: [...(entry.jobs || [])],
+      })),
     },
     completion: { ...fetchPanelState.completion },
     footer: { ...fetchPanelState.footer },
@@ -130,6 +142,10 @@ function buildHeaderState() {
     if (summary.company) {
       metaText = `${summary.current}/${summary.total} · ${summary.company}`;
       chipTitle += ` · ${summary.company}`;
+    }
+    if (summary.newJobs > 0) {
+      metaText = `${metaText} · ${summary.newJobs} new`;
+      chipTitle += ` · ${summary.newJobs} new`;
     }
   } else if (summary.company) {
     metaText = summary.company;

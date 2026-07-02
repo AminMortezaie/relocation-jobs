@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "relocation-jobs": {
+      "command": "/absolute/path/to/resume/.venv/bin/python3",
+      "args": [
+        "/absolute/path/to/resume/scripts/mcp_server.py"
+      ]
+    }
+  }
+}

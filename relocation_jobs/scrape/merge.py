@@ -66,7 +66,7 @@ def _add_from_scrape(scraped: dict, key: str, seen_at: str) -> dict:
 def merge_matching_jobs(
     existing: list[dict],
     scraped: list[dict],
-) -> tuple[list[dict], int, int, int]:
+) -> tuple[list[dict], int, int, int, list[dict]]:
     seen_at = now_iso()
     cache = _index_existing_by_key(existing)
 
@@ -74,6 +74,7 @@ def merge_matching_jobs(
     scraped_keys: set[str] = set()
     preserved = 0
     new_count = 0
+    new_jobs: list[dict] = []
 
     for job in scraped:
         key = job_idempotency_key(job.get("url", ""))
@@ -88,6 +89,7 @@ def merge_matching_jobs(
         else:
             merged.append(_add_from_scrape(job, key, seen_at))
             new_count += 1
+            new_jobs.append(merged[-1])
 
     stale_kept = 0
     for key, old in cache.items():
@@ -101,4 +103,4 @@ def merge_matching_jobs(
     for job in merged:
         stamp_job_identity(job)
 
-    return merged, preserved, new_count, stale_kept
+    return merged, preserved, new_count, stale_kept, new_jobs

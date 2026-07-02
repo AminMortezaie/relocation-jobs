@@ -3,6 +3,7 @@ frontend/node_modules/
 __pycache__/
 *.py[cod]
 .env
+claude_desktop_config.json
 .env.neon-backup-*
 aws-postgres.env
 data/

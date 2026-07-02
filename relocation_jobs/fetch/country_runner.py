@@ -68,6 +68,7 @@ def _fetch_one_thread(
     run_id: int,
     http_concurrency: int,
     enrich_concurrency: int,
+    on_company_result: Callable[[str, int, list[dict]], None] | None = None,
 ) -> tuple[str, int, bool, str | None]:
     """Run a single company fetch in its own thread with its own event loop.
 
@@ -88,6 +89,7 @@ def _fetch_one_thread(
                 return await fetch_and_persist_company(
                     client, country_key, name, fetch_run_id=run_id,
                     enrich_concurrency=enrich_concurrency,
+                    on_company_result=on_company_result,
                 )
 
         try:
@@ -111,6 +113,7 @@ async def run_country_fetch(
     concurrency: int = 1,
     on_progress: Callable[[dict], None] | None = None,
     on_log: Callable[[str], None] | None = None,
+    on_company_result: Callable[[str, int, list[dict]], None] | None = None,
 ) -> tuple[int, int, bool]:
     companies = _companies_to_fetch(
         country_key,
@@ -159,6 +162,7 @@ async def run_country_fetch(
                     msg, new_count = await fetch_and_persist_company(
                         client, country_key, name, fetch_run_id=run_id,
                         enrich_concurrency=enrich_concurrency,
+                        on_company_result=on_company_result,
                     )
                     new_jobs_total += new_count
                     if on_log:
@@ -199,6 +203,7 @@ async def run_country_fetch(
                         run_id=run_id,
                         http_concurrency=http_concurrency,
                         enrich_concurrency=enrich_concurrency,
+                        on_company_result=on_company_result,
                     )
                     futures_map[f] = (name, index)
                     f.add_done_callback(lambda _: None)

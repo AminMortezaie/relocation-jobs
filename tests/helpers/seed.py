@@ -33,7 +33,7 @@ def merge_and_save_jobs(country_key: str, company_name: str, scraped: list[dict]
     company = get_company(country_key, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
-    merged, _, _, _ = merge_matching_jobs(company.get("matching_jobs") or [], scraped)
+    merged, _, _, _, _ = merge_matching_jobs(company.get("matching_jobs") or [], scraped)
     company["matching_jobs"] = merged
     sync_company_board_to_catalog(country_key, company)
     return merged

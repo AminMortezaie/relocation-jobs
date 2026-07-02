@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+import json
 import os
+import tempfile
+from pathlib import Path
 
 from relocation_jobs.catalog.repo import get_company, get_job_by_url
 from relocation_jobs.core.db import _normalize_url
 from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.db.users import get_user_by_username
-from relocation_jobs.mcp import paths, repo, render, validate
+from relocation_jobs.mcp import repo, render, validate
 from relocation_jobs.mcp.types import (
+    ApplicationProfile,
     ApplicationQueueItem,
     JobContext,
+    MasterResumeSummary,
     RenderResult,
     ValidationResult,
 )
@@ -38,6 +43,31 @@ def _tracking_row(
     return tracking.get(key, {})
 
 
+def _application_state(user_id: int, idempotency_key: str) -> dict:
+    row = repo.get_application(user_id, idempotency_key) or {}
+    return {
+        "has_tex": bool((row.get("tailored_tex") or "").strip()),
+        "has_pdf": bool(row.get("pdf_bytes")),
+        "master_slug": (row.get("master_resume_slug") or "").strip(),
+    }
+
+
+def _resolve_master_slug(
+    user_id: int,
+    idempotency_key: str,
+    slug: str | None,
+) -> str:
+    if slug and slug.strip():
+        return repo.normalize_master_resume_slug(slug)
+    stored = _application_state(user_id, idempotency_key)["master_slug"]
+    if stored:
+        return stored
+    raise LookupError(
+        "master_resume_slug is required (e.g. go, java, fullstack). "
+        "Pass it to save_tailored_tex / validate_tex, or save tailored tex first."
+    )
+
+
 def get_job_context(
     country: str,
     company: str,
@@ -55,10 +85,7 @@ def get_job_context(
     idem_key = (job.get("idempotency_key") or "").strip() or job_idempotency_key(catalog_url)
     tracking = load_job_tracking(uid, country=country)
     row = _tracking_row(tracking, country, company, catalog_url)
-
-    app_dir = paths.application_dir(idem_key)
-    tex = paths.tailored_tex_path(idem_key)
-    pdf = paths.pdf_path(idem_key)
+    app_state = _application_state(uid, idem_key)
 
     return JobContext(
         country=country,
@@ -75,9 +102,9 @@ def get_job_context(
         looking_to_apply=bool(row.get("looking_to_apply")),
         pinned=bool(row.get("pinned")),
         ats_score=row.get("ats_score"),
-        application_dir=str(app_dir),
-        tailored_tex_path=str(tex) if tex.is_file() else "",
-        pdf_path=str(pdf) if pdf.is_file() else "",
+        master_resume_slug=app_state["master_slug"],
+        has_tailored_tex=app_state["has_tex"],
+        has_pdf=app_state["has_pdf"],
     )
 
 
@@ -118,26 +145,84 @@ def list_application_queue(
     return items
 
 
+def list_master_resumes(*, user_id: int | None = None) -> list[MasterResumeSummary]:
+    uid = user_id if user_id is not None else resolve_user_id()
+    return repo.list_master_resumes(uid)
+
+
+def get_application_profile(*, user_id: int | None = None) -> ApplicationProfile:
+    uid = user_id if user_id is not None else resolve_user_id()
+    docs = repo.get_user_documents(uid)
+    if docs is None:
+        return ApplicationProfile()
+    raw = json.loads(docs.get("profile_json") or "{}")
+    return ApplicationProfile(**raw)
+
+
+def get_master_resume_detail(slug: str, *, user_id: int | None = None) -> dict:
+    uid = user_id if user_id is not None else resolve_user_id()
+    key = repo.normalize_master_resume_slug(slug)
+    content = repo.read_master_resume(uid, slug)
+    summaries = {item.slug: item for item in repo.list_master_resumes(uid)}
+    summary = summaries.get(key)
+    return {
+        "slug": key,
+        "label": (summary.label if summary else ""),
+        "content": content,
+        "updated_at": (summary.updated_at if summary else ""),
+    }
+
+
+def save_master_resume(
+    slug: str,
+    content: str,
+    *,
+    label: str = "",
+    user_id: int | None = None,
+) -> dict:
+    uid = user_id if user_id is not None else resolve_user_id()
+    return repo.save_master_resume(uid, slug, content, label=label)
+
+
+def save_application_profile(profile: ApplicationProfile, *, user_id: int | None = None) -> dict:
+    uid = user_id if user_id is not None else resolve_user_id()
+    return repo.save_profile(uid, profile)
+
+
 def save_tailored_tex_for_job(
     country: str,
     company: str,
     url: str,
     content: str,
     *,
+    master_resume_slug: str,
     user_id: int | None = None,
 ) -> dict:
-    ctx = get_job_context(country, company, url, user_id=user_id)
-    path = repo.save_tailored_tex(ctx.idempotency_key, content)
+    uid = user_id if user_id is not None else resolve_user_id()
+    ctx = get_job_context(country, company, url, user_id=uid)
+    slug = repo.normalize_master_resume_slug(master_resume_slug)
+    saved = repo.save_tailored_tex(
+        uid,
+        ctx.idempotency_key,
+        content,
+        country=country,
+        company=company,
+        url=ctx.url,
+        master_resume_slug=slug,
+    )
     meta = repo.touch_application_meta(
+        uid,
         ctx.idempotency_key,
         country=country,
         company=company,
         url=ctx.url,
         event="tailored_tex_saved",
+        extra={"master_resume_slug": slug},
     )
     return {
-        "path": str(path),
         "idempotency_key": ctx.idempotency_key,
+        "master_resume_slug": slug,
+        "updated_at": saved["updated_at"],
         "meta": meta,
     }
 
@@ -148,19 +233,31 @@ def validate_tailored_tex(
     url: str,
     *,
     tex_content: str | None = None,
+    master_resume_slug: str | None = None,
     user_id: int | None = None,
 ) -> ValidationResult:
-    ctx = get_job_context(country, company, url, user_id=user_id)
-    master = repo.read_master_resume()
-    tailored = tex_content if tex_content is not None else repo.read_tailored_tex(ctx.idempotency_key)
+    uid = user_id if user_id is not None else resolve_user_id()
+    ctx = get_job_context(country, company, url, user_id=uid)
+    slug = _resolve_master_slug(uid, ctx.idempotency_key, master_resume_slug)
+    master = repo.read_master_resume(uid, slug)
+    tailored = (
+        tex_content
+        if tex_content is not None
+        else repo.read_tailored_tex(uid, ctx.idempotency_key)
+    )
     result = validate.validate_tex_content(tailored, master)
     repo.touch_application_meta(
+        uid,
         ctx.idempotency_key,
         country=country,
         company=company,
         url=ctx.url,
         event="validated",
-        extra={"validation_ok": result.ok, "issue_count": len(result.issues)},
+        extra={
+            "validation_ok": result.ok,
+            "issue_count": len(result.issues),
+            "master_resume_slug": slug,
+        },
     )
     return result
 
@@ -170,29 +267,53 @@ def render_tailored_pdf(
     company: str,
     url: str,
     *,
+    master_resume_slug: str | None = None,
     user_id: int | None = None,
 ) -> RenderResult:
-    ctx = get_job_context(country, company, url, user_id=user_id)
-    tex_path = paths.tailored_tex_path(ctx.idempotency_key)
-    if not tex_path.is_file():
-        return RenderResult(ok=False, log=f"No tailored tex at {tex_path}")
+    uid = user_id if user_id is not None else resolve_user_id()
+    ctx = get_job_context(country, company, url, user_id=uid)
 
-    validation = validate_tailored_tex(country, company, url, user_id=user_id)
+    try:
+        tex = repo.read_tailored_tex(uid, ctx.idempotency_key)
+    except LookupError as exc:
+        return RenderResult(ok=False, log=str(exc))
+
+    validation = validate_tailored_tex(
+        country,
+        company,
+        url,
+        user_id=uid,
+        master_resume_slug=master_resume_slug,
+    )
     if not validation.ok:
         lines = [f"{issue.code}: {issue.message}" for issue in validation.issues]
         return RenderResult(ok=False, log="Validation failed:\n" + "\n".join(lines))
 
-    result = render.render_tex_to_pdf(tex_path)
-    if result.ok:
+    with tempfile.TemporaryDirectory() as tmp:
+        tex_path = Path(tmp) / "resume.tex"
+        tex_path.write_text(tex, encoding="utf-8")
+        compiled = render.render_tex_to_pdf(tex_path)
+        if not compiled.ok:
+            return RenderResult(ok=False, log=compiled.log)
+
+        pdf_bytes = Path(compiled.pdf_path).read_bytes()
+        stored = repo.save_pdf(uid, ctx.idempotency_key, pdf_bytes)
+        slug = _resolve_master_slug(uid, ctx.idempotency_key, master_resume_slug)
         repo.touch_application_meta(
+            uid,
             ctx.idempotency_key,
             country=country,
             company=company,
             url=ctx.url,
             event="pdf_rendered",
-            extra={"pdf_path": result.pdf_path},
+            extra={"pdf_bytes": stored["pdf_bytes"], "master_resume_slug": slug},
         )
-    return result
+        return RenderResult(
+            ok=True,
+            log=compiled.log,
+            pdf_stored=True,
+            pdf_bytes=stored["pdf_bytes"],
+        )
 
 
 def mark_job_applied(
@@ -207,6 +328,7 @@ def mark_job_applied(
     result = set_job_applied(country, company, url, applied, user_id=uid)
     ctx = get_job_context(country, company, url, user_id=uid)
     repo.touch_application_meta(
+        uid,
         ctx.idempotency_key,
         country=country,
         company=company,

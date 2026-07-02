@@ -15,10 +15,11 @@ class TestMergeMatchingJobs:
                 "visa_sponsorship": True,
             },
         ]
-        merged, preserved, new_count, stale = merge_matching_jobs(existing, scraped)
+        merged, preserved, new_count, stale, new_jobs = merge_matching_jobs(existing, scraped)
         assert preserved == 1
         assert new_count == 0
         assert stale == 0
+        assert new_jobs == []
         assert merged[0]["visa_sponsorship"] is True
         assert merged[0]["title"] == "New Title"
         assert merged[0]["fetched"] == "2025-01-01"
@@ -27,10 +28,11 @@ class TestMergeMatchingJobs:
         existing = [
             {"title": "Gone", "url": "https://example.com/j/1?gh_jid=1", "fetched": "2025-01-01"},
         ]
-        merged, preserved, new_count, stale = merge_matching_jobs(existing, [])
+        merged, preserved, new_count, stale, new_jobs = merge_matching_jobs(existing, [])
         assert preserved == 0
         assert new_count == 0
         assert stale == 1
+        assert new_jobs == []
         assert len(merged) == 1
         assert merged[0]["title"] == "Gone"
 
@@ -40,8 +42,9 @@ class TestMergeMatchingJobs:
             {"title": "B", "url": "https://example.com/j/1?gh_jid=1", "fetched": "2025-01-01"},
         ]
         scraped = [{"title": "C", "url": "https://example.com/j/2?gh_jid=2"}]
-        merged, _, new_count, _ = merge_matching_jobs(existing, scraped)
+        merged, _, new_count, _, new_jobs = merge_matching_jobs(existing, scraped)
         assert new_count == 1
+        assert len(new_jobs) == 1
         preserved = [j for j in merged if "j/1" in j["url"]][0]
         assert preserved["fetched"] == "2025-01-01"
 
@@ -55,8 +58,9 @@ class TestMergeMatchingJobs:
             },
         ]
         scraped = [{"title": "New Title", "url": "https://example.com/j/1?gh_jid=1"}]
-        merged, preserved, new_count, stale = merge_matching_jobs(existing, scraped)
+        merged, preserved, new_count, stale, new_jobs = merge_matching_jobs(existing, scraped)
         assert preserved == 1
         assert new_count == 0
+        assert new_jobs == []
         assert merged[0]["fetched"] == "2025-01-01"
         assert merged[0]["last_seen"] != "2025-01-01T00:00:00+00:00"

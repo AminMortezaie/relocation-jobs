@@ -95,6 +95,8 @@ def _migrate_schema(conn) -> None:
     run_migration_once(conn, "fetch_runs_table_v1", _ensure_fetch_runs_table)
     run_migration_once(conn, "fetch_runs_live_state_v1", _migrate_fetch_runs_live_state)
     run_migration_once(conn, "users_admin_column_v1", _ensure_users_admin_column)
+    run_migration_once(conn, "mcp_tables_v1", _ensure_mcp_tables)
+    run_migration_once(conn, "mcp_master_resumes_v2", _migrate_mcp_master_resumes_v2)
 
 
 def _migrate_fetch_runs_live_state(conn) -> None:
@@ -128,6 +130,68 @@ def _ensure_users_admin_column(conn) -> None:
     conn.execute(
         "UPDATE users SET is_admin = 1 WHERE LOWER(username) = LOWER(%s)",
         (admin_name,),
+    )
+
+
+def _ensure_mcp_tables(conn) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS mcp_user_documents (
+            user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+            master_resume_tex TEXT NOT NULL DEFAULT '',
+            profile_json TEXT NOT NULL DEFAULT '{}',
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS mcp_applications (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            idempotency_key TEXT NOT NULL,
+            country TEXT NOT NULL,
+            company_name TEXT NOT NULL,
+            job_url TEXT NOT NULL,
+            tailored_tex TEXT,
+            pdf_bytes BYTEA,
+            meta_json TEXT NOT NULL DEFAULT '{}',
+            tailored_tex_updated_at TEXT,
+            pdf_updated_at TEXT,
+            updated_at TEXT NOT NULL,
+            UNIQUE (user_id, idempotency_key)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_mcp_applications_user
+            ON mcp_applications(user_id, updated_at DESC);
+        """
+    )
+
+
+def _migrate_mcp_master_resumes_v2(conn) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS mcp_master_resumes (
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            slug TEXT NOT NULL,
+            label TEXT NOT NULL DEFAULT '',
+            content TEXT NOT NULL DEFAULT '',
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (user_id, slug)
+        );
+
+        ALTER TABLE mcp_applications
+        ADD COLUMN IF NOT EXISTS master_resume_slug TEXT;
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO mcp_master_resumes (user_id, slug, label, content, updated_at)
+        SELECT user_id, 'default', 'Default', master_resume_tex, updated_at
+        FROM mcp_user_documents
+        WHERE TRIM(COALESCE(master_resume_tex, '')) <> ''
+        ON CONFLICT (user_id, slug) DO NOTHING
+        """
+    )
+    conn.execute(
+        "ALTER TABLE mcp_user_documents DROP COLUMN IF EXISTS master_resume_tex"
     )
 
 

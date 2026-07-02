@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Application data — Relocation Jobs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=41" />
+</head>
+<body>
+  <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
+  <div class="layout admin-layout apply-layout">
+    <div id="applyLoginPanel" class="login-panel" hidden>
+      <h2>Sign in</h2>
+      <p class="hint">Your application profile and master resumes are stored per user in the database.</p>
+      <div class="login-error" id="applyLoginError"></div>
+      <form id="applyLoginForm">
+        <label for="applyLoginUsername">Username</label>
+        <input type="text" id="applyLoginUsername" autocomplete="username" required />
+        <label for="applyLoginPassword">Password</label>
+        <input type="password" id="applyLoginPassword" autocomplete="current-password" required />
+        <div class="login-actions">
+          <a href="/" class="link-btn">Back to jobs</a>
+          <button type="submit" class="primary">Sign in</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="applyContent" class="admin-content hidden">
+      <header class="admin-header">
+        <div class="admin-header-left">
+          <h1 class="app-title">Application data</h1>
+          <p class="admin-subtitle">Profile and master resumes for Claude Desktop MCP</p>
+        </div>
+        <div class="admin-header-actions">
+          <a href="/" class="header-secondary-btn admin-nav-link">Job panel</a>
+          <button type="button" class="header-secondary-btn" id="applyLogoutBtn">Sign out</button>
+        </div>
+      </header>
+
+      <div id="applyError" class="admin-error" hidden></div>
+      <div id="applySuccess" class="apply-success" hidden></div>
+
+      <nav class="apply-tabs" aria-label="Application data sections">
+        <button type="button" class="apply-tab apply-tab--active" data-tab="profile" id="applyTabProfile">Profile</button>
+        <button type="button" class="apply-tab" data-tab="masters" id="applyTabMasters">Master resumes</button>
+      </nav>
+
+      <section class="admin-panel apply-panel" id="applyProfilePanel">
+        <h2 class="admin-panel-title">Application profile</h2>
+        <p class="hint apply-hint">Used when tailoring resumes and filling application forms via MCP.</p>
+        <form id="applyProfileForm" class="apply-profile-form">
+          <label for="profileFullName">Full name</label>
+          <input type="text" id="profileFullName" autocomplete="name" />
+
+          <label for="profileEmail">Email</label>
+          <input type="email" id="profileEmail" autocomplete="email" />
+
+          <label for="profilePhone">Phone</label>
+          <input type="tel" id="profilePhone" autocomplete="tel" />
+
+          <label for="profileLinkedin">LinkedIn URL</label>
+          <input type="url" id="profileLinkedin" autocomplete="url" />
+
+          <label for="profileLocation">Location</label>
+          <input type="text" id="profileLocation" autocomplete="address-level2" />
+
+          <label for="profileWorkAuth">Work authorization</label>
+          <input type="text" id="profileWorkAuth" placeholder="e.g. EU citizen, need sponsorship" />
+
+          <label for="profileNotice">Notice period</label>
+          <input type="text" id="profileNotice" placeholder="e.g. 4 weeks" />
+
+          <label for="profileSummary">Summary</label>
+          <textarea id="profileSummary" rows="4" placeholder="Short professional summary for cover letters"></textarea>
+
+          <div class="apply-pipeline-section">
+            <h3 class="apply-pipeline-title">Pipeline</h3>
+            <p class="hint apply-hint apply-pipeline-hint">Up to 5 prompts run in order before reframing the resume. Claude reads these via MCP as reference for tailoring.</p>
+            <div id="applyPipelineList" class="apply-pipeline-list"></div>
+            <button type="button" class="link-btn apply-pipeline-add-btn" id="applyPipelineAddBtn">+ Add prompt</button>
+          </div>
+
+          <div class="apply-form-actions">
+            <button type="submit" class="header-primary-btn" id="applyProfileSaveBtn">Save profile</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="admin-panel apply-panel hidden" id="applyMastersPanel">
+        <h2 class="admin-panel-title">Master resumes</h2>
+        <p class="hint apply-hint">One LaTeX source per stack or role variant (e.g. <code>go</code>, <code>java</code>, <code>fullstack</code>).</p>
+
+        <div class="apply-masters-layout">
+          <aside class="apply-master-list-wrap">
+            <div class="apply-master-list-header">
+              <span class="apply-master-list-title">Variants</span>
+              <button type="button" class="link-btn apply-new-master-btn" id="applyNewMasterBtn">+ New</button>
+            </div>
+            <ul class="apply-master-list" id="applyMasterList"></ul>
+          </aside>
+
+          <div class="apply-master-editor">
+            <div class="apply-master-meta">
+              <label for="applyMasterSlug">Slug</label>
+              <input type="text" id="applyMasterSlug" class="apply-master-slug-input" placeholder="go" spellcheck="false" />
+              <label for="applyMasterLabel">Label</label>
+              <input type="text" id="applyMasterLabel" placeholder="Go backend" />
+            </div>
+            <label for="applyMasterContent">LaTeX content</label>
+            <textarea id="applyMasterContent" class="apply-tex-editor" spellcheck="false" placeholder="\documentclass{article}&#10;..."></textarea>
+            <div class="apply-form-actions">
+              <span class="apply-updated-at" id="applyMasterUpdated"></span>
+              <button type="button" class="header-primary-btn" id="applyMasterSaveBtn">Save resume</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="toast" id="applyToast"></div>
+
+  <script type="module" src="/static/js/apply.js?v=3"></script>
+</body>
+</html>

@@ -17,6 +17,7 @@ FetchBoard = Callable[..., Awaitable[list[dict]]]
 EnrichBoard = Callable[..., Awaitable[list[dict]]]
 PersistBoard = Optional[Callable[[], None]]
 OnReview = Optional[Callable[[dict], None]]
+OnCompanyResult = Optional[Callable[[str, int, list[dict]], None]]
 
 
 @dataclass(frozen=True)
@@ -101,6 +102,17 @@ def _mark_fetch_failed(company: dict) -> None:
     company["fetch_problem_date"] = _today()
     company["fetch_ok"] = False
     company.pop("fetch_ok_date", None)
+
+
+def _slim_new_jobs(jobs: list[dict]) -> list[dict]:
+    out: list[dict] = []
+    for job in jobs:
+        url = (job.get("url") or "").strip()
+        title = (job.get("title") or "").strip() or url
+        if not url:
+            continue
+        out.append({"title": title, "url": url})
+    return out
 
 
 def _scrape_success_line(
@@ -212,6 +224,7 @@ async def scrape_company_board(
     persist_board: PersistBoard,
     review_mode: bool = False,
     on_review: OnReview = None,
+    on_company_result: OnCompanyResult = None,
 ) -> tuple[str, int]:
     raise_if_cancelled()
     name = company.get("name") or ""
@@ -233,7 +246,9 @@ async def scrape_company_board(
             f"review: {len(scraped)} included, {len(filtered_out)} filtered",
             company=name,
         )
-    jobs, preserved, new_count, stale_kept = merge_matching_jobs(existing, scraped)
+    jobs, preserved, new_count, stale_kept, new_jobs = merge_matching_jobs(existing, scraped)
+    if on_company_result and new_count > 0:
+        on_company_result(name, new_count, _slim_new_jobs(new_jobs))
     jobs = await _maybe_enrich_scraped_board(
         client, jobs, company,
         enrich_board=enrich_board,
@@ -266,6 +281,7 @@ async def process_company(
     catalog_country: str = "",
     review_mode: bool = False,
     on_review: OnReview = None,
+    on_company_result: OnCompanyResult = None,
 ) -> tuple[str, int]:
     company["updated"] = now_iso()
     prefix = _company_line(company, index, total)
@@ -290,6 +306,7 @@ async def process_company(
             persist_board=persist_board,
             review_mode=review_mode,
             on_review=on_review,
+            on_company_result=on_company_result,
         )
     except FetchCancelled:
         raise

@@ -88,6 +88,8 @@ class FakePgConnection:
                     return self._conn.execute("SELECT 1 AS ok")
                 if "cannot add a column" in msg and "alter table" in msg.lower():
                     return self._conn.execute("SELECT 1 AS ok")
+                if "no such column" in msg and "drop column" in sql.lower():
+                    return self._conn.execute("SELECT 1 AS ok")
                 raise
 
     def _adapt_any(self, sql: str, params: tuple | list) -> tuple[str, tuple]:
@@ -123,6 +125,9 @@ class FakePgConnection:
         self._conn.close()
 
     _DATA_TABLES = (
+        "mcp_applications",
+        "mcp_master_resumes",
+        "mcp_user_documents",
         "job_status_events",
         "fetch_runs",
         "job_tracking",
@@ -134,6 +139,9 @@ class FakePgConnection:
     )
 
     _TRACKING_TABLES = (
+        "mcp_applications",
+        "mcp_master_resumes",
+        "mcp_user_documents",
         "job_status_events",
         "fetch_runs",
         "company_fetch_attempts",
@@ -176,6 +184,7 @@ class FakePgConnection:
             out,
             flags=re.I,
         )
+        out = re.sub(r"\bDROP COLUMN IF EXISTS\b", "DROP COLUMN", out, flags=re.I)
         out = re.sub(r"\bJSONB\b", "TEXT", out, flags=re.I)
         out = re.sub(r"'::(jsonb|text)", "'", out, flags=re.I)
         return out, returning

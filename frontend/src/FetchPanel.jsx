@@ -27,6 +27,7 @@ function FetchPanel({ panel = {} }) {
 
   const actions = window.relocationJobs?.fetchActions || {};
   const review = panel.review || {};
+  const countryResults = panel.countryResults || {};
   const footer = panel.footer || {};
   const progress = panel.progress || {};
   const activity = panel.activity || {};
@@ -142,6 +143,44 @@ function FetchPanel({ panel = {} }) {
                   ))}
                 </ol>
               ) : null}
+            </div>
+          ) : null}
+
+          {countryResults.visible ? (
+            <div className="fetch-country-results">
+              <div className="fetch-country-results-head">
+                <h3 className="fetch-review-heading">
+                  New roles found ({countryResults.totalNewJobs || 0})
+                </h3>
+                <p className="fetch-country-results-sub">
+                  {countryResults.companies.length === 1
+                    ? "1 company with new roles"
+                    : `${countryResults.companies.length} companies with new roles`}
+                </p>
+              </div>
+              <div className="fetch-country-results-list">
+                {countryResults.companies.map((entry) => (
+                  <section key={entry.company} className="fetch-country-results-company">
+                    <h4 className="fetch-country-results-company-name">
+                      {entry.company}
+                      <span className="fetch-country-results-count">
+                        {entry.new_count === 1 ? "1 new role" : `${entry.new_count} new roles`}
+                      </span>
+                    </h4>
+                    {entry.jobs?.length ? (
+                      <ul className="fetch-review-list">
+                        {entry.jobs.map((job) => (
+                          <li key={job.url || job.title} className="fetch-review-item">
+                            <a href={job.url} target="_blank" rel="noopener noreferrer">
+                              {job.title || job.url}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </section>
+                ))}
+              </div>
             </div>
           ) : null}
 

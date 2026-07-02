@@ -28,6 +28,7 @@ async def fetch_and_persist_company(
     fetch_run_id: int | None = None,
     review_mode: bool = False,
     on_review: OnReview = None,
+    on_company_result: OnCompanyResult = None,
 ) -> tuple[str, int]:
     company = get_company(country_key, company_name)
     if company is None:
@@ -68,6 +69,7 @@ async def fetch_and_persist_company(
             catalog_country=country_key,
             review_mode=review_mode,
             on_review=on_review,
+            on_company_result=on_company_result,
         )
 
     return await fetch_service.fetch_company(

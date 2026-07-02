@@ -219,7 +219,6 @@ export async function setNotForMe(country, company, url, notForMe, reason = null
     } else {
       restoreJobToOpen(co, url, idempotencyKey);
     }
-    void pinJob(country, company, url, idempotencyKey);
     void refreshUserStatsQuiet();
   } else {
     await reloadBoardFallback();

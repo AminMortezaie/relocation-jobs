@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+ACME = "Acme Backend Ltd"
+
+
+def _acme(board: dict) -> dict:
+    return next(c for c in board["companies"] if c["name"] == ACME)
+
 
 def test_pin_job_persists_on_board(v2_auth_client, seeded_catalog_v2):
     board = v2_auth_client.get("/api/board?country=uk").get_json()
-    co = board["companies"][0]
+    co = _acme(board)
     job = co["jobs"][0]
 
     pin = v2_auth_client.post(
@@ -21,7 +27,7 @@ def test_pin_job_persists_on_board(v2_auth_client, seeded_catalog_v2):
     assert not payload.get("board_pinned")
 
     board2 = v2_auth_client.get("/api/board?country=uk&sort=newest").get_json()
-    acme = next(c for c in board2["companies"] if c["name"] == co["name"])
+    acme = _acme(board2)
     assert not acme.get("board_pinned")
     pinned_jobs = [j for j in acme["jobs"] if j["url"] == job["url"]]
     assert len(pinned_jobs) == 1
@@ -50,10 +56,7 @@ def test_pin_does_not_reorder_company_on_board(v2_auth_client, seeded_catalog_v2
             ],
         },
     )
-    older = next(
-        c for c in v2_auth_client.get("/api/board?country=uk").get_json()["companies"]
-        if c["name"] == "Acme Backend Ltd"
-    )
+    older = _acme(v2_auth_client.get("/api/board?country=uk").get_json())
     older_job = older["jobs"][0]
     v2_auth_client.post(
         "/api/jobs/pin",
@@ -67,13 +70,13 @@ def test_pin_does_not_reorder_company_on_board(v2_auth_client, seeded_catalog_v2
 
     board = v2_auth_client.get("/api/board?country=uk&sort=newest").get_json()
     assert board["companies"][0]["name"] == "Newer Jobs Co"
-    acme = next(c for c in board["companies"] if c["name"] == "Acme Backend Ltd")
+    acme = _acme(board)
     assert acme["jobs"][0]["pinned"] is True
 
 
 def test_unpin_job_clears_pin_on_board(v2_auth_client, seeded_catalog_v2):
     board = v2_auth_client.get("/api/board?country=uk").get_json()
-    co = board["companies"][0]
+    co = _acme(board)
     job = co["jobs"][0]
 
     pin = v2_auth_client.post(
@@ -88,7 +91,7 @@ def test_unpin_job_clears_pin_on_board(v2_auth_client, seeded_catalog_v2):
     assert pin.status_code == 200
     assert pin.get_json().get("pinned") is True
 
-    unpin = v2_auth_client.post(
+    unpin = v2_auth_client.patch(
         "/api/jobs/pin",
         json={
             "country": "uk",
@@ -101,14 +104,38 @@ def test_unpin_job_clears_pin_on_board(v2_auth_client, seeded_catalog_v2):
     assert unpin.get_json().get("pinned") is False
 
     board2 = v2_auth_client.get("/api/board?country=uk").get_json()
-    acme = next(c for c in board2["companies"] if c["name"] == co["name"])
-    pinned_jobs = [j for j in acme["jobs"] if j.get("pinned")]
-    assert not pinned_jobs
+    acme = _acme(board2)
+    target = next(j for j in acme["jobs"] if j["url"] == job["url"])
+    assert target["pinned"] is False
+    assert not [j for j in acme["jobs"] if j.get("pinned")]
+
+
+def test_hide_not_for_me_does_not_pin_job(v2_auth_client, seeded_catalog_v2):
+    board = v2_auth_client.get("/api/board?country=uk").get_json()
+    co = _acme(board)
+    job = co["jobs"][0]
+
+    hide = v2_auth_client.post(
+        "/api/jobs/not-for-me",
+        json={
+            "country": "uk",
+            "company": co["name"],
+            "url": job["url"],
+            "not_for_me": True,
+        },
+    )
+    assert hide.status_code == 200
+
+    board2 = v2_auth_client.get("/api/board?country=uk").get_json()
+    acme = _acme(board2)
+    hidden = next(j for j in acme["not_for_me_jobs"] if j["url"] == job["url"])
+    assert hidden["not_for_me"] is True
+    assert not hidden.get("pinned")
 
 
 def test_pin_replaces_previous_job_pin_in_same_company(v2_auth_client, seeded_catalog_v2):
     board = v2_auth_client.get("/api/board?country=uk").get_json()
-    co = board["companies"][0]
+    co = _acme(board)
     first_job, second_job = co["jobs"][0], co["jobs"][1]
 
     v2_auth_client.post(
@@ -121,7 +148,7 @@ def test_pin_replaces_previous_job_pin_in_same_company(v2_auth_client, seeded_ca
     )
 
     board2 = v2_auth_client.get("/api/board?country=uk").get_json()
-    acme = next(c for c in board2["companies"] if c["name"] == co["name"])
+    acme = _acme(board2)
     pinned_jobs = [j for j in acme["jobs"] if j.get("pinned")]
     assert len(pinned_jobs) == 1
     assert pinned_jobs[0]["url"] == second_job["url"]

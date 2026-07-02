@@ -1,0 +1,13 @@
+add the realtime pdf preview for master CVs like we have for applications on companies.
+
+---
+
+No PDF yet — save LaTeX, then re-render.
+
+---
+
+No PDF yet — save LaTeX, then re-render.
+
+---
+
+add a button to make the pdf on click open window to show the details better on screen.

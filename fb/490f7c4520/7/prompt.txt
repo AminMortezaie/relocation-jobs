@@ -1,0 +1,8 @@
+its a problem when fetching companies positions its not updating the new fetched positions during the fetch and just at the final place it updates the count of new fetched job.
+
+also i want you to add a new feature to it to show the new fetched job per company, which means that for example you found 3 jobs from 3 companies.
+and after fetching the UI shows the position and companies for the result of fetching.
+
+---
+
+start the application and use the browser to see the actions and see its happening rightly or not.

@@ -3,7 +3,7 @@
   "checkpoint_id": "fb490f7c4520",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 30,
+  "checkpoints_count": 32,
   "files_touched": [
     ".gitignore",
     "claude_desktop_config.json.example",
@@ -37,13 +37,15 @@
     "relocation_jobs/web/routes/mcp.py",
     "relocation_jobs/web/server.py",
     "scripts/mcp_server.py",
+    "tests/fetch/test_runner_country_results.py",
     "tests/helpers/postgres_mock.py",
     "tests/helpers/route_manifest.py",
     "tests/helpers/seed.py",
     "tests/mcp/conftest.py",
     "tests/mcp/test_mcp_service.py",
     "tests/scrape/test_merge.py",
-    "tests/web/test_mcp_panel.py"
+    "tests/web/test_mcp_panel.py",
+    "tmp_inject_fetch.py"
   ],
   "sessions": [
     {
@@ -87,6 +89,12 @@
       "transcript": "/fb/490f7c4520/6/full.jsonl",
       "content_hash": "/fb/490f7c4520/6/content_hash.txt",
       "prompt": "/fb/490f7c4520/6/prompt.txt"
+    },
+    {
+      "metadata": "/fb/490f7c4520/7/metadata.json",
+      "transcript": "/fb/490f7c4520/7/full.jsonl",
+      "content_hash": "/fb/490f7c4520/7/content_hash.txt",
+      "prompt": "/fb/490f7c4520/7/prompt.txt"
     }
   ]
 }

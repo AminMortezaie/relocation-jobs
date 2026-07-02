@@ -1,0 +1,32 @@
+we're using the ec2 aws currently for the postgres, can we completely move the application to aws and not using the render and also for the domain using something free like .dev postfix?
+
+---
+
+is there any other free options for domain?
+
+---
+
+ok we want to go through some cheap domain names what would be your suggestion?
+
+---
+
+relocation-jobs.uk
+with just 5 $ per year.
+what do you think of it?
+on cloudflare.
+
+---
+
+is this free also on AWS because what we have currently on aws is totally free for one year.
+
+---
+
+is this free also on AWS because what we have currently on aws is totally free for one year.
+
+---
+
+ok i will buy relocation-jobs.uk now from cloudflare and then come back to you.
+
+---
+
+ok i will buy relocation-jobs.uk now from cloudflare and then come back to you.

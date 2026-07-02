@@ -1,6 +1,6 @@
 # Documentation
 
-**Last updated:** 2026-06-28
+**Last updated:** 2026-07-02
 
 All project docs live under `docs/`. [README](../README.md) at the repo root covers product setup and usage only.
 
@@ -20,6 +20,7 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Panel / admin statistics | [reference/stats.md](reference/stats.md) |
 | Test failures / catalog seed in tests | [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md) |
 | MCP apply assistant (Claude Desktop, v0) | [reference/mcp-application.md](reference/mcp-application.md) |
+| Company workspace (CV/PDF on panel) | [reference/company-workspace.md](reference/company-workspace.md) |
 | Agent commands cheat sheet | [CLAUDE.md](../CLAUDE.md) |
 
 ---
@@ -42,6 +43,7 @@ docs/
     catalog-pattern.md        shared catalog + per-user overlay (design)
     catalog-seed-test-failure.md  post-mortem: pytest pollution after board sort tests
     mcp-application.md          Claude Desktop MCP: resume tex → PDF, apply prep (v0)
+    company-workspace.md        Panel company page: tailored CV + PDF preview
   operations/
     aws-postgres.md           AWS EC2 Postgres, Render DATABASE_URL
   archive/                    historical handoffs — read only if debugging old work

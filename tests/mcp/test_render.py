@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from relocation_jobs.mcp.render import render_tex_to_pdf
+from relocation_jobs.mcp.render import render_tex_to_pdf, sanitize_tex_for_tectonic
 
 
 def test_render_tex_to_pdf_success(monkeypatch, tmp_path):
@@ -40,3 +40,18 @@ def test_render_tex_to_pdf_missing_compiler(monkeypatch, tmp_path):
     result = render_tex_to_pdf(tex)
     assert result.ok is False
     assert "not found" in result.log.lower()
+
+
+def test_sanitize_tex_for_tectonic_removes_fontawesome5():
+    tex = r"""
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\begin{document}
+Hi
+\end{document}
+"""
+    sanitized, removed = sanitize_tex_for_tectonic(tex)
+    assert "fontawesome5" in removed
+    assert "fontawesome5" not in sanitized
+    assert r"\usepackage{hyperref}" in sanitized

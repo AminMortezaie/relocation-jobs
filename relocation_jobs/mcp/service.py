@@ -13,6 +13,9 @@ from relocation_jobs.mcp import repo, render, validate
 from relocation_jobs.mcp.types import (
     ApplicationProfile,
     ApplicationQueueItem,
+    ApplicationTexDetail,
+    CompanyApplicationsResponse,
+    CompanyPositionApplication,
     JobContext,
     MasterResumeSummary,
     RenderResult,
@@ -143,6 +146,150 @@ def list_application_queue(
 
     items.sort(key=lambda item: (not item.pinned, not item.looking_to_apply, item.company.lower()))
     return items
+
+
+def resolve_company_for_workspace(
+    country: str,
+    company_or_slug: str,
+) -> str:
+    country_key = country.strip().lower()
+    raw = (company_or_slug or "").strip()
+    if not raw:
+        raise LookupError("company is required")
+    company_row = get_company(country_key, raw)
+    if company_row is not None:
+        return (company_row.get("name") or raw).strip()
+    resolved = repo.resolve_company_name_by_slug(country_key, raw)
+    if resolved is None:
+        raise LookupError(f"Company not found: {company_or_slug}")
+    return resolved
+
+
+def list_company_applications(
+    country: str,
+    company: str,
+    *,
+    user_id: int | None = None,
+) -> CompanyApplicationsResponse:
+    uid = user_id if user_id is not None else resolve_user_id()
+    country_key = country.strip().lower()
+    company_name = resolve_company_for_workspace(country_key, company)
+    company_row = get_company(country_key, company_name)
+    if company_row is None:
+        raise LookupError(f"Company not found: {company}")
+
+    tracking = load_job_tracking(uid, country=country_key)
+    app_rows = repo.list_applications_for_company(uid, country_key, company_name)
+    app_by_key = {
+        (row.get("idempotency_key") or "").strip(): row
+        for row in app_rows
+        if (row.get("idempotency_key") or "").strip()
+    }
+
+    positions: list[CompanyPositionApplication] = []
+    for job in company_row.get("matching_jobs") or []:
+        catalog_url = (job.get("url") or "").strip()
+        idem_key = (
+            (job.get("idempotency_key") or "").strip()
+            or job_idempotency_key(catalog_url)
+        )
+        row = _tracking_row(tracking, country_key, company_name, catalog_url)
+        app = app_by_key.get(idem_key, {})
+        positions.append(CompanyPositionApplication(
+            title=(job.get("title") or "").strip(),
+            url=catalog_url,
+            idempotency_key=idem_key,
+            location=(job.get("location") or "").strip(),
+            applied=bool(row.get("applied")),
+            rejected=bool(row.get("rejected")),
+            looking_to_apply=bool(row.get("looking_to_apply")),
+            pinned=bool(row.get("pinned")),
+            ats_score=row.get("ats_score"),
+            has_tailored_tex=bool((app.get("tailored_tex") or "").strip()),
+            has_pdf=bool(app.get("pdf_bytes")),
+            master_resume_slug=(app.get("master_resume_slug") or "").strip(),
+            tailored_tex_updated_at=(app.get("tailored_tex_updated_at") or "").strip(),
+            pdf_updated_at=(app.get("pdf_updated_at") or "").strip(),
+        ))
+
+    positions.sort(key=lambda item: (not item.pinned, not item.looking_to_apply, item.title.lower()))
+    return CompanyApplicationsResponse(
+        country=country_key,
+        company=company_name,
+        company_slug=repo.company_slug(company_name),
+        positions=positions,
+    )
+
+
+def get_application_detail(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> JobContext:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        raise LookupError(f"Application not found: {idempotency_key}")
+    return get_job_context(
+        row["country"],
+        row["company_name"],
+        row["job_url"],
+        user_id=uid,
+    )
+
+
+def read_application_tex(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> ApplicationTexDetail:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        raise LookupError(f"Application not found: {idempotency_key}")
+    content = repo.read_tailored_tex(uid, idempotency_key)
+    ctx = get_job_context(
+        row["country"],
+        row["company_name"],
+        row["job_url"],
+        user_id=uid,
+    )
+    return ApplicationTexDetail(
+        idempotency_key=idempotency_key,
+        country=ctx.country,
+        company=ctx.company,
+        url=ctx.url,
+        title=ctx.title,
+        content=content,
+        master_resume_slug=ctx.master_resume_slug,
+        updated_at=(row.get("tailored_tex_updated_at") or "").strip(),
+    )
+
+
+def read_application_pdf(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> bytes:
+    uid = user_id if user_id is not None else resolve_user_id()
+    return repo.read_pdf_bytes(uid, idempotency_key)
+
+
+def render_application_pdf(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> RenderResult:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        return RenderResult(ok=False, log=f"Application not found: {idempotency_key}")
+    return render_tailored_pdf(
+        row["country"],
+        row["company_name"],
+        row["job_url"],
+        user_id=uid,
+    )
 
 
 def list_master_resumes(*, user_id: int | None = None) -> list[MasterResumeSummary]:

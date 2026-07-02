@@ -1,6 +1,6 @@
 # MCP application assistant (v0)
 
-**Last updated:** 2026-07-01
+**Last updated:** 2026-07-02
 
 Plan and reference for the `relocation_jobs/mcp/` domain: a local MCP server for **Claude Desktop** that prepares tailored resume PDFs for jobs on the panel. v0 does **not** submit applications automatically and does **not** use the Claude API — Claude Desktop (subscription) does the resume reframing in chat; this app supplies data, validation, PDF rendering, and board state updates.
 
@@ -85,6 +85,20 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 | `validate_tex` | Structure + fact checks vs master |
 | `render_pdf` | Compile → store PDF bytes |
 | `mark_applied` | Panel tracking |
+
+### Panel integration (company workspace)
+
+MCP writes artifacts to Postgres; the panel reads them via HTTP (same user session as `/apply`).
+
+| Panel surface | Purpose |
+|---------------|---------|
+| `/apply` | Profile, pipeline prompts, master resumes (setup) |
+| `/company/<country>/<company-slug>` | Per-company workspace: positions, tailored tex, PDF preview — see [company-workspace.md](company-workspace.md) |
+| Job board (phase 3) | CV/PDF badges; company name → workspace |
+
+Web API (login required): `GET /api/mcp/companies/<country>/<company>/applications`, `GET/POST /api/mcp/applications/<idempotency_key>/…` — documented in [company-workspace.md](company-workspace.md).
+
+Claude Desktop still owns reframing (`save_tailored_tex`); the panel is read + re-render + download for v1.
 
 ### End-to-end flow (position → pipeline → reframe)
 
@@ -266,6 +280,10 @@ Correct: there is no `run_pipeline` tool. Prompts are **data**, not an executabl
 **`get_job_context` shows `null` for `visa_sponsorship` or `ats_score`**
 
 Normal when the catalog or your tracking has no value for those fields.
+
+**PDF render fails or returns almost no log**
+
+`tectonic` (default via `MCP_LATEX_CMD`) can crash on some packages — notably `fontawesome5` / `fontawesome`, which are omitted automatically at compile time if the first attempt fails. The stored `.tex` in Postgres is not modified. If render still fails, check the workspace **Re-render PDF** error text or run `tectonic` locally on the tailored file. Em-dashes (`—`) may warn under `lmodern` but usually still produce a PDF.
 
 ---
 

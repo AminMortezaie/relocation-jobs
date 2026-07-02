@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { companyWorkspacePath } from "./companyWorkspace";
 import { companyActivityTs, formatActivityBadge, formatAppliedLabel } from "./format";
 import { sortJobsForDisplay } from "./sort";
 import JobCard from "./JobCard";
@@ -67,6 +68,8 @@ function CompanyCard({ company, ui }) {
   const countLabel = company.job_count === 1 ? "1 role" : `${company.job_count} roles`;
   const appliedCount = company.positions_applied_all ?? company.positions_applied ?? 0;
   const openJobs = sortJobsForDisplay(company.jobs || []);
+  const workspaceHref = companyWorkspacePath(company.country, company.name);
+  const tailoredCount = openJobs.filter((job) => job.has_pdf || job.has_tailored_tex).length;
 
   return (
     <article
@@ -77,7 +80,9 @@ function CompanyCard({ company, ui }) {
       <div className="company-header">
         <div>
           <div className="company-name-row">
-            <div className="company-name">{company.name}</div>
+            <a className="company-name company-name-link" href={workspaceHref} title="Open application workspace">
+              {company.name}
+            </a>
             <button
               type="button"
               className="edit-name-btn"
@@ -104,6 +109,11 @@ function CompanyCard({ company, ui }) {
             </button>
             <span>{company.country_label}</span>
             <span>{countLabel}</span>
+            {tailoredCount > 0 ? (
+              <a className="company-cv-summary" href={workspaceHref} title="View tailored CVs">
+                {tailoredCount} tailored CV{tailoredCount === 1 ? "" : "s"}
+              </a>
+            ) : null}
           </div>
           {company.careers_url ? (
             <div className="careers-row">

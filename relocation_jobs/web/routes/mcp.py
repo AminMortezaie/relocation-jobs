@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from flask import g, jsonify, request
+from flask import Response, g, jsonify, request
 
 from pydantic import ValidationError
 
 from relocation_jobs.core.auth import login_required
+from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
 from relocation_jobs.mcp import service as mcp_service
 from relocation_jobs.mcp.types import ApplicationProfile
 
@@ -62,3 +63,54 @@ def register(app):
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
         return jsonify({"ok": True, **saved})
+
+    @app.get("/api/mcp/companies/<country>/<path:company>/applications")
+    @login_required
+    def api_mcp_company_applications(country: str, company: str):
+        country_key = country.strip().lower()
+        if country_key not in SUPPORTED_COUNTRIES:
+            return jsonify({"error": f"Unknown country: {country}"}), 400
+        try:
+            payload = mcp_service.list_company_applications(
+                country_key,
+                company,
+                user_id=g.user_id,
+            )
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        return jsonify(payload.model_dump())
+
+    @app.get("/api/mcp/applications/<path:idempotency_key>")
+    @login_required
+    def api_mcp_application_detail(idempotency_key: str):
+        try:
+            detail = mcp_service.get_application_detail(idempotency_key, user_id=g.user_id)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        return jsonify(detail.model_dump())
+
+    @app.get("/api/mcp/applications/<path:idempotency_key>/tex")
+    @login_required
+    def api_mcp_application_tex(idempotency_key: str):
+        try:
+            detail = mcp_service.read_application_tex(idempotency_key, user_id=g.user_id)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        return jsonify(detail.model_dump())
+
+    @app.get("/api/mcp/applications/<path:idempotency_key>/pdf")
+    @login_required
+    def api_mcp_application_pdf(idempotency_key: str):
+        try:
+            pdf_bytes = mcp_service.read_application_pdf(idempotency_key, user_id=g.user_id)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        return Response(pdf_bytes, mimetype="application/pdf")
+
+    @app.post("/api/mcp/applications/<path:idempotency_key>/render")
+    @login_required
+    def api_mcp_application_render(idempotency_key: str):
+        result = mcp_service.render_application_pdf(idempotency_key, user_id=g.user_id)
+        if not result.ok:
+            return jsonify({"ok": False, "error": result.log, **result.model_dump()}), 400
+        return jsonify({"ok": True, **result.model_dump()})

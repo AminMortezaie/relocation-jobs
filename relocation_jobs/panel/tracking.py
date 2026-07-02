@@ -11,6 +11,21 @@ from relocation_jobs.core.location_tags import job_location_fields
 from relocation_jobs.shared.coerce import as_bool
 
 
+def mcp_fields_for_key(idempotency_key: str, mcp_applications: dict | None) -> dict:
+    if not mcp_applications:
+        return {
+            "has_tailored_tex": False,
+            "has_pdf": False,
+            "master_resume_slug": "",
+        }
+    app = mcp_applications.get((idempotency_key or "").strip(), {})
+    return {
+        "has_tailored_tex": bool(app.get("has_tailored_tex")),
+        "has_pdf": bool(app.get("has_pdf")),
+        "master_resume_slug": (app.get("master_resume_slug") or "").strip(),
+    }
+
+
 def tracking_key(country: str, company: str, url: str) -> tuple[str, str, str]:
     return (country, company, normalize_job_url(url))
 
@@ -205,9 +220,11 @@ def tracked_job_dict(
     country_key: str,
     country_label: str,
     status_history: dict | None = None,
+    mcp_applications: dict | None = None,
 ) -> dict:
     url = track.get("job_url", "")
     title = (track.get("job_title") or "").strip() or _title_from_tracked_url(url)
+    idempotency_key = job_idempotency_key(url)
     applied = bool(track.get("applied"))
     rejected = as_bool(track.get("rejected"))
     hist = _status_history(
@@ -219,7 +236,7 @@ def tracked_job_dict(
     return {
         "title": title,
         "url": url,
-        "idempotency_key": job_idempotency_key(url),
+        "idempotency_key": idempotency_key,
         "fetched": "",
         "last_seen": "",
         "visa_sponsorship": None,
@@ -248,6 +265,7 @@ def tracked_job_dict(
         "country_label": country_label,
         "careers_url": company.get("careers_url", ""),
         "ats_type": company.get("ats_type", ""),
+        **mcp_fields_for_key(idempotency_key, mcp_applications),
     }
 
 
@@ -260,6 +278,7 @@ def job_dict(
     country_label: str,
     job_tracking: dict | None = None,
     status_history: dict | None = None,
+    mcp_applications: dict | None = None,
 ) -> dict:
     url = job.get("url", "")
     track = (
@@ -275,10 +294,11 @@ def job_dict(
     hist = _status_history(status_history, country_key=country_key, company_name=company_name, job=job)
     track_applied_date = (track.get("applied_date", "") if logged_in else job.get("applied_date", "")) if applied else ""
     track_rejected_date = (track.get("rejected_date", "") if logged_in else job.get("rejected_date", "")) if rejected else ""
+    idempotency_key = job_idempotency_key_for_job(job)
     return {
         "title": job.get("title", ""),
         "url": url,
-        "idempotency_key": job_idempotency_key_for_job(job),
+        "idempotency_key": idempotency_key,
         "fetched": job.get("fetched", ""),
         "last_seen": job.get("last_seen", ""),
         "visa_sponsorship": job.get("visa_sponsorship"),
@@ -311,4 +331,5 @@ def job_dict(
         "country_label": country_label,
         "careers_url": company.get("careers_url", ""),
         "ats_type": company.get("ats_type", ""),
+        **mcp_fields_for_key(idempotency_key, mcp_applications),
     }

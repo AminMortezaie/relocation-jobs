@@ -1,6 +1,6 @@
 # Panel board — pagination, sort, and activity timestamps
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-07-02
 
 How the main company board loads, paginates, and sorts by “newest”. Read before changing `panel/`, `static/js/board*.js`, `static/js/render.js`, or `GET /api/board`.
 
@@ -138,3 +138,17 @@ After a fetch, a company rises in sort order only when it has a **new or updated
 | Client load | `static/js/board.js` |
 | Client sort | `static/js/render.js` |
 | Sort UI | `static/js/filters.js`, `static/js/storage.js` |
+
+---
+
+## MCP application flags on jobs
+
+When a user is logged in, `GET /api/board` merges per-position MCP state from `mcp_applications` into each job row:
+
+| Field | Meaning |
+|-------|---------|
+| `has_tailored_tex` | Tailored LaTeX saved for this position |
+| `has_pdf` | Compiled PDF stored |
+| `master_resume_slug` | Master variant used (e.g. `go`, `java`) |
+
+Company name on the board links to the application workspace at `/company/<country>/<company-slug>`. See [company-workspace.md](company-workspace.md).

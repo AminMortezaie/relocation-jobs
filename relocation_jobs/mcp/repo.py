@@ -23,6 +23,28 @@ def normalize_master_resume_slug(slug: str) -> str:
     return cleaned
 
 
+def company_slug(name: str) -> str:
+    raw = (name or "").strip().lower()
+    cleaned = re.sub(r"[^a-z0-9]+", "-", raw).strip("-")
+    return cleaned
+
+
+def resolve_company_name_by_slug(country_key: str, slug: str) -> str | None:
+    target = company_slug(slug)
+    if not target:
+        return None
+    with db_read() as conn:
+        rows = conn.execute(
+            "SELECT name FROM companies WHERE country = %s",
+            (country_key.strip().lower(),),
+        ).fetchall()
+    for row in rows:
+        name = (row["name"] or "").strip()
+        if company_slug(name) == target:
+            return name
+    return None
+
+
 def get_user_documents(user_id: int) -> dict | None:
     with db_read() as conn:
         row = conn.execute(
@@ -133,6 +155,63 @@ def get_application(user_id: int, idempotency_key: str) -> dict | None:
             (user_id, idempotency_key),
         ).fetchone()
     return _row(row) if row else None
+
+
+def list_applications_for_company(
+    user_id: int,
+    country: str,
+    company: str,
+) -> list[dict]:
+    with db_read() as conn:
+        rows = conn.execute(
+            """
+            SELECT idempotency_key, tailored_tex, pdf_bytes, master_resume_slug,
+                   tailored_tex_updated_at, pdf_updated_at, job_url
+            FROM mcp_applications
+            WHERE user_id = %s AND country = %s AND company_name = %s
+            """,
+            (user_id, country.strip().lower(), company.strip()),
+        ).fetchall()
+    return [_row(row) for row in rows]
+
+
+def load_application_summaries(
+    user_id: int,
+    *,
+    country: str | None = None,
+) -> dict[str, dict]:
+    sql = """
+        SELECT idempotency_key, tailored_tex, pdf_bytes, master_resume_slug
+        FROM mcp_applications
+        WHERE user_id = %s
+    """
+    params: list = [user_id]
+    if country:
+        sql += " AND country = %s"
+        params.append(country.strip().lower())
+    with db_read() as conn:
+        rows = conn.execute(sql, tuple(params)).fetchall()
+    summaries: dict[str, dict] = {}
+    for row in rows:
+        key = (row["idempotency_key"] or "").strip()
+        if not key:
+            continue
+        summaries[key] = {
+            "has_tailored_tex": bool((row.get("tailored_tex") or "").strip()),
+            "has_pdf": bool(row.get("pdf_bytes")),
+            "master_resume_slug": (row.get("master_resume_slug") or "").strip(),
+        }
+    return summaries
+
+
+def read_pdf_bytes(user_id: int, idempotency_key: str) -> bytes:
+    row = get_application(user_id, idempotency_key)
+    if row is None or not row.get("pdf_bytes"):
+        raise LookupError(f"No PDF for application {idempotency_key}")
+    data = row["pdf_bytes"]
+    if isinstance(data, memoryview):
+        return bytes(data)
+    return data
 
 
 def upsert_application_shell(

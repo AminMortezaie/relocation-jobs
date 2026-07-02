@@ -105,3 +105,9 @@ def test_apply_page_served(v2_client):
     resp = v2_client.get("/apply")
     assert resp.status_code == 200
     assert b"Application data" in resp.data
+
+
+def test_company_workspace_page_served(v2_client):
+    resp = v2_client.get("/company/uk/acme-backend-ltd")
+    assert resp.status_code == 200
+    assert b"Application workspace" in resp.data

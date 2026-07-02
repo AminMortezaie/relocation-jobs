@@ -8,6 +8,7 @@ import {
 } from "./format";
 import { notForMeReasonMeta } from "./constants";
 import AtsScoreWidget from "./widgets/AtsScoreWidget";
+import CvApplicationBadges from "./CvApplicationBadges";
 import HideReasonPicker from "./widgets/HideReasonPicker";
 import PinJobButton from "./widgets/PinJobButton";
 import ReferralWidget from "./widgets/ReferralWidget";
@@ -110,6 +111,7 @@ function OpenJobCard({ job, company }) {
             {job.seen ? (
               <span className="badge seen">Saw before{job.seen_date ? ` · ${job.seen_date}` : ""}</span>
             ) : null}
+            <CvApplicationBadges job={job} company={company} />
             <span className="badge date">{formatActivityBadge(jobActivityTs(job))}</span>
           </div>
         </div>
@@ -175,6 +177,7 @@ function RejectedJobCard({ job, company }) {
             ) : null}
             {job.visa_sponsorship === true ? <span className="badge visa">Visa / relocation</span> : null}
             {job.seen ? <span className="badge seen">Saw before{job.seen_date ? ` · ${job.seen_date}` : ""}</span> : null}
+            <CvApplicationBadges job={job} company={company} />
             <span className="badge date">{formatActivityBadge(jobActivityTs(job))}</span>
           </div>
         </div>

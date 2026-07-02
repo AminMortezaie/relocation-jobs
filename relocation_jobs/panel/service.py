@@ -14,6 +14,7 @@ from relocation_jobs.users.repo import (
     load_job_status_history,
     load_job_tracking,
 )
+from relocation_jobs.mcp import repo as mcp_repo
 from relocation_jobs.panel.flatten import PanelContext, flatten_company
 from relocation_jobs.panel.types import FlattenFilters
 from relocation_jobs.shared.timestamps import normalize_ts_for_sort
@@ -49,6 +50,10 @@ def load_context(user_id: int | None, country_key: str | None = None) -> PanelCo
         job_tracking=load_job_tracking(user_id, country=scope_country),
         company_tracking=load_company_tracking(user_id, country=scope_country),
         status_history=load_job_status_history(user_id, country=scope_country),
+        mcp_applications=mcp_repo.load_application_summaries(
+            user_id,
+            country=scope_country,
+        ),
     )
 
 

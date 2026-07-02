@@ -69,6 +69,13 @@ def apply_page():
     return resp
 
 
+@app.route("/company/<country>/<path:company_slug>")
+def company_workspace_page(country, company_slug):
+    resp = send_from_directory(STATIC, "company.html")
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
 @app.route("/")
 def index():
     resp = send_from_directory(STATIC, "index.html")

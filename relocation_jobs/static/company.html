@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Company — Relocation Jobs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=43" />
+</head>
+<body>
+  <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
+  <div class="layout admin-layout company-layout">
+    <div id="companyLoginPanel" class="login-panel" hidden>
+      <h2>Sign in</h2>
+      <p class="hint">Tailored resumes and PDF previews are stored per user.</p>
+      <div class="login-error" id="companyLoginError"></div>
+      <form id="companyLoginForm">
+        <label for="companyLoginUsername">Username</label>
+        <input type="text" id="companyLoginUsername" autocomplete="username" required />
+        <label for="companyLoginPassword">Password</label>
+        <input type="password" id="companyLoginPassword" autocomplete="current-password" required />
+        <div class="login-actions">
+          <a href="/" class="link-btn">Back to jobs</a>
+          <button type="submit" class="primary">Sign in</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="companyContent" class="admin-content" hidden>
+      <header class="admin-header company-header">
+        <div class="admin-header-left">
+          <p class="company-breadcrumb">
+            <a href="/" class="link-btn">Job panel</a>
+            <span aria-hidden="true">/</span>
+            <span id="companyCountryLabel">…</span>
+          </p>
+          <h1 class="app-title" id="companyTitle">Company</h1>
+          <p class="admin-subtitle" id="companySubtitle">Application workspace</p>
+        </div>
+        <div class="admin-header-actions">
+          <a href="/apply" class="header-secondary-btn admin-nav-link">Application data</a>
+          <button type="button" class="header-secondary-btn" id="companyLogoutBtn">Sign out</button>
+        </div>
+      </header>
+
+      <div id="companyError" class="admin-error" hidden></div>
+
+      <div class="company-workspace">
+        <aside class="company-positions-panel admin-panel">
+          <h2 class="admin-panel-title">Positions</h2>
+          <p class="hint company-positions-hint" id="companyPositionsHint">Select a role to preview its tailored CV.</p>
+          <ul class="company-position-list" id="companyPositionList"></ul>
+        </aside>
+
+        <section class="company-detail-panel admin-panel" id="companyDetailPanel">
+          <div id="companyDetailEmpty" class="company-detail-empty">
+            <p>Select a position with a tailored resume to preview LaTeX and PDF.</p>
+            <p class="hint">Use Claude Desktop MCP to generate tailored CVs, or mark roles as <em>looking to apply</em> on the job panel.</p>
+          </div>
+
+          <div id="companyDetailBody" class="company-detail-body" hidden>
+            <div class="company-position-header">
+              <div>
+                <h2 class="company-position-title" id="companyPositionTitle"></h2>
+                <p class="company-position-meta" id="companyPositionMeta"></p>
+              </div>
+              <div class="company-position-actions">
+                <a class="header-secondary-btn" id="companyJobLink" href="#" target="_blank" rel="noopener noreferrer">Open job posting</a>
+                <button type="button" class="header-secondary-btn" id="companyRenderBtn">Re-render PDF</button>
+                <a class="header-primary-btn" id="companyDownloadPdf" href="#" download="resume.pdf">Download PDF</a>
+              </div>
+            </div>
+
+            <div class="company-preview-grid">
+              <div class="company-tex-panel">
+                <h3 class="company-preview-label">LaTeX source</h3>
+                <pre class="company-tex-view" id="companyTexView"></pre>
+              </div>
+              <div class="company-pdf-panel">
+                <h3 class="company-preview-label">PDF preview</h3>
+                <div class="company-pdf-frame-wrap">
+                  <iframe id="companyPdfFrame" class="company-pdf-frame" title="Resume PDF preview"></iframe>
+                  <p id="companyPdfMissing" class="company-pdf-missing" hidden>No PDF yet — save tailored tex via MCP, then re-render.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="companyToast"></div>
+
+  <script type="module" src="/static/js/company.js?v=3"></script>
+</body>
+</html>

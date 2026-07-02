@@ -77,3 +77,38 @@ class ApplicationQueueItem(BaseSchema):
     pinned: bool = False
     looking_to_apply: bool = False
     ats_score: int | None = None
+
+
+class CompanyPositionApplication(BaseSchema):
+    title: str = ""
+    url: str = ""
+    idempotency_key: str = ""
+    location: str = ""
+    applied: bool = False
+    rejected: bool = False
+    looking_to_apply: bool = False
+    pinned: bool = False
+    ats_score: int | None = None
+    has_tailored_tex: bool = False
+    has_pdf: bool = False
+    master_resume_slug: str = ""
+    tailored_tex_updated_at: str = ""
+    pdf_updated_at: str = ""
+
+
+class CompanyApplicationsResponse(BaseSchema):
+    country: str
+    company: str
+    company_slug: str = ""
+    positions: list[CompanyPositionApplication] = Field(default_factory=list)
+
+
+class ApplicationTexDetail(BaseSchema):
+    idempotency_key: str
+    country: str = ""
+    company: str = ""
+    url: str = ""
+    title: str = ""
+    content: str = ""
+    master_resume_slug: str = ""
+    updated_at: str = ""

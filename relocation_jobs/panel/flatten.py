@@ -30,6 +30,7 @@ class PanelContext:
     job_tracking: dict = field(default_factory=dict)
     company_tracking: dict = field(default_factory=dict)
     status_history: dict = field(default_factory=dict)
+    mcp_applications: dict = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -129,6 +130,7 @@ def _not_for_me_entry(
     country_label: str,
     job_tracking: dict | None,
     status_history: dict | None,
+    mcp_applications: dict | None,
     wrong_location: bool,
 ) -> dict:
     entry = job_dict(
@@ -139,6 +141,7 @@ def _not_for_me_entry(
         country_label=country_label,
         job_tracking=job_tracking,
         status_history=status_history,
+        mcp_applications=mcp_applications,
     )
     if wrong_location:
         entry["not_for_me"] = True
@@ -157,6 +160,7 @@ def partition_stored_jobs(
     country_key: str,
     country_label: str,
     status_history: dict,
+    mcp_applications: dict | None,
     visa_only: bool,
     position_filters: PositionFilters,
 ) -> tuple[list[dict], list[dict], list[dict], int, int]:
@@ -185,6 +189,7 @@ def partition_stored_jobs(
                     country_label=country_label,
                     job_tracking=job_tracking,
                     status_history=status_history,
+                    mcp_applications=mcp_applications,
                     wrong_location=wrong_location,
                 ))
                 continue
@@ -198,6 +203,7 @@ def partition_stored_jobs(
                 country_label=country_label,
                 job_tracking=None,
                 status_history=None,
+                mcp_applications=mcp_applications,
                 wrong_location=wrong_location,
             ))
             continue
@@ -214,6 +220,7 @@ def partition_stored_jobs(
             country_label=country_label,
             job_tracking=job_tracking if user_id else None,
             status_history=status_history if user_id else None,
+            mcp_applications=mcp_applications if user_id else None,
         )
         flags = TrackingFlags.from_job_panel_dict(job_entry)
         if derive_bucket(flags) == PositionBucket.REJECTED:
@@ -245,6 +252,7 @@ def _append_tracked_orphans(
     country_label: str,
     job_tracking: dict,
     status_history: dict,
+    mcp_applications: dict | None,
     visa_only: bool,
     position_filters: PositionFilters,
 ) -> None:
@@ -275,6 +283,7 @@ def _append_tracked_orphans(
             country_key=country_key,
             country_label=country_label,
             status_history=status_history,
+            mcp_applications=mcp_applications,
         )
         if visa_only and job_entry.get("visa_sponsorship") is not True:
             continue
@@ -471,6 +480,7 @@ def _visible_jobs(
         country_key=country_key,
         country_label=country_label,
         status_history=ctx.status_history,
+        mcp_applications=ctx.mcp_applications,
         visa_only=filters.visa_only,
         position_filters=filters.position_filters,
     )
@@ -484,6 +494,7 @@ def _visible_jobs(
             country_label=country_label,
             job_tracking=ctx.job_tracking,
             status_history=ctx.status_history,
+            mcp_applications=ctx.mcp_applications,
             visa_only=filters.visa_only,
             position_filters=filters.position_filters,
         )

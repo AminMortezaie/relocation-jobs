@@ -83,11 +83,15 @@ def reset_custom_cities_cache():
 def _app_schema(db):
     from relocation_jobs.core.db import get_connection
     from relocation_jobs.db.migrate import apply_v2_migrations
+    from relocation_jobs.fetch import runner as fetch_runner
     from relocation_jobs.fetch.repo import clear_running_fetch_runs_for_tests
 
     apply_v2_migrations(get_connection())
     get_connection().execute("DELETE FROM company_fetch_attempts")
     clear_running_fetch_runs_for_tests()
+    with fetch_runner._fetch_lock:
+        fetch_runner._fetch_state.clear()
+        fetch_runner._fetch_state.update(fetch_runner._idle_fetch_status())
     yield
 
 

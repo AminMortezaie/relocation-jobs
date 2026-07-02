@@ -3,7 +3,7 @@
   "checkpoint_id": "fb490f7c4520",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 32,
+  "checkpoints_count": 34,
   "files_touched": [
     ".gitignore",
     "claude_desktop_config.json.example",
@@ -95,6 +95,12 @@
       "transcript": "/fb/490f7c4520/7/full.jsonl",
       "content_hash": "/fb/490f7c4520/7/content_hash.txt",
       "prompt": "/fb/490f7c4520/7/prompt.txt"
+    },
+    {
+      "metadata": "/fb/490f7c4520/8/metadata.json",
+      "transcript": "/fb/490f7c4520/8/full.jsonl",
+      "content_hash": "/fb/490f7c4520/8/content_hash.txt",
+      "prompt": "/fb/490f7c4520/8/prompt.txt"
     }
   ]
 }

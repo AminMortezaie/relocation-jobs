@@ -1,0 +1,18 @@
+we have implemented a whole new flow for the per company optimization cv, but it's not put on job panel correctly.
+if i click on a company i should see the resume we created for specified positions and also a live preview for the latex files to see the related pdf might be generated.
+it means that we have to see pdf generated for each position we created based on the latex file.
+
+surely it needs a live rendering pdf tool on the application something like overleaf has.
+
+what do you think about it.
+
+i also suggest to have a new flow to click on a company and see the detailed info on a new page path with the company name and country.
+
+you give me your idea about it.
+
+also in near future we need to scrape the job descriptions and and create a new place to put them to user see it just in the application and if they wanted to apply just click on the job and apply directly on their page.
+
+---
+
+every thing you're doing needs to be documented.
+then start to work round by round.

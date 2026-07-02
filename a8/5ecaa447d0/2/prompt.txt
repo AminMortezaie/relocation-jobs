@@ -1,0 +1,17 @@
+make this a skill to add claude directly.
+
+---
+
+Match: 74/100. Tailored fullstack CV saved and validate_tex passed.
+Unclaimable gaps: Claude Code/Codex by name, formal mentoring of juniors, BPM/process mining background, GitHub links in contact bar (kept off per your standing rule).
+Reframed: AI-assisted dev workflows (LangChain/OpenAI) front-loaded in summary+skills to match "AI-native" framing; rapid-prototyping language pulled from DevLearner/EstateFlow bullets; stakeholder communication tied to NL-to-SQL work.
+PDF: render failed (missing FontAwesome glyphs, same underlying issue as prior renders) — .tex is saved and valid, PDF compile needs a font-package fix in the master template itself, unrelated to this tailoring.
+
+---
+
+claude says i saved something but i cannot see on my panel the latex format also, to check you can see talon.one to track whats happening.
+
+---
+
+you should show the progress bar during the rendering the pdf on panel.
+also find the problem that claude cannot create pdf and always get error during creating pdf.

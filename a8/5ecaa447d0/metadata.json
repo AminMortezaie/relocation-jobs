@@ -3,7 +3,7 @@
   "checkpoint_id": "a85ecaa447d0",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 9,
+  "checkpoints_count": 13,
   "files_touched": [
     ".gitignore",
     "claude_desktop_config.json.example",
@@ -43,6 +43,12 @@
       "transcript": "/a8/5ecaa447d0/1/full.jsonl",
       "content_hash": "/a8/5ecaa447d0/1/content_hash.txt",
       "prompt": "/a8/5ecaa447d0/1/prompt.txt"
+    },
+    {
+      "metadata": "/a8/5ecaa447d0/2/metadata.json",
+      "transcript": "/a8/5ecaa447d0/2/full.jsonl",
+      "content_hash": "/a8/5ecaa447d0/2/content_hash.txt",
+      "prompt": "/a8/5ecaa447d0/2/prompt.txt"
     }
   ]
 }

@@ -5,9 +5,7 @@ import re
 from relocation_jobs.mcp.types import ValidationIssue, ValidationResult
 
 _YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
-_EMPLOYER_LINE_RE = re.compile(
-    r"\\textbf\{([^}]+)\}|\\company\{([^}]+)\}",
-)
+_EMPLOYER_LINE_RE = re.compile(r"\\company\{([^}]+)\}")
 _MAX_LINES = 400
 
 
@@ -18,11 +16,9 @@ def _extract_years(text: str) -> set[str]:
 def _extract_employer_tokens(text: str) -> set[str]:
     tokens: set[str] = set()
     for match in _EMPLOYER_LINE_RE.finditer(text):
-        for group in match.groups():
-            if group:
-                cleaned = group.strip()
-                if len(cleaned) >= 3:
-                    tokens.add(cleaned.lower())
+        cleaned = match.group(1).strip()
+        if len(cleaned) >= 3:
+            tokens.add(cleaned.lower())
     return tokens
 
 

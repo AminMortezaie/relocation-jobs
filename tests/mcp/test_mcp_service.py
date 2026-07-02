@@ -39,6 +39,7 @@ def test_save_and_validate_tailored_tex(seeded_catalog_v2, mcp_documents):
     )
     assert saved["idempotency_key"]
     assert saved["master_resume_slug"] == "go"
+    assert saved["overwritten"] is False
 
     validation = service.validate_tailored_tex(
         "uk",
@@ -56,6 +57,46 @@ def test_save_and_validate_tailored_tex(seeded_catalog_v2, mcp_documents):
     )
     assert ctx.has_tailored_tex is True
     assert ctx.master_resume_slug == "go"
+    assert ctx.can_save_tailored_tex is True
+    assert ctx.in_application_queue is False
+
+
+def test_save_tailored_tex_overwrites_without_queue_membership(
+    seeded_catalog_v2, mcp_documents,
+):
+    first = service.save_tailored_tex_for_job(
+        "uk",
+        "Acme Backend Ltd",
+        JOB_URL,
+        GO_MASTER_TEX,
+        master_resume_slug="go",
+        user_id=1,
+    )
+    assert first["overwritten"] is False
+
+    replacement = GO_MASTER_TEX.replace("Go Backend Engineer", "Staff Go Engineer")
+    second = service.save_tailored_tex_for_job(
+        "uk",
+        "Acme Backend Ltd",
+        JOB_URL,
+        replacement,
+        master_resume_slug="go",
+        user_id=1,
+    )
+    assert second["overwritten"] is True
+
+    ctx = service.get_job_context(
+        "uk",
+        "Acme Backend Ltd",
+        JOB_URL,
+        user_id=1,
+    )
+    assert ctx.can_save_tailored_tex is True
+    assert ctx.in_application_queue is False
+    assert ctx.has_tailored_tex is True
+
+    tex = mcp_repo.read_tailored_tex(1, ctx.idempotency_key)
+    assert "Staff Go Engineer" in tex
 
 
 def test_validate_uses_correct_master_variant(seeded_catalog_v2, mcp_documents):

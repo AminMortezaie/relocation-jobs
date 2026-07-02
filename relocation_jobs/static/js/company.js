@@ -1,6 +1,7 @@
 /** Company workspace — per-position tailored CV + PDF preview. */
 
 import { companyWorkspacePath } from "./company-workspace.js";
+import { beginScreenLoad, endScreenLoad, setScreenLoadProgress } from "./screen-loader.js";
 import { $, escapeHtml, finishLoadingProgress, setLoadingProgress } from "./utils.js";
 
 let routeCountry = "";
@@ -8,6 +9,8 @@ let routeSlug = "";
 let companyName = "";
 let positions = [];
 let selectedKey = "";
+let savedTexContent = "";
+let texEditing = false;
 
 function parseRoute() {
   const parts = window.location.pathname.split("/").filter(Boolean);
@@ -111,17 +114,92 @@ function renderPositionList() {
 
 function clearDetail() {
   selectedKey = "";
+  savedTexContent = "";
+  texEditing = false;
   const body = $("companyDetailBody");
   const empty = $("companyDetailEmpty");
   if (body) body.hidden = true;
   if (empty) empty.hidden = false;
   $("companyPdfFrame")?.removeAttribute("src");
+  $("companyOpenPdf")?.setAttribute("hidden", "");
+  $("companyApplyLink")?.setAttribute("hidden", "");
+  $("companyApplyHint")?.setAttribute("hidden", "");
   const pdfMissing = $("companyPdfMissing");
   if (pdfMissing) pdfMissing.hidden = true;
   renderPositionList();
 }
 
-async function loadPositionDetail(idempotencyKey, position) {
+function setTexViewMode({ editing = false, content = savedTexContent } = {}) {
+  texEditing = editing;
+  savedTexContent = content;
+  const view = $("companyTexView");
+  const editor = $("companyTexEditor");
+  const editBtn = $("companyTexEditBtn");
+  const saveBtn = $("companyTexSaveBtn");
+  const cancelBtn = $("companyTexCancelBtn");
+  const hasTex = Boolean(content.trim());
+
+  if (view) {
+    view.textContent = content || "No tailored LaTeX for this position yet.";
+    view.hidden = editing;
+  }
+  if (editor) {
+    editor.value = content;
+    editor.hidden = !editing;
+  }
+  if (editBtn) editBtn.hidden = !hasTex || editing;
+  if (saveBtn) saveBtn.hidden = !editing;
+  if (cancelBtn) cancelBtn.hidden = !editing;
+}
+
+function startTexEdit() {
+  if (!savedTexContent.trim()) return;
+  setTexViewMode({ editing: true });
+  $("companyTexEditor")?.focus();
+}
+
+function cancelTexEdit() {
+  setTexViewMode({ editing: false });
+}
+
+async function persistTex() {
+  if (!selectedKey) {
+    throw new Error("Select a position first");
+  }
+  const content = $("companyTexEditor")?.value ?? savedTexContent;
+  if (!content.trim()) {
+    throw new Error("LaTeX content cannot be empty");
+  }
+  const saved = await api(
+    `/api/mcp/applications/${encodeURIComponent(selectedKey)}/tex`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content }),
+    },
+  );
+  setTexViewMode({ editing: false, content });
+  return saved;
+}
+
+async function saveTex() {
+  const btn = $("companyTexSaveBtn");
+  const editBtn = $("companyTexEditBtn");
+  btn.disabled = true;
+  if (editBtn) editBtn.disabled = true;
+  showError("");
+  try {
+    await persistTex();
+    showToast("LaTeX saved");
+  } catch (err) {
+    showError(err.message || "Failed to save LaTeX");
+  } finally {
+    btn.disabled = false;
+    if (editBtn) editBtn.disabled = false;
+  }
+}
+
+async function loadPositionDetail(idempotencyKey, position, { quiet = false } = {}) {
   selectedKey = idempotencyKey;
   renderPositionList();
   const empty = $("companyDetailEmpty");
@@ -138,16 +216,37 @@ async function loadPositionDetail(idempotencyKey, position) {
   ].filter(Boolean);
   $("companyPositionMeta").textContent = metaParts.join(" · ");
 
-  const jobLink = $("companyJobLink");
-  if (jobLink) {
-    jobLink.href = position.url || "#";
-    jobLink.hidden = !position.url;
+  const hasUrl = Boolean(position.url);
+  const applyLink = $("companyApplyLink");
+  const applyHint = $("companyApplyHint");
+  const applyHintText = $("companyApplyHintText");
+  const applyUrl = $("companyApplyUrl");
+  if (applyLink) {
+    applyLink.href = position.url || "#";
+    applyLink.hidden = !hasUrl;
+  }
+  if (applyHint && applyHintText && applyUrl) {
+    applyHint.hidden = !hasUrl;
+    if (hasUrl) {
+      applyHintText.textContent = position.has_pdf
+        ? "After downloading your PDF, apply at the original posting: "
+        : "Apply at the original posting: ";
+      applyUrl.href = position.url;
+      applyUrl.textContent = position.url;
+    }
   }
 
   const download = $("companyDownloadPdf");
+  const openPdf = $("companyOpenPdf");
+  const pdfUrl = `/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/pdf?ts=${Date.now()}`;
   if (download) {
-    download.href = `/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/pdf`;
+    download.href = `/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/pdf?download=1`;
+    download.download = position.pdf_filename || "resume.pdf";
     download.hidden = !position.has_pdf;
+  }
+  if (openPdf) {
+    openPdf.href = position.has_pdf ? pdfUrl : "#";
+    openPdf.hidden = !position.has_pdf;
   }
 
   const texView = $("companyTexView");
@@ -155,23 +254,24 @@ async function loadPositionDetail(idempotencyKey, position) {
   const pdfMissing = $("companyPdfMissing");
 
   if (position.has_tailored_tex) {
-    setLoadingProgress(35);
+    if (!quiet) setLoadingProgress(35);
     try {
       const tex = await api(`/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/tex`);
-      if (texView) texView.textContent = tex.content || "";
+      setTexViewMode({ editing: false, content: tex.content || "" });
     } catch (err) {
+      setTexViewMode({ editing: false, content: "" });
       if (texView) texView.textContent = "";
       showError(err.message || "Failed to load LaTeX");
     } finally {
-      finishLoadingProgress();
+      if (!quiet) finishLoadingProgress();
     }
-  } else if (texView) {
-    texView.textContent = "No tailored LaTeX for this position yet.";
+  } else {
+    setTexViewMode({ editing: false, content: "" });
   }
 
   if (position.has_pdf && pdfFrame) {
     pdfFrame.hidden = false;
-    pdfFrame.src = `/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/pdf?ts=${Date.now()}`;
+    pdfFrame.src = pdfUrl;
     if (pdfMissing) pdfMissing.hidden = true;
   } else {
     if (pdfFrame) {
@@ -226,25 +326,55 @@ async function loadWorkspace() {
   }
 }
 
+async function refreshPositionsAfterRender() {
+  const data = await api(
+    `/api/mcp/companies/${encodeURIComponent(routeCountry)}/${encodeURIComponent(routeSlug)}/applications`,
+  );
+  positions = data.positions || [];
+  renderPositionList();
+  const position = positions.find((p) => p.idempotency_key === selectedKey);
+  if (position) {
+    await loadPositionDetail(selectedKey, position, { quiet: true });
+  }
+}
+
 async function rerenderPdf() {
   if (!selectedKey) return;
   const btn = $("companyRenderBtn");
+  const saveBtn = $("companyTexSaveBtn");
+  const editBtn = $("companyTexEditBtn");
   btn.disabled = true;
+  if (saveBtn) saveBtn.disabled = true;
+  if (editBtn) editBtn.disabled = true;
   showError("");
+  beginScreenLoad("Rendering PDF…");
+  setScreenLoadProgress(15);
+  const tick = window.setInterval(() => setScreenLoadProgress(88), 800);
   try {
+    if (texEditing) {
+      setScreenLoadProgress(20);
+      await persistTex();
+    }
+    setScreenLoadProgress(25);
     const result = await api(
       `/api/mcp/applications/${encodeURIComponent(selectedKey)}/render`,
       { method: "POST" },
     );
+    setScreenLoadProgress(92);
     if (!result.ok) {
       throw new Error(result.error || result.log || "Render failed");
     }
     showToast("PDF re-rendered");
-    await loadWorkspace();
+    setScreenLoadProgress(96);
+    await refreshPositionsAfterRender();
   } catch (err) {
     showError(err.message || "Failed to re-render PDF");
   } finally {
+    window.clearInterval(tick);
+    endScreenLoad();
     btn.disabled = false;
+    if (saveBtn) saveBtn.disabled = false;
+    if (editBtn) editBtn.disabled = false;
   }
 }
 
@@ -295,6 +425,9 @@ function bindEvents() {
   $("companyLoginForm")?.addEventListener("submit", submitLogin);
   $("companyLogoutBtn")?.addEventListener("click", logout);
   $("companyRenderBtn")?.addEventListener("click", rerenderPdf);
+  $("companyTexEditBtn")?.addEventListener("click", startTexEdit);
+  $("companyTexSaveBtn")?.addEventListener("click", saveTex);
+  $("companyTexCancelBtn")?.addEventListener("click", cancelTexEdit);
   $("companyPositionList")?.addEventListener("click", (event) => {
     const btn = event.target.closest(".company-position-item");
     if (!btn) return;

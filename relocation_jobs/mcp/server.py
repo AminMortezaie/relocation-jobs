@@ -20,7 +20,12 @@ def _json(payload) -> str:
 
 @mcp.tool()
 def get_job_context(country: str, company: str, url: str) -> str:
-    """Load job and tracking context for an application (title, ATS, flags, artifact state)."""
+    """Load job and tracking context for an application (title, ATS, flags, artifact state).
+
+    can_save_tailored_tex is true whenever the job exists in the catalog — queue membership
+    (pinned / looking_to_apply) is not required. Use the returned country, company, and url
+    for save_tailored_tex (overwrites any previous tailored tex).
+    """
     return _json(service.get_job_context(country, company, url))
 
 
@@ -143,7 +148,12 @@ def save_tailored_tex(
     content: str,
     master_resume_slug: str,
 ) -> str:
-    """Save tailored resume tex for this job, tied to a master resume slug."""
+    """Save tailored resume tex for this job, tied to a master resume slug.
+
+    Overwrites any existing tailored tex. Does not require the job to be pinned or marked
+    looking-to-apply — only that it exists in the catalog (call get_job_context first and
+    use the url/country/company it returns).
+    """
     return _json(service.save_tailored_tex_for_job(
         country, company, url, content, master_resume_slug=master_resume_slug,
     ))

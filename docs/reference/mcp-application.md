@@ -10,6 +10,8 @@ Use the panel **Application data** page at `/apply` (also linked from the accoun
 
 Related: [architecture.md](architecture.md), [business-rules.md](business-rules.md), [contributing.md](../contributing.md).
 
+**Claude skill:** [`.claude/skills/mcp-resume-reframe/SKILL.md`](../../.claude/skills/mcp-resume-reframe/SKILL.md) — **interactive** gated reframe (one phase per turn, user approval), **additive** JD-mirror bullets on the full master CV (never remove responsibilities without permission), `save_tailored_tex` after final sign-off; PDF render on the panel.
+
 ---
 
 ## Goals (v0)
@@ -74,14 +76,14 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 
 | Tool | Purpose |
 |------|---------|
-| `get_job_context` | Job + tracking + `master_resume_slug`, `has_tailored_tex` / `has_pdf` |
-| `list_application_queue` | Pinned + looking-to-apply jobs |
+| `get_job_context` | Job + tracking + `master_resume_slug`, `has_tailored_tex` / `has_pdf`, `can_save_tailored_tex` |
+| `list_application_queue` | Pinned + looking-to-apply jobs (discovery only — not required to save) |
 | `list_master_resumes` | All master variants |
 | `get_master_resume` / `save_master_resume` | Read/write master tex by slug |
 | `get_mcp_status` | Debug: MCP user + profile/resume presence + `pipeline_prompt_count` |
 | `get_application_profile` / `save_application_profile` | Profile fields; `pipeline` array on profile |
 | `get_reframe_pipeline` | Ordered pipeline prompts only (alias of profile.pipeline) |
-| `save_tailored_tex` | Requires `master_resume_slug` |
+| `save_tailored_tex` | Requires `master_resume_slug`; overwrites prior tailored tex; queue membership not required |
 | `validate_tex` | Structure + fact checks vs master |
 | `render_pdf` | Compile → store PDF bytes |
 | `mark_applied` | Panel tracking |
@@ -98,40 +100,42 @@ MCP writes artifacts to Postgres; the panel reads them via HTTP (same user sessi
 
 Web API (login required): `GET /api/mcp/companies/<country>/<company>/applications`, `GET/POST /api/mcp/applications/<idempotency_key>/…` — documented in [company-workspace.md](company-workspace.md).
 
-Claude Desktop still owns reframing (`save_tailored_tex`); the panel is read + re-render + download for v1.
+Claude Desktop owns reframing (`save_tailored_tex` after user approval); the panel **renders PDF** (Re-render PDF) to save tokens in chat.
 
 ### End-to-end flow (position → pipeline → reframe)
 
-One job from queue to tailored PDF. Claude Desktop runs the **pipeline in chat** (not as separate MCP calls); MCP supplies the job, profile, prompts, and master tex.
+One job from queue to tailored PDF. Claude runs **one pipeline prompt per turn** with a user checkpoint; MCP supplies job, profile, prompts, and master tex.
 
 ```mermaid
 flowchart TD
   A[Panel: pin job or mark looking to apply] --> B[list_application_queue]
   B --> C[Pick one job]
   C --> D[get_job_context]
-  D --> E[get_application_profile]
-  E --> F{pipeline non-empty?}
-  F -->|yes| G[Run pipeline prompts 1..N in order on this job]
-  F -->|no| H[Skip pipeline]
-  G --> I[list_master_resumes + pick slug]
-  H --> I
-  I --> J[get_master_resume slug]
-  J --> K[Claude reframes CV using pipeline output + job + master]
-  K --> L[save_tailored_tex]
-  L --> M[validate_tex]
-  M --> N[render_pdf]
-  N --> O[Upload PDF manually]
-  O --> P[mark_applied]
+  D --> E[get_reframe_pipeline]
+  E --> F[Phase 1: JD + ATS lens — markdown]
+  F --> G{User: go ahead?}
+  G -->|edit| F
+  G -->|yes| H[Phase 2: master + mirror pick]
+  H --> I{User: go ahead?}
+  I -->|edit| H
+  I -->|yes| J[Phase 3: add 1–2 mirror bullets]
+  J --> K{User: go ahead?}
+  K -->|edit| J
+  K -->|yes| L[Phase 4: full CV draft markdown]
+  L --> M{Final acceptance?}
+  M -->|edit| L
+  M -->|yes| N[get_master_resume + LaTeX]
+  N --> O[save_tailored_tex]
+  O --> P[Panel: Re-render PDF]
+  P --> Q[Upload PDF manually]
+  Q --> R[mark_applied]
 ```
 
 #### 0. One-time setup (`/apply`)
 
-1. Save **master resume(s)** (e.g. `go`, `java`).
+1. Save **master resume(s)** (e.g. `go`, `java`, `fullstack`).
 2. Save **application profile** (name, email, …).
-3. Add up to **5 pipeline prompts** in order (Profile → Pipeline). Example:
-   - *Read the job title and URL context; list the top skills the role likely needs.*
-   - *Map my master resume experience to those skills; note gaps.*
-   - *Reframe the resume bullets to emphasize matches; do not invent employers or dates.*
+3. Add **five pipeline prompts** (one phase each) from [`.claude/skills/mcp-resume-reframe/pipeline-prompts.md`](../../.claude/skills/mcp-resume-reframe/pipeline-prompts.md). Each slot ends with a **go ahead?** checkpoint — do not use a single consolidated auto-run prompt.
 
 #### 1. Pick a position
 
@@ -153,7 +157,9 @@ Use `country`, `company`, and `url` from the panel board.
 get_job_context(country, company, url)
 ```
 
-Use `title`, `ats_url`, flags (`looking_to_apply`, `pinned`), and whether tailored tex/PDF already exist.
+Use `title`, `ats_url`, flags (`looking_to_apply`, `pinned`, `in_application_queue`), `can_save_tailored_tex`, and whether tailored tex/PDF already exist.
+
+`can_save_tailored_tex` is true whenever the job is in the catalog. **Re-runs and overwrites do not require** pinned or looking-to-apply — call `save_tailored_tex` with the `url` / `country` / `company` from this response.
 
 #### 3. Load profile and pipeline prompts
 
@@ -185,34 +191,31 @@ Example `get_reframe_pipeline()` response:
 
 Quick sanity check: `get_mcp_status()` → `pipeline_prompt_count` (count only, not text).
 
-#### 4. Run the pipeline (in Claude chat)
+#### 4. Run the pipeline (in Claude chat) — one phase per turn
 
 For each string in `pipeline[0]`, `pipeline[1]`, … **in order**:
 
-1. Apply that instruction to **this job** (use `get_job_context` output + job URL if needed).
-2. Keep the output of each step as context for the next.
-3. Do **not** reframe the `.tex` until the last pipeline step (unless a prompt explicitly says to).
+1. Run **only that phase** for this job (use `get_job_context` + job URL + masters as needed).
+2. Output **markdown** (not LaTeX) until the final phase.
+3. End with **go ahead?** and **wait** for the user before the next phase.
+4. **Mirror additions (phase 3):** add **1–2 new bullets** to one real role for ATS/JD similarity — **all master bullets kept**. User approves new bullets in phase 2–3. Never remove or shorten master content without explicit user approval.
+5. **Final acceptance** on the full markdown draft (master + additions) before any `.tex` work.
 
-Pipeline runs in Claude’s reasoning — there is no `run_pipeline` MCP tool. Use `get_reframe_pipeline` or `get_application_profile().pipeline`.
+There is no `run_pipeline` MCP tool. Use `get_reframe_pipeline` or `get_application_profile().pipeline`.
 
-#### 5. Reframe the CV
-
-```text
-list_master_resumes()
-get_master_resume("<slug>")    # e.g. go
-```
-
-Using pipeline outputs + job context + master `.tex`, produce tailored LaTeX. Facts must stay within the master (no new employers/years).
-
-#### 6. Save, validate, render
+#### 5. LaTeX + save (after final acceptance)
 
 ```text
-save_tailored_tex(country, company, url, content, master_resume_slug="go")
-validate_tex(country, company, url, master_resume_slug="go")
-render_pdf(country, company, url, master_resume_slug="go")
+get_master_resume("<slug>")    # chosen in phase 2
+save_tailored_tex(country, company, url, content, master_resume_slug="java")
+validate_tex(...)              # optional in chat; fix blocking issues
 ```
 
-Fix validation issues and re-save if needed.
+Use the chosen master's LaTeX structure (preamble, macros, sections). Employers and dates stay fixed. **Copy all master content**; apply only approved additions (new mirror bullets, optional summary tweak, skills reorder).
+
+#### 6. Render PDF on the panel
+
+Do **not** call `render_pdf` in Claude by default — open the company workspace and **Re-render PDF** (saves tokens). Call `render_pdf` in chat only if you explicitly want it.
 
 #### 7. After applying
 
@@ -225,23 +228,21 @@ mark_applied(country, company, url, applied=true)
 #### Paste into Claude Desktop
 
 ```text
-Apply to the first job in my UK queue:
+Apply using the mcp-resume-reframe skill to the first job in my UK queue:
 1. list_application_queue(country="uk") and pick one job
-2. get_job_context for that job
-3. get_reframe_pipeline — run each prompt in pipeline[] in order for this job (not a separate run tool)
-4. get_master_resume for the best matching slug
-5. Reframe the CV from the master using pipeline results
-6. save_tailored_tex, validate_tex, render_pdf
-Stop if validate_tex fails and show me the issues.
+2. get_job_context + get_reframe_pipeline
+3. Run pipeline phase 1 only — markdown, then ask me to go ahead
+4. Continue one phase per turn until I accept the full draft
+5. save_tailored_tex after final acceptance — do not render_pdf; I'll render on the panel
 ```
 
 ### Workflow (short)
 
-1. Setup on `/apply`: master resumes + profile + pipeline prompts.
+1. Setup on `/apply`: master resumes + profile + **five** gated pipeline prompts.
 2. Pin job or mark **looking to apply** on the panel.
-3. `list_application_queue` → `get_job_context` → `get_application_profile` → run `pipeline` in order → `get_master_resume` → reframe.
-4. `save_tailored_tex` → `validate_tex` → `render_pdf`.
-5. Upload PDF manually → `mark_applied`.
+3. Claude: bootstrap MCP → **one phase per turn** → user checkpoints → **add** mirror bullets to master (never trim without permission).
+4. After final acceptance: `save_tailored_tex` → optional `validate_tex`.
+5. Panel: **Re-render PDF** → upload manually → `mark_applied`.
 
 ---
 
@@ -281,9 +282,33 @@ Correct: there is no `run_pipeline` tool. Prompts are **data**, not an executabl
 
 Normal when the catalog or your tracking has no value for those fields.
 
+**Tailored CV not visible on company workspace**
+
+1. Confirm MCP and panel use the **same user** (`get_mcp_status` → `username` must match your panel login; set `MCP_USERNAME` in Claude Desktop config if not `admin`).
+2. Country keys are stored **lowercase** (`germany`, not `Germany`). Older rows are fixed by migration `mcp_applications_country_lower_v1`; new saves normalize automatically.
+3. Open `/company/<country>/<company-slug>` (e.g. `/company/germany/talon.one`) and select the **exact position** Claude tailored — CV badge appears per role, not per company.
+4. `has_tailored_tex` joins on `idempotency_key` from the catalog job URL. If Claude used a different URL for the same role, call `get_job_context` and use the `url` it returns for `save_tailored_tex`.
+
+**Claude refuses to save / says job is not in the application queue**
+
+`save_tailored_tex` does **not** require pinned or looking-to-apply. Restart Claude Desktop after MCP updates so tool descriptions refresh. Then:
+
+1. Call `get_job_context(country, company, url)` — confirm `can_save_tailored_tex` is true.
+2. Call `save_tailored_tex` with the **exact** `country`, `company`, and `url` from that response (overwrites prior tailored tex).
+3. Queue membership (`list_application_queue`) is only for **discovering** jobs, not for gating save.
+
 **PDF render fails or returns almost no log**
 
-`tectonic` (default via `MCP_LATEX_CMD`) can crash on some packages — notably `fontawesome5` / `fontawesome`, which are omitted automatically at compile time if the first attempt fails. The stored `.tex` in Postgres is not modified. If render still fails, check the workspace **Re-render PDF** error text or run `tectonic` locally on the tailored file. Em-dashes (`—`) may warn under `lmodern` but usually still produce a PDF.
+`tectonic` (default via `MCP_LATEX_CMD`) cannot load `fontawesome5` — it aborts before a useful error. Compile **strips fontawesome packages, `\\fa…` icons, and unicode em-dashes** in a temp copy only (Postgres `.tex` unchanged).
+
+1. Set **`MCP_LATEX_CMD`** to tectonic’s **full path** in Claude Desktop MCP `env` (e.g. `/opt/homebrew/bin/tectonic`) — the GUI app often has no Homebrew on `PATH`. See `claude_desktop_config.json.example`.
+2. Restart Claude Desktop after MCP server code changes.
+3. Panel **Re-render PDF** on the company workspace shows a progress overlay while compiling (~10s).
+4. If render still fails, read `validate_tex` first, then the error text from **Re-render PDF** or `render_pdf` log.
+
+**`save_tailored_tex` fails: missing `pdf_bytes` column (or other schema error)**
+
+The MCP server runs `init_db()` migrations on startup (`scripts/mcp_server.py`). If Claude Desktop was connected before you pulled MCP changes, restart Claude Desktop so the MCP process restarts and applies `mcp_master_resumes_pdf_v1` (adds `pdf_bytes` / `pdf_updated_at` on `mcp_master_resumes`). Alternatively start the panel once (`python3 scripts/panel_server.py`) — it also runs migrations on startup.
 
 ---
 

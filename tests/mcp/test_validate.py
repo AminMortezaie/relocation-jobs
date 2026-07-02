@@ -34,6 +34,17 @@ def test_validate_rejects_new_employer():
     assert "new_employers" in codes
 
 
+def test_validate_ignores_textbf_achievements():
+    tailored = MASTER + r"""
+\item \textbf{34\(\to\)8 states, 4 minutes \(\to\) under 1 second}
+\item \textbf{Real-time authorization API engine}
+\item \textbf{Senior Backend Engineer (Go) with 6+ years}
+"""
+    result = validate_tex_content(tailored, MASTER)
+    codes = {issue.code for issue in result.issues}
+    assert "new_employers" not in codes
+
+
 def test_validate_rejects_unbalanced_environments():
     tailored = MASTER.replace("\\end{document}", "")
     result = validate_tex_content(tailored, MASTER)

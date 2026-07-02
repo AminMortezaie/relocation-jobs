@@ -13,6 +13,10 @@ def _row(row) -> dict:
     return dict(row) if row else {}
 
 
+def normalize_country_key(country: str) -> str:
+    return (country or "").strip().lower()
+
+
 def normalize_master_resume_slug(slug: str) -> str:
     raw = (slug or "").strip().lower()
     if not raw:
@@ -62,7 +66,7 @@ def list_master_resumes(user_id: int) -> list[MasterResumeSummary]:
     with db_read() as conn:
         rows = conn.execute(
             """
-            SELECT slug, label, updated_at
+            SELECT slug, label, updated_at, pdf_bytes
             FROM mcp_master_resumes
             WHERE user_id = %s
             ORDER BY slug
@@ -74,9 +78,24 @@ def list_master_resumes(user_id: int) -> list[MasterResumeSummary]:
             slug=row["slug"],
             label=(row.get("label") or "").strip(),
             updated_at=(row.get("updated_at") or "").strip(),
+            has_pdf=bool(row.get("pdf_bytes")),
         )
         for row in rows
     ]
+
+
+def get_master_resume_row(user_id: int, slug: str) -> dict | None:
+    key = normalize_master_resume_slug(slug)
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT slug, label, content, updated_at, pdf_bytes, pdf_updated_at
+            FROM mcp_master_resumes
+            WHERE user_id = %s AND slug = %s
+            """,
+            (user_id, key),
+        ).fetchone()
+    return _row(row) if row else None
 
 
 def read_master_resume(user_id: int, slug: str) -> str:
@@ -90,9 +109,40 @@ def read_master_resume(user_id: int, slug: str) -> str:
             """,
             (user_id, key),
         ).fetchone()
-    if row is None or not (row["content"] or "").strip():
+    if row is None or not (row.get("content") or "").strip():
         raise LookupError(f"Master resume not found: {key}")
     return row["content"]
+
+
+def read_master_pdf_bytes(user_id: int, slug: str) -> bytes:
+    row = get_master_resume_row(user_id, slug)
+    key = normalize_master_resume_slug(slug)
+    if row is None or not row.get("pdf_bytes"):
+        raise LookupError(f"No PDF for master resume {key}")
+    data = row["pdf_bytes"]
+    if isinstance(data, memoryview):
+        return bytes(data)
+    return data
+
+
+def save_master_pdf(user_id: int, slug: str, pdf_bytes: bytes) -> dict:
+    key = normalize_master_resume_slug(slug)
+    now = _utc_now()
+    with db_transaction() as conn:
+        conn.execute(
+            """
+            UPDATE mcp_master_resumes
+            SET pdf_bytes = %s, pdf_updated_at = %s, updated_at = %s
+            WHERE user_id = %s AND slug = %s
+            """,
+            (pdf_bytes, now, now, user_id, key),
+        )
+    return {
+        "user_id": user_id,
+        "slug": key,
+        "pdf_bytes": len(pdf_bytes),
+        "pdf_updated_at": now,
+    }
 
 
 def save_master_resume(
@@ -112,7 +162,15 @@ def save_master_resume(
             ON CONFLICT (user_id, slug) DO UPDATE SET
                 label = EXCLUDED.label,
                 content = EXCLUDED.content,
-                updated_at = EXCLUDED.updated_at
+                updated_at = EXCLUDED.updated_at,
+                pdf_bytes = CASE
+                    WHEN mcp_master_resumes.content IS DISTINCT FROM EXCLUDED.content THEN NULL
+                    ELSE mcp_master_resumes.pdf_bytes
+                END,
+                pdf_updated_at = CASE
+                    WHEN mcp_master_resumes.content IS DISTINCT FROM EXCLUDED.content THEN NULL
+                    ELSE mcp_master_resumes.pdf_updated_at
+                END
             """,
             (user_id, key, (label or "").strip(), content, now),
         )
@@ -168,9 +226,9 @@ def list_applications_for_company(
             SELECT idempotency_key, tailored_tex, pdf_bytes, master_resume_slug,
                    tailored_tex_updated_at, pdf_updated_at, job_url
             FROM mcp_applications
-            WHERE user_id = %s AND country = %s AND company_name = %s
+            WHERE user_id = %s AND LOWER(TRIM(country)) = %s AND company_name = %s
             """,
-            (user_id, country.strip().lower(), company.strip()),
+            (user_id, normalize_country_key(country), company.strip()),
         ).fetchall()
     return [_row(row) for row in rows]
 
@@ -187,8 +245,8 @@ def load_application_summaries(
     """
     params: list = [user_id]
     if country:
-        sql += " AND country = %s"
-        params.append(country.strip().lower())
+        sql += " AND LOWER(TRIM(country)) = %s"
+        params.append(normalize_country_key(country))
     with db_read() as conn:
         rows = conn.execute(sql, tuple(params)).fetchall()
     summaries: dict[str, dict] = {}
@@ -227,6 +285,7 @@ def upsert_application_shell(
     slug = ""
     if master_resume_slug.strip():
         slug = normalize_master_resume_slug(master_resume_slug)
+    country_key = normalize_country_key(country)
     with db_transaction() as conn:
         conn.execute(
             """
@@ -241,7 +300,7 @@ def upsert_application_shell(
                 master_resume_slug = COALESCE(NULLIF(EXCLUDED.master_resume_slug, ''), mcp_applications.master_resume_slug),
                 updated_at = EXCLUDED.updated_at
             """,
-            (user_id, idempotency_key, country, company, url, slug, now),
+            (user_id, idempotency_key, country_key, company, url, slug, now),
         )
     return get_application(user_id, idempotency_key) or {}
 

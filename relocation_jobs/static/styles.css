@@ -5159,6 +5159,10 @@ body.scroll-locked {
   padding: 1rem 1.25rem 2rem;
 }
 
+.apply-layout [hidden] {
+  display: none !important;
+}
+
 .apply-tabs {
   display: flex;
   gap: 0.35rem;
@@ -5337,7 +5341,7 @@ body.scroll-locked {
 
 .apply-masters-layout {
   display: grid;
-  grid-template-columns: minmax(160px, 220px) 1fr;
+  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
   gap: 1rem;
   min-height: 420px;
 }
@@ -5401,6 +5405,28 @@ body.scroll-locked {
   box-shadow: inset 0 0 0 1px var(--accent);
 }
 
+.apply-master-item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.apply-master-item-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.3rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.apply-master-item-badge--pdf {
+  color: #0d9488;
+  border-color: rgba(13, 148, 136, 0.35);
+}
+
 .apply-master-item-slug {
   font-size: 0.72rem;
   color: var(--muted);
@@ -5416,8 +5442,69 @@ body.scroll-locked {
 .apply-master-editor {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.65rem;
   min-width: 0;
+}
+
+.apply-master-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.apply-master-preview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.85rem;
+  min-height: 420px;
+}
+
+.apply-master-preview-label {
+  display: block;
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.apply-master-tex-panel,
+.apply-master-pdf-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.apply-master-pdf-frame-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 420px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  overflow: hidden;
+}
+
+.apply-master-pdf-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  border: 0;
+  background: #fff;
+}
+
+.apply-master-pdf-missing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .apply-master-meta {
@@ -5448,7 +5535,7 @@ body.scroll-locked {
 
 .apply-tex-editor {
   flex: 1;
-  min-height: 320px;
+  min-height: 420px;
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.8rem;
   line-height: 1.45;
@@ -5469,6 +5556,12 @@ body.scroll-locked {
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   color: var(--text);
   font-size: 0.875rem;
+}
+
+@media (max-width: 960px) {
+  .apply-master-preview-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
@@ -5653,6 +5746,23 @@ body.scroll-locked {
   gap: 0.45rem;
 }
 
+.company-apply-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.company-apply-url {
+  color: var(--accent);
+  word-break: break-all;
+}
+
+.company-apply-url:hover {
+  text-decoration: underline;
+}
+
 .company-preview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -5669,6 +5779,24 @@ body.scroll-locked {
   color: var(--muted);
 }
 
+.company-tex-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.company-tex-header .company-preview-label {
+  margin: 0;
+}
+
+.company-tex-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .company-tex-view {
   margin: 0;
   padding: 0.75rem;
@@ -5683,6 +5811,22 @@ body.scroll-locked {
   overflow: auto;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.company-tex-editor {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 420px;
+  max-height: 520px;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: #0f1419;
+  color: #e6edf3;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  resize: vertical;
 }
 
 .company-pdf-frame-wrap {

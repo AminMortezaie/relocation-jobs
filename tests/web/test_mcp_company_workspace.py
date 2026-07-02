@@ -33,6 +33,7 @@ def test_list_company_applications_merges_catalog_and_mcp(
     assert match.has_tailored_tex is True
     assert match.has_pdf is True
     assert match.master_resume_slug == "go"
+    assert match.pdf_filename == "test_user_acme_backend_ltd.pdf"
 
 
 def test_list_company_applications_resolves_slug(
@@ -86,6 +87,26 @@ def test_read_application_tex_and_pdf(seeded_catalog_v2, mcp_documents):
     assert pdf == FAKE_PDF
 
 
+def test_save_application_tex_updates_content(seeded_catalog_v2, mcp_documents):
+    saved = service.save_tailored_tex_for_job(
+        COUNTRY,
+        COMPANY,
+        JOB_URL,
+        GO_MASTER_TEX,
+        master_resume_slug="go",
+        user_id=1,
+    )
+    idem_key = saved["idempotency_key"]
+    updated_tex = GO_MASTER_TEX.replace("Go Backend Engineer", "Senior Go Developer")
+
+    result = service.save_application_tex(idem_key, updated_tex, user_id=1)
+    assert result["ok"] is True
+    assert result["updated_at"]
+
+    tex = service.read_application_tex(idem_key, user_id=1)
+    assert "Senior Go Developer" in tex.content
+
+
 def test_company_applications_api(v2_auth_client, seeded_catalog_v2, mcp_documents):
     saved = service.save_tailored_tex_for_job(
         COUNTRY,
@@ -116,19 +137,59 @@ def test_company_applications_api(v2_auth_client, seeded_catalog_v2, mcp_documen
     assert tex.status_code == 200
     assert "documentclass" in tex.get_json()["content"]
 
+    updated_tex = GO_MASTER_TEX.replace("Go Backend Engineer", "Staff Go Developer")
+    saved_tex = v2_auth_client.put(
+        f"/api/mcp/applications/{idem_key}/tex",
+        json={"content": updated_tex},
+    )
+    assert saved_tex.status_code == 200
+    assert saved_tex.get_json()["ok"] is True
+
+    tex_after = v2_auth_client.get(f"/api/mcp/applications/{idem_key}/tex")
+    assert "Staff Go Developer" in tex_after.get_json()["content"]
+
     pdf = v2_auth_client.get(f"/api/mcp/applications/{idem_key}/pdf")
     assert pdf.status_code == 200
     assert pdf.mimetype == "application/pdf"
     assert pdf.data == FAKE_PDF
+    disposition = pdf.headers.get("Content-Disposition") or ""
+    assert disposition.startswith("inline;")
+    assert "test_user_acme_backend_ltd.pdf" in disposition
+
+    pdf_download = v2_auth_client.get(f"/api/mcp/applications/{idem_key}/pdf?download=1")
+    assert pdf_download.status_code == 200
+    download_disposition = pdf_download.headers.get("Content-Disposition") or ""
+    assert download_disposition.startswith("attachment;")
+    assert "test_user_acme_backend_ltd.pdf" in download_disposition
 
     detail = v2_auth_client.get(f"/api/mcp/applications/{idem_key}")
     assert detail.status_code == 200
     assert detail.get_json()["has_pdf"] is True
 
 
+def test_list_company_applications_finds_tex_when_country_mixed_case(
+    seeded_catalog_v2, mcp_documents,
+):
+    saved = service.save_tailored_tex_for_job(
+        "UK",
+        COMPANY,
+        JOB_URL,
+        GO_MASTER_TEX,
+        master_resume_slug="go",
+        user_id=1,
+    )
+    payload = service.list_company_applications("uk", COMPANY, user_id=1)
+    match = next(p for p in payload.positions if p.idempotency_key == saved["idempotency_key"])
+    assert match.has_tailored_tex is True
+    row = mcp_repo.get_application(1, saved["idempotency_key"])
+    assert row is not None
+    assert row["country"] == "uk"
+
+
 def test_company_applications_routes_require_auth(v2_client):
     assert v2_client.get("/api/mcp/companies/uk/acme/applications").status_code == 401
     assert v2_client.get("/api/mcp/applications/some-key/tex").status_code == 401
+    assert v2_client.put("/api/mcp/applications/some-key/tex", json={"content": "x"}).status_code == 401
 
 
 def test_board_jobs_include_mcp_flags(v2_auth_client, seeded_catalog_v2, mcp_documents):

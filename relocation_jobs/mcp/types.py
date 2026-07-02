@@ -20,12 +20,15 @@ class RenderResult(BaseSchema):
     log: str = ""
     pdf_stored: bool = False
     pdf_bytes: int = 0
+    pdf_filename: str = ""
 
 
 class MasterResumeSummary(BaseSchema):
     slug: str
     label: str = ""
     updated_at: str = ""
+    has_pdf: bool = False
+    pdf_filename: str = ""
 
 
 class ApplicationProfile(BaseSchema):
@@ -62,10 +65,13 @@ class JobContext(BaseSchema):
     rejected: bool = False
     looking_to_apply: bool = False
     pinned: bool = False
+    in_application_queue: bool = False
+    can_save_tailored_tex: bool = True
     ats_score: int | None = None
     master_resume_slug: str = ""
     has_tailored_tex: bool = False
     has_pdf: bool = False
+    pdf_filename: str = ""
 
 
 class ApplicationQueueItem(BaseSchema):
@@ -94,6 +100,7 @@ class CompanyPositionApplication(BaseSchema):
     master_resume_slug: str = ""
     tailored_tex_updated_at: str = ""
     pdf_updated_at: str = ""
+    pdf_filename: str = ""
 
 
 class CompanyApplicationsResponse(BaseSchema):

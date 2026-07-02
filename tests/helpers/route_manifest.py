@@ -56,9 +56,11 @@ PANEL_API_ROUTES: dict[str, frozenset[str]] = {
     "/api/mcp/profile": frozenset({"GET", "PUT"}),
     "/api/mcp/master-resumes": frozenset({"GET"}),
     "/api/mcp/master-resumes/<slug>": frozenset({"GET", "PUT"}),
+    "/api/mcp/master-resumes/<slug>/pdf": frozenset({"GET"}),
+    "/api/mcp/master-resumes/<slug>/render": frozenset({"POST"}),
     "/api/mcp/companies/<country>/<path:company>/applications": frozenset({"GET"}),
     "/api/mcp/applications/<path:idempotency_key>": frozenset({"GET"}),
-    "/api/mcp/applications/<path:idempotency_key>/tex": frozenset({"GET"}),
+    "/api/mcp/applications/<path:idempotency_key>/tex": frozenset({"GET", "PUT"}),
     "/api/mcp/applications/<path:idempotency_key>/pdf": frozenset({"GET"}),
     "/api/mcp/applications/<path:idempotency_key>/render": frozenset({"POST"}),
 }

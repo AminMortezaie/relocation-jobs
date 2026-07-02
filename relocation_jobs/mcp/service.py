@@ -10,6 +10,7 @@ from relocation_jobs.core.db import _normalize_url
 from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.db.users import get_user_by_username
 from relocation_jobs.mcp import repo, render, validate
+from relocation_jobs.mcp.names import application_pdf_filename, master_pdf_filename
 from relocation_jobs.mcp.types import (
     ApplicationProfile,
     ApplicationQueueItem,
@@ -55,6 +56,16 @@ def _application_state(user_id: int, idempotency_key: str) -> dict:
     }
 
 
+def _application_pdf_filename(user_id: int, company: str) -> str:
+    profile = get_application_profile(user_id=user_id)
+    return application_pdf_filename(profile.full_name, company)
+
+
+def _master_pdf_filename(user_id: int, slug: str) -> str:
+    profile = get_application_profile(user_id=user_id)
+    return master_pdf_filename(profile.full_name, slug)
+
+
 def _resolve_master_slug(
     user_id: int,
     idempotency_key: str,
@@ -79,20 +90,24 @@ def get_job_context(
     user_id: int | None = None,
 ) -> JobContext:
     uid = user_id if user_id is not None else resolve_user_id()
-    job = get_job_by_url(url, company_name=company, country_key=country)
+    country_key = country.strip().lower()
+    company_name = resolve_company_for_workspace(country_key, company)
+    job = get_job_by_url(url, company_name=company_name, country_key=country_key)
     if job is None:
         raise LookupError(f"Job not found: {company} — {url[:120]}")
 
-    company_row = get_company(country, company) or {}
+    company_row = get_company(country_key, company_name) or {}
     catalog_url = (job.get("url") or url).strip()
     idem_key = (job.get("idempotency_key") or "").strip() or job_idempotency_key(catalog_url)
-    tracking = load_job_tracking(uid, country=country)
-    row = _tracking_row(tracking, country, company, catalog_url)
+    tracking = load_job_tracking(uid, country=country_key)
+    row = _tracking_row(tracking, country_key, company_name, catalog_url)
     app_state = _application_state(uid, idem_key)
+    pinned = bool(row.get("pinned"))
+    looking_to_apply = bool(row.get("looking_to_apply"))
 
     return JobContext(
-        country=country,
-        company=company,
+        country=country_key,
+        company=company_name,
         url=catalog_url,
         title=(job.get("title") or "").strip(),
         idempotency_key=idem_key,
@@ -102,12 +117,15 @@ def get_job_context(
         visa_sponsorship=job.get("visa_sponsorship"),
         applied=bool(row.get("applied")),
         rejected=bool(row.get("rejected")),
-        looking_to_apply=bool(row.get("looking_to_apply")),
-        pinned=bool(row.get("pinned")),
+        looking_to_apply=looking_to_apply,
+        pinned=pinned,
+        in_application_queue=pinned or looking_to_apply,
+        can_save_tailored_tex=True,
         ats_score=row.get("ats_score"),
         master_resume_slug=app_state["master_slug"],
         has_tailored_tex=app_state["has_tex"],
         has_pdf=app_state["has_pdf"],
+        pdf_filename=_application_pdf_filename(uid, company_name),
     )
 
 
@@ -180,6 +198,7 @@ def list_company_applications(
 
     tracking = load_job_tracking(uid, country=country_key)
     app_rows = repo.list_applications_for_company(uid, country_key, company_name)
+    profile = get_application_profile(user_id=uid)
     app_by_key = {
         (row.get("idempotency_key") or "").strip(): row
         for row in app_rows
@@ -210,6 +229,7 @@ def list_company_applications(
             master_resume_slug=(app.get("master_resume_slug") or "").strip(),
             tailored_tex_updated_at=(app.get("tailored_tex_updated_at") or "").strip(),
             pdf_updated_at=(app.get("pdf_updated_at") or "").strip(),
+            pdf_filename=application_pdf_filename(profile.full_name, company_name),
         ))
 
     positions.sort(key=lambda item: (not item.pinned, not item.looking_to_apply, item.title.lower()))
@@ -266,6 +286,37 @@ def read_application_tex(
     )
 
 
+def save_application_tex(
+    idempotency_key: str,
+    content: str,
+    *,
+    user_id: int | None = None,
+) -> dict:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        raise LookupError(f"Application not found: {idempotency_key}")
+    if not content.strip():
+        raise ValueError("LaTeX content cannot be empty")
+    master_slug = (row.get("master_resume_slug") or "").strip()
+    if not master_slug:
+        raise ValueError("Application has no master resume slug")
+    saved = repo.save_tailored_tex(
+        uid,
+        idempotency_key,
+        content,
+        country=row["country"],
+        company=row["company_name"],
+        url=row["job_url"],
+        master_resume_slug=master_slug,
+    )
+    return {
+        "ok": True,
+        "idempotency_key": idempotency_key,
+        "updated_at": saved["updated_at"],
+    }
+
+
 def read_application_pdf(
     idempotency_key: str,
     *,
@@ -273,6 +324,20 @@ def read_application_pdf(
 ) -> bytes:
     uid = user_id if user_id is not None else resolve_user_id()
     return repo.read_pdf_bytes(uid, idempotency_key)
+
+
+def read_application_pdf_download(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> tuple[bytes, str]:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        raise LookupError(f"Application not found: {idempotency_key}")
+    pdf_bytes = repo.read_pdf_bytes(uid, idempotency_key)
+    filename = _application_pdf_filename(uid, row["company_name"])
+    return pdf_bytes, filename
 
 
 def render_application_pdf(
@@ -294,7 +359,11 @@ def render_application_pdf(
 
 def list_master_resumes(*, user_id: int | None = None) -> list[MasterResumeSummary]:
     uid = user_id if user_id is not None else resolve_user_id()
-    return repo.list_master_resumes(uid)
+    items = repo.list_master_resumes(uid)
+    return [
+        item.model_copy(update={"pdf_filename": _master_pdf_filename(uid, item.slug)})
+        for item in items
+    ]
 
 
 def get_application_profile(*, user_id: int | None = None) -> ApplicationProfile:
@@ -309,15 +378,62 @@ def get_application_profile(*, user_id: int | None = None) -> ApplicationProfile
 def get_master_resume_detail(slug: str, *, user_id: int | None = None) -> dict:
     uid = user_id if user_id is not None else resolve_user_id()
     key = repo.normalize_master_resume_slug(slug)
-    content = repo.read_master_resume(uid, slug)
-    summaries = {item.slug: item for item in repo.list_master_resumes(uid)}
-    summary = summaries.get(key)
+    row = repo.get_master_resume_row(uid, slug)
+    if row is None or not (row.get("content") or "").strip():
+        raise LookupError(f"Master resume not found: {key}")
     return {
         "slug": key,
-        "label": (summary.label if summary else ""),
-        "content": content,
-        "updated_at": (summary.updated_at if summary else ""),
+        "label": (row.get("label") or "").strip(),
+        "content": row["content"],
+        "updated_at": (row.get("updated_at") or "").strip(),
+        "has_pdf": bool(row.get("pdf_bytes")),
+        "pdf_updated_at": (row.get("pdf_updated_at") or "").strip(),
+        "pdf_filename": _master_pdf_filename(uid, key),
     }
+
+
+def read_master_pdf_download(
+    slug: str,
+    *,
+    user_id: int | None = None,
+) -> tuple[bytes, str]:
+    uid = user_id if user_id is not None else resolve_user_id()
+    key = repo.normalize_master_resume_slug(slug)
+    pdf_bytes = repo.read_master_pdf_bytes(uid, key)
+    return pdf_bytes, _master_pdf_filename(uid, key)
+
+
+def render_master_pdf(
+    slug: str,
+    *,
+    user_id: int | None = None,
+) -> RenderResult:
+    uid = user_id if user_id is not None else resolve_user_id()
+    key = repo.normalize_master_resume_slug(slug)
+    try:
+        tex = repo.read_master_resume(uid, key)
+    except LookupError as exc:
+        return RenderResult(ok=False, log=str(exc))
+
+    pdf_filename = _master_pdf_filename(uid, key)
+    basename = pdf_filename.removesuffix(".pdf")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tex_path = Path(tmp) / f"{basename}.tex"
+        tex_path.write_text(tex, encoding="utf-8")
+        compiled = render.render_tex_to_pdf(tex_path)
+        if not compiled.ok:
+            return RenderResult(ok=False, log=compiled.log)
+
+        pdf_bytes = Path(compiled.pdf_path).read_bytes()
+        stored = repo.save_master_pdf(uid, key, pdf_bytes)
+        return RenderResult(
+            ok=True,
+            log=compiled.log,
+            pdf_stored=True,
+            pdf_bytes=stored["pdf_bytes"],
+            pdf_filename=pdf_filename,
+        )
 
 
 def save_master_resume(
@@ -348,28 +464,30 @@ def save_tailored_tex_for_job(
     uid = user_id if user_id is not None else resolve_user_id()
     ctx = get_job_context(country, company, url, user_id=uid)
     slug = repo.normalize_master_resume_slug(master_resume_slug)
+    overwritten = ctx.has_tailored_tex
     saved = repo.save_tailored_tex(
         uid,
         ctx.idempotency_key,
         content,
-        country=country,
-        company=company,
+        country=ctx.country,
+        company=ctx.company,
         url=ctx.url,
         master_resume_slug=slug,
     )
     meta = repo.touch_application_meta(
         uid,
         ctx.idempotency_key,
-        country=country,
-        company=company,
+        country=ctx.country,
+        company=ctx.company,
         url=ctx.url,
         event="tailored_tex_saved",
-        extra={"master_resume_slug": slug},
+        extra={"master_resume_slug": slug, "overwritten": overwritten},
     )
     return {
         "idempotency_key": ctx.idempotency_key,
         "master_resume_slug": slug,
         "updated_at": saved["updated_at"],
+        "overwritten": overwritten,
         "meta": meta,
     }
 
@@ -436,8 +554,11 @@ def render_tailored_pdf(
         lines = [f"{issue.code}: {issue.message}" for issue in validation.issues]
         return RenderResult(ok=False, log="Validation failed:\n" + "\n".join(lines))
 
+    pdf_filename = _application_pdf_filename(uid, company)
+    basename = pdf_filename.removesuffix(".pdf")
+
     with tempfile.TemporaryDirectory() as tmp:
-        tex_path = Path(tmp) / "resume.tex"
+        tex_path = Path(tmp) / f"{basename}.tex"
         tex_path.write_text(tex, encoding="utf-8")
         compiled = render.render_tex_to_pdf(tex_path)
         if not compiled.ok:
@@ -460,6 +581,7 @@ def render_tailored_pdf(
             log=compiled.log,
             pdf_stored=True,
             pdf_bytes=stored["pdf_bytes"],
+            pdf_filename=pdf_filename,
         )
 
 

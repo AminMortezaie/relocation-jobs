@@ -6,10 +6,22 @@
   <title>Company — Relocation Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=43" />
+  <link rel="stylesheet" href="/static/styles.css?v=46" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
+  <div id="screenLoader" class="screen-loader" hidden aria-hidden="true" aria-live="polite">
+    <div class="screen-loader-panel">
+      <div id="screenLoaderRing" class="screen-loader-ring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <svg class="screen-loader-svg" viewBox="0 0 56 56" aria-hidden="true">
+          <circle class="screen-loader-track" cx="28" cy="28" r="24" />
+          <circle id="screenLoaderArc" class="screen-loader-arc" cx="28" cy="28" r="24" />
+        </svg>
+        <span id="screenLoaderPct" class="screen-loader-pct" aria-hidden="true"></span>
+      </div>
+      <p id="screenLoaderLabel" class="screen-loader-label">Loading…</p>
+    </div>
+  </div>
   <div class="layout admin-layout company-layout">
     <div id="companyLoginPanel" class="login-panel" hidden>
       <h2>Sign in</h2>
@@ -66,16 +78,29 @@
                 <p class="company-position-meta" id="companyPositionMeta"></p>
               </div>
               <div class="company-position-actions">
-                <a class="header-secondary-btn" id="companyJobLink" href="#" target="_blank" rel="noopener noreferrer">Open job posting</a>
                 <button type="button" class="header-secondary-btn" id="companyRenderBtn">Re-render PDF</button>
+                <a class="header-secondary-btn" id="companyOpenPdf" href="#" target="_blank" rel="noopener noreferrer" hidden>Open PDF</a>
                 <a class="header-primary-btn" id="companyDownloadPdf" href="#" download="resume.pdf">Download PDF</a>
+                <a class="header-secondary-btn" id="companyApplyLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Apply on company site</a>
               </div>
+              <p class="company-apply-hint" id="companyApplyHint" hidden>
+                <span id="companyApplyHintText"></span>
+                <a class="company-apply-url" id="companyApplyUrl" href="#" target="_blank" rel="noopener noreferrer"></a>
+              </p>
             </div>
 
             <div class="company-preview-grid">
               <div class="company-tex-panel">
-                <h3 class="company-preview-label">LaTeX source</h3>
+                <div class="company-tex-header">
+                  <h3 class="company-preview-label">LaTeX source</h3>
+                  <div class="company-tex-actions">
+                    <button type="button" class="header-secondary-btn" id="companyTexEditBtn" hidden>Edit</button>
+                    <button type="button" class="header-secondary-btn" id="companyTexSaveBtn" hidden>Save</button>
+                    <button type="button" class="link-btn" id="companyTexCancelBtn" hidden>Cancel</button>
+                  </div>
+                </div>
                 <pre class="company-tex-view" id="companyTexView"></pre>
+                <textarea class="company-tex-editor" id="companyTexEditor" hidden spellcheck="false"></textarea>
               </div>
               <div class="company-pdf-panel">
                 <h3 class="company-preview-label">PDF preview</h3>
@@ -93,6 +118,6 @@
 
   <div class="toast" id="companyToast"></div>
 
-  <script type="module" src="/static/js/company.js?v=3"></script>
+  <script type="module" src="/static/js/company.js?v=8"></script>
 </body>
 </html>

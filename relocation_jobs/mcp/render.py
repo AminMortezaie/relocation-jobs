@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,6 +10,11 @@ from pathlib import Path
 _COMPILE_TIMEOUT_SEC = 60
 _TECTONIC_INCOMPATIBLE_PACKAGES = ("fontawesome5", "fontawesome")
 _USEPACKAGE_RE = re.compile(r"^\\usepackage(\[[^\]]*\])?\{([^}]+)\}")
+_FA_CMD_RE = re.compile(r"\\fa(?:Icon|[A-Za-z]+)(?:\[[^\]]*\])?(?:\{[^}]*\})?")
+_TECTONIC_SEARCH_PATHS = (
+    "/opt/homebrew/bin/tectonic",
+    "/usr/local/bin/tectonic",
+)
 
 
 @dataclass
@@ -18,8 +24,18 @@ class CompileResult:
     pdf_path: str = ""
 
 
-def _latex_command() -> str:
-    return (os.environ.get("MCP_LATEX_CMD") or "tectonic").strip() or "tectonic"
+def _resolve_latex_command() -> str:
+    raw = (os.environ.get("MCP_LATEX_CMD") or "tectonic").strip() or "tectonic"
+    if Path(raw).is_file():
+        return raw
+    found = shutil.which(raw)
+    if found:
+        return found
+    if raw == "tectonic":
+        for candidate in _TECTONIC_SEARCH_PATHS:
+            if Path(candidate).is_file():
+                return candidate
+    return raw
 
 
 def sanitize_tex_for_tectonic(tex: str) -> tuple[str, list[str]]:
@@ -35,9 +51,28 @@ def sanitize_tex_for_tectonic(tex: str) -> tuple[str, list[str]]:
                 continue
         kept.append(line)
     sanitized = "\n".join(kept)
+    if _FA_CMD_RE.search(sanitized):
+        sanitized = _FA_CMD_RE.sub("", sanitized)
+        removed.append("fa-icons")
+    if "—" in sanitized:
+        sanitized = sanitized.replace("—", "--")
+        removed.append("unicode-em-dash")
     if tex.endswith("\n"):
         sanitized += "\n"
     return sanitized, removed
+
+
+def _tex_needs_tectonic_sanitize(tex: str) -> bool:
+    for line in tex.splitlines():
+        match = _USEPACKAGE_RE.match(line.strip())
+        if match is None:
+            continue
+        packages = [part.strip() for part in match.group(2).split(",")]
+        if any(pkg in _TECTONIC_INCOMPATIBLE_PACKAGES for pkg in packages):
+            return True
+    if _FA_CMD_RE.search(tex):
+        return True
+    return "—" in tex
 
 
 def _build_command(cmd: str, tex_path: Path, out_dir: Path) -> list[str]:
@@ -49,26 +84,9 @@ def _build_command(cmd: str, tex_path: Path, out_dir: Path) -> list[str]:
     return [cmd, str(tex_path)]
 
 
-def _compile_failed(result: CompileResult, pdf_path: Path) -> bool:
-    if result.ok and pdf_path.is_file():
-        return False
-    return True
-
-
-def _should_retry_without_fontawesome(result: CompileResult, pdf_path: Path, cmd: str) -> bool:
-    if Path(cmd).name != "tectonic":
-        return False
-    if not _compile_failed(result, pdf_path):
-        return False
-    log = (result.log or "").strip()
-    if not log or log == "note: Running TeX ...":
-        return True
-    return "fontawesome" in log.lower()
-
-
 def _run_compile(tex_path: Path, out_dir: Path) -> CompileResult:
     pdf_path = out_dir / tex_path.with_suffix(".pdf").name
-    cmd = _latex_command()
+    cmd = _resolve_latex_command()
     argv = _build_command(cmd, tex_path, out_dir)
     try:
         completed = subprocess.run(
@@ -82,7 +100,11 @@ def _run_compile(tex_path: Path, out_dir: Path) -> CompileResult:
     except FileNotFoundError:
         return CompileResult(
             ok=False,
-            log=f"LaTeX compiler not found: {cmd}. Install tectonic or set MCP_LATEX_CMD.",
+            log=(
+                f"LaTeX compiler not found: {cmd}. "
+                "Install tectonic, set MCP_LATEX_CMD to its full path in Claude Desktop MCP env, "
+                "or use pdflatex."
+            ),
         )
     except subprocess.TimeoutExpired:
         return CompileResult(ok=False, log=f"LaTeX compile timed out after {_COMPILE_TIMEOUT_SEC}s")
@@ -102,23 +124,23 @@ def render_tex_to_pdf(tex_path: Path) -> CompileResult:
 
     out_dir = tex_path.parent
     original = tex_path.read_text(encoding="utf-8")
+    to_compile = original
+    note = ""
+
+    if Path(_resolve_latex_command()).name == "tectonic" and _tex_needs_tectonic_sanitize(original):
+        to_compile, removed = sanitize_tex_for_tectonic(original)
+        if removed:
+            pkgs = ", ".join(sorted(set(removed)))
+            note = f"Omitted tectonic-incompatible: {pkgs}"
+
+    if to_compile != original:
+        tex_path.write_text(to_compile, encoding="utf-8")
+
     result = _run_compile(tex_path, out_dir)
-    pdf_path = out_dir / tex_path.with_suffix(".pdf").name
-    if not _should_retry_without_fontawesome(result, pdf_path, _latex_command()):
-        return result
 
-    sanitized, removed = sanitize_tex_for_tectonic(original)
-    if not removed or sanitized == original:
-        return result
+    if to_compile != original:
+        tex_path.write_text(original, encoding="utf-8")
 
-    tex_path.write_text(sanitized, encoding="utf-8")
-    retry = _run_compile(tex_path, out_dir)
-    tex_path.write_text(original, encoding="utf-8")
-    if retry.ok:
-        pkgs = ", ".join(sorted(set(removed)))
-        note = f"Compiled after omitting tectonic-incompatible package(s): {pkgs}"
-        retry.log = f"{note}\n\n{retry.log}".strip()
-        return retry
-
-    combined = f"{result.log}\n\nRetry without {', '.join(sorted(set(removed)))}:\n{retry.log}"
-    return CompileResult(ok=False, log=combined.strip())
+    if result.ok and note:
+        result.log = f"{note}\n\n{result.log}".strip() if result.log else note
+    return result

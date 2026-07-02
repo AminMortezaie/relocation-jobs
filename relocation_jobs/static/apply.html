@@ -6,10 +6,22 @@
   <title>Application data — Relocation Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=41" />
+  <link rel="stylesheet" href="/static/styles.css?v=44" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
+  <div id="screenLoader" class="screen-loader" hidden aria-hidden="true" aria-live="polite">
+    <div class="screen-loader-panel">
+      <div id="screenLoaderRing" class="screen-loader-ring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <svg class="screen-loader-svg" viewBox="0 0 56 56" aria-hidden="true">
+          <circle class="screen-loader-track" cx="28" cy="28" r="24" />
+          <circle id="screenLoaderArc" class="screen-loader-arc" cx="28" cy="28" r="24" />
+        </svg>
+        <span id="screenLoaderPct" class="screen-loader-pct" aria-hidden="true"></span>
+      </div>
+      <p id="screenLoaderLabel" class="screen-loader-label">Loading…</p>
+    </div>
+  </div>
   <div class="layout admin-layout apply-layout">
     <div id="applyLoginPanel" class="login-panel" hidden>
       <h2>Sign in</h2>
@@ -108,8 +120,27 @@
               <label for="applyMasterLabel">Label</label>
               <input type="text" id="applyMasterLabel" placeholder="Go backend" />
             </div>
-            <label for="applyMasterContent">LaTeX content</label>
-            <textarea id="applyMasterContent" class="apply-tex-editor" spellcheck="false" placeholder="\documentclass{article}&#10;..."></textarea>
+
+            <div class="apply-master-actions">
+              <button type="button" class="header-secondary-btn" id="applyMasterRenderBtn">Re-render PDF</button>
+              <a class="header-secondary-btn" id="applyMasterOpenPdf" href="#" target="_blank" rel="noopener noreferrer" hidden>Open PDF</a>
+              <a class="header-primary-btn" id="applyMasterDownloadPdf" href="#" download="resume.pdf" hidden>Download PDF</a>
+            </div>
+
+            <div class="apply-master-preview-grid">
+              <div class="apply-master-tex-panel">
+                <label for="applyMasterContent" class="apply-master-preview-label">LaTeX content</label>
+                <textarea id="applyMasterContent" class="apply-tex-editor" spellcheck="false" placeholder="\documentclass{article}&#10;..."></textarea>
+              </div>
+              <div class="apply-master-pdf-panel">
+                <h3 class="apply-master-preview-label">PDF preview</h3>
+                <div class="apply-master-pdf-frame-wrap">
+                  <iframe id="applyMasterPdfFrame" class="apply-master-pdf-frame" title="Master resume PDF preview" hidden></iframe>
+                  <p id="applyMasterPdfMissing" class="apply-master-pdf-missing" hidden>No PDF yet — click Re-render PDF.</p>
+                </div>
+              </div>
+            </div>
+
             <div class="apply-form-actions">
               <span class="apply-updated-at" id="applyMasterUpdated"></span>
               <button type="button" class="header-primary-btn" id="applyMasterSaveBtn">Save resume</button>
@@ -122,6 +153,6 @@
 
   <div class="toast" id="applyToast"></div>
 
-  <script type="module" src="/static/js/apply.js?v=3"></script>
+  <script type="module" src="/static/js/apply.js?v=6"></script>
 </body>
 </html>

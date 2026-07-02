@@ -1,9 +1,12 @@
 /** Application data — profile + master resumes for MCP (per logged-in user). */
 
-import { $, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
+import { beginScreenLoad, endScreenLoad, setScreenLoadProgress } from "./screen-loader.js";
+import { $, escapeHtml, finishLoadingProgress, setLoadingProgress } from "./utils.js";
 
 let masterItems = [];
 let selectedSlug = "";
+let selectedHasPdf = false;
+let selectedPdfFilename = "resume.pdf";
 const MAX_PIPELINE_PROMPTS = 5;
 
 function showLogin() {
@@ -34,11 +37,16 @@ function showToast(message) {
 
 async function api(path, options = {}) {
   const res = await fetch(path, { credentials: "same-origin", ...options });
-  const data = await res.json().catch(() => ({}));
   if (res.status === 401) {
     showLogin();
     throw new Error("Authentication required");
   }
+  const contentType = res.headers.get("content-type") || "";
+  if (contentType.includes("application/pdf")) {
+    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+    return res;
+  }
+  const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error || `Request failed (${res.status})`);
   }
@@ -144,6 +152,49 @@ function profilePayload() {
   };
 }
 
+function masterPdfUrl(slug, { download = false } = {}) {
+  const params = new URLSearchParams();
+  if (download) params.set("download", "1");
+  else params.set("ts", String(Date.now()));
+  const query = params.toString();
+  return `/api/mcp/master-resumes/${encodeURIComponent(slug)}/pdf${query ? `?${query}` : ""}`;
+}
+
+function updateMasterPdfPreview({ slug, hasPdf, pdfFilename }) {
+  selectedHasPdf = Boolean(hasPdf);
+  selectedPdfFilename = pdfFilename || "resume.pdf";
+
+  const download = $("applyMasterDownloadPdf");
+  const openPdf = $("applyMasterOpenPdf");
+  if (download) {
+    download.href = slug ? masterPdfUrl(slug, { download: true }) : "#";
+    download.download = selectedPdfFilename;
+    download.hidden = !selectedHasPdf;
+  }
+  if (openPdf) {
+    openPdf.href = slug && selectedHasPdf ? masterPdfUrl(slug) : "#";
+    openPdf.hidden = !selectedHasPdf;
+  }
+
+  const pdfFrame = $("applyMasterPdfFrame");
+  const pdfMissing = $("applyMasterPdfMissing");
+  const renderBtn = $("applyMasterRenderBtn");
+
+  if (renderBtn) renderBtn.disabled = !slug;
+
+  if (selectedHasPdf && slug && pdfFrame) {
+    pdfFrame.hidden = false;
+    pdfFrame.src = masterPdfUrl(slug);
+    if (pdfMissing) pdfMissing.hidden = true;
+  } else {
+    if (pdfFrame) {
+      pdfFrame.removeAttribute("src");
+      pdfFrame.hidden = true;
+    }
+    if (pdfMissing) pdfMissing.hidden = false;
+  }
+}
+
 function renderMasterList() {
   const list = $("applyMasterList");
   if (!list) return;
@@ -156,16 +207,24 @@ function renderMasterList() {
   list.innerHTML = masterItems.map((item) => {
     const label = (item.label || item.slug).trim();
     const active = item.slug === selectedSlug ? " apply-master-item--active" : "";
-    return `<li><button type="button" class="apply-master-item${active}" data-slug="${escapeHtml(item.slug)}">${escapeHtml(label)}<span class="apply-master-item-slug">${escapeHtml(item.slug)}</span></button></li>`;
+    const pdfBadge = item.has_pdf
+      ? '<span class="apply-master-item-badge apply-master-item-badge--pdf">PDF</span>'
+      : "";
+    return `<li><button type="button" class="apply-master-item${active}" data-slug="${escapeHtml(item.slug)}"><span class="apply-master-item-label">${escapeHtml(label)}${pdfBadge}</span><span class="apply-master-item-slug">${escapeHtml(item.slug)}</span></button></li>`;
   }).join("");
 }
 
 function clearMasterEditor() {
   selectedSlug = "";
+  selectedHasPdf = false;
+  selectedPdfFilename = "resume.pdf";
   $("applyMasterSlug").value = "";
   $("applyMasterLabel").value = "";
   $("applyMasterContent").value = "";
   $("applyMasterUpdated").textContent = "";
+  updateMasterPdfPreview({ slug: "", hasPdf: false });
+  const pdfMissing = $("applyMasterPdfMissing");
+  if (pdfMissing) pdfMissing.hidden = false;
   renderMasterList();
 }
 
@@ -178,11 +237,105 @@ async function loadMasterDetail(slug) {
     $("applyMasterSlug").value = detail.slug || slug;
     $("applyMasterLabel").value = detail.label || "";
     $("applyMasterContent").value = detail.content || "";
-    $("applyMasterUpdated").textContent = detail.updated_at
-      ? `Updated ${detail.updated_at}`
-      : "";
+    const updatedParts = [];
+    if (detail.updated_at) updatedParts.push(`Updated ${detail.updated_at}`);
+    if (detail.pdf_updated_at) updatedParts.push(`PDF ${detail.pdf_updated_at}`);
+    $("applyMasterUpdated").textContent = updatedParts.join(" · ");
+    updateMasterPdfPreview({
+      slug: detail.slug || slug,
+      hasPdf: detail.has_pdf,
+      pdfFilename: detail.pdf_filename,
+    });
   } finally {
     finishLoadingProgress();
+  }
+}
+
+async function persistMaster() {
+  const slug = $("applyMasterSlug").value.trim();
+  const content = $("applyMasterContent").value;
+  if (!slug) {
+    throw new Error("Slug is required (e.g. go, java, fullstack)");
+  }
+  if (!content.trim()) {
+    throw new Error("LaTeX content cannot be empty");
+  }
+
+  const saved = await api(`/api/mcp/master-resumes/${encodeURIComponent(slug)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      content,
+      label: $("applyMasterLabel").value.trim(),
+    }),
+  });
+  selectedSlug = saved.slug || slug;
+  const mastersData = await api("/api/mcp/master-resumes");
+  masterItems = mastersData.items || [];
+  renderMasterList();
+  $("applyMasterUpdated").textContent = saved.updated_at
+    ? `Updated ${saved.updated_at}`
+    : "";
+  return saved;
+}
+
+async function refreshMasterDetail(slug = selectedSlug) {
+  if (!slug) return null;
+  const detail = await api(`/api/mcp/master-resumes/${encodeURIComponent(slug)}`);
+  const updatedParts = [];
+  if (detail.updated_at) updatedParts.push(`Updated ${detail.updated_at}`);
+  if (detail.pdf_updated_at) updatedParts.push(`PDF ${detail.pdf_updated_at}`);
+  $("applyMasterUpdated").textContent = updatedParts.join(" · ");
+  updateMasterPdfPreview({
+    slug: detail.slug || slug,
+    hasPdf: detail.has_pdf,
+    pdfFilename: detail.pdf_filename,
+  });
+  return detail;
+}
+
+async function rerenderMasterPdf() {
+  const slug = $("applyMasterSlug").value.trim() || selectedSlug;
+  if (!slug) {
+    showError("Select or save a master resume before rendering PDF");
+    return;
+  }
+
+  const btn = $("applyMasterRenderBtn");
+  const saveBtn = $("applyMasterSaveBtn");
+  btn.disabled = true;
+  if (saveBtn) saveBtn.disabled = true;
+  showError("");
+  beginScreenLoad("Rendering PDF…");
+  setScreenLoadProgress(15);
+  const tick = window.setInterval(() => setScreenLoadProgress(88), 800);
+  try {
+    setScreenLoadProgress(20);
+    await persistMaster();
+    setScreenLoadProgress(35);
+    const result = await api(
+      `/api/mcp/master-resumes/${encodeURIComponent(selectedSlug)}/render`,
+      { method: "POST" },
+    );
+    setScreenLoadProgress(92);
+    if (!result.ok) {
+      throw new Error(result.error || result.log || "Render failed");
+    }
+    showToast("PDF re-rendered");
+    updateMasterPdfPreview({
+      slug: selectedSlug,
+      hasPdf: Boolean(result.pdf_stored),
+      pdfFilename: result.pdf_filename,
+    });
+    setScreenLoadProgress(96);
+    await refreshMasterDetail(selectedSlug);
+  } catch (err) {
+    showError(err.message || "Failed to re-render PDF");
+  } finally {
+    window.clearInterval(tick);
+    endScreenLoad();
+    btn.disabled = false;
+    if (saveBtn) saveBtn.disabled = false;
   }
 }
 
@@ -226,35 +379,11 @@ async function saveProfile(event) {
 
 async function saveMaster() {
   showError("");
-  const slug = $("applyMasterSlug").value.trim();
-  const content = $("applyMasterContent").value;
-  if (!slug) {
-    showError("Slug is required (e.g. go, java, fullstack)");
-    return;
-  }
-  if (!content.trim()) {
-    showError("LaTeX content cannot be empty");
-    return;
-  }
-
   const btn = $("applyMasterSaveBtn");
   btn.disabled = true;
   try {
-    const saved = await api(`/api/mcp/master-resumes/${encodeURIComponent(slug)}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content,
-        label: $("applyMasterLabel").value.trim(),
-      }),
-    });
-    selectedSlug = saved.slug || slug;
-    const mastersData = await api("/api/mcp/master-resumes");
-    masterItems = mastersData.items || [];
-    renderMasterList();
-    $("applyMasterUpdated").textContent = saved.updated_at
-      ? `Updated ${saved.updated_at}`
-      : "";
+    await persistMaster();
+    await refreshMasterDetail(selectedSlug);
     showToast(`Saved ${selectedSlug}`);
   } catch (err) {
     showError(err.message || "Failed to save master resume");
@@ -264,12 +393,7 @@ async function saveMaster() {
 }
 
 function startNewMaster() {
-  selectedSlug = "";
-  $("applyMasterSlug").value = "";
-  $("applyMasterLabel").value = "";
-  $("applyMasterContent").value = "";
-  $("applyMasterUpdated").textContent = "";
-  renderMasterList();
+  clearMasterEditor();
   $("applyMasterSlug").focus();
 }
 
@@ -312,6 +436,7 @@ async function submitLogin(event) {
 async function logout() {
   await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
   clearMasterEditor();
+  masterItems = [];
   showLogin();
 }
 
@@ -331,6 +456,7 @@ function bindEvents() {
     movePipelinePrompt(Number(moveBtn.dataset.index), Number(moveBtn.dataset.dir));
   });
   $("applyMasterSaveBtn")?.addEventListener("click", saveMaster);
+  $("applyMasterRenderBtn")?.addEventListener("click", rerenderMasterPdf);
   $("applyNewMasterBtn")?.addEventListener("click", startNewMaster);
   $("applyMasterList")?.addEventListener("click", (e) => {
     const btn = e.target.closest(".apply-master-item");

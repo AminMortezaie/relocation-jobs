@@ -4,7 +4,12 @@
       "command": "/absolute/path/to/resume/.venv/bin/python3",
       "args": [
         "/absolute/path/to/resume/scripts/mcp_server.py"
-      ]
+      ],
+      "env": {
+        "DATABASE_URL": "postgresql://…",
+        "MCP_USERNAME": "admin",
+        "MCP_LATEX_CMD": "/opt/homebrew/bin/tectonic"
+      }
     }
   }
 }

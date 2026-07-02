@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "c4e3211e3c41",
+  "session_id": "41693014-5a86-4d1d-87d5-01fb85c50926",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-02T17:30:02.041664Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/events.js",
+    "tests/web/test_job_pin.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "8fa711f7ed55",
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-02T17:30:02.038186Z",
+    "agent_lines": 41,
+    "agent_removed": 5,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 41,
+    "total_lines_changed": 46,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 41,
+      "agent_lines_removed": 5
+    }
+  ]
+}

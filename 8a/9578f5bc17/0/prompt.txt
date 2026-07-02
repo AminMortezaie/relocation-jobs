@@ -1,0 +1,31 @@
+if i pin a job in a company it does not mean that the company should be pinned.
+just this job should be pinned there in company section, if there is new job positions it should be go above the company with pinned position.
+
+---
+
+if i pin a job in a company it does not mean that the company should be pinned.
+just this job should be pinned there in company section, if there is new job positions it should be go above the company with pinned position.
+
+---
+
+no again aboutyou positions are on the top though there are new positions on other companies with no pinned positions with most recent jobs.
+
+---
+
+restart the server
+
+---
+
+restart the server
+
+---
+
+ok its working correctly.
+now i want a little change there.
+
+if a position is pinned, you should change the color of background for that position to make it distinct.
+a lite change.
+
+---
+
+restart the server

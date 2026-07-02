@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "a85ecaa447d0",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "claude_desktop_config.json.example",
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/mcp/names.py",
+    "relocation_jobs/mcp/render.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/js/company.js",
+    "relocation_jobs/web/routes/mcp.py",
+    "tests/mcp/test_names.py",
+    "tests/mcp/test_render.py",
+    "tests/web/test_mcp_company_workspace.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/a8/5ecaa447d0/0/metadata.json",
+      "transcript": "/a8/5ecaa447d0/0/full.jsonl",
+      "content_hash": "/a8/5ecaa447d0/0/content_hash.txt",
+      "prompt": "/a8/5ecaa447d0/0/prompt.txt"
+    }
+  ]
+}

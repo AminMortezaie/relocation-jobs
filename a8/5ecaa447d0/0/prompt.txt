@@ -1,0 +1,14 @@
+two little changes.
+one is for pdf name generating.
+each pdf generats has a name, which is the firstname_lastname_companyName.
+
+based one the user and company info.
+apply this.
+
+---
+
+restart the server to test
+
+---
+
+pdf preview not working on panel and also when opening a position that has pdf it starts to download the file which is not requested and it should be downloaded in case when user requests.

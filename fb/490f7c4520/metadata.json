@@ -3,9 +3,10 @@
   "checkpoint_id": "fb490f7c4520",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 12,
+  "checkpoints_count": 14,
   "files_touched": [
     ".gitignore",
+    "claude_desktop_config.json.example",
     "docs/reference/mcp-application.md",
     "frontend/src/FetchPanel.jsx",
     "relocation_jobs/core/migrations.py",
@@ -25,6 +26,7 @@
     "relocation_jobs/scrape/merge.py",
     "relocation_jobs/static/dist/board.js",
     "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/apply.js",
     "relocation_jobs/static/js/fetch-render.js",
     "relocation_jobs/static/js/fetch-ui.js",
     "relocation_jobs/static/js/render.js",
@@ -57,6 +59,12 @@
       "transcript": "/fb/490f7c4520/2/full.jsonl",
       "content_hash": "/fb/490f7c4520/2/content_hash.txt",
       "prompt": "/fb/490f7c4520/2/prompt.txt"
+    },
+    {
+      "metadata": "/fb/490f7c4520/3/metadata.json",
+      "transcript": "/fb/490f7c4520/3/full.jsonl",
+      "content_hash": "/fb/490f7c4520/3/content_hash.txt",
+      "prompt": "/fb/490f7c4520/3/prompt.txt"
     }
   ]
 }

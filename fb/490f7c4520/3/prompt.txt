@@ -1,0 +1,9 @@
+how can i connect mcp we created to claude desktop?
+
+---
+
+ok do it and add to gitignore and then tell me what should i do in claude desktop to use this?
+
+---
+
+ok do it and add to gitignore and then tell me what should i do in claude desktop to use this?

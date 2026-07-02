@@ -71,6 +71,41 @@ def test_pin_does_not_reorder_company_on_board(v2_auth_client, seeded_catalog_v2
     assert acme["jobs"][0]["pinned"] is True
 
 
+def test_unpin_job_clears_pin_on_board(v2_auth_client, seeded_catalog_v2):
+    board = v2_auth_client.get("/api/board?country=uk").get_json()
+    co = board["companies"][0]
+    job = co["jobs"][0]
+
+    pin = v2_auth_client.post(
+        "/api/jobs/pin",
+        json={
+            "country": "uk",
+            "company": co["name"],
+            "url": job["url"],
+            "pinned": True,
+        },
+    )
+    assert pin.status_code == 200
+    assert pin.get_json().get("pinned") is True
+
+    unpin = v2_auth_client.post(
+        "/api/jobs/pin",
+        json={
+            "country": "uk",
+            "company": co["name"],
+            "url": job["url"],
+            "pinned": False,
+        },
+    )
+    assert unpin.status_code == 200
+    assert unpin.get_json().get("pinned") is False
+
+    board2 = v2_auth_client.get("/api/board?country=uk").get_json()
+    acme = next(c for c in board2["companies"] if c["name"] == co["name"])
+    pinned_jobs = [j for j in acme["jobs"] if j.get("pinned")]
+    assert not pinned_jobs
+
+
 def test_pin_replaces_previous_job_pin_in_same_company(v2_auth_client, seeded_catalog_v2):
     board = v2_auth_client.get("/api/board?country=uk").get_json()
     co = board["companies"][0]

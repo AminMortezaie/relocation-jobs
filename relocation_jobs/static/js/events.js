@@ -713,8 +713,9 @@ function bindJobsListEvents() {
       const card = pinJobBtn.closest(".position-card");
       if (!card) return;
       const { country, company, url, idempotencyKey } = card.dataset;
-      if (await pinJob(country, company, url, idempotencyKey)) {
-        toast("Pinned to top");
+      const nextPinned = !pinJobBtn.classList.contains("is-pinned");
+      if (await pinJob(country, company, url, idempotencyKey, nextPinned)) {
+        toast(nextPinned ? "Pinned to top" : "Unpinned");
       }
       return;
     }

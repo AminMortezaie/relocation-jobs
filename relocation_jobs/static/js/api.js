@@ -32,7 +32,7 @@ function applyJobMutation(country, company, url, idempotencyKey, data, { pin = t
   return false;
 }
 
-export async function pinJob(country, company, url, idempotencyKey = "") {
+export async function pinJob(country, company, url, idempotencyKey = "", pinned = true) {
   const res = await apiFetch("/api/jobs/pin", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -40,13 +40,13 @@ export async function pinJob(country, company, url, idempotencyKey = "") {
       country,
       company,
       url,
-      pinned: true,
+      pinned,
       ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
     }),
   });
   const data = await parseJsonResponse(res);
   if (!res.ok) {
-    toast(data.error || "Could not pin role");
+    toast(data.error || (pinned ? "Could not pin role" : "Could not unpin role"));
     return false;
   }
   applyPinToCatalog(country, company, url, idempotencyKey, data);

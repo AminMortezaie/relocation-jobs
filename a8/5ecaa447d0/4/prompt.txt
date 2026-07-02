@@ -1,0 +1,23 @@
+when claude create a resume and when i want to create it again, it will give me this error.
+
+i expect to overwrite the previous version and save again.
+
+Master go CV is saved with mentoring/architecture updates. But saving the tailored .tex failed — Talon.One isn't in your application queue yet (the MCP requires the job pinned or marked "looking to apply" on the panel first).
+Please add it on the panel (/apply → pin or mark "looking to apply" for Talon.One, Germany, with that job URL), then tell me to retry — I'll save the tailored .tex immediately, no need to redo the phases.
+
+---
+
+That's a server-side DB error on their end (a missing pdf_bytes column), not something I can fix from here. Your tailored .tex content is ready above and the master go CV is already saved with the mentoring/architecture updates — just the save into that job's record is failing due to a schema bug on the panel/MCP server.
+Worth flagging to whoever maintains the relocation-jobs app (looks like a migration issue on mcp_applications/mcp_master_resumes). Want me to save the .tex under a different job slug as a workaround, or hold it until the server's fixed?
+
+---
+
+Restart
+
+---
+
+Validation failed: new_employers: Employer tokens not in master resume: 34\(\to\)8 states, 4 minutes \(\to\) under 1 second, real-time authorization api engine, senior backend engineer (go) with 6+ years
+
+after saving by claude on re-render pdf i got this.
+
+Validation failed: new_employers: Employer tokens not in master resume: 34\(\to\)8 states, 4 minutes \(\to\) under 1 second, real-time authorization api engine, senior backend engineer (go) with 6+ years

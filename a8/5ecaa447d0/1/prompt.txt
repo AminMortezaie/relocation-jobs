@@ -1,0 +1,578 @@
+see the skill we created for claude, which is not what i need and working great.
+
+see these two resumes.
+
+this is base fullstack data.
+
+
+\documentclass[9pt, a4paper]{article}
+\usepackage[top=0.8cm, bottom=0.8cm, left=1.4cm, right=1.4cm]{geometry}
+
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{xcolor}
+
+
+\hypersetup{colorlinks=true, urlcolor=black}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+% Section formatting
+\titleformat{\section}{\bfseries\normalsize}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{6pt}{3pt}
+
+% Tighter lists
+\setlist[itemize]{noitemsep, topsep=1pt, parsep=0pt, leftmargin=*}
+
+\begin{document}
+
+% ── HEADER ────────────────────────────────────────────────────────────────────
+{\Large\bfseries AMIN MORTEZAIE}\\[2pt]
+{\small Fullstack Engineer — TypeScript \textperiodcentered{} Node.js \textperiodcentered{} React \textperiodcentered{} AI-First Systems}\\[4pt]
+\scriptsize
+Yerevan, Armenia (open to relocation)~\textbar~
+\faEnvelope~a.mortezaie98@gmail.com~\textbar~
+\faPhone~+374 43 351 388~\textbar~
+\faLinkedin~\href{https://linkedin.com/in/aminmortezaie}{linkedin.com/in/aminmortezaie}
+
+% ── SUMMARY ───────────────────────────────────────────────────────────────────
+\section{Summary}
+\small
+Fullstack Engineer with 7+ years building high-scale event-driven systems — TypeScript/Node.js, React/Next.js, autonomous LLM agent workflows, and data pipelines serving millions of users. I default to action, prototype and productionize rapidly using lean experimentation and feature flags — concept to production in hours, not sprints. Strong instincts for observability, reliability, and closing feedback loops between systems and business outcomes.
+
+% ── KEY ACHIEVEMENTS ──────────────────────────────────────────────────────────
+\section{Key Achievements}
+\small
+\begin{itemize}
+  \item Shipped autonomous LLM agent workflow end-to-end — Next.js + LangChain + OpenAI, concept to production
+  \item Built NL-to-SQL marketing analytics assistant used by Mili Gold's marketing team — self-serve queries across 20M daily users, analyst turnaround \textasciitilde{}2 days to seconds
+  \item Eliminated \textasciitilde{}90\% of failed transaction interventions — self-healing Kafka pipeline with circuit breaker, retry, DLQ
+  \item Reduced critical PostgreSQL query from 4 minutes to under 1 second — serving 20M daily users without degradation
+\end{itemize}
+
+% ── TECHNICAL SKILLS ──────────────────────────────────────────────────────────
+\section{Technical Skills}
+\small
+\begin{itemize}
+  \item \textbf{Languages:} TypeScript, Node.js, JavaScript, Python
+  \item \textbf{Frontend:} React, Next.js, SSR, PWA, WebSocket, SSE
+  \item \textbf{AI \& Data:} LangChain, OpenAI API, Vercel AI SDK, RAG pipelines, vector search, PostgreSQL, Kafka, BigQuery
+  \item \textbf{Infrastructure:} AWS, Docker, CI/CD, feature flags, Prometheus, observability; GCP (learning exposure)
+  \item \textbf{Architecture:} REST, event-driven, microservices, autonomous agent workflows, data pipelines, semantic caching
+\end{itemize}
+
+% ── PROJECTS ──────────────────────────────────────────────────────────────────
+\section{Projects}
+
+\textbf{DevLearner — AI-powered learning platform}\\
+\textit{\small TypeScript \textperiodcentered{} React \textperiodcentered{} Next.js \textperiodcentered{} FastAPI \textperiodcentered{} PostgreSQL \textperiodcentered{} LangChain \textperiodcentered{} OpenAI}
+\begin{itemize}
+  \item Shipped an autonomous LLM agent workflow that researches, reasons, and personalizes learning paths per user — orchestrated multi-step decisioning and content delivery across Next.js frontend and FastAPI backend using LangChain and OpenAI
+  \item Built data ingestion pipeline transforming raw course content into indexed context for AI-driven recommendations — sub-second retrieval latency at query time
+  \item Built customer-facing dashboard translating LLM agent operations into actionable insights — reduced time for users to understand personalized recommendations from minutes to seconds
+  \item Prototyped and productionized rapidly using lean experimentation — iterated from concept to working agent pipeline in days using feature flags and incremental rollouts
+  \item Closed the feedback loop with end-to-end observability — logging, tracing, and performance metrics fed back into agent behavior, creating a self-optimizing system that improved recommendation relevance continuously
+\end{itemize}
+
+\vspace{4pt}
+\textbf{Payever — Commerce platform}\\
+\textit{\small TypeScript \textperiodcentered{} NestJS \textperiodcentered{} Node.js \textperiodcentered{} MongoDB \textperiodcentered{} RabbitMQ}
+\begin{itemize}
+  \item Delivered production-quality REST API handling multichannel payment processing with NestJS and TypeScript — event-driven async processing via RabbitMQ, full test coverage, zero regressions on deployment
+  \item Applied clean architecture separating domain logic from infrastructure — independent testing of business rules and straightforward integration of new payment providers
+\end{itemize}
+
+\vspace{4pt}
+\textbf{EstateFlow — Real estate platform}\\
+\textit{\small TypeScript \textperiodcentered{} React \textperiodcentered{} Next.js \textperiodcentered{} NestJS \textperiodcentered{} PostgreSQL}
+\begin{itemize}
+  \item Built customer-facing dashboard for real estate agents — translating complex property data and market trends into simple, actionable insights that accelerated deal decisions
+  \item Shipped full-stack platform with Next.js SSR and React component library using lean experimentation — prototyped core features rapidly, validated with real users, then productionized with NestJS backend and PostgreSQL with GDPR-compliant data handling
+  \item Optimized for Core Web Vitals and mobile-first experience — sub-second response times on complex property filtering across large datasets
+\end{itemize}
+
+% ── EXPERIENCE ────────────────────────────────────────────────────────────────
+\section{Experience}
+
+\textbf{Senior Backend Engineer — Mili Gold} \hfill \textit{Nov 2023 – Present}\\
+\small Mili Gold is a gold-backed digital assets and payments platform with 20M daily active users.
+\begin{itemize}
+  \item Built an internal \textbf{NL-to-SQL analytics assistant} (Node.js · TypeScript · OpenAI · PostgreSQL) enabling Mili Gold's marketing team to self-serve campaign and user-engagement queries across \textbf{20M+ daily users} in plain English — analyst request turnaround from \textasciitilde{}2 days to seconds; per-query LLM cost reduced \textasciitilde{}60\% via RAG with column pruning, Redis semantic caching, and token-aware rate limiting; all generated queries validated read-only against a \textbf{PostgreSQL read replica} with results streamed over \textbf{WebSocket} to a lightweight React interface
+  \item Eliminated daily blocking transactions for 20M users — rebuilt a broken 34-state machine into an 8-state model with Kafka exactly-once processing, idempotency keys, and retry-inquiry mechanism hardened against real production failure cases
+  \item Reduced critical query execution from 4 minutes to under 1 second by restructuring indexes and rewriting inefficient query plans in PostgreSQL — zero degradation under peak load
+  \item Improved deployment reliability to near-zero flaky failures by eliminating unstable integration tests — unblocked release cadence and enabled faster feature flag rollouts across the pipeline
+  \item Owned end-to-end observability across financial workflows — alerting, tracing, and performance budgets integrated into CI/CD
+\end{itemize}
+
+\vspace{4pt}
+\textbf{Backend Engineer — AbanTether} \hfill \textit{Feb 2022 – Nov 2023}\\
+\small AbanTether is a crypto exchange platform processing high-frequency financial events for 1M+ users and 400K+ active wallets across 8 blockchain networks.
+\begin{itemize}
+  \item Served 1M+ users at thousands of requests per second with sub-10ms latency by building an event-driven microservice with async worker pools — replaced polling architecture with real-time data pipeline
+  \item Eliminated \textasciitilde{}90\% of failed transaction interventions by redesigning async Kafka workflows with circuit breaker, retry, and DLQ patterns — self-healing system under transient failures
+  \item Built robust data ingestion pipeline reconciling transaction states across 8 blockchain networks — ensured zero fund loss during network partitions and external provider timeouts
+  \item Reduced infrastructure cost by \textasciitilde{}90\% through connection pooling, async processing, and query optimization across PostgreSQL and MongoDB
+\end{itemize}
+
+\vspace{4pt}
+\textbf{Backend Engineer — NuraFinTech} \hfill \textit{Mar 2020 – Feb 2022}\\
+\small Remote — Early-stage fintech infrastructure company building distributed payment processing systems.
+\begin{itemize}
+  \item Delivered zero-loss message guarantees across banking integrations by designing transactional outbox patterns — eliminated distributed transaction complexity entirely
+  \item Built multi-currency settlement and reconciliation pipelines with full observability and state consistency across unreliable external systems
+  \item Operated in a fast-moving early-stage environment — shipped reliable financial infrastructure incrementally, validating each integration before scaling
+\end{itemize}
+
+% ── EDUCATION ─────────────────────────────────────────────────────────────────
+\section{Education}
+
+\textbf{B.Sc. Computer Engineering} \hfill \textit{2016 – 2020}\\
+\small Iran University of Science and Technology (IUST)
+
+\end{document}
+
+this is java master:
+
+\documentclass[9pt, a4paper]{article}
+
+\usepackage[top=0.8cm, bottom=0.8cm, left=1.4cm, right=1.4cm]{geometry}
+\usepackage{fontawesome5}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{needspace}
+
+\hypersetup{colorlinks=true, urlcolor=black, linkcolor=black}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\newcommand{\cvsection}[1]{%
+  \vspace{6pt}%
+  {\small\textbf{\textsc{#1}}}%
+  \vspace{1pt}%
+  \hrule height 0.5pt%
+  \vspace{4pt}%
+}
+
+\newcommand{\jobheader}[4]{%
+  \textbf{#1} \textemdash\ #2 \hfill #3\\%
+  \textit{\scriptsize #4}%
+  \vspace{2pt}%
+}
+
+\setlist[itemize]{leftmargin=1.4em, itemsep=0pt, parsep=0pt, topsep=2pt}
+\renewcommand{\labelitemi}{\small$\bullet$}
+
+\begin{document}
+
+% ── HEADER ──────────────────────────────────────────────────────────────────
+{\Large\textbf{Amin Mortezaie}}\\[2pt]
+{\small\textit{Senior Backend Engineer · Java · Spring Boot · Kafka · Distributed Systems}}\\[3pt]
+{\scriptsize
+  \faMapMarker*~Yerevan, Armenia~\textbar~Open to relocation to Berlin~\textbar~
+  \faEnvelope~\href{mailto:a.mortezaie98@gmail.com}{a.mortezaie98@gmail.com}~\textbar~
+  \faPhone~+374\,43\,351\,388~\textbar~
+  \faLinkedin~\href{https://linkedin.com/in/aminmortezaie}{linkedin.com/in/aminmortezaie}
+}
+
+% ── PROFILE ─────────────────────────────────────────────────────────────────
+\cvsection{Profile}
+
+Senior Backend Engineer with 7+ years of production experience in Java/Spring Boot, Kafka, and PostgreSQL. Specialises in fintech and B2B platform systems, building distributed services at scale with end-to-end feature ownership across the full software lifecycle. Track record delivering production-grade features — from schema design to deployment — in high-throughput environments with real-world scale, automation, and AI-driven workflows.
+
+% ── EXPERIENCE ──────────────────────────────────────────────────────────────
+\cvsection{Experience}
+
+\jobheader{Mili Gold}{Senior Backend Engineer}{Nov 2023 -- Present}{Tehran}
+\begin{itemize}
+  \item Redesigned withdrawal state machine from 34 to 8 states using Java/Spring Boot and Kafka exactly-once delivery, eliminating daily blocking transactions across a B2B platform serving 20M daily users
+  \item Delivered AI-driven document processing feature (LLM-based data extraction) end-to-end — from schema design through deployment via CI/CD pipeline — reducing manual data entry by $\sim$40\%
+  \item Optimised PostgreSQL query from 4 minutes to under 1 second through EXPLAIN ANALYZE, execution plan rewriting, and composite indexing; improved data freshness for downstream automation workflows
+  \item Built Lua+Redis leaderboard with atomic ranking, eliminating distributed lock contention and supporting high-throughput read patterns across services
+  \item Tuned HikariCP connection pool from 12 to under 2 average active connections; resolved Hibernate N+1 reducing DB round-trips by 60\%, stabilising services under peak load
+  \item Integrated Datadog APM and deployed Elasticsearch-based centralized logging, establishing observability across distributed services and reducing mean time to detection
+  \item Built NL-to-SQL internal analytics assistant (Node.js, TypeScript, OpenAI, PostgreSQL) with Redis caching and token-aware rate limiting, enabling non-technical teams to query production data without engineering involvement
+\end{itemize}
+
+\vspace{4pt}
+\jobheader{AbanTether}{Backend Engineer}{Feb 2022 -- Nov 2023}{Tehran}
+\begin{itemize}
+  \item Built Go microservice for real-time wallet balance retrieval across 8 blockchain networks using goroutine worker pools and channel-based backpressure; achieved sub-10ms p99 latency under concurrent load for 1M+ users
+  \item Designed Kafka idempotency pipeline with circuit breaker and DLQ pattern; reduced failed transaction interventions by $\sim$90\% and ensured exactly-once processing across distributed consumers
+  \item Diagnosed and resolved PostgreSQL connection leak under MongoDB write spikes; fixed HikariCP misconfiguration and added connection health checks, eliminating production outages
+  \item Modelled multi-currency wallet schema in PostgreSQL supporting 400K+ wallets across 8 blockchain networks with balance consistency guarantees
+\end{itemize}
+
+\vspace{4pt}
+\jobheader{NuraFinTech}{Backend Engineer}{Mar 2020 -- Feb 2022}{Remote}
+\begin{itemize}
+  \item Built audit trail and data synchronisation platform for trading transparency, ensuring cross-product data consistency across regulatory reporting flows
+  \item Delivered end-to-end backend features in a cross-functional team, contributing to architectural decisions and production deployments
+\end{itemize}
+
+% ── SKILLS ──────────────────────────────────────────────────────────────────
+\cvsection{Technical Skills}
+
+\begin{itemize}
+  \item \textbf{Languages:} Java 17/21 (primary), Go (production), Kotlin (learning), TypeScript/Node.js
+  \item \textbf{Frameworks:} Spring Boot 3.x, Spring Security, Spring Data JPA, \texttt{@Transactional}, Hibernate
+  \item \textbf{Data:} PostgreSQL (EXPLAIN ANALYZE, query optimisation, composite indexing), Redis, MongoDB, Elasticsearch
+  \item \textbf{Messaging:} Kafka (exactly-once, idempotency, DLQ, circuit breaker), event-driven architecture
+  \item \textbf{Observability:} Datadog APM, async-profiler, JVM GC tuning, HikariCP
+  \item \textbf{Infrastructure:} Docker, CI/CD (GitHub Actions), Kubernetes (basic), Linux
+  \item \textbf{Testing:} JUnit 5, Mockito, Testcontainers
+  \item \textbf{Architecture:} Hexagonal architecture, SOLID, CQRS, saga pattern, transactional outbox
+\end{itemize}
+
+% ── PUBLICATIONS ────────────────────────────────────────────────────────────
+\cvsection{Publications} {\scriptsize\textit{Medium @a.mortezaie}}
+
+\begin{itemize}
+  \item \textit{The Hidden Cost of @DirtiesContext in Spring Boot} --- Medium @a.mortezaie
+  \item \textit{Spring Security permitAll() Returns 401} --- Medium @a.mortezaie
+  \item \textit{Spring Boot Anti-Patterns 2025: Polymorphic DTOs} --- Medium @a.mortezaie
+  \item \textit{Debugging SpEL in @TransactionalEventListener} --- Medium @a.mortezaie
+  \item \textit{Spring Boot Testing Best Practices 2025} --- Medium @a.mortezaie
+  \item \textit{Hibernate Lazy Loading Trap: Parallel Streams} --- Medium @a.mortezaie
+  \item \textit{What GC Spikes Kill Your P99} --- Medium @a.mortezaie
+  \item \textit{Hidden Pitfalls of JPA @ManyToMany} --- Medium @a.mortezaie
+  \item \textit{What Happens When the Client Disconnects?} --- Medium @a.mortezaie
+\end{itemize}
+
+% ── EDUCATION ───────────────────────────────────────────────────────────────
+\cvsection{Education}
+
+\textbf{B.Sc. Computer Engineering} --- Iran University of Science and Technology (IUST) \hfill 2016 -- 2020
+
+% ── LANGUAGES ───────────────────────────────────────────────────────────────
+\cvsection{Languages}
+
+\begin{itemize}
+  \item English --- Full Professional Proficiency
+  \item Persian --- Native
+\end{itemize}
+
+\end{document}
+
+
+this is what we created for bonial(image attached).
+
+
+see these templates and real resume i created and then i will tell you whats wrong with skill we created for claude.
+
+---
+
+see the skill we created for claude, which is not what i need and working great.
+
+see these two resumes.
+
+this is base fullstack data.
+
+
+\documentclass[9pt, a4paper]{article}
+\usepackage[top=0.8cm, bottom=0.8cm, left=1.4cm, right=1.4cm]{geometry}
+
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{xcolor}
+
+
+\hypersetup{colorlinks=true, urlcolor=black}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+% Section formatting
+\titleformat{\section}{\bfseries\normalsize}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{6pt}{3pt}
+
+% Tighter lists
+\setlist[itemize]{noitemsep, topsep=1pt, parsep=0pt, leftmargin=*}
+
+\begin{document}
+
+% ── HEADER ────────────────────────────────────────────────────────────────────
+{\Large\bfseries AMIN MORTEZAIE}\\[2pt]
+{\small Fullstack Engineer — TypeScript \textperiodcentered{} Node.js \textperiodcentered{} React \textperiodcentered{} AI-First Systems}\\[4pt]
+\scriptsize
+Yerevan, Armenia (open to relocation)~\textbar~
+\faEnvelope~a.mortezaie98@gmail.com~\textbar~
+\faPhone~+374 43 351 388~\textbar~
+\faLinkedin~\href{https://linkedin.com/in/aminmortezaie}{linkedin.com/in/aminmortezaie}
+
+% ── SUMMARY ───────────────────────────────────────────────────────────────────
+\section{Summary}
+\small
+Fullstack Engineer with 7+ years building high-scale event-driven systems — TypeScript/Node.js, React/Next.js, autonomous LLM agent workflows, and data pipelines serving millions of users. I default to action, prototype and productionize rapidly using lean experimentation and feature flags — concept to production in hours, not sprints. Strong instincts for observability, reliability, and closing feedback loops between systems and business outcomes.
+
+% ── KEY ACHIEVEMENTS ──────────────────────────────────────────────────────────
+\section{Key Achievements}
+\small
+\begin{itemize}
+  \item Shipped autonomous LLM agent workflow end-to-end — Next.js + LangChain + OpenAI, concept to production
+  \item Built NL-to-SQL marketing analytics assistant used by Mili Gold's marketing team — self-serve queries across 20M daily users, analyst turnaround \textasciitilde{}2 days to seconds
+  \item Eliminated \textasciitilde{}90\% of failed transaction interventions — self-healing Kafka pipeline with circuit breaker, retry, DLQ
+  \item Reduced critical PostgreSQL query from 4 minutes to under 1 second — serving 20M daily users without degradation
+\end{itemize}
+
+% ── TECHNICAL SKILLS ──────────────────────────────────────────────────────────
+\section{Technical Skills}
+\small
+\begin{itemize}
+  \item \textbf{Languages:} TypeScript, Node.js, JavaScript, Python
+  \item \textbf{Frontend:} React, Next.js, SSR, PWA, WebSocket, SSE
+  \item \textbf{AI \& Data:} LangChain, OpenAI API, Vercel AI SDK, RAG pipelines, vector search, PostgreSQL, Kafka, BigQuery
+  \item \textbf{Infrastructure:} AWS, Docker, CI/CD, feature flags, Prometheus, observability; GCP (learning exposure)
+  \item \textbf{Architecture:} REST, event-driven, microservices, autonomous agent workflows, data pipelines, semantic caching
+\end{itemize}
+
+% ── PROJECTS ──────────────────────────────────────────────────────────────────
+\section{Projects}
+
+\textbf{DevLearner — AI-powered learning platform}\\
+\textit{\small TypeScript \textperiodcentered{} React \textperiodcentered{} Next.js \textperiodcentered{} FastAPI \textperiodcentered{} PostgreSQL \textperiodcentered{} LangChain \textperiodcentered{} OpenAI}
+\begin{itemize}
+  \item Shipped an autonomous LLM agent workflow that researches, reasons, and personalizes learning paths per user — orchestrated multi-step decisioning and content delivery across Next.js frontend and FastAPI backend using LangChain and OpenAI
+  \item Built data ingestion pipeline transforming raw course content into indexed context for AI-driven recommendations — sub-second retrieval latency at query time
+  \item Built customer-facing dashboard translating LLM agent operations into actionable insights — reduced time for users to understand personalized recommendations from minutes to seconds
+  \item Prototyped and productionized rapidly using lean experimentation — iterated from concept to working agent pipeline in days using feature flags and incremental rollouts
+  \item Closed the feedback loop with end-to-end observability — logging, tracing, and performance metrics fed back into agent behavior, creating a self-optimizing system that improved recommendation relevance continuously
+\end{itemize}
+
+\vspace{4pt}
+\textbf{Payever — Commerce platform}\\
+\textit{\small TypeScript \textperiodcentered{} NestJS \textperiodcentered{} Node.js \textperiodcentered{} MongoDB \textperiodcentered{} RabbitMQ}
+\begin{itemize}
+  \item Delivered production-quality REST API handling multichannel payment processing with NestJS and TypeScript — event-driven async processing via RabbitMQ, full test coverage, zero regressions on deployment
+  \item Applied clean architecture separating domain logic from infrastructure — independent testing of business rules and straightforward integration of new payment providers
+\end{itemize}
+
+\vspace{4pt}
+\textbf{EstateFlow — Real estate platform}\\
+\textit{\small TypeScript \textperiodcentered{} React \textperiodcentered{} Next.js \textperiodcentered{} NestJS \textperiodcentered{} PostgreSQL}
+\begin{itemize}
+  \item Built customer-facing dashboard for real estate agents — translating complex property data and market trends into simple, actionable insights that accelerated deal decisions
+  \item Shipped full-stack platform with Next.js SSR and React component library using lean experimentation — prototyped core features rapidly, validated with real users, then productionized with NestJS backend and PostgreSQL with GDPR-compliant data handling
+  \item Optimized for Core Web Vitals and mobile-first experience — sub-second response times on complex property filtering across large datasets
+\end{itemize}
+
+% ── EXPERIENCE ────────────────────────────────────────────────────────────────
+\section{Experience}
+
+\textbf{Senior Backend Engineer — Mili Gold} \hfill \textit{Nov 2023 – Present}\\
+\small Mili Gold is a gold-backed digital assets and payments platform with 20M daily active users.
+\begin{itemize}
+  \item Built an internal \textbf{NL-to-SQL analytics assistant} (Node.js · TypeScript · OpenAI · PostgreSQL) enabling Mili Gold's marketing team to self-serve campaign and user-engagement queries across \textbf{20M+ daily users} in plain English — analyst request turnaround from \textasciitilde{}2 days to seconds; per-query LLM cost reduced \textasciitilde{}60\% via RAG with column pruning, Redis semantic caching, and token-aware rate limiting; all generated queries validated read-only against a \textbf{PostgreSQL read replica} with results streamed over \textbf{WebSocket} to a lightweight React interface
+  \item Eliminated daily blocking transactions for 20M users — rebuilt a broken 34-state machine into an 8-state model with Kafka exactly-once processing, idempotency keys, and retry-inquiry mechanism hardened against real production failure cases
+  \item Reduced critical query execution from 4 minutes to under 1 second by restructuring indexes and rewriting inefficient query plans in PostgreSQL — zero degradation under peak load
+  \item Improved deployment reliability to near-zero flaky failures by eliminating unstable integration tests — unblocked release cadence and enabled faster feature flag rollouts across the pipeline
+  \item Owned end-to-end observability across financial workflows — alerting, tracing, and performance budgets integrated into CI/CD
+\end{itemize}
+
+\vspace{4pt}
+\textbf{Backend Engineer — AbanTether} \hfill \textit{Feb 2022 – Nov 2023}\\
+\small AbanTether is a crypto exchange platform processing high-frequency financial events for 1M+ users and 400K+ active wallets across 8 blockchain networks.
+\begin{itemize}
+  \item Served 1M+ users at thousands of requests per second with sub-10ms latency by building an event-driven microservice with async worker pools — replaced polling architecture with real-time data pipeline
+  \item Eliminated \textasciitilde{}90\% of failed transaction interventions by redesigning async Kafka workflows with circuit breaker, retry, and DLQ patterns — self-healing system under transient failures
+  \item Built robust data ingestion pipeline reconciling transaction states across 8 blockchain networks — ensured zero fund loss during network partitions and external provider timeouts
+  \item Reduced infrastructure cost by \textasciitilde{}90\% through connection pooling, async processing, and query optimization across PostgreSQL and MongoDB
+\end{itemize}
+
+\vspace{4pt}
+\textbf{Backend Engineer — NuraFinTech} \hfill \textit{Mar 2020 – Feb 2022}\\
+\small Remote — Early-stage fintech infrastructure company building distributed payment processing systems.
+\begin{itemize}
+  \item Delivered zero-loss message guarantees across banking integrations by designing transactional outbox patterns — eliminated distributed transaction complexity entirely
+  \item Built multi-currency settlement and reconciliation pipelines with full observability and state consistency across unreliable external systems
+  \item Operated in a fast-moving early-stage environment — shipped reliable financial infrastructure incrementally, validating each integration before scaling
+\end{itemize}
+
+% ── EDUCATION ─────────────────────────────────────────────────────────────────
+\section{Education}
+
+\textbf{B.Sc. Computer Engineering} \hfill \textit{2016 – 2020}\\
+\small Iran University of Science and Technology (IUST)
+
+\end{document}
+
+this is java master:
+
+\documentclass[9pt, a4paper]{article}
+
+\usepackage[top=0.8cm, bottom=0.8cm, left=1.4cm, right=1.4cm]{geometry}
+\usepackage{fontawesome5}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{needspace}
+
+\hypersetup{colorlinks=true, urlcolor=black, linkcolor=black}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\newcommand{\cvsection}[1]{%
+  \vspace{6pt}%
+  {\small\textbf{\textsc{#1}}}%
+  \vspace{1pt}%
+  \hrule height 0.5pt%
+  \vspace{4pt}%
+}
+
+\newcommand{\jobheader}[4]{%
+  \textbf{#1} \textemdash\ #2 \hfill #3\\%
+  \textit{\scriptsize #4}%
+  \vspace{2pt}%
+}
+
+\setlist[itemize]{leftmargin=1.4em, itemsep=0pt, parsep=0pt, topsep=2pt}
+\renewcommand{\labelitemi}{\small$\bullet$}
+
+\begin{document}
+
+% ── HEADER ──────────────────────────────────────────────────────────────────
+{\Large\textbf{Amin Mortezaie}}\\[2pt]
+{\small\textit{Senior Backend Engineer · Java · Spring Boot · Kafka · Distributed Systems}}\\[3pt]
+{\scriptsize
+  \faMapMarker*~Yerevan, Armenia~\textbar~Open to relocation to Berlin~\textbar~
+  \faEnvelope~\href{mailto:a.mortezaie98@gmail.com}{a.mortezaie98@gmail.com}~\textbar~
+  \faPhone~+374\,43\,351\,388~\textbar~
+  \faLinkedin~\href{https://linkedin.com/in/aminmortezaie}{linkedin.com/in/aminmortezaie}
+}
+
+% ── PROFILE ─────────────────────────────────────────────────────────────────
+\cvsection{Profile}
+
+Senior Backend Engineer with 7+ years of production experience in Java/Spring Boot, Kafka, and PostgreSQL. Specialises in fintech and B2B platform systems, building distributed services at scale with end-to-end feature ownership across the full software lifecycle. Track record delivering production-grade features — from schema design to deployment — in high-throughput environments with real-world scale, automation, and AI-driven workflows.
+
+% ── EXPERIENCE ──────────────────────────────────────────────────────────────
+\cvsection{Experience}
+
+\jobheader{Mili Gold}{Senior Backend Engineer}{Nov 2023 -- Present}{Tehran}
+\begin{itemize}
+  \item Redesigned withdrawal state machine from 34 to 8 states using Java/Spring Boot and Kafka exactly-once delivery, eliminating daily blocking transactions across a B2B platform serving 20M daily users
+  \item Delivered AI-driven document processing feature (LLM-based data extraction) end-to-end — from schema design through deployment via CI/CD pipeline — reducing manual data entry by $\sim$40\%
+  \item Optimised PostgreSQL query from 4 minutes to under 1 second through EXPLAIN ANALYZE, execution plan rewriting, and composite indexing; improved data freshness for downstream automation workflows
+  \item Built Lua+Redis leaderboard with atomic ranking, eliminating distributed lock contention and supporting high-throughput read patterns across services
+  \item Tuned HikariCP connection pool from 12 to under 2 average active connections; resolved Hibernate N+1 reducing DB round-trips by 60\%, stabilising services under peak load
+  \item Integrated Datadog APM and deployed Elasticsearch-based centralized logging, establishing observability across distributed services and reducing mean time to detection
+  \item Built NL-to-SQL internal analytics assistant (Node.js, TypeScript, OpenAI, PostgreSQL) with Redis caching and token-aware rate limiting, enabling non-technical teams to query production data without engineering involvement
+\end{itemize}
+
+\vspace{4pt}
+\jobheader{AbanTether}{Backend Engineer}{Feb 2022 -- Nov 2023}{Tehran}
+\begin{itemize}
+  \item Built Go microservice for real-time wallet balance retrieval across 8 blockchain networks using goroutine worker pools and channel-based backpressure; achieved sub-10ms p99 latency under concurrent load for 1M+ users
+  \item Designed Kafka idempotency pipeline with circuit breaker and DLQ pattern; reduced failed transaction interventions by $\sim$90\% and ensured exactly-once processing across distributed consumers
+  \item Diagnosed and resolved PostgreSQL connection leak under MongoDB write spikes; fixed HikariCP misconfiguration and added connection health checks, eliminating production outages
+  \item Modelled multi-currency wallet schema in PostgreSQL supporting 400K+ wallets across 8 blockchain networks with balance consistency guarantees
+\end{itemize}
+
+\vspace{4pt}
+\jobheader{NuraFinTech}{Backend Engineer}{Mar 2020 -- Feb 2022}{Remote}
+\begin{itemize}
+  \item Built audit trail and data synchronisation platform for trading transparency, ensuring cross-product data consistency across regulatory reporting flows
+  \item Delivered end-to-end backend features in a cross-functional team, contributing to architectural decisions and production deployments
+\end{itemize}
+
+% ── SKILLS ──────────────────────────────────────────────────────────────────
+\cvsection{Technical Skills}
+
+\begin{itemize}
+  \item \textbf{Languages:} Java 17/21 (primary), Go (production), Kotlin (learning), TypeScript/Node.js
+  \item \textbf{Frameworks:} Spring Boot 3.x, Spring Security, Spring Data JPA, \texttt{@Transactional}, Hibernate
+  \item \textbf{Data:} PostgreSQL (EXPLAIN ANALYZE, query optimisation, composite indexing), Redis, MongoDB, Elasticsearch
+  \item \textbf{Messaging:} Kafka (exactly-once, idempotency, DLQ, circuit breaker), event-driven architecture
+  \item \textbf{Observability:} Datadog APM, async-profiler, JVM GC tuning, HikariCP
+  \item \textbf{Infrastructure:} Docker, CI/CD (GitHub Actions), Kubernetes (basic), Linux
+  \item \textbf{Testing:} JUnit 5, Mockito, Testcontainers
+  \item \textbf{Architecture:} Hexagonal architecture, SOLID, CQRS, saga pattern, transactional outbox
+\end{itemize}
+
+% ── PUBLICATIONS ────────────────────────────────────────────────────────────
+\cvsection{Publications} {\scriptsize\textit{Medium @a.mortezaie}}
+
+\begin{itemize}
+  \item \textit{The Hidden Cost of @DirtiesContext in Spring Boot} --- Medium @a.mortezaie
+  \item \textit{Spring Security permitAll() Returns 401} --- Medium @a.mortezaie
+  \item \textit{Spring Boot Anti-Patterns 2025: Polymorphic DTOs} --- Medium @a.mortezaie
+  \item \textit{Debugging SpEL in @TransactionalEventListener} --- Medium @a.mortezaie
+  \item \textit{Spring Boot Testing Best Practices 2025} --- Medium @a.mortezaie
+  \item \textit{Hibernate Lazy Loading Trap: Parallel Streams} --- Medium @a.mortezaie
+  \item \textit{What GC Spikes Kill Your P99} --- Medium @a.mortezaie
+  \item \textit{Hidden Pitfalls of JPA @ManyToMany} --- Medium @a.mortezaie
+  \item \textit{What Happens When the Client Disconnects?} --- Medium @a.mortezaie
+\end{itemize}
+
+% ── EDUCATION ───────────────────────────────────────────────────────────────
+\cvsection{Education}
+
+\textbf{B.Sc. Computer Engineering} --- Iran University of Science and Technology (IUST) \hfill 2016 -- 2020
+
+% ── LANGUAGES ───────────────────────────────────────────────────────────────
+\cvsection{Languages}
+
+\begin{itemize}
+  \item English --- Full Professional Proficiency
+  \item Persian --- Native
+\end{itemize}
+
+\end{document}
+
+
+this is what we created for bonial(image attached).
+
+
+see these templates and real resume i created and then i will tell you whats wrong with skill we created for claude.
+
+---
+
+Okay, what's the real problem here? Is when I want to apply for a, a, you know, specific job position, I need to tailor and reframe my resume, for example. I have three master resume which is on Java, GoLang, and full stack. Also, I want to create the Python master resume also. But for example, I want to apply for Ponyo. I just got an interview from the Ponyo And What is the difference between the skill you have created and real reframing I was thinking about and I told you to create this skill? For example, the Bonyol is working on a retail media which is extensively using migration, leading a migration from Java Monolith to Node.js, and also ex-extensively using Elastic Search, and we need to reframe our resume if Elastic Search isn't available on my, on on our resume on each past resume to just, to just get an interview for the first round. And then we will fill the gaps And the most important thing here is to get more interviews, and it needs to You know, reframe our resume to something that It's currently backed by the JD, not something we have on our master resume. We will pull the data from the master resumes on our, for example, tailored for the specific con company resume. But as I wrote that you need to rewrite one of my, for example, experiences with the specific work that their company is working on. It's what I needed, something like Ponyo. For example, I have created a lead migration from Java only to Node.js. Maybe I don't want to mention on our, on my master resume all the experiences I had, which is too long you know, documents, and maybe I think that one without Any ask permissions on cloud, one prompt with these types of, you know accessibility can ruin all the Bond, we bonds. okay, I think that we need to rewrite the scale with something that like this. Think about a position, it's JD, for example, for Talon One. Okay. And they're working, for example, on something, I don't know, for example, just an example. For example, they're working on payment systems. I have most of my experience on payment systems. Just we need to put one project that is completely similar to their work, just one of my experiences is completely similar to their works. To just make this similarity, because AI checking the resume firstly be-before any interview or any HR round for most of the coun-uh, companies. So, we need to just put one of these you know, experiences with my acceptance. It means that, for example, cloud working on the keyboards, working like a hiring manager for prompts we had before, I will send it to you at the end of this. Chat for prompts, we need to work one by one and just Claude ask me, go ahead or not, or any, you know, ideas about this. And at the final round, Claude will give my, you know, acceptance on the last thing. Okay? It's a MD format file, and Claude just wrote it down and just Claude So Using the data, real data we have on our  M C P and then start to work like i told you and for each prompt is runnig ask me to go ahead or not.
+
+and the final thing is to save the .tex file on our application and on application we will go and render the pdf(it just about token optimization and cut the price).
+
+do you understand?
+
+---
+
+sure.
+
+---
+
+make them zip file and something that just put on claude.
+all the files related to it.
+
+---
+
+SKILL.md file must be in the top-level folder, not nested deeper. Currently at mcp-resume-reframe-for-claude/.claude/skills/mcp-resume-reframe/SKILL.md
+
+---
+
+SKILL.md file must be in the top-level folder, not nested deeper. Currently at mcp-resume-reframe-for-claude/.claude/skills/mcp-resume-reframe/SKILL.md
+
+---
+
+a bug occured on creating the resume.
+claude did remove lots of job responsibiltes i had on master cv and made the lines less.
+
+and i asked it to :
+please use the master cv again and just add to it and if you wanted to remove something just ask me.
+
+which is not acceptable.
+
+cluade should not have right to remove other responsibilites and just put the reframed data there.
+
+it can just add one or 2 bullets to experiences based on reframed new project based on the company domain and project.
+
+please update the skill to not happen again.

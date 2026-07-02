@@ -3,7 +3,7 @@
   "checkpoint_id": "fb490f7c4520",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 15,
+  "checkpoints_count": 24,
   "files_touched": [
     ".gitignore",
     "claude_desktop_config.json.example",
@@ -24,6 +24,7 @@
     "relocation_jobs/mcp/types.py",
     "relocation_jobs/scrape/company.py",
     "relocation_jobs/scrape/merge.py",
+    "relocation_jobs/static/apply.html",
     "relocation_jobs/static/dist/board.js",
     "relocation_jobs/static/index.html",
     "relocation_jobs/static/js/apply.js",
@@ -33,13 +34,16 @@
     "relocation_jobs/static/js/scrape.js",
     "relocation_jobs/static/styles.css",
     "relocation_jobs/web/routes/__init__.py",
+    "relocation_jobs/web/routes/mcp.py",
     "relocation_jobs/web/server.py",
     "scripts/mcp_server.py",
     "tests/helpers/postgres_mock.py",
     "tests/helpers/route_manifest.py",
     "tests/helpers/seed.py",
+    "tests/mcp/conftest.py",
     "tests/mcp/test_mcp_service.py",
-    "tests/scrape/test_merge.py"
+    "tests/scrape/test_merge.py",
+    "tests/web/test_mcp_panel.py"
   ],
   "sessions": [
     {
@@ -71,6 +75,12 @@
       "transcript": "/fb/490f7c4520/4/full.jsonl",
       "content_hash": "/fb/490f7c4520/4/content_hash.txt",
       "prompt": "/fb/490f7c4520/4/prompt.txt"
+    },
+    {
+      "metadata": "/fb/490f7c4520/5/metadata.json",
+      "transcript": "/fb/490f7c4520/5/full.jsonl",
+      "content_hash": "/fb/490f7c4520/5/content_hash.txt",
+      "prompt": "/fb/490f7c4520/5/prompt.txt"
     }
   ]
 }

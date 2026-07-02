@@ -1,0 +1,141 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "fb490f7c4520",
+  "session_id": "a108ae11-8403-4e42-b35d-c5b7335bf886",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-02T11:57:40.268423Z",
+  "branch": "main",
+  "checkpoints_count": 9,
+  "save_step_count": 9,
+  "files_touched": [
+    ".gitignore",
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/mcp/__init__.py",
+    "relocation_jobs/mcp/assets/master_resume.tex",
+    "relocation_jobs/mcp/assets/profile.example.json",
+    "relocation_jobs/mcp/paths.py",
+    "relocation_jobs/mcp/render.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/static/apply.html",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/apply.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/__init__.py",
+    "relocation_jobs/web/routes/mcp.py",
+    "relocation_jobs/web/server.py",
+    "scripts/mcp_server.py",
+    "tests/helpers/postgres_mock.py",
+    "tests/helpers/route_manifest.py",
+    "tests/mcp/conftest.py",
+    "tests/mcp/test_mcp_service.py",
+    "tests/web/test_mcp_panel.py"
+  ],
+  "agent": "Cursor",
+  "model": "unknown",
+  "turn_id": "77f1e2595b77",
+  "checkpoint_transcript_start": 45,
+  "transcript_lines_at_start": 45,
+  "session_metrics": {
+    "turn_count": 14,
+    "context_tokens": 188470,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-02T11:57:40.260264Z",
+    "agent_lines": 2041,
+    "agent_removed": 334,
+    "human_added": 311,
+    "human_modified": 2,
+    "human_removed": 0,
+    "total_committed": 2354,
+    "total_lines_changed": 2706,
+    "agent_percentage": 87.76792313377679,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 457,
+      "agent_lines_removed": 277
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 729,
+      "agent_lines_removed": 297
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 1,
+      "user_lines_removed": 1,
+      "agent_lines_added": 1229,
+      "agent_lines_removed": 382,
+      "user_added_per_file": {
+        "relocation_jobs/mcp/keywords.py": 1
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/mcp/keywords.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 1,
+      "agent_lines_added": 708,
+      "agent_lines_removed": 377,
+      "user_removed_per_file": {
+        "tests/mcp/conftest.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 19,
+      "user_lines_removed": 1,
+      "agent_lines_added": 1522,
+      "agent_lines_removed": 379,
+      "user_added_per_file": {
+        ".gitignore": 1,
+        "claude_desktop_config.json.example": 10,
+        "scripts/mcp_server.py": 8
+      },
+      "user_removed_per_file": {
+        "scripts/mcp_server.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1541,
+      "agent_lines_removed": 380
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1541,
+      "agent_lines_removed": 380
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1580,
+      "agent_lines_removed": 375
+    }
+  ]
+}

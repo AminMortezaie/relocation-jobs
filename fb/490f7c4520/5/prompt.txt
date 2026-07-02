@@ -1,0 +1,56 @@
+something that is needed in this step is that we cannot push the template, or profile on github so we need to keep it on our db so you need to change this part to keep in db.
+change it now.
+no static file we have here.
+
+---
+
+something that is needed in this step is that we cannot push the template, or profile on github so we need to keep it on our db so you need to change this part to keep in db.
+change it now.
+no static file we have here.
+
+---
+
+you need to have multiple master resume, for example one person can have java, go, fullstack resume and this make for each person several master CVs.
+please apply this and update the doc then we go throught the next level.
+
+---
+
+ok, go for next level
+
+---
+
+ok, go for next level
+
+---
+
+no rollback v1 i just want the v0.
+
+---
+
+no rollback v1 i just want the v0.
+
+---
+
+ok, add something to panel to put data on it.
+for each user.
+
+---
+
+restart the server
+
+---
+
+where can i put the resumes there?
+
+---
+
+i just connected the mcp to claude desktop and superisingly it works !!
+but metadata is returning null.
+
+---
+
+restart the panel
+
+---
+
+restart the panel

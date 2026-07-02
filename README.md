@@ -1,6 +1,6 @@
 # Relocation Jobs
 
-A job-search tool for backend and software engineering roles at tech companies that offer visa or relocation sponsorship. Company lists are sourced from [relocate.me](https://relocate.me); each employer's ATS (Applicant Tracking System) is auto-detected and jobs are scraped into a shared catalog. A Flask web panel lets you track applications per user.
+A job-search tool for backend and software engineering roles at tech companies that offer visa or relocation sponsorship. Company lists are sourced from [relocate.me](https://relocate.me); each employer's ATS (Applicant Tracking System) is auto-detected and jobs are scraped into a shared catalog. A Flask web panel lets you track applications per user and prepare tailored resume PDFs per position.
 
 **Supported countries:** Germany, Netherlands, UK, Portugal.
 
@@ -12,6 +12,7 @@ A job-search tool for backend and software engineering roles at tech companies t
 - **Relevance filtering** — include/exclude keyword rules for backend and software roles
 - **Web panel** — paginated company board (25 per page), filters and search, mark applied / not-for-me, trigger scrapes, add companies
 - **Per-user tracking** — applied state and rejections stored in Postgres, merged with the catalog at read time
+- **Application assistant** — per-position tailored LaTeX + PDF (Claude Desktop MCP), profile and master resumes on `/apply`, company workspace at `/company/<country>/<slug>` with live PDF preview
 - **Concurrent scraping** — asyncio + httpx for ATS API calls (default 16 workers); Playwright in a thread pool for detection
 
 ## Quick start
@@ -44,6 +45,10 @@ Copy `.env.example` to `.env` before running locally.
 | `PANEL_SCRAPE_ENABLED` | Set to `0` on Render free tier (512 MB RAM); `1` locally for fetch |
 | `PANEL_DATA_DIR` | Local data dir for `custom_cities.json` (default: `data/`) |
 | `PANEL_ALLOW_REGISTER` | Allow self-service registration after first user |
+| `MCP_USERNAME` / `MCP_USER_ID` | Panel user for Claude Desktop MCP (default `admin`) |
+| `MCP_LATEX_CMD` | LaTeX compiler for PDF render (default `tectonic`) |
+
+Application assistant docs: [mcp-application.md](docs/reference/mcp-application.md) · [company-workspace.md](docs/reference/company-workspace.md).
 
 AWS Postgres ops: `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes. See [docs index § Operations](docs/README.md#5-operations).
 
@@ -65,6 +70,12 @@ Your aggregate stats (applied counts, fetch summary) live on the **admin** page 
 After changing React UI (`frontend/`), run `cd frontend && npm run build` (outputs `relocation_jobs/static/dist/board.js`). Hard refresh after JS/CSS changes (`Cmd+Shift+R`).
 
 Tracking (applied, not-for-me, company-level applied) is stored per user in Postgres. Re-scrapes merge jobs by URL — existing `fetched` dates and tracking state are preserved; jobs removed from an ATS stay in the catalog as orphans and reappear if you have tracking for them.
+
+**Application data** (`/apply`) — edit profile, pipeline prompts, and master resume `.tex` variants (per logged-in user).
+
+**Company workspace** (`/company/<country>/<company-slug>`) — open from a company name on the board to see all positions, tailored LaTeX, PDF preview, and re-render. CV/PDF badges appear on the board when MCP has prepared artifacts for a role.
+
+**Claude Desktop MCP** — `python3 scripts/mcp_server.py` exposes tools to tailor resumes per job, validate, render PDF, and mark applied. See [docs/reference/mcp-application.md](docs/reference/mcp-application.md).
 
 ### Build company lists
 
@@ -126,6 +137,7 @@ relocation_jobs/
 ├── catalog/      # Postgres catalog repo + writes
 ├── positions/    # Job tracking (apply, reject, not-for-me)
 ├── panel/        # flatten_companies, paginated board, stats, filters
+├── mcp/          # Application assistant: tailored tex, PDF render, MCP tools
 ├── fetch/        # In-process country + company fetch
 ├── scrape/       # ATS boards, merge, enrich
 ├── web/          # Flask server + routes
@@ -180,7 +192,8 @@ Jobs match when the title contains an **include** keyword and no **exclude** key
 ## Testing
 
 ```bash
-pytest tests -o addopts=                 # full suite (~103 tests)
+pytest tests -o addopts=                 # full suite (~166 tests)
+pytest tests/mcp tests/web/test_mcp_company_workspace.py -o addopts=   # application assistant
 pytest tests/test_route_manifest.py -o addopts=   # fast route check
 pytest --cov --cov-report=term-missing   # coverage (90% gate on business modules)
 ```

@@ -102,5 +102,17 @@
       "content_hash": "/fb/490f7c4520/8/content_hash.txt",
       "prompt": "/fb/490f7c4520/8/prompt.txt"
     }
-  ]
+  ],
+  "combined_attribution": {
+    "calculated_at": "2026-07-02T11:57:40.560856Z",
+    "agent_lines": 2294,
+    "agent_removed": 375,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 2294,
+    "total_lines_changed": 2669,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
 }

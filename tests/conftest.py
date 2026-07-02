@@ -211,3 +211,15 @@ def test_user(db):
     from tests.helpers.passwords import hash_test_password
 
     return create_user("testuser", hash_test_password("testpass123"))
+
+
+@pytest.fixture
+def mcp_documents(db):
+    from relocation_jobs.mcp import repo as mcp_repo
+    from relocation_jobs.mcp.types import ApplicationProfile
+    from tests.mcp.conftest import GO_MASTER_TEX, JAVA_MASTER_TEX
+
+    mcp_repo.save_master_resume(1, "go", GO_MASTER_TEX, label="Go backend")
+    mcp_repo.save_master_resume(1, "java", JAVA_MASTER_TEX, label="Java backend")
+    mcp_repo.save_profile(1, ApplicationProfile(full_name="Test User", email="test@example.com"))
+    yield

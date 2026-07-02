@@ -15,6 +15,7 @@ def test_partition_routes_rejected():
         country_key="uk",
         country_label="UK",
         status_history={},
+        mcp_applications=None,
         visa_only=False,
         position_filters=PositionFilters(),
     )
@@ -34,6 +35,7 @@ def test_partition_skips_visa_filter():
         country_key="uk",
         country_label="UK",
         status_history={},
+        mcp_applications=None,
         visa_only=True,
         position_filters=PositionFilters(),
     )

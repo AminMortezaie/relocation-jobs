@@ -1,0 +1,21 @@
+a problem in pinning is happening.
+
+more than 1 position cannot be pinned and overwrite other pins when pins more than 1 pin.
+
+read the skills and then fix this problem
+
+---
+
+restart the panel
+
+---
+
+restart the panel
+
+---
+
+why looking to apply pin the position, its just a question.
+
+---
+
+yes please decouple

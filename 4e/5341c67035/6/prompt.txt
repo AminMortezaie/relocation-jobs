@@ -1,0 +1,10 @@
+i cannot add country to this application you can implement similar flow like we have for cities for countries.
+before doing anything you need to read skills and readme files.
+
+---
+
+restart the panel to apply
+
+---
+
+restart the panel to apply

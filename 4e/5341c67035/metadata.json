@@ -3,7 +3,7 @@
   "checkpoint_id": "4e5341c67035",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 31,
+  "checkpoints_count": 33,
   "files_touched": [
     "README.md",
     "docs/README.md",
@@ -63,6 +63,7 @@
     "tests/catalog/test_repo.py",
     "tests/conftest.py",
     "tests/core/test_ats_constants.py",
+    "tests/core/test_custom_countries.py",
     "tests/fixtures/ats/greenhouse_job_detail.json",
     "tests/fixtures/ats/hibob_job_ads.json",
     "tests/fixtures/ats/recruitee_offer_detail.json",
@@ -119,6 +120,12 @@
       "transcript": "/4e/5341c67035/5/full.jsonl",
       "content_hash": "/4e/5341c67035/5/content_hash.txt",
       "prompt": "/4e/5341c67035/5/prompt.txt"
+    },
+    {
+      "metadata": "/4e/5341c67035/6/metadata.json",
+      "transcript": "/4e/5341c67035/6/full.jsonl",
+      "content_hash": "/4e/5341c67035/6/content_hash.txt",
+      "prompt": "/4e/5341c67035/6/prompt.txt"
     }
   ]
 }

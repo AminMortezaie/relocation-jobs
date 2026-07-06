@@ -1,0 +1,175 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "4e5341c67035",
+  "session_id": "50aa112d-d0d9-43fe-9235-a9074b355737",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-06T23:20:00.375358Z",
+  "branch": "main",
+  "checkpoints_count": 12,
+  "save_step_count": 12,
+  "files_touched": [
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/catalog/schema.py",
+    "relocation_jobs/catalog/writes.py",
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/scrape/boards/ashby.py",
+    "relocation_jobs/scrape/boards/greenhouse.py",
+    "relocation_jobs/scrape/boards/smartrecruiters.py",
+    "relocation_jobs/scrape/descriptions.py",
+    "relocation_jobs/scrape/enrich.py",
+    "relocation_jobs/scrape/job_text.py",
+    "relocation_jobs/scrape/merge.py",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/js/company.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/mcp.py",
+    "scripts/fix_job_descriptions.py",
+    "scripts/refetch_smartrecruiters_descriptions.py",
+    "tests/catalog/test_repo.py",
+    "tests/fixtures/ats/greenhouse_job_detail.json",
+    "tests/fixtures/ats/smartrecruiters_posting_detail.json",
+    "tests/mcp/test_mcp_service.py",
+    "tests/mcp/test_position_description_format.py",
+    "tests/scrape/test_ashby_job_text.py",
+    "tests/scrape/test_descriptions_format.py",
+    "tests/scrape/test_enrich.py",
+    "tests/scrape/test_greenhouse_job_text.py",
+    "tests/scrape/test_smartrecruiters_job_text.py",
+    "tests/web/test_mcp_company_workspace.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "9a8a593d49ed",
+  "session_metrics": {
+    "duration_ms": 246455531,
+    "turn_count": 12,
+    "context_tokens": 187138,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-06T23:20:00.355364Z",
+    "agent_lines": 1834,
+    "agent_removed": 0,
+    "human_added": 1474,
+    "human_modified": 277,
+    "human_removed": 0,
+    "total_committed": 3585,
+    "total_lines_changed": 3723,
+    "agent_percentage": 49.261348374966424,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 366,
+      "agent_lines_removed": 23
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 441,
+      "agent_lines_removed": 21
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 441,
+      "agent_lines_removed": 21
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 642,
+      "agent_lines_removed": 21
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 648,
+      "agent_lines_removed": 21
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 883,
+      "agent_lines_removed": 27
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1668,
+      "agent_lines_removed": 35
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1885,
+      "agent_lines_removed": 36
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 12,
+      "user_lines_removed": 1,
+      "agent_lines_added": 2029,
+      "agent_lines_removed": 36,
+      "user_added_per_file": {
+        "tests/scrape/test_smartrecruiters_job_text.py": 12
+      },
+      "user_removed_per_file": {
+        "tests/scrape/test_smartrecruiters_job_text.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 19,
+      "user_lines_removed": 124,
+      "agent_lines_added": 2190,
+      "agent_lines_removed": 36,
+      "user_added_per_file": {
+        "scripts/refetch_smartrecruiters_descriptions.py": 7,
+        "tests/scrape/test_smartrecruiters_job_text.py": 12
+      },
+      "user_removed_per_file": {
+        "scripts/refetch_smartrecruiters_descriptions.py": 123,
+        "tests/scrape/test_smartrecruiters_job_text.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 58,
+      "user_lines_removed": 131,
+      "agent_lines_added": 2364,
+      "agent_lines_removed": 59,
+      "user_added_per_file": {
+        "scripts/fix_job_descriptions.py": 39,
+        "scripts/refetch_smartrecruiters_descriptions.py": 7,
+        "tests/scrape/test_smartrecruiters_job_text.py": 12
+      },
+      "user_removed_per_file": {
+        "scripts/fix_job_descriptions.py": 7,
+        "scripts/refetch_smartrecruiters_descriptions.py": 123,
+        "tests/scrape/test_smartrecruiters_job_text.py": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+small fix in UI.
+
+more than 3 cities should not show and just have an extend button for it to if user wants extend to see what are the complete list.
+
+---
+
+restart the panel to apply changes
+
+---
+
+did not apply anything and it stays

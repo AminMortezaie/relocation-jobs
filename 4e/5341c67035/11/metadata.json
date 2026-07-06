@@ -1,0 +1,97 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "4e5341c67035",
+  "session_id": "b8554f09-b0f2-497c-bcf1-51cfd1857551",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-06T23:20:00.841996Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/catalog/schema.py",
+    "relocation_jobs/catalog/writes.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/scrape/descriptions.py",
+    "relocation_jobs/scrape/enrich.py",
+    "relocation_jobs/scrape/job_text.py",
+    "relocation_jobs/scrape/merge.py",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/js/company.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/mcp.py",
+    "tests/catalog/test_repo.py",
+    "tests/mcp/test_mcp_service.py",
+    "tests/scrape/test_enrich.py",
+    "tests/web/test_mcp_company_workspace.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "ebb7e88f651e",
+  "session_metrics": {
+    "duration_ms": 229030962,
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-06T23:20:00.838025Z",
+    "agent_lines": 581,
+    "agent_removed": 82,
+    "human_added": 2279,
+    "human_modified": 50,
+    "human_removed": 0,
+    "total_committed": 2889,
+    "total_lines_changed": 3132,
+    "agent_percentage": 21.168582375478927,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 923,
+      "user_lines_removed": 29,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/catalog/repo.py": 93,
+        "relocation_jobs/catalog/schema.py": 10,
+        "relocation_jobs/catalog/writes.py": 12,
+        "relocation_jobs/mcp/server.py": 3,
+        "relocation_jobs/mcp/service.py": 86,
+        "relocation_jobs/mcp/types.py": 17,
+        "relocation_jobs/scrape/descriptions.py": 82,
+        "relocation_jobs/scrape/enrich.py": 8,
+        "relocation_jobs/scrape/job_text.py": 9,
+        "relocation_jobs/scrape/merge.py": 3,
+        "relocation_jobs/static/company.html": 25,
+        "relocation_jobs/static/js/company.js": 170,
+        "relocation_jobs/static/styles.css": 87,
+        "relocation_jobs/web/routes/mcp.py": 35,
+        "tests/catalog/test_repo.py": 14,
+        "tests/mcp/test_mcp_service.py": 21,
+        "tests/mcp/test_position_description_format.py": 25,
+        "tests/scrape/test_descriptions_format.py": 50,
+        "tests/scrape/test_enrich.py": 66,
+        "tests/web/test_mcp_company_workspace.py": 107
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/catalog/repo.py": 10,
+        "relocation_jobs/catalog/writes.py": 4,
+        "relocation_jobs/mcp/server.py": 2,
+        "relocation_jobs/mcp/service.py": 3,
+        "relocation_jobs/scrape/enrich.py": 2,
+        "relocation_jobs/scrape/job_text.py": 6,
+        "relocation_jobs/static/company.html": 2
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1668,
+      "agent_lines_removed": 35
+    }
+  ]
+}

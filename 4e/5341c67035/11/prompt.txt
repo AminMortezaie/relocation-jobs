@@ -1,0 +1,7 @@
+update the mcp and zip file instruction to get the JD from application.
+
+---
+
+NavVis isn't in your queue. To pull the JD via get_job_context, I need the exact posting URL — could you paste the NavVis job link? Once it's in the catalog (fetched on the panel if needed), I'll kick off Phase 1.
+
+why happens?

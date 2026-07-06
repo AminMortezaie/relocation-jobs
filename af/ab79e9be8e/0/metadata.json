@@ -1,0 +1,59 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "afab79e9be8e",
+  "session_id": "649bc179-b00b-41da-ae6a-50e25d41da41",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-06T23:55:46.799979Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "frontend/src/CompanyCard.jsx",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/core/paths.py",
+    "relocation_jobs/fetch/runner.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/web/routes/companies.py",
+    "relocation_jobs/web/routes/fetch.py",
+    "tests/core/test_custom_countries.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "e4c6f0f6b70a",
+  "checkpoint_transcript_start": 51,
+  "transcript_lines_at_start": 51,
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-06T23:55:46.7966Z",
+    "agent_lines": 115,
+    "agent_removed": 30,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 115,
+    "total_lines_changed": 145,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 25,
+      "agent_lines_removed": 11
+    }
+  ]
+}

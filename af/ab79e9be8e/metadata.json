@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "afab79e9be8e",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "frontend/src/CompanyCard.jsx",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/core/paths.py",
+    "relocation_jobs/fetch/runner.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/web/routes/companies.py",
+    "relocation_jobs/web/routes/fetch.py",
+    "tests/core/test_custom_countries.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/af/ab79e9be8e/0/metadata.json",
+      "transcript": "/af/ab79e9be8e/0/full.jsonl",
+      "content_hash": "/af/ab79e9be8e/0/content_hash.txt",
+      "prompt": "/af/ab79e9be8e/0/prompt.txt"
+    }
+  ]
+}

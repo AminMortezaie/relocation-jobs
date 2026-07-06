@@ -1,0 +1,5 @@
+see the logs of server we have added a new country and we got error
+
+---
+
+i just added Hopper company in Ireland and added Dubiln as city but it shows 3 dublin on the tag for the location of company, what this happening, i think it might be a bug there.

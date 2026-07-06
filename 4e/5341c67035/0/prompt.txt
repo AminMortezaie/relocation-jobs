@@ -1,0 +1,2 @@
+add a feature to mcp to claude can add company with the flow that use can add.
+read the skills and readme.

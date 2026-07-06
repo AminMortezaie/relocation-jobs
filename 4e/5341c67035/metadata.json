@@ -3,11 +3,12 @@
   "checkpoint_id": "4e5341c67035",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
+  "checkpoints_count": 7,
   "files_touched": [
     "README.md",
     "docs/README.md",
     "docs/backlog.md",
+    "docs/reference/board-read-model-proposal.md",
     "docs/reference/board.md",
     "docs/reference/business-rules.md",
     "docs/reference/catalog-pattern.md",
@@ -28,6 +29,7 @@
     "relocation_jobs/scrape/board.py",
     "relocation_jobs/scrape/boards/ashby.py",
     "relocation_jobs/scrape/boards/greenhouse.py",
+    "relocation_jobs/scrape/boards/hibob.py",
     "relocation_jobs/scrape/boards/smartrecruiters.py",
     "relocation_jobs/scrape/descriptions.py",
     "relocation_jobs/scrape/enrich.py",
@@ -44,13 +46,25 @@
     "relocation_jobs/static/styles.css",
     "relocation_jobs/web/routes/mcp.py",
     "scripts/exclude_stray_board_jobs.py",
+    "scripts/fix_job_descriptions.py",
+    "scripts/refetch_smartrecruiters_descriptions.py",
     "tests/catalog/test_repo.py",
+    "tests/core/test_ats_constants.py",
     "tests/fixtures/ats/greenhouse_job_detail.json",
+    "tests/fixtures/ats/hibob_job_ads.json",
     "tests/fixtures/ats/recruitee_offer_detail.json",
+    "tests/fixtures/ats/smartrecruiters_posting_detail.json",
     "tests/mcp/test_add_company.py",
     "tests/mcp/test_mcp_service.py",
+    "tests/mcp/test_position_description_format.py",
+    "tests/scrape/test_ashby_job_text.py",
+    "tests/scrape/test_descriptions_format.py",
     "tests/scrape/test_enrich.py",
+    "tests/scrape/test_greenhouse_job_text.py",
+    "tests/scrape/test_hibob_board.py",
     "tests/scrape/test_merge.py",
+    "tests/scrape/test_recruitee_job_text.py",
+    "tests/scrape/test_smartrecruiters_job_text.py",
     "tests/web/test_job_pin.py",
     "tests/web/test_mcp_company_workspace.py"
   ],
@@ -60,6 +74,12 @@
       "transcript": "/4e/5341c67035/0/full.jsonl",
       "content_hash": "/4e/5341c67035/0/content_hash.txt",
       "prompt": "/4e/5341c67035/0/prompt.txt"
+    },
+    {
+      "metadata": "/4e/5341c67035/1/metadata.json",
+      "transcript": "/4e/5341c67035/1/full.jsonl",
+      "content_hash": "/4e/5341c67035/1/content_hash.txt",
+      "prompt": "/4e/5341c67035/1/prompt.txt"
     }
   ]
 }

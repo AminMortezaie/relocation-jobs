@@ -1,0 +1,35 @@
+as we have the JD in out appliction is quite simple to find out the exact loaction for a position using fetched JD.
+
+but lots of the position did not tag with related positions, please check for the problem during setting of location on a position.
+
+---
+
+continue
+
+---
+
+run and then restart the server
+
+---
+
+run and then restart the server
+
+---
+
+whats the problem?
+
+---
+
+whats the problem?
+
+---
+
+You need to make the logic correct, not something that forcefully gets the location from JD. I will, for example, fetch again the jobs with fetch button and then I want to have the exact locations there. It's the main concern of me. No need to you know, fetch for example, correct or correct or fix the locations by some scripts. I will run the fetch, but fetch and, you know, it will put the locations on the job positions. are correctly working.
+
+---
+
+restart the panel to apply the changes
+
+---
+
+restart the panel to apply the changes

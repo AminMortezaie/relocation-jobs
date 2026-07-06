@@ -1,0 +1,11 @@
+read the skills and readme.
+
+and also answer this  please walk me through it so I write something accurate and specific rather than vague. Since it'll go on the CV as a **Key Project**, I need real detail to keep every claim truthful (per your honesty rule). Specifically:
+
+1. **Tech stack** — Flask + React confirmed; what's the DB (Postgres?), scraper stack, deployment (EC2 + Render — anything else)?
+2. **Core pipeline** — how does it go from raw scraped job postings → structured/normalized data? Any parsing logic, dedup, ATS scoring worth naming?
+3. **Scale/metrics** — how many jobs tracked, sources scraped, countries covered, how long you've run it, any performance numbers (scrape frequency, job count, etc.)?
+4. **Your role** — solo build? Ongoing maintenance? Any specific hard problem you solved (e.g., handling different ATS formats, rate limiting, data freshness)?
+5. **What it does end-to-end** — panel/dashboard features (filtering, state tracking, application pipeline) that mirror "structured signals consumed as APIs" language from the JD?
+
+Give me what you've got and I'll draft the **Key Projects** section (new section — flagging since this is a structural addition, not just new bullets in an existing role, so I want your explicit OK before it goes into the saved `.tex`).

@@ -1,0 +1,21 @@
+we need to add a new feature on new branch.
+
+expired jobs.
+means some of the jobs are currently closed and no longer available.
+
+during the fetch process we should check for them (maybe on another flow)
+and make them soft delete and set expried state to them.
+
+also about the not for me position we should have the same scenario and should be soft deleted when it marks as not for me position to have the track of it on db to not add it again but now showing instantly on front and get them when the job board loads and if the user requestes it show be shown in a pop up that user can restore like what we have now.
+
+you need to read the skills before designing a feature like this which is important and has some edge cases then tell me your idea about.
+
+---
+
+i think the first step should be human review to just mention that the job is expired in not for me options.
+
+lets add this firstly.
+
+just adding a new state.
+
+no need to add in another branch, also update the related documents.

@@ -1,11 +1,7 @@
-i have lots of files to push on git.
-i need your guide to review carefully these files and based on the skills and readme files we have tell me which parts should be better to push on git finally.
+<timestamp>Tuesday, Jul 7, 2026, 3:19 AM (UTC+4)</timestamp>
 
-have a deep review on them
+Git push review guide
 
----
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
 
-i have lots of files to push on git.
-i need your guide to review carefully these files and based on the skills and readme files we have tell me which parts should be better to push on git finally.
-
-have a deep review on them
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.

@@ -7,7 +7,7 @@ from flask import g, jsonify, request
 from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import login_required
 from relocation_jobs.core.location_tags import COUNTRY_LABELS
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
 from relocation_jobs.catalog.repo import get_company
 from relocation_jobs.fetch.runner import (
     _fetch_lock,
@@ -27,7 +27,7 @@ def register(app):
     @login_required
     def api_company_detail(country: str, company_name: str):
         country = country.strip().lower()
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         company = get_company(country, company_name)
         if company is None:
@@ -45,7 +45,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -69,7 +69,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -108,11 +108,11 @@ def register(app):
                 if (item or "").strip()
             ]
             for key in country_keys:
-                if key not in SUPPORTED_COUNTRIES:
+                if key not in supported_countries():
                     return jsonify({"error": f"Unknown country: {key}"}), 400
         else:
             country_hint = None if country in ("", "auto", "all") else country
-            if country_hint and country_hint not in SUPPORTED_COUNTRIES:
+            if country_hint and country_hint not in supported_countries():
                 return jsonify({"error": f"Unknown country: {country}"}), 400
             if country_hint:
                 country_keys = [country_hint]
@@ -150,7 +150,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -175,7 +175,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -203,7 +203,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -240,7 +240,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -272,7 +272,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -297,7 +297,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -321,7 +321,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400
@@ -359,7 +359,7 @@ def register(app):
 
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not company:
             return jsonify({"error": "company is required"}), 400

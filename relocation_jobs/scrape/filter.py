@@ -13,8 +13,9 @@ def filter_relevant_jobs(jobs: list[dict], relevant_only: bool) -> list[dict]:
         if relevant_only and not is_relevant(title):
             continue
         entry = {"title": title, "url": url}
-        if job.get("location") is not None:
-            entry["location"] = job["location"]
+        location = (job.get("location") or "").strip()
+        if location:
+            entry["location"] = location
         if job.get("locations") is not None:
             entry["locations"] = job["locations"]
         out.append(entry)

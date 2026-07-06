@@ -16,7 +16,7 @@ from relocation_jobs.positions.types import TrackingFlags
 from relocation_jobs.scrape.relevance import explain_title_filter, is_relevant
 from relocation_jobs.users.repo import load_job_tracking
 
-USER_CHOSEN_REASONS = frozenset({"not_for_me", "no_relocation"})
+USER_CHOSEN_REASONS = frozenset({"not_for_me", "no_relocation", "expired"})
 
 
 def _catalog_url(job: dict) -> str:

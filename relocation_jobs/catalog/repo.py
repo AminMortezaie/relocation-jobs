@@ -61,6 +61,7 @@ def _job_row(row) -> dict:
         "last_seen": data.get("last_seen") or "",
         "idempotency_key": data.get("idempotency_key") or "",
         "visa_sponsorship": _visa_from_db(data.get("visa_sponsorship")),
+        "description_text": (data.get("description_text") or "").strip(),
     }
     location = (data.get("location") or "").strip()
     if location:
@@ -74,6 +75,23 @@ def _job_row(row) -> dict:
         except json.JSONDecodeError:
             pass
     return job
+
+
+def _job_row_with_context(row) -> dict:
+    data = _row(row)
+    job = _job_row(row)
+    if data.get("company_name"):
+        job["company_name"] = data["company_name"]
+    if data.get("country"):
+        job["country"] = data["country"]
+    return job
+
+
+_JOB_LOOKUP_COLUMNS = """
+    j.title, j.url, j.idempotency_key, j.fetched, j.last_seen,
+    j.visa_sponsorship, j.location, j.locations_json, j.description_text,
+    c.name AS company_name, c.country
+"""
 
 
 def _company_row(row: dict, jobs: list[dict]) -> dict:
@@ -348,8 +366,8 @@ def get_job_by_url(
     if company_name and country_key and key:
         with db_read() as conn:
             row = conn.execute(
-                """
-                SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
+                f"""
+                SELECT {_JOB_LOOKUP_COLUMNS}
                 FROM matching_jobs j
                 JOIN companies c ON c.id = j.company_id
                 WHERE c.country = %s AND c.name = %s
@@ -359,9 +377,9 @@ def get_job_by_url(
                 (country_key.strip().lower(), company_name.strip(), key, job_url.strip()),
             ).fetchone()
             if row is not None:
-                return _row(row)
-    sql = """
-        SELECT j.title, j.url, j.idempotency_key, c.name AS company_name, c.country
+                return _job_row_with_context(row)
+    sql = f"""
+        SELECT {_JOB_LOOKUP_COLUMNS}
         FROM matching_jobs j
         JOIN companies c ON c.id = j.company_id
         WHERE 1=1
@@ -377,15 +395,52 @@ def get_job_by_url(
         rows = conn.execute(sql, tuple(params)).fetchall()
     for row in rows:
         if norm and normalize_job_url(row.get("url", "")) == norm:
-            return _row(row)
+            return _job_row_with_context(row)
     if key:
         for row in rows:
             if (row.get("idempotency_key") or "") == key:
-                return _row(row)
+                return _job_row_with_context(row)
         for row in rows:
             if job_idempotency_key(row.get("url", "")) == key:
-                return _row(row)
+                return _job_row_with_context(row)
     return None
+
+
+def get_job_by_idempotency_key(idempotency_key: str) -> dict | None:
+    key = (idempotency_key or "").strip()
+    if not key:
+        return None
+    with db_read() as conn:
+        row = conn.execute(
+            f"""
+            SELECT {_JOB_LOOKUP_COLUMNS}
+            FROM matching_jobs j
+            JOIN companies c ON c.id = j.company_id
+            WHERE j.idempotency_key = %s
+            LIMIT 1
+            """,
+            (key,),
+        ).fetchone()
+    if row is None:
+        return None
+    return _job_row_with_context(row)
+
+
+def update_job_description_text(idempotency_key: str, description_text: str) -> bool:
+    key = (idempotency_key or "").strip()
+    if not key:
+        return False
+    with db_transaction() as conn:
+        row = conn.execute(
+            """
+            UPDATE matching_jobs
+            SET description_text = %s
+            WHERE idempotency_key = %s
+            RETURNING id
+            """,
+            ((description_text or "").strip(), key),
+        ).fetchone()
+    return row is not None
 
 
 def _upsert_company_catalog_row(
@@ -456,8 +511,8 @@ def _replace_company_job_rows(conn, company_id: int, full_board: list[dict]) -> 
             """
             INSERT INTO matching_jobs (
                 company_id, idempotency_key, title, url, fetched, last_seen,
-                visa_sponsorship, location, locations_json
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                visa_sponsorship, location, locations_json, description_text
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (company_id, idempotency_key) DO UPDATE SET
                 title = EXCLUDED.title,
                 url = EXCLUDED.url,
@@ -470,6 +525,12 @@ def _replace_company_job_rows(conn, company_id: int, full_board: list[dict]) -> 
                          AND EXCLUDED.locations_json != '[]'
                     THEN EXCLUDED.locations_json
                     ELSE matching_jobs.locations_json
+                END,
+                description_text = CASE
+                    WHEN EXCLUDED.description_text IS NOT NULL
+                         AND EXCLUDED.description_text != ''
+                    THEN EXCLUDED.description_text
+                    ELSE matching_jobs.description_text
                 END
             """,
             (
@@ -482,6 +543,7 @@ def _replace_company_job_rows(conn, company_id: int, full_board: list[dict]) -> 
                 _visa_to_db(job.get("visa_sponsorship")),
                 (job.get("location") or "").strip(),
                 _job_locations_column(job),
+                (job.get("description_text") or "").strip(),
             ),
         )
     if board_keys:

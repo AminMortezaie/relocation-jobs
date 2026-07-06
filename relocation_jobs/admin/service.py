@@ -9,7 +9,7 @@ from relocation_jobs.core.ats_constants import (
     KNOWN_ATS,
     MAX_CONCURRENCY,
 )
-from relocation_jobs.core.location_tags import COUNTRY_LABELS, SUGGESTED_CITIES, load_custom_cities
+from relocation_jobs.core.location_tags import SUGGESTED_CITIES, all_country_labels, load_custom_cities, load_custom_countries
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES, data_dir
 from relocation_jobs.db import admin_tracking_totals, list_users_with_stats, user_count
 from relocation_jobs.catalog.stats import get_catalog_overview
@@ -34,8 +34,9 @@ def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
         "known_ats_companies": sorted(KNOWN_ATS.keys()),
         "suggested_cities": {key: len(values) for key, values in SUGGESTED_CITIES.items()},
         "custom_cities": custom,
+        "custom_countries": load_custom_countries(),
         "countries": [
-            {"id": key, "label": label} for key, label in COUNTRY_LABELS.items()
+            {"id": key, "label": label} for key, label in sorted(all_country_labels().items())
         ],
         "archives": archives,
     }

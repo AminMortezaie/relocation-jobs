@@ -1,0 +1,22 @@
+{
+  "filterGroups": {
+    "departments": [],
+    "sites": []
+  },
+  "jobAdDetails": [
+    {
+      "id": "0413848d-1163-4682-a260-0d024ff9b031",
+      "title": "Principal Engineer (d/f/m)",
+      "site": "Berlin",
+      "country": "Germany",
+      "description": "<p>Build platform services.</p>",
+      "requirements": "<p>Strong backend experience.</p>"
+    },
+    {
+      "id": "a0e8effe-c5b2-45a2-8ed6-f7a678505c46",
+      "title": "",
+      "site": "Berlin",
+      "country": "Germany"
+    }
+  ]
+}

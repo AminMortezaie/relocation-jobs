@@ -7,7 +7,7 @@ from relocation_jobs.core.location_tags import (
     picker_cities_for_country,
     sync_company_location_fields,
 )
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.catalog.repo import load_country_catalog
 
 
@@ -33,14 +33,14 @@ def list_company_locations(
         keyed.setdefault(loc["key"], loc)
 
     if for_picker:
-        for key in SUPPORTED_COUNTRIES:
+        for key in supported_countries():
             for city in picker_cities_for_country(key):
                 add(key, city)
 
     country_keys = (
         [filter_country]
         if filter_country
-        else sorted(SUPPORTED_COUNTRIES)
+        else sorted(supported_countries())
     )
     for key in country_keys:
         data = load_country_catalog(key)

@@ -1,58 +1,100 @@
 from __future__ import annotations
 
 import re
+from typing import NamedTuple
 
 import requests
 
 from relocation_jobs.core.ats_detection import HEADERS
-from relocation_jobs.scrape.descriptions import html_to_text
+from relocation_jobs.scrape.boards.ashby import ashby_job_detail, ashby_job_ids_from_url
+from relocation_jobs.scrape.boards.greenhouse import (
+    greenhouse_job_detail,
+    greenhouse_job_ids_from_url,
+)
+from relocation_jobs.scrape.boards.hibob import fetch_hibob_job_detail as hibob_job_detail_fetch
+from relocation_jobs.scrape.boards.smartrecruiters import (
+    smartrecruiters_job_ad_html,
+    smartrecruiters_location_text,
+    smartrecruiters_posting_detail_url,
+)
+from relocation_jobs.scrape.descriptions import html_to_readable
 
 
-def fetch_greenhouse_job_text(url: str) -> str:
+class JobFetchResult(NamedTuple):
+    text: str
+    location: str
+
+
+def _empty_fetch() -> JobFetchResult:
+    return JobFetchResult("", "")
+
+
+def _recruitee_location_label(offer: dict) -> str:
+    location = (offer.get("location") or "").strip()
+    if location:
+        return location
+    city = (offer.get("city") or "").strip()
+    country = (offer.get("country") or offer.get("country_code") or "").strip()
+    parts = [part for part in (city, country) if part]
+    return ", ".join(dict.fromkeys(parts))
+
+
+def fetch_greenhouse_job_detail(url: str) -> JobFetchResult:
+    ids = greenhouse_job_ids_from_url(url)
+    if ids:
+        content, location = greenhouse_job_detail(ids[0], ids[1])
+        if content:
+            return JobFetchResult(content, location)
     match = re.search(r"greenhouse\.io/(?:[^/]+/)?jobs/(\d+)", url, re.I)
     if not match:
-        return ""
+        return _empty_fetch()
     job_id = match.group(1)
     board_match = re.search(r"greenhouse\.io/([^/]+)/jobs/", url, re.I)
     slug = board_match.group(1) if board_match else ""
-    for board in [slug, ""]:
-        if not board:
-            continue
-        api = f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{job_id}"
-        try:
-            response = requests.get(api, headers=HEADERS, timeout=10)
-            if response.ok and response.json().get("content"):
-                return html_to_text(response.json()["content"])
-        except Exception:
-            pass
-    return ""
+    if not slug or slug in ("embed", "jobs"):
+        return _empty_fetch()
+    content, location = greenhouse_job_detail(slug, job_id)
+    return JobFetchResult(content, location)
 
 
-def fetch_lever_job_text(url: str) -> str:
+def fetch_greenhouse_job_text(url: str) -> str:
+    return fetch_greenhouse_job_detail(url).text
+
+
+def fetch_lever_job_detail(url: str) -> JobFetchResult:
     match = re.search(r"lever\.co/[^/]+/([0-9a-f-]{36})", url, re.I)
     if not match:
-        return ""
+        return _empty_fetch()
     api = f"https://api.lever.co/v0/postings/{match.group(1)}"
     try:
         response = requests.get(api, headers=HEADERS, timeout=10)
         if not response.ok:
-            return ""
+            return _empty_fetch()
         data = response.json()
+        location = ((data.get("categories") or {}).get("location") or "").strip()
         parts = [
             data.get("descriptionPlain") or "",
             data.get("description") or "",
             str(data.get("lists") or ""),
             str(data.get("additional") or ""),
         ]
-        return html_to_text("\n".join(parts))
+        plain = (data.get("descriptionPlain") or "").strip()
+        if plain:
+            return JobFetchResult(plain, location)
+        readable = html_to_readable("\n".join(parts))
+        return JobFetchResult(readable, location)
     except Exception:
-        return ""
+        return _empty_fetch()
 
 
-def fetch_recruitee_job_text(url: str) -> str:
+def fetch_lever_job_text(url: str) -> str:
+    return fetch_lever_job_detail(url).text
+
+
+def fetch_recruitee_job_detail(url: str) -> JobFetchResult:
     match = re.search(r"([a-z0-9-]+)\.recruitee\.com/o/([a-z0-9-]+)", url, re.I)
     if not match:
-        return ""
+        return _empty_fetch()
     company, offer_slug = match.group(1), match.group(2)
     try:
         response = requests.get(
@@ -62,63 +104,116 @@ def fetch_recruitee_job_text(url: str) -> str:
         )
         response.raise_for_status()
         for offer in response.json().get("offers", []):
-            if offer.get("slug") == offer_slug:
-                detail = requests.get(
-                    f"https://{company}.recruitee.com/api/offers/{offer['id']}",
-                    headers=HEADERS,
-                    timeout=10,
-                )
-                if detail.ok:
-                    desc = detail.json().get("offer", {}).get("description", "")
-                    return html_to_text(desc)
+            if offer.get("slug") != offer_slug:
+                continue
+            detail = requests.get(
+                f"https://{company}.recruitee.com/api/offers/{offer['id']}",
+                headers=HEADERS,
+                timeout=10,
+            )
+            if not detail.ok:
+                continue
+            offer = detail.json().get("offer", {}) or {}
+            parts = [
+                (offer.get("description") or "").strip(),
+                (offer.get("requirements") or "").strip(),
+            ]
+            html = "\n\n".join(part for part in parts if part)
+            return JobFetchResult(
+                html_to_readable(html),
+                _recruitee_location_label(offer),
+            )
     except Exception:
         pass
-    return ""
+    return _empty_fetch()
+
+
+def fetch_recruitee_job_text(url: str) -> str:
+    return fetch_recruitee_job_detail(url).text
+
+
+def fetch_smartrecruiters_job_detail(url: str) -> JobFetchResult:
+    detail_url = smartrecruiters_posting_detail_url(url)
+    if not detail_url:
+        return _empty_fetch()
+    try:
+        response = requests.get(detail_url, headers=HEADERS, timeout=10)
+        if not response.ok:
+            return _empty_fetch()
+        payload = response.json()
+        html = smartrecruiters_job_ad_html(payload)
+        if not html.strip():
+            return _empty_fetch()
+        return JobFetchResult(
+            html,
+            smartrecruiters_location_text(payload.get("location")),
+        )
+    except Exception:
+        pass
+    return _empty_fetch()
+
+
+def fetch_smartrecruiters_job_text(url: str) -> str:
+    return fetch_smartrecruiters_job_detail(url).text
+
+
+def fetch_ashby_job_detail(url: str) -> JobFetchResult:
+    ids = ashby_job_ids_from_url(url)
+    if not ids:
+        return _empty_fetch()
+    content, location = ashby_job_detail(ids[0], ids[1])
+    return JobFetchResult(content, location)
 
 
 def fetch_ashby_job_text(url: str) -> str:
-    match = re.search(r"ashbyhq\.com/[^/]+/([0-9a-f-]{36})", url, re.I)
-    if not match:
-        return ""
-    org_match = re.search(r"ashbyhq\.com/([^/]+)/", url, re.I)
-    org = org_match.group(1) if org_match else ""
-    if not org:
-        return ""
-    api = f"https://api.ashbyhq.com/posting-api/job-board/{org}?includeCompensationRanges=true"
-    try:
-        response = requests.get(api, headers=HEADERS, timeout=10)
-        if not response.ok:
-            return ""
-        for job in response.json().get("jobs", []) or []:
-            if job.get("id") == match.group(1) or match.group(1) in (job.get("jobUrl") or ""):
-                return html_to_text(job.get("descriptionHtml") or job.get("description") or "")
-    except Exception:
-        pass
-    return ""
+    return fetch_ashby_job_detail(url).text
 
 
-_JOB_TEXT_FETCHERS = {
-    "greenhouse": fetch_greenhouse_job_text,
-    "greenhouse_eu": fetch_greenhouse_job_text,
-    "lever": fetch_lever_job_text,
-    "lever_eu": fetch_lever_job_text,
-    "recruitee": fetch_recruitee_job_text,
-    "ashby": fetch_ashby_job_text,
+def fetch_hibob_job_detail(url: str) -> JobFetchResult:
+    text, location = hibob_job_detail_fetch(url)
+    return JobFetchResult(text, location)
+
+
+def fetch_hibob_job_text(url: str) -> str:
+    return fetch_hibob_job_detail(url).text
+
+
+_JOB_DETAIL_FETCHERS = {
+    "greenhouse": fetch_greenhouse_job_detail,
+    "greenhouse_eu": fetch_greenhouse_job_detail,
+    "lever": fetch_lever_job_detail,
+    "lever_eu": fetch_lever_job_detail,
+    "recruitee": fetch_recruitee_job_detail,
+    "ashby": fetch_ashby_job_detail,
+    "hibob": fetch_hibob_job_detail,
+    "smartrecruiters": fetch_smartrecruiters_job_detail,
 }
 
 
-def fetch_job_description(url: str, ats_type: str | None = None) -> str:
-    fetcher = _JOB_TEXT_FETCHERS.get(ats_type or "")
+def fetch_job_detail(url: str, ats_type: str | None = None) -> JobFetchResult:
+    fetcher = _JOB_DETAIL_FETCHERS.get(ats_type or "")
     if fetcher:
-        text = fetcher(url)
-        if text:
-            return text
+        result = fetcher(url)
+        if result.text:
+            return result
+    if (ats_type or "") not in ("greenhouse", "greenhouse_eu"):
+        result = fetch_greenhouse_job_detail(url)
+        if result.text:
+            return result
+    if (ats_type or "") != "ashby":
+        result = fetch_ashby_job_detail(url)
+        if result.text:
+            return result
     try:
         response = requests.get(url, headers=HEADERS, timeout=15)
         if response.ok:
-            text = html_to_text(response.text)
+            text = html_to_readable(response.text)
             if len(text) > 200:
-                return text
+                return JobFetchResult(text, "")
     except Exception:
         pass
-    return ""
+    return _empty_fetch()
+
+
+def fetch_job_description(url: str, ats_type: str | None = None) -> str:
+    return fetch_job_detail(url, ats_type).text

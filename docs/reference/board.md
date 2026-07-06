@@ -4,7 +4,7 @@
 
 How the main company board loads, paginates, and sorts by “newest”. Read before changing `panel/`, `static/js/board*.js`, `static/js/render.js`, or `GET /api/board`.
 
-Related: [business-rules.md](business-rules.md) (job buckets), [architecture.md](architecture.md) (panel read path).
+Related: [business-rules.md](business-rules.md) (job buckets), [architecture.md](architecture.md) (panel read path). Performance / read-model proposal: [board-read-model-proposal.md](board-read-model-proposal.md).
 
 ---
 

@@ -128,6 +128,7 @@ def upsert_company_and_jobs(
             visa_to_db(job.get("visa_sponsorship")),
             (job.get("location") or "").strip(),
             job_locations_json(job),
+            (job.get("description_text") or "").strip(),
         ))
 
     for row in job_rows:
@@ -135,8 +136,8 @@ def upsert_company_and_jobs(
             """
             INSERT INTO matching_jobs (
                 company_id, idempotency_key, title, url, fetched, last_seen,
-                visa_sponsorship, location, locations_json
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                visa_sponsorship, location, locations_json, description_text
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (company_id, idempotency_key) DO UPDATE SET
                 title = EXCLUDED.title,
                 url = EXCLUDED.url,
@@ -149,6 +150,12 @@ def upsert_company_and_jobs(
                          AND EXCLUDED.locations_json != '[]'
                     THEN EXCLUDED.locations_json
                     ELSE matching_jobs.locations_json
+                END,
+                description_text = CASE
+                    WHEN EXCLUDED.description_text IS NOT NULL
+                         AND EXCLUDED.description_text != ''
+                    THEN EXCLUDED.description_text
+                    ELSE matching_jobs.description_text
                 END
             """,
             row,
@@ -358,8 +365,8 @@ def insert_jobs(country_key: str, company_name: str, jobs: list[dict]) -> int:
                 """
                 INSERT INTO matching_jobs (
                     company_id, idempotency_key, title, url, fetched, last_seen,
-                    visa_sponsorship, location, locations_json
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    visa_sponsorship, location, locations_json, description_text
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT DO NOTHING
                 RETURNING id
                 """,
@@ -372,6 +379,7 @@ def insert_jobs(country_key: str, company_name: str, jobs: list[dict]) -> int:
                     visa_to_db(job.get("visa_sponsorship")),
                     (job.get("location") or "").strip(),
                     job_locations_json(job),
+                    (job.get("description_text") or "").strip(),
                 ),
             )
             if cur.fetchone() is not None:

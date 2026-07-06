@@ -39,15 +39,116 @@ SUGGESTED_CITIES: dict[str, tuple[str, ...]] = {
 
 _custom_cities_lock = threading.Lock()
 _custom_cities_cache: dict[str, list[str]] | None = None
+_custom_countries_lock = threading.Lock()
+_custom_countries_cache: dict[str, str] | None = None
 
 
 def custom_cities_path() -> Path:
     return data_dir() / "custom_cities.json"
 
 
+def custom_countries_path() -> Path:
+    return data_dir() / "custom_countries.json"
+
+
 def _invalidate_custom_cities_cache() -> None:
     global _custom_cities_cache
     _custom_cities_cache = None
+
+
+def _invalidate_custom_countries_cache() -> None:
+    global _custom_countries_cache
+    _custom_countries_cache = None
+
+
+def load_custom_countries(*, use_cache: bool = True) -> dict[str, str]:
+    global _custom_countries_cache
+    if use_cache and _custom_countries_cache is not None:
+        return _custom_countries_cache
+
+    path = custom_countries_path()
+    raw: object = {}
+    if path.is_file():
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            raw = {}
+
+    parsed: dict[str, str] = {}
+    if isinstance(raw, dict):
+        for country, label in raw.items():
+            country_key = normalize_country_key(str(country))
+            if not country_key or country_key in COUNTRY_LABELS:
+                continue
+            if not isinstance(label, str):
+                continue
+            country_label_text = label.strip()
+            if not country_label_text:
+                continue
+            parsed[country_key] = country_label_text
+
+    if use_cache:
+        _custom_countries_cache = parsed
+    return parsed
+
+
+def save_custom_countries(data: dict[str, str]) -> None:
+    ensure_data_dir()
+    ordered = {
+        key: data[key].strip()
+        for key in sorted(data)
+        if key not in COUNTRY_LABELS and data[key].strip()
+    }
+    custom_countries_path().write_text(
+        json.dumps(ordered, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    _invalidate_custom_countries_cache()
+
+
+def all_country_labels() -> dict[str, str]:
+    merged = dict(COUNTRY_LABELS)
+    merged.update(load_custom_countries())
+    return merged
+
+
+def supported_country_keys() -> frozenset[str]:
+    return frozenset(all_country_labels().keys())
+
+
+def normalize_country_slug(label: str) -> str:
+    s = (label or "").strip()
+    if not s:
+        return ""
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.casefold()
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return s
+
+
+def add_custom_country(label: str) -> dict:
+    country_label_text = (label or "").strip()
+    if not country_label_text:
+        raise ValueError("Country name is required")
+
+    country_key = normalize_country_slug(country_label_text)
+    if not country_key:
+        raise ValueError("Invalid country name")
+
+    for key, existing in COUNTRY_LABELS.items():
+        if key == country_key or existing.casefold() == country_label_text.casefold():
+            return {"id": key, "label": existing}
+
+    with _custom_countries_lock:
+        data = load_custom_countries()
+        for key, existing in data.items():
+            if key == country_key or existing.casefold() == country_label_text.casefold():
+                return {"id": key, "label": existing}
+        data[country_key] = country_label_text
+        save_custom_countries(data)
+
+    return {"id": country_key, "label": country_label_text}
 
 
 def load_custom_cities(*, use_cache: bool = True) -> dict[str, list[str]]:
@@ -68,7 +169,7 @@ def load_custom_cities(*, use_cache: bool = True) -> dict[str, list[str]]:
     if isinstance(raw, dict):
         for country, cities in raw.items():
             country_key = normalize_country_key(str(country))
-            if country_key not in COUNTRY_LABELS or not isinstance(cities, list):
+            if country_key not in supported_country_keys() or not isinstance(cities, list):
                 continue
             clean: list[str] = []
             seen: set[str] = set()
@@ -96,7 +197,7 @@ def save_custom_cities(data: dict[str, list[str]]) -> None:
     ordered = {
         key: data[key]
         for key in sorted(data)
-        if key in COUNTRY_LABELS and data[key]
+        if key in supported_country_keys() and data[key]
     }
     custom_cities_path().write_text(
         json.dumps(ordered, indent=2, ensure_ascii=False) + "\n",
@@ -108,7 +209,7 @@ def save_custom_cities(data: dict[str, list[str]]) -> None:
 def picker_cities_for_country(country: str) -> tuple[str, ...]:
     """Built-in suggested cities plus user-added picker cities."""
     country_key = normalize_country_key(country)
-    if country_key not in COUNTRY_LABELS:
+    if country_key not in supported_country_keys():
         return ()
 
     merged: list[str] = []
@@ -168,7 +269,7 @@ def normalize_city_key(city: str) -> str:
 
 def country_label(country: str) -> str:
     key = normalize_country_key(country)
-    return COUNTRY_LABELS.get(key, key.title() if key else "")
+    return all_country_labels().get(key, key.title() if key else "")
 
 
 def location_key(country: str, city: str) -> str:
@@ -278,10 +379,21 @@ def _strip_country_suffix(city: str) -> str:
     return stripped or city
 
 
+def _legacy_city_parts(text: str) -> list[str]:
+    text = (text or "").strip()
+    if not text:
+        return []
+    if "," in text:
+        return [part.strip() for part in text.split(",") if part.strip()]
+    if " · " in text:
+        return [part.strip() for part in text.split(" · ") if part.strip()]
+    return [text]
+
+
 def normalize_location(country: str, city: str) -> dict | None:
     country_key = normalize_country_key(country)
     city_label = _strip_country_suffix((city or "").strip())
-    if not country_key or country_key not in COUNTRY_LABELS or not city_label:
+    if not country_key or country_key not in supported_country_keys() or not city_label:
         return None
     return {
         "country": country_key,
@@ -323,17 +435,15 @@ def normalize_locations(
     catalog = normalize_country_key(catalog_country)
     if isinstance(legacy_cities, list):
         for city in legacy_cities:
-            add(catalog or "", city)
+            for part in _legacy_city_parts(str(city)):
+                add(catalog or "", part)
         if out:
             return out
 
     single = (legacy_city or "").strip()
     if single:
-        if "," in single:
-            for part in single.split(","):
-                add(catalog or "", part.strip())
-        else:
-            add(catalog or "", single)
+        for part in _legacy_city_parts(single):
+            add(catalog or "", part)
     return sorted(out, key=lambda loc: (loc["country_label"], loc["city"].casefold()))
 
 
@@ -403,7 +513,8 @@ def company_visible_for_country_filter(
     )
 
 
-SUPPORTED_COUNTRY_KEYS = frozenset(COUNTRY_LABELS.keys())
+def supported_country_keys_for_matching() -> frozenset[str]:
+    return supported_country_keys()
 
 _COUNTRY_TEXT_ALIASES: dict[str, tuple[str, ...]] = {
     "germany": ("germany", "deutschland", "german", "de"),
@@ -666,7 +777,7 @@ def _text_matches_expected_offices(text: str, expected: list[dict]) -> bool:
         return True
     if country_key and country_key.startswith("unsupported:"):
         return False
-    if country_key and country_key not in SUPPORTED_COUNTRY_KEYS:
+    if country_key and country_key not in supported_country_keys():
         return False
 
     supported_countries = {
@@ -773,7 +884,7 @@ def job_matches_expected_locations(
 
         if country_key and country_key.startswith("unsupported:"):
             return False, f"unsupported country ({country_key.split(':', 1)[1]})"
-        if country_key and country_key not in SUPPORTED_COUNTRY_KEYS:
+        if country_key and country_key not in supported_country_keys():
             return False, f"unsupported country ({country_key})"
         if country_key and country_key not in supported_countries:
             return False, f"outside tagged countries ({country_key})"

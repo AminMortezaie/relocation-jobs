@@ -10,6 +10,7 @@ from relocation_jobs.core.ats_detection import (
     _detect_applytojob_from_url,
     _detect_bamboohr_from_url,
     _detect_deel_from_url,
+    _detect_hibob_from_url,
     _detect_join_from_url,
     _detect_job_shop_from_url,
     _detect_recruitee_from_careers_host,
@@ -55,6 +56,18 @@ def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) 
                 persist_board()
         return
 
+    if (not cached or cached == "generic") and careers_url:
+        lowered = careers_url.lower()
+        for host, board in (
+            ("getyourguide.careers", "getyourguide"),
+        ):
+            if host in lowered:
+                company["ats_type"] = "greenhouse"
+                company["ats_url"] = f"https://boards.greenhouse.io/{board}"
+                if persist_board:
+                    persist_board()
+                return
+
     smartrecruiters = _detect_smartrecruiters_from_careers_url(careers_url)
     if smartrecruiters[0]:
         cached_id = _smartrecruiters_company_id(company.get("ats_url") or "")
@@ -66,7 +79,7 @@ def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) 
                 persist_board()
             return
 
-    if careers_url and (not cached or cached == "generic"):
+    if careers_url and not cached:
         detectors = (
             _detect_smartrecruiters_from_careers_url,
             _detect_job_shop_from_url,
@@ -74,6 +87,7 @@ def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) 
             _detect_join_from_url,
             _detect_applytojob_from_url,
             _detect_bamboohr_from_url,
+            _detect_hibob_from_url,
             _detect_recruitee_from_careers_host,
             _detect_smartrecruiters_from_redcare_careers,
         )
@@ -111,11 +125,11 @@ async def ensure_company_ats(
     persist_board: PersistBoard = None,
 ) -> None:
     del client
+    apply_known_ats_override(company, persist_board)
     cached = (company.get("ats_type") or "").strip().lower()
     if cached == "generic":
         return
 
-    apply_known_ats_override(company, persist_board)
     ats_type, ats_url = effective_cached_ats(company)
     if ats_type:
         return

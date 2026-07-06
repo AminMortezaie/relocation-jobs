@@ -6,8 +6,8 @@ from flask import g, jsonify, request
 
 from relocation_jobs.core.auth import login_required
 from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILABLE, MAX_CONCURRENCY
-from relocation_jobs.core.location_tags import COUNTRY_LABELS, add_custom_city
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.location_tags import add_custom_city, add_custom_country, all_country_labels
+from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.catalog.locations import list_company_locations
 from relocation_jobs.web import deps
 
@@ -37,8 +37,24 @@ def register(app):
     def api_countries():
         return jsonify([
             {"id": "all", "label": "All countries"},
-            *[{"id": k, "label": COUNTRY_LABELS[k]} for k in sorted(SUPPORTED_COUNTRIES)],
+            *[
+                {"id": key, "label": label}
+                for key, label in sorted(all_country_labels().items())
+            ],
         ])
+
+    @app.post("/api/countries")
+    @login_required
+    def api_countries_add():
+        body = request.get_json(silent=True) or {}
+        label = (body.get("label") or body.get("country") or body.get("name") or "").strip()
+        if not label:
+            return jsonify({"error": "Country name is required"}), 400
+        try:
+            country = add_custom_country(label)
+            return jsonify({"ok": True, "country": country})
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
 
     @app.get("/api/ats-types")
     @login_required
@@ -50,7 +66,7 @@ def register(app):
     def api_cities():
         country = request.args.get("country", "all")
         country_key = country if country != "all" else None
-        if country != "all" and country not in SUPPORTED_COUNTRIES:
+        if country != "all" and country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         for_picker = request.args.get("picker", "").lower() in ("1", "true", "yes")
         locations = list_company_locations(country_key, for_picker=for_picker)
@@ -64,7 +80,7 @@ def register(app):
     def api_locations():
         country = request.args.get("country", "all")
         country_key = country if country != "all" else None
-        if country != "all" and country not in SUPPORTED_COUNTRIES:
+        if country != "all" and country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         for_picker = request.args.get("picker", "").lower() in ("1", "true", "yes")
         return jsonify({
@@ -79,7 +95,7 @@ def register(app):
         city = (body.get("city") or "").strip()
         if not country or country == "all":
             return jsonify({"error": "country is required (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         if not city:
             return jsonify({"error": "city is required"}), 400

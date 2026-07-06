@@ -6,8 +6,8 @@ from flask import g, jsonify, request
 
 from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILABLE, MAX_CONCURRENCY
 from relocation_jobs.core.auth import admin_required, login_required
-from relocation_jobs.core.location_tags import COUNTRY_LABELS
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
+from relocation_jobs.core.location_tags import country_label
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
 from relocation_jobs.db import is_user_admin
 from relocation_jobs.web import deps
 from relocation_jobs.fetch import repo as fetch_repo
@@ -49,7 +49,7 @@ def register(app):
     @admin_required
     def api_fetch_history():
         country = (request.args.get("country") or "").strip().lower() or None
-        if country and country not in SUPPORTED_COUNTRIES:
+        if country and country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         try:
             limit = int(request.args.get("limit", 20))
@@ -87,7 +87,7 @@ def register(app):
 
         if country == "all":
             return jsonify({"error": "Select a single country to fetch (not 'all')"}), 400
-        if country not in SUPPORTED_COUNTRIES:
+        if country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
 
         valid_ats = {item["id"] for item in deps.list_ats_types()} | {"generic"}
@@ -121,7 +121,7 @@ def register(app):
             "file": COUNTRY_ARCHIVE_FILENAMES[country],
             "concurrency": workers,
             "message": (
-                f"Started scraping {COUNTRY_LABELS.get(country, country)} "
+                f"Started scraping {country_label(country)} "
                 f"({workers} concurrent)"
             ),
         })
@@ -131,7 +131,7 @@ def register(app):
     def api_fetch_attempts():
         country = (request.args.get("country") or "").strip().lower() or None
         company = (request.args.get("company") or "").strip() or None
-        if country and country not in SUPPORTED_COUNTRIES:
+        if country and country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         try:
             limit = int(request.args.get("limit", 50))

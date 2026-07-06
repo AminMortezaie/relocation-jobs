@@ -331,14 +331,6 @@ def set_job_pinned(
             )
             conn.execute(
                 """
-                UPDATE job_tracking
-                SET pinned = 0, pinned_at = NULL, updated_at = %s
-                WHERE user_id = %s AND country = %s AND company_name = %s AND pinned = 1
-                """,
-                (now, user_id, country, company_name),
-            )
-            conn.execute(
-                """
                 INSERT INTO job_tracking (
                     user_id, country, company_name, job_url, job_title,
                     pinned, pinned_at, updated_at

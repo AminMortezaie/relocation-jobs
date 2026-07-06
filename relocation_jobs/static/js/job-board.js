@@ -147,6 +147,7 @@ function sortPinnedJobsFirst(jobs) {
   if (!jobs?.length) return jobs || [];
   const pinned = jobs.filter((job) => job.pinned);
   const rest = jobs.filter((job) => !job.pinned);
+  pinned.sort((a, b) => String(b.pinned_at || "").localeCompare(String(a.pinned_at || "")));
   return [...pinned, ...rest];
 }
 
@@ -184,9 +185,9 @@ export function applyPinToCatalog(country, companyName, url, idempotencyKey, dat
     const list = company[bucket];
     if (!Array.isArray(list)) continue;
     for (const job of list) {
-      const isPinnedJob = pinned && jobMatchesPinTarget(job, url, idempotencyKey, data);
-      job.pinned = isPinnedJob;
-      job.pinned_at = isPinnedJob ? (data.pinned_at || "") : "";
+      if (!jobMatchesPinTarget(job, url, idempotencyKey, data)) continue;
+      job.pinned = pinned;
+      job.pinned_at = pinned ? (data.pinned_at || "") : "";
     }
     company[bucket] = sortPinnedJobsFirst(list);
   }

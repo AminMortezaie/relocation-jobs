@@ -6,9 +6,11 @@ Living backlog of planned work. Add items as we discover them; check off when sh
 
 ## Not-for-me soft delete (wrong location + user hides)
 
-**Status:** planned  
+**Status:** in progress (expired hide reason shipped 2026-07-03)  
 **Priority:** medium  
 **Context:** Rule 16 routes known wrong-location roles to the not-for-me bucket at panel read time. User-initiated “not for me” writes `job_tracking.not_for_me`. Wrong-location hides were read-time only until the one-shot `scripts/mark_wrong_location_jobs.py` backfill.
+
+**Shipped (2026-07-03):** **Expired** added as a user-chosen hide reason (`not_for_me_reason='expired'`) in the board hide picker — human review when a posting is closed; same tracking bucket and restore flow as other not-for-me reasons. Automatic expiry during fetch is still out of scope.
 
 ### Problem today
 
@@ -32,7 +34,7 @@ Soft delete means every hide that affects the board should have a durable `job_t
    - New `apply_wrong_location_hides(user_id, *, country_key=None)` in `positions/service.py`:
      - Scan catalog jobs (all countries or scoped).
      - Use same gate as panel: `job_fails_office_location_gate`.
-     - Skip rows already `not_for_me` with a user-chosen reason (`not_for_me`, `no_relocation`, etc.).
+     - Skip rows already `not_for_me` with a user-chosen reason (`not_for_me`, `expired`, `no_relocation`, etc.).
      - `INSERT … ON CONFLICT` with `not_for_me=1`, `not_for_me_reason='wrong_location'`.
    - Inverse already exists: `reconcile_wrong_location_hides` clears wrong-location hides when tags expand.
 
@@ -67,6 +69,38 @@ Soft delete means every hide that affects the board should have a durable `job_t
 - Hard-deleting catalog `matching_jobs` rows for wrong location (scrape merge already excludes new ones; stale rows kept by design).
 - Changing orphan reinjection for wrong-location applied jobs (product decision — see [business-rules.md](reference/business-rules.md) “Not specified”).
 - Per-user vs global wrong-location policy (today: per-user tracking, shared catalog).
+
+---
+
+## Board read model (fast pagination + mutation refresh)
+
+**Status:** planned (proposal written)  
+**Priority:** high  
+**Context:** `GET /api/board` rescans/flattens the catalog on many requests (~2s). Mutations (not-for-me on newest job, hide-empty, sort) require a **correct global board refresh** with pagination — client cache or ES are poor fits. See [reference/board-read-model-proposal.md](reference/board-read-model-proposal.md).
+
+### Problem / goal
+
+- Sub-second, authoritative board update after state changes (one round trip).
+- Millisecond-scale paginated reads at scale.
+- Postgres remains sole source of truth; `flatten.py` remains merge spec.
+
+### Approach (summary)
+
+1. **Phase 0:** mutation responses return board page + stats; cut extra round trips.
+2. **Phase 1:** `user_board_company` Postgres projection, synchronous write-through via `flatten_company()` (Option F).
+3. **Phase 2:** keyset cursor pagination on `(sort_ts, company_id)`.
+4. **Phase 4 (optional):** Redis ZSET + HASH read path (Option G) — [proposal](reference/board-read-model-proposal.md#g-redis-derived-board-zset-rank--row-cache--viable-read-accelerator).
+
+### Decision pending
+
+- **F only** vs **F + G** (Postgres truth + Redis board reads)
+- **Reject:** Redis-first UI with async Postgres writes
+
+### Done when
+
+- [ ] Proposal approved (open decisions in doc resolved)
+- [ ] Parity tests: projection vs legacy flatten
+- [ ] p95 targets in proposal met on realistic data
 
 ---
 

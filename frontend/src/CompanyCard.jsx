@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { companyWorkspacePath } from "./companyWorkspace";
 import { companyActivityTs, formatActivityBadge, formatAppliedLabel } from "./format";
 import { sortJobsForDisplay } from "./sort";
@@ -8,21 +8,52 @@ function companyKey(company) {
   return `${company.country}:${company.name}`;
 }
 
-function companyLocationLabels(company) {
-  if (Array.isArray(company.locations) && company.locations.length) {
-    return company.locations.map(
-      (loc) => loc.label || `${loc.city} (${loc.country_label || loc.country})`,
-    );
+const CITY_SEP = " · ";
+
+function splitLocationText(text) {
+  const trimmed = (text || "").trim();
+  if (!trimmed) return [];
+  if (trimmed.includes(CITY_SEP)) {
+    return trimmed.split(CITY_SEP).map((part) => part.trim()).filter(Boolean);
   }
-  if (Array.isArray(company.cities) && company.cities.length) return company.cities;
-  const single = (company.city || "").trim();
-  if (!single) return [];
-  return single.split(",").map((part) => part.trim()).filter(Boolean);
+  return trimmed.split(",").map((part) => part.trim()).filter(Boolean);
 }
 
-function formatCompanyCities(company) {
-  const labels = companyLocationLabels(company);
-  return labels.length ? labels.join(" · ") : "Set locations";
+function flattenJoinedLabels(labels) {
+  const out = [];
+  for (const label of labels) {
+    const parts = splitLocationText(label);
+    if (parts.length) out.push(...parts);
+  }
+  return out;
+}
+
+function companyLocationLabels(company) {
+  if (Array.isArray(company.locations) && company.locations.length) {
+    const labels = company.locations.map(
+      (loc) => loc.label || `${loc.city} (${loc.country_label || loc.country})`,
+    );
+    return flattenJoinedLabels(labels);
+  }
+  if (Array.isArray(company.cities) && company.cities.length) {
+    const labels = flattenJoinedLabels(company.cities);
+    if (labels.length) return labels;
+  }
+  return splitLocationText(company.city);
+}
+
+const CITY_PREVIEW_LIMIT = 3;
+
+function formatCityLabels(labels, { expanded = false } = {}) {
+  if (!labels.length) return { text: "Set locations", truncated: false, hiddenCount: 0 };
+  if (expanded || labels.length <= CITY_PREVIEW_LIMIT) {
+    return { text: labels.join(" · "), truncated: false, hiddenCount: 0 };
+  }
+  return {
+    text: labels.slice(0, CITY_PREVIEW_LIMIT).join(" · "),
+    truncated: true,
+    hiddenCount: labels.length - CITY_PREVIEW_LIMIT,
+  };
 }
 
 function emptyMessage(company, ui) {
@@ -44,6 +75,7 @@ function emptyMessage(company, ui) {
 }
 
 function CompanyCard({ company, ui }) {
+  const [citiesExpanded, setCitiesExpanded] = useState(false);
   const keyStr = companyKey(company);
   const collapsedSet = new Set(ui.collapsed || []);
   const showNotForMeSet = new Set(ui.showNotForMe || []);
@@ -56,6 +88,7 @@ function CompanyCard({ company, ui }) {
     company.fetch_ok && !company.fetch_problem ? " fetch-ok" : "",
   ].join("");
   const cityLabels = companyLocationLabels(company);
+  const cityDisplay = formatCityLabels(cityLabels, { expanded: citiesExpanded });
   const locationPayload = Array.isArray(company.locations) && company.locations.length
     ? company.locations
     : cityLabels.map((city) => ({ city }));
@@ -95,18 +128,39 @@ function CompanyCard({ company, ui }) {
             </button>
           </div>
           <div className="company-meta">
-            <button
-              type="button"
-              className="edit-city-btn"
-              data-country={company.country}
-              data-country-label={company.country_label || ""}
-              data-company={company.name}
-              data-locations={JSON.stringify(locationPayload)}
-              data-has-cities={cityLabels.length ? "true" : "false"}
-              title="Set or change company locations"
-            >
-              {formatCompanyCities(company)}
-            </button>
+            <div className="company-locations-wrap">
+              <button
+                type="button"
+                className="edit-city-btn"
+                data-country={company.country}
+                data-country-label={company.country_label || ""}
+                data-company={company.name}
+                data-locations={JSON.stringify(locationPayload)}
+                data-has-cities={cityLabels.length ? "true" : "false"}
+                title="Set or change company locations"
+              >
+                {cityDisplay.text}
+              </button>
+              {cityDisplay.truncated ? (
+                <button
+                  type="button"
+                  className="expand-cities-btn"
+                  onClick={() => setCitiesExpanded(true)}
+                  title="Show all locations"
+                >
+                  +{cityDisplay.hiddenCount} more
+                </button>
+              ) : citiesExpanded && cityLabels.length > CITY_PREVIEW_LIMIT ? (
+                <button
+                  type="button"
+                  className="expand-cities-btn"
+                  onClick={() => setCitiesExpanded(false)}
+                  title="Show fewer locations"
+                >
+                  Show less
+                </button>
+              ) : null}
+            </div>
             <span>{company.country_label}</span>
             <span>{countLabel}</span>
             {tailoredCount > 0 ? (

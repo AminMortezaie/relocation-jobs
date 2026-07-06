@@ -81,6 +81,13 @@ def init_catalog_schema() -> None:
 
         run_migration_once(conn, "catalog_extra_columns_v1", _apply_catalog_extra_columns)
         run_migration_once(conn, "catalog_jsonb_columns_v1", migrate_columns_to_jsonb)
+        run_migration_once(conn, "catalog_job_description_v1", _ensure_job_description_column)
+
+
+def _ensure_job_description_column(conn) -> None:
+    conn.execute(
+        "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS description_text TEXT NOT NULL DEFAULT ''"
+    )
 
 
 def _ensure_country_meta_columns(conn) -> None:
@@ -110,4 +117,7 @@ def _ensure_job_columns(conn) -> None:
     )
     conn.execute(
         "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS locations_json TEXT NOT NULL DEFAULT '[]'"
+    )
+    conn.execute(
+        "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS description_text TEXT NOT NULL DEFAULT ''"
     )

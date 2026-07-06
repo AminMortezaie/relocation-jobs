@@ -6,7 +6,7 @@
   <title>Relocation Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=38" />
+  <link rel="stylesheet" href="/static/styles.css?v=39" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
@@ -353,6 +353,21 @@
                     <div class="country-chips add-company-country-chips" role="group" aria-labelledby="addCompanyCountryLabel">
                       <div class="country-chips-list" id="addCompanyCountryOptions"></div>
                     </div>
+                    <div class="custom-city-add-row">
+                      <input
+                        type="text"
+                        class="custom-city-add-input"
+                        id="addCompanyCustomCountryInput"
+                        placeholder="Add a country…"
+                        autocomplete="off"
+                        spellcheck="false"
+                      />
+                      <button
+                        type="button"
+                        class="dialog-btn dialog-btn-ghost custom-city-add-btn"
+                        id="addCompanyCustomCountryBtn"
+                      >Add country</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -570,7 +585,7 @@
     </form>
   </div>
 
-  <script type="module" crossorigin src="/static/dist/board.js"></script>
+  <script type="module" crossorigin src="/static/dist/board.js?v=2"></script>
   <script type="module" src="/static/js/main.js?v=102"></script>
 </body>
 </html>

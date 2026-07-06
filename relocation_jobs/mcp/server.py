@@ -20,7 +20,12 @@ def _json(payload) -> str:
 
 @mcp.tool()
 def get_job_context(country: str, company: str, url: str) -> str:
-    """Load job and tracking context for an application (title, ATS, flags, artifact state).
+    """Load job and tracking context for an application (title, ATS, JD text, flags, artifact state).
+
+    Use description_text as the job description for reframe phases — do not scrape the posting
+    URL in chat. When has_description is false (needs_fetch is true), the user should fetch the
+    JD on the panel (company workspace → Fetch job description) or via catalog enrich, then call
+    this tool again.
 
     can_save_tailored_tex is true whenever the job exists in the catalog — queue membership
     (pinned / looking_to_apply) is not required. Use the returned country, company, and url
@@ -190,6 +195,49 @@ def render_pdf(country: str, company: str, url: str, master_resume_slug: str = "
 def mark_applied(country: str, company: str, url: str, applied: bool = True) -> str:
     """Mark the job applied (or unapplied) in the panel tracking DB."""
     return _json(service.mark_job_applied(country, company, url, applied=applied))
+
+
+@mcp.tool()
+def list_supported_countries() -> str:
+    """List catalog country keys (germany, netherlands, uk, portugal) for add_company."""
+    items = service.list_supported_countries()
+    return _json([item.model_dump() for item in items])
+
+
+@mcp.tool()
+def list_ats_types() -> str:
+    """List ATS type ids for add_company (use auto to detect from the careers URL)."""
+    items = service.list_ats_types()
+    return _json([item.model_dump() for item in items])
+
+
+@mcp.tool()
+def add_company(
+    name: str,
+    careers_url: str,
+    country: str = "auto",
+    countries: list[str] | None = None,
+    ats: str = "auto",
+    locations_json: str = "",
+) -> str:
+    """Add a company to the catalog — same flow as the panel Add company dialog.
+
+    Required: name and careers_url (public careers or ATS board URL).
+    Optional: country or countries (omit or use auto to detect from URL / relocate.me);
+    ats (auto, greenhouse, lever, ashby, … — call list_ats_types); locations_json as a JSON
+    array of objects with country and city keys when country is set manually.
+    Runs ATS detection and metadata enrichment like the panel. Returns workspace_path
+    for the company workspace on the panel.
+    """
+    locations = locations_json.strip() or None
+    return _json(service.add_company(
+        name,
+        careers_url,
+        country=country,
+        countries=countries,
+        ats=ats,
+        locations=locations,
+    ))
 
 
 def main() -> None:

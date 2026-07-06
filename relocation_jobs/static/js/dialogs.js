@@ -2,7 +2,7 @@
 
 import { state } from "./state.js";
 import { $, escapeAttr, escapeHtml, toast } from "./utils.js";
-import { addCompany, updateCareersUrl, updateCompanyCity, updateCompanyName, fetchLocations, fetchAtsTypes, addCustomLocation } from "./api.js";
+import { addCompany, updateCareersUrl, updateCompanyCity, updateCompanyName, fetchLocations, fetchAtsTypes, addCustomLocation, addCustomCountry } from "./api.js";
 import { loadJobs, loadCities } from "./data.js";
 import { migrateCompanyKeyInState } from "./storage.js";
 
@@ -14,9 +14,10 @@ function getAddCompanyCountryOptions() {
 
 let addCompanyPickerLocations = [];
 
-export function populateAddCompanyCountryPicker() {
+export function populateAddCompanyCountryPicker({ force = false } = {}) {
   const container = $("addCompanyCountryOptions");
-  if (!container || container.dataset.ready === "1") return;
+  if (!container) return;
+  if (!force && container.dataset.ready === "1") return;
 
   container.innerHTML = getAddCompanyCountryOptions()
     .map(
@@ -559,6 +560,34 @@ function locationFromApi(saved, countryLabel = "") {
   };
 }
 
+async function addCustomCompanyCountry(label) {
+  const trimmed = (label || "").trim();
+  if (!trimmed) {
+    toast("Enter a country name");
+    return false;
+  }
+  const saved = await addCustomCountry(trimmed);
+  if (!saved?.id) return false;
+
+  const { loadCountries } = await import("./data.js");
+  await loadCountries();
+  populateAddCompanyCountryPicker({ force: true });
+
+  const selected = new Set(getAddCompanySelectedCountries());
+  selected.add(saved.id);
+  setAddCompanyCountries([...selected]);
+  toast(`Added ${saved.label}`);
+  return true;
+}
+
+function handleAddCompanyCustomCountryClick() {
+  const input = $("addCompanyCustomCountryInput");
+  const label = (input?.value || "").trim();
+  void addCustomCompanyCountry(label).then((ok) => {
+    if (ok && input) input.value = "";
+  });
+}
+
 async function addCustomCompanyLocation(country, city, countryLabel = "") {
   const trimmed = (city || "").trim();
   if (!trimmed) {
@@ -1032,6 +1061,12 @@ export function bindDialogEvents() {
   $("addCompanyForm").addEventListener("submit", submitAddCompany);
 
   $("addCompanyCountryAutoBtn")?.addEventListener("click", setAddCompanyCountryAuto);
+  $("addCompanyCustomCountryBtn")?.addEventListener("click", handleAddCompanyCustomCountryClick);
+  $("addCompanyCustomCountryInput")?.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    handleAddCompanyCustomCountryClick();
+  });
   $("addCompanyAtsAutoBtn")?.addEventListener("click", () => setAddCompanyAts("auto"));
   $("addCompanyLocationsClear")?.addEventListener("click", () => setAddCompanyLocations([]));
 

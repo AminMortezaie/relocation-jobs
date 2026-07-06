@@ -72,6 +72,7 @@ ATS_TYPE_CHOICES: tuple[tuple[str, str], ...] = (
     ("teamtailor", "Teamtailor"),
     ("workable", "Workable"),
     ("workday", "Workday"),
+    ("hibob", "HiBob"),
 )
 
 BOL_CAREERS_API = "https://careers.bol.com/wp-json/wp/v2/hggns/multilanguage_vacature_search"
@@ -116,6 +117,7 @@ KNOWN_ATS: dict[str, tuple[str, str]] = {
     "justtrack":             ("ashby",         "https://jobs.ashbyhq.com/justtrack"),
     "movingimage":           ("movingimage",   "https://www.movingimage.com/careers/"),
     "N26":                   ("greenhouse",    "https://boards.greenhouse.io/n26"),
+    "GetYourGuide":          ("greenhouse",    "https://boards.greenhouse.io/getyourguide"),
     "Onefootball":           ("applytojob",    "https://onefootball.applytojob.com/"),
     "Prime Intellect":       ("ashby",         "https://jobs.ashbyhq.com/PrimeIntellect"),
     "Project A Ventures":    ("project_a",     "https://www.project-a.vc/careers"),
@@ -125,12 +127,15 @@ KNOWN_ATS: dict[str, tuple[str, str]] = {
     "Vimcar":                ("workable",      "https://apply.workable.com/shiftmove/"),
     "Deutsche Boerse":       ("job_shop",      "https://careers.deutsche-boerse.com/"),
     "Redcare - Dusseldorf":  ("smartrecruiters", "https://api.smartrecruiters.com/v1/companies/Redcare-Pharmacy/postings"),
+    "Wolt":                  ("greenhouse",    "https://boards.greenhouse.io/wolt"),
+    "Mobile.de":             ("hibob",         "https://mobilede.careers.hibob.com/jobs"),
 }
 
 FORCE_KNOWN_ATS = frozenset({
     "bol", "adjoe",
     "Deutsche Boerse",
-    "Highsnobiety", "ToolTime", "Vimcar",
+    "GetYourGuide",
+    "Highsnobiety", "ToolTime", "Vimcar", "Wolt", "Mobile.de",
     "ASML", "Atlassian", "Booking.com", "C Teleport", "Elements", "EPAM",
     "EVBox", "Just Eat Takeaway.com", "TomTom", "ZooStation",
 })

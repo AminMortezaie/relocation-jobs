@@ -15,6 +15,12 @@ SUPPORTED_COUNTRIES: frozenset[str] = frozenset(
     {"germany", "netherlands", "uk", "portugal"}
 )
 
+
+def supported_countries() -> frozenset[str]:
+    from relocation_jobs.core.location_tags import supported_country_keys
+
+    return supported_country_keys()
+
 # Legacy git-archive filenames (companies/*.json) — not read at runtime.
 COUNTRY_ARCHIVE_FILENAMES: dict[str, str] = {
     "germany": "germany_companies.json",

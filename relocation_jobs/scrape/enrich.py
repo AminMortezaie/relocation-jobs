@@ -5,16 +5,23 @@ from datetime import date
 
 import httpx
 
-from relocation_jobs.core.ats_detection import PLAYWRIGHT_AVAILABLE
 from relocation_jobs.core.scrape_cancel import FetchCancelled, raise_if_cancelled
 from relocation_jobs.fetch.log import log_event
 from relocation_jobs.scrape.boards._async import run_sync
-from relocation_jobs.scrape.descriptions import detect_visa_relocation, html_to_text
+from relocation_jobs.scrape.descriptions import detect_visa_relocation
 from relocation_jobs.scrape.job_text import fetch_job_description
+from relocation_jobs.scrape.merge import job_has_listing_location
 
 
 def _today() -> str:
     return date.today().isoformat()
+
+
+def _job_enrichment_complete(job: dict) -> bool:
+    has_visa = job.get("visa_sponsorship") is not None
+    has_desc = bool((job.get("description_text") or "").strip())
+    has_location = job_has_listing_location(job)
+    return has_visa and has_desc and has_location
 
 
 async def fetch_job_description_async(
@@ -22,19 +29,7 @@ async def fetch_job_description_async(
     url: str,
     ats_type: str | None = None,
 ) -> str:
-    if ats_type in ("greenhouse", "greenhouse_eu", "lever", "lever_eu", "recruitee", "ashby"):
-        return await run_sync(fetch_job_description, url, ats_type)
-    try:
-        response = await client.get(url, timeout=15.0)
-        if response.is_success:
-            text = html_to_text(response.text)
-            if len(text) > 200:
-                return text
-    except Exception:
-        pass
-    if PLAYWRIGHT_AVAILABLE:
-        return await run_sync(fetch_job_description, url, ats_type)
-    return ""
+    return await run_sync(fetch_job_description, url, ats_type)
 
 
 async def enrich_one_job_async(
@@ -44,11 +39,14 @@ async def enrich_one_job_async(
     fetched: str,
     only_missing: bool,
 ) -> None:
-    if only_missing and job.get("visa_sponsorship") is not None:
+    if only_missing and _job_enrichment_complete(job):
         return
 
     text = await fetch_job_description_async(client, job["url"], ats_type)
     job["visa_sponsorship"] = detect_visa_relocation(text)
+    stripped = (text or "").strip()
+    if stripped:
+        job["description_text"] = stripped
     if not (job.get("fetched") or "").strip():
         job["fetched"] = fetched
 

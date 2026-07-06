@@ -75,7 +75,7 @@ Tracking (applied, not-for-me, company-level applied) is stored per user in Post
 
 **Company workspace** (`/company/<country>/<company-slug>`) — open from a company name on the board to see all positions, tailored LaTeX, PDF preview, and re-render. CV/PDF badges appear on the board when MCP has prepared artifacts for a role.
 
-**Claude Desktop MCP** — `python3 scripts/mcp_server.py` exposes tools to tailor resumes per job, validate, render PDF, and mark applied. See [docs/reference/mcp-application.md](docs/reference/mcp-application.md).
+**Claude Desktop MCP** — `python3 scripts/mcp_server.py` exposes tools to tailor resumes per job, validate, render PDF, mark applied, and **add companies** (same flow as the panel Add company dialog). See [docs/reference/mcp-application.md](docs/reference/mcp-application.md).
 
 ### Build company lists
 

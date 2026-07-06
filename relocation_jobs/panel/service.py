@@ -7,8 +7,8 @@ from relocation_jobs.catalog.repo import (
     load_country_catalog,
     load_country_meta,
 )
-from relocation_jobs.core.location_tags import COUNTRY_LABELS, sync_company_location_fields
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
+from relocation_jobs.core.location_tags import country_label, sync_company_location_fields
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
 from relocation_jobs.users.repo import (
     load_company_tracking,
     load_job_status_history,
@@ -85,7 +85,7 @@ def _file_meta_row(country_key: str, data: dict) -> dict | None:
         return None
     if not data.get("companies") and not data.get("source"):
         return None
-    label = COUNTRY_LABELS.get(country_key, country_key)
+    label = country_label(country_key)
     return {
         "country": country_key,
         "label": label,
@@ -234,7 +234,7 @@ def _flatten_companies_page_streaming(
         for country_key, company in batch:
             if has_more:
                 break
-            label = COUNTRY_LABELS.get(country_key, country_key)
+            label = country_label(country_key)
             row = flatten_company(
                 company,
                 country_key=country_key,
@@ -295,7 +295,7 @@ def _flatten_companies_page_by_activity(
         if not batch:
             break
         for country_key, company in batch:
-            label = COUNTRY_LABELS.get(country_key, country_key)
+            label = country_label(country_key)
             row = flatten_company(
                 company,
                 country_key=country_key,
@@ -318,7 +318,7 @@ def _flatten_companies_page_by_activity(
 def _country_keys_for_filters(filters: FlattenFilters) -> list[str]:
     if filters.country_key and filters.country_key != "all":
         return [filters.country_key]
-    return sorted(SUPPORTED_COUNTRIES)
+    return sorted(supported_countries())
 
 
 def flatten_with_filters(filters: FlattenFilters) -> tuple[list[dict], list[dict], int]:
@@ -333,7 +333,7 @@ def flatten_with_filters(filters: FlattenFilters) -> tuple[list[dict], list[dict
         data = load_country(key, cache=country_cache)
         if not data.get("companies") and not data.get("source"):
             continue
-        label = COUNTRY_LABELS.get(key, key)
+        label = country_label(key)
 
         for company in data.get("companies", []):
             if company.get("fetch_problem"):

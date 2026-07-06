@@ -70,12 +70,17 @@ def _session_postgres(_session_env):
 @pytest.fixture(autouse=True)
 def reset_custom_cities_cache():
     from relocation_jobs.catalog.cache import invalidate_country_cache
-    from relocation_jobs.core.location_tags import _invalidate_custom_cities_cache
+    from relocation_jobs.core.location_tags import (
+        _invalidate_custom_cities_cache,
+        _invalidate_custom_countries_cache,
+    )
 
     _invalidate_custom_cities_cache()
+    _invalidate_custom_countries_cache()
     invalidate_country_cache()
     yield
     _invalidate_custom_cities_cache()
+    _invalidate_custom_countries_cache()
     invalidate_country_cache()
 
 

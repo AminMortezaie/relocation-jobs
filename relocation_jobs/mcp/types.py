@@ -72,6 +72,22 @@ class JobContext(BaseSchema):
     has_tailored_tex: bool = False
     has_pdf: bool = False
     pdf_filename: str = ""
+    description_text: str = ""
+    description_html: str = ""
+    has_description: bool = False
+    needs_fetch: bool = False
+
+
+class PositionDescription(BaseSchema):
+    idempotency_key: str
+    country: str = ""
+    company: str = ""
+    url: str = ""
+    title: str = ""
+    description_text: str = ""
+    description_html: str = ""
+    has_description: bool = False
+    needs_fetch: bool = False
 
 
 class ApplicationQueueItem(BaseSchema):
@@ -101,6 +117,7 @@ class CompanyPositionApplication(BaseSchema):
     tailored_tex_updated_at: str = ""
     pdf_updated_at: str = ""
     pdf_filename: str = ""
+    has_description: bool = False
 
 
 class CompanyApplicationsResponse(BaseSchema):
@@ -119,3 +136,28 @@ class ApplicationTexDetail(BaseSchema):
     content: str = ""
     master_resume_slug: str = ""
     updated_at: str = ""
+
+
+class SupportedCountry(BaseSchema):
+    id: str
+    label: str
+
+
+class AtsTypeOption(BaseSchema):
+    id: str
+    label: str
+
+
+class AddCompanyResult(BaseSchema):
+    ok: bool = True
+    country: str
+    country_label: str
+    name: str
+    company_slug: str
+    careers_url: str
+    ats_type: str = ""
+    ats_url: str = ""
+    city: str = ""
+    size: str = ""
+    matching_jobs_count: int = 0
+    workspace_path: str = ""

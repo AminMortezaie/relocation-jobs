@@ -234,6 +234,13 @@ def _extract_workday(url: str) -> str:
     return f"{api}|{base}" if base else api
 
 
+def _extract_hibob(url: str) -> str:
+    match = re.search(r"https?://([a-z0-9-]+)\.careers\.hibob\.com", url, re.I)
+    if match:
+        return f"https://{match.group(1)}.careers.hibob.com/jobs"
+    return url
+
+
 XHR_ATS_PATTERNS = [
     # (url_regex, ats_type, extractor_fn)
     (r"personio\.com/api/careers/jobs",              "personio",
@@ -253,6 +260,7 @@ XHR_ATS_PATTERNS = [
     (r"api-prod\.letsdeel\.com",                     "deel",
      lambda url: _detect_deel_from_url(url)[1] or url),
     (r"/wday/cxs/[^/]+/[^/]+/jobs",                 "workday",         _extract_workday),
+    (r"careers\.hibob\.com/api/job-ad",             "hibob",           _extract_hibob),
 ]
 
 # Static HTML patterns as a secondary check (for pages that load ATS links in HTML
@@ -292,6 +300,8 @@ HTML_ATS_PATTERNS = [
      lambda m: f"https://join.com/companies/{m.group(1)}"),
     (r"jobs\.deel\.com/([a-zA-Z0-9_-]+)",             "deel",
      lambda m: f"https://jobs.deel.com/{m.group(1)}"),
+    (r"([a-z0-9-]+)\.careers\.hibob\.com",           "hibob",
+     lambda m: f"https://{m.group(1)}.careers.hibob.com/jobs"),
     (_WORKDAY_BOARD_URL_RE.pattern,                  "workday",
      _workday_url_from_html_match),
 ]
@@ -399,6 +409,16 @@ def _detect_smartrecruiters_from_redcare_careers(
     return None, None
 
 
+def _detect_hibob_from_url(careers_url: str) -> tuple[str | None, str | None]:
+    match = re.search(r"https?://([a-z0-9-]+)\.careers\.hibob\.com", careers_url or "", re.I)
+    if not match:
+        return None, None
+    slug = match.group(1).lower()
+    if slug in ("www", "api", "careers", "app"):
+        return None, None
+    return "hibob", f"https://{slug}.careers.hibob.com/jobs"
+
+
 def _detect_recruitee_from_careers_host(careers_url: str) -> tuple[str | None, str | None]:
     """careers.{slug}.com / careers.{slug}.io often maps to {slug}.recruitee.com."""
     parsed = urlparse(careers_url)
@@ -474,6 +494,7 @@ def _detect_ats_from_careers_url(careers_url: str) -> tuple[str | None, str | No
         _detect_workday_from_url,
         _detect_hirehive_from_url,
         _detect_teamtailor_from_url,
+        _detect_hibob_from_url,
         _detect_deel_from_url,
         _detect_join_from_url,
         _detect_applytojob_from_url,
@@ -589,6 +610,7 @@ ATS_HINT_URL_DETECTORS = (
     _detect_workday_from_url,
     _detect_hirehive_from_url,
     _detect_teamtailor_from_url,
+    _detect_hibob_from_url,
     _detect_deel_from_url,
     _detect_join_from_url,
     _detect_applytojob_from_url,
@@ -636,6 +658,7 @@ def guess_ats_url_from_name(ats_type: str, company_name: str) -> str:
         "applytojob": lambda s: f"https://{s}.applytojob.com/",
         "bamboohr": lambda s: f"https://{s}.bamboohr.com/careers/list",
         "hirehive": lambda s: f"https://{s}.hirehive.com",
+        "hibob": lambda s: f"https://{s}.careers.hibob.com/jobs",
     }
     builder = builders.get(ats_type)
     return builder(slug) if builder else ""

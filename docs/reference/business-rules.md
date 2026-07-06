@@ -22,7 +22,7 @@ Plain-language contracts extracted from the code (`catalog_service`, `db`, `cata
 
 7. **Reject and reapply** — Rejecting moves a job to the `rejected_jobs` list on read; it does not clear applied. Reapply clears rejection only and returns the job to the main `jobs` list.
 
-8. **Not for me** — Marks the job hidden from main and rejected reinjection paths; it appears only under `not_for_me_jobs`. Orphan reinjection skips not-for-me rows.
+8. **Not for me** — Marks the job hidden from main and rejected reinjection paths; it appears only under `not_for_me_jobs`. Orphan reinjection skips not-for-me rows. Hide reasons stored on `job_tracking.not_for_me_reason` include `not_for_me`, `expired` (posting closed — human review), `wrong_location`, and `no_relocation`.
 
 9. **Waiting for referral** — Requires a LinkedIn URL when enabled; stored on the tracking row. Independent of applied/rejected buckets unless filters say otherwise.
 

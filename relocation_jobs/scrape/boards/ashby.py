@@ -1,13 +1,21 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from collections.abc import Callable
+
+import requests
 
 from relocation_jobs.core.ats_detection import HEADERS
 from relocation_jobs.scrape.listing import listing_job
 from relocation_jobs.scrape.playwright_board import scrape_board_with_playwright
 
 PlaywrightFallback = Callable[[str], list[dict]]
+
+_ASHBY_JOB_URL_RE = re.compile(
+    r"ashbyhq\.com/([^/?#]+)/([0-9a-f-]{36})",
+    re.I,
+)
 
 
 def ashby_board_slug(ats_url: str) -> str:
@@ -16,6 +24,50 @@ def ashby_board_slug(ats_url: str) -> str:
 
 def ashby_job_board_api_url(slug: str) -> str:
     return f"https://api.ashbyhq.com/posting-api/job-board/{slug}"
+
+
+def ashby_job_ids_from_url(url: str) -> tuple[str, str] | None:
+    match = _ASHBY_JOB_URL_RE.search(url or "")
+    if not match:
+        return None
+    return match.group(1), match.group(2)
+
+
+def _ashby_location_label(row: dict) -> str:
+    location = row.get("location") or row.get("locationName")
+    if isinstance(location, str):
+        return location.strip()
+    if isinstance(location, dict):
+        return (location.get("name") or location.get("city") or "").strip()
+    return ""
+
+
+def ashby_job_detail(org: str, job_id: str) -> tuple[str, str]:
+    slug = (org or "").strip()
+    posting_id = (job_id or "").strip()
+    if not slug or not posting_id:
+        return "", ""
+    try:
+        response = requests.get(
+            f"{ashby_job_board_api_url(slug)}?includeCompensationRanges=true",
+            headers=HEADERS,
+            timeout=10,
+        )
+        if not response.ok:
+            return "", ""
+        for job in response.json().get("jobs") or []:
+            if job.get("id") == posting_id or posting_id in (job.get("jobUrl") or ""):
+                html = (job.get("descriptionHtml") or "").strip()
+                if html:
+                    return html, _ashby_location_label(job)
+    except Exception:
+        pass
+    return "", ""
+
+
+def ashby_job_content(org: str, job_id: str) -> str:
+    content, _location = ashby_job_detail(org, job_id)
+    return content
 
 
 def parse_ashby_api_jobs(payload: dict, ats_url: str) -> list[dict]:

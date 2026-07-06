@@ -139,3 +139,26 @@ def test_admin_panel_stats_new_jobs_today_from_fetch_runs(v2_auth_client, seeded
 
     stats = v2_auth_client.get("/api/admin/panel-stats?country=uk&timezone=UTC").get_json()
     assert stats["latest_fetch_new_jobs"] == 6
+
+
+def test_countries_list_includes_custom_country(v2_auth_client, tmp_data_dir):
+    created = v2_auth_client.post("/api/countries", json={"label": "Spain"}).get_json()
+    assert created["ok"] is True
+    assert created["country"] == {"id": "spain", "label": "Spain"}
+
+    countries = v2_auth_client.get("/api/countries").get_json()
+    ids = {item["id"] for item in countries}
+    assert "spain" in ids
+
+
+def test_add_custom_city_requires_supported_country(v2_auth_client, tmp_data_dir):
+    resp = v2_auth_client.post("/api/locations", json={"country": "spain", "city": "Madrid"})
+    assert resp.status_code == 400
+
+    v2_auth_client.post("/api/countries", json={"label": "Spain"})
+    saved = v2_auth_client.post(
+        "/api/locations",
+        json={"country": "spain", "city": "Madrid"},
+    ).get_json()
+    assert saved["ok"] is True
+    assert saved["location"]["city"] == "Madrid"

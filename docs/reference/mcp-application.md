@@ -22,7 +22,7 @@ Related: [architecture.md](architecture.md), [business-rules.md](business-rules.
 | Master `.tex` + tailored `.tex` per job in DB | Browser auto-submit (Playwright) |
 | Deterministic validation before PDF render | ATS-specific form fillers |
 | Local LaTeX → PDF (`tectonic` / `pdflatex`) | Batch unattended apply |
-| `mark_applied` via existing `positions` service | JD fetch / keyword scoring |
+| `mark_applied` via existing `positions` service | Keyword scoring / auto-fetch JD in chat |
 
 ---
 
@@ -76,7 +76,7 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 
 | Tool | Purpose |
 |------|---------|
-| `get_job_context` | Job + tracking + `master_resume_slug`, `has_tailored_tex` / `has_pdf`, `can_save_tailored_tex` |
+| `get_job_context` | Job + tracking + `description_text` (JD), `has_description` / `needs_fetch`, `master_resume_slug`, `has_tailored_tex` / `has_pdf`, `can_save_tailored_tex` |
 | `list_application_queue` | Pinned + looking-to-apply jobs (discovery only — not required to save) |
 | `list_master_resumes` | All master variants |
 | `get_master_resume` / `save_master_resume` | Read/write master tex by slug |
@@ -87,6 +87,9 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 | `validate_tex` | Structure + fact checks vs master |
 | `render_pdf` | Compile → store PDF bytes |
 | `mark_applied` | Panel tracking |
+| `list_supported_countries` | Country keys for `add_company` (germany, netherlands, uk, portugal) |
+| `list_ats_types` | ATS ids for `add_company` (`auto` detects from careers URL) |
+| `add_company` | Add employer to catalog — same flow as panel **Add company** (name, careers URL, optional country/ATS/locations) |
 
 ### Panel integration (company workspace)
 
@@ -159,6 +162,8 @@ get_job_context(country, company, url)
 
 Use `title`, `ats_url`, flags (`looking_to_apply`, `pinned`, `in_application_queue`), `can_save_tailored_tex`, and whether tailored tex/PDF already exist.
 
+**Job description:** use `description_text` from this response as the JD for all pipeline phases — do **not** open or scrape the posting URL in chat. When `has_description` is false (`needs_fetch` is true), ask the user to open the company workspace for this position and click **Fetch job description** (or re-run catalog enrich locally), then call `get_job_context` again before phase 1.
+
 `can_save_tailored_tex` is true whenever the job is in the catalog. **Re-runs and overwrites do not require** pinned or looking-to-apply — call `save_tailored_tex` with the `url` / `country` / `company` from this response.
 
 #### 3. Load profile and pipeline prompts
@@ -195,7 +200,7 @@ Quick sanity check: `get_mcp_status()` → `pipeline_prompt_count` (count only, 
 
 For each string in `pipeline[0]`, `pipeline[1]`, … **in order**:
 
-1. Run **only that phase** for this job (use `get_job_context` + job URL + masters as needed).
+1. Run **only that phase** for this job (use `get_job_context.description_text` as the JD + masters as needed).
 2. Output **markdown** (not LaTeX) until the final phase.
 3. End with **go ahead?** and **wait** for the user before the next phase.
 4. **Mirror additions (phase 3):** add **1–2 new bullets** to one real role for ATS/JD similarity — **all master bullets kept**. User approves new bullets in phase 2–3. Never remove or shorten master content without explicit user approval.
@@ -225,15 +230,34 @@ Upload the PDF to the ATS manually, then:
 mark_applied(country, company, url, applied=true)
 ```
 
+#### Add a company (panel parity)
+
+Same inputs as the panel **Add company** dialog:
+
+```text
+list_supported_countries()          # optional — country hints
+list_ats_types()                    # optional — or use ats="auto"
+add_company(
+  name="Example GmbH",
+  careers_url="https://boards.greenhouse.io/example",
+  country="germany",                # or "auto" / omit to detect
+  ats="auto",                       # or greenhouse, lever, ashby, …
+  locations_json='[{"country":"germany","city":"Berlin"}]'  # optional
+)
+```
+
+Returns `workspace_path` (e.g. `/company/germany/example-gmbh`) for the panel company workspace. After adding, run a **Fetch** on the panel (or `scrape_jobs.py`) to load open roles.
+
 #### Paste into Claude Desktop
 
 ```text
 Apply using the mcp-resume-reframe skill to the first job in my UK queue:
 1. list_application_queue(country="uk") and pick one job
-2. get_job_context + get_reframe_pipeline
-3. Run pipeline phase 1 only — markdown, then ask me to go ahead
-4. Continue one phase per turn until I accept the full draft
-5. save_tailored_tex after final acceptance — do not render_pdf; I'll render on the panel
+2. get_job_context + get_reframe_pipeline — use description_text as the JD
+3. If has_description is false, ask me to fetch the JD on the panel before phase 1
+4. Run pipeline phase 1 only — markdown, then ask me to go ahead
+5. Continue one phase per turn until I accept the full draft
+6. save_tailored_tex after final acceptance — do not render_pdf; I'll render on the panel
 ```
 
 ### Workflow (short)
@@ -281,6 +305,10 @@ Correct: there is no `run_pipeline` tool. Prompts are **data**, not an executabl
 **`get_job_context` shows `null` for `visa_sponsorship` or `ats_score`**
 
 Normal when the catalog or your tracking has no value for those fields.
+
+**`description_text` is empty / `needs_fetch` is true**
+
+The JD is not stored in the catalog yet. On the panel, open `/company/<country>/<company-slug>`, select the position, click **Fetch job description**, then call `get_job_context` again. Do not scrape the ATS URL in Claude chat. After a local enrich run, `description_text` is filled automatically for newly fetched jobs.
 
 **Tailored CV not visible on company workspace**
 

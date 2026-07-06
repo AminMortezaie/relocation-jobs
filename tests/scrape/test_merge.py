@@ -64,3 +64,23 @@ class TestMergeMatchingJobs:
         assert new_jobs == []
         assert merged[0]["fetched"] == "2025-01-01"
         assert merged[0]["last_seen"] != "2025-01-01T00:00:00+00:00"
+
+    def test_refreshes_location_from_latest_board_scrape(self):
+        existing = [
+            {
+                "title": "Engineer",
+                "url": "https://example.com/j/1?gh_jid=1",
+                "fetched": "2025-01-01",
+                "location": "London, UK",
+            },
+        ]
+        scraped = [
+            {
+                "title": "Engineer",
+                "url": "https://example.com/j/1?gh_jid=1",
+                "location": "Berlin, Germany",
+            },
+        ]
+        merged, preserved, _, _, _ = merge_matching_jobs(existing, scraped)
+        assert preserved == 1
+        assert merged[0]["location"] == "Berlin, Germany"

@@ -1,5 +1,6 @@
 {
   "offer": {
-    "description": "<p>Relocation package available including visa sponsorship.</p>"
+    "description": "<p>Relocation package available including visa sponsorship.</p>",
+    "requirements": "<h4><strong>What awaits you</strong></h4><p>Build our platform using TypeScript and React.</p><ul><li>Ship features end to end</li><li>Collaborate with product</li></ul>"
   }
 }

@@ -5,24 +5,43 @@ import os
 import tempfile
 from pathlib import Path
 
-from relocation_jobs.catalog.repo import get_company, get_job_by_url
+from relocation_jobs.catalog.repo import (
+    get_company,
+    get_job_by_idempotency_key,
+    get_job_by_url,
+    update_job_description_text,
+)
+from relocation_jobs.companies.service import add_company as catalog_add_company
+from relocation_jobs.companies.service import list_ats_types as catalog_list_ats_types
+from relocation_jobs.core.location_tags import COUNTRY_LABELS, all_country_labels
+from relocation_jobs.core.paths import supported_countries
+from relocation_jobs.scrape.descriptions import format_job_description
+from relocation_jobs.scrape.job_text import fetch_job_description
 from relocation_jobs.core.db import _normalize_url
 from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.db.users import get_user_by_username
 from relocation_jobs.mcp import repo, render, validate
 from relocation_jobs.mcp.names import application_pdf_filename, master_pdf_filename
 from relocation_jobs.mcp.types import (
+    AddCompanyResult,
     ApplicationProfile,
     ApplicationQueueItem,
     ApplicationTexDetail,
+    AtsTypeOption,
     CompanyApplicationsResponse,
     CompanyPositionApplication,
     JobContext,
     MasterResumeSummary,
+    PositionDescription,
     RenderResult,
+    SupportedCountry,
     ValidationResult,
 )
+from relocation_jobs.core.location_tags import job_fails_office_location_gate
+from relocation_jobs.panel.tracking import resolve_track
 from relocation_jobs.positions.service import set_job_applied
+from relocation_jobs.positions.state import position_view_from_row
+from relocation_jobs.positions.types import PositionBucket
 from relocation_jobs.users.repo import load_job_tracking
 
 
@@ -82,6 +101,18 @@ def _resolve_master_slug(
     )
 
 
+def _job_description_fields(job: dict) -> dict[str, str | bool]:
+    raw = (job.get("description_text") or "").strip()
+    readable, display_html = format_job_description(raw)
+    has = bool(readable)
+    return {
+        "description_text": readable,
+        "description_html": display_html,
+        "has_description": has,
+        "needs_fetch": not has,
+    }
+
+
 def get_job_context(
     country: str,
     company: str,
@@ -104,6 +135,7 @@ def get_job_context(
     app_state = _application_state(uid, idem_key)
     pinned = bool(row.get("pinned"))
     looking_to_apply = bool(row.get("looking_to_apply"))
+    description = _job_description_fields(job)
 
     return JobContext(
         country=country_key,
@@ -126,6 +158,10 @@ def get_job_context(
         has_tailored_tex=app_state["has_tex"],
         has_pdf=app_state["has_pdf"],
         pdf_filename=_application_pdf_filename(uid, company_name),
+        description_text=str(description["description_text"]),
+        has_description=bool(description["has_description"]),
+        needs_fetch=bool(description["needs_fetch"]),
+        description_html=str(description.get("description_html") or ""),
     )
 
 
@@ -207,12 +243,23 @@ def list_company_applications(
 
     positions: list[CompanyPositionApplication] = []
     for job in company_row.get("matching_jobs") or []:
+        track = resolve_track(
+            tracking,
+            country=country_key,
+            company_name=company_name,
+            job=job,
+        )
+        wrong_location, _ = job_fails_office_location_gate(
+            job, company_row, catalog_country=country_key,
+        )
+        if position_view_from_row(track, wrong_location=wrong_location).bucket == PositionBucket.NOT_FOR_ME:
+            continue
         catalog_url = (job.get("url") or "").strip()
         idem_key = (
             (job.get("idempotency_key") or "").strip()
             or job_idempotency_key(catalog_url)
         )
-        row = _tracking_row(tracking, country_key, company_name, catalog_url)
+        row = track
         app = app_by_key.get(idem_key, {})
         positions.append(CompanyPositionApplication(
             title=(job.get("title") or "").strip(),
@@ -230,6 +277,7 @@ def list_company_applications(
             tailored_tex_updated_at=(app.get("tailored_tex_updated_at") or "").strip(),
             pdf_updated_at=(app.get("pdf_updated_at") or "").strip(),
             pdf_filename=application_pdf_filename(profile.full_name, company_name),
+            has_description=bool(_job_description_fields(job)["has_description"]),
         ))
 
     positions.sort(key=lambda item: (not item.pinned, not item.looking_to_apply, item.title.lower()))
@@ -239,6 +287,48 @@ def list_company_applications(
         company_slug=repo.company_slug(company_name),
         positions=positions,
     )
+
+
+def get_position_description(idempotency_key: str) -> PositionDescription:
+    key = (idempotency_key or "").strip()
+    if not key:
+        raise LookupError("idempotency_key is required")
+    job = get_job_by_idempotency_key(key)
+    if job is None:
+        raise LookupError(f"Position not found: {key}")
+    description = _job_description_fields(job)
+    return PositionDescription(
+        idempotency_key=key,
+        country=(job.get("country") or "").strip(),
+        company=(job.get("company_name") or "").strip(),
+        url=(job.get("url") or "").strip(),
+        title=(job.get("title") or "").strip(),
+        description_text=str(description["description_text"]),
+        has_description=bool(description["has_description"]),
+        needs_fetch=bool(description["needs_fetch"]),
+        description_html=str(description.get("description_html") or ""),
+    )
+
+
+def fetch_and_store_position_description(idempotency_key: str) -> PositionDescription:
+    key = (idempotency_key or "").strip()
+    if not key:
+        raise LookupError("idempotency_key is required")
+    job = get_job_by_idempotency_key(key)
+    if job is None:
+        raise LookupError(f"Position not found: {key}")
+    url = (job.get("url") or "").strip()
+    if not url:
+        raise ValueError("Position has no job URL")
+    country_key = (job.get("country") or "").strip().lower()
+    company_name = (job.get("company_name") or "").strip()
+    company_row = get_company(country_key, company_name) or {}
+    ats_type = (company_row.get("ats_type") or "").strip() or None
+    text = fetch_job_description(url, ats_type)
+    stripped = (text or "").strip()
+    if stripped and not update_job_description_text(key, stripped):
+        raise LookupError(f"Position not found: {key}")
+    return get_position_description(key)
 
 
 def get_application_detail(
@@ -583,6 +673,121 @@ def render_tailored_pdf(
             pdf_bytes=stored["pdf_bytes"],
             pdf_filename=pdf_filename,
         )
+
+
+def _parse_add_company_locations(raw: str | list[dict] | None) -> list[dict] | None:
+    if raw is None:
+        return None
+    if isinstance(raw, str):
+        text = raw.strip()
+        if not text:
+            return None
+        parsed = json.loads(text)
+        if not isinstance(parsed, list):
+            raise ValueError("locations must be a JSON array")
+        return parsed
+    if not raw:
+        return None
+    return raw
+
+
+def _validate_add_company_inputs(
+    name: str,
+    careers_url: str,
+    *,
+    country: str,
+    countries: list[str] | None,
+    ats: str,
+    locations: list[dict] | None,
+) -> tuple[list[str] | None, str | None]:
+    cleaned_name = (name or "").strip()
+    cleaned_url = (careers_url or "").strip()
+    if not cleaned_name:
+        raise ValueError("Company name is required")
+    if not cleaned_url:
+        raise ValueError("Careers page URL is required")
+
+    country_keys: list[str] | None = None
+    if countries:
+        country_keys = [
+            (item or "").strip().lower()
+            for item in countries
+            if (item or "").strip()
+        ]
+        for key in country_keys:
+            if key not in supported_countries():
+                raise ValueError(f"Unknown country: {key}")
+    else:
+        country_hint = (country or "").strip().lower()
+        if country_hint and country_hint not in ("", "auto", "all"):
+            if country_hint not in supported_countries():
+                raise ValueError(f"Unknown country: {country_hint}")
+            country_keys = [country_hint]
+
+    if locations is not None and not isinstance(locations, list):
+        raise ValueError("locations must be an array")
+
+    ats_hint = (ats or "auto").strip().lower()
+    valid_ats = {item["id"] for item in catalog_list_ats_types()}
+    if ats_hint and ats_hint not in ("auto", "") and ats_hint not in valid_ats:
+        raise ValueError(f"Unknown ATS: {ats_hint}")
+    ats_hint_arg = None if ats_hint in ("", "auto") else ats_hint
+    return country_keys, ats_hint_arg
+
+
+def list_supported_countries() -> list[SupportedCountry]:
+    return [
+        SupportedCountry(id=key, label=label)
+        for key, label in sorted(all_country_labels().items())
+    ]
+
+
+def list_ats_types() -> list[AtsTypeOption]:
+    return [AtsTypeOption(**item) for item in catalog_list_ats_types()]
+
+
+def add_company(
+    name: str,
+    careers_url: str,
+    *,
+    country: str = "auto",
+    countries: list[str] | None = None,
+    ats: str = "auto",
+    locations: str | list[dict] | None = None,
+) -> AddCompanyResult:
+    parsed_locations = _parse_add_company_locations(locations)
+    country_keys, ats_hint = _validate_add_company_inputs(
+        name,
+        careers_url,
+        country=country,
+        countries=countries,
+        ats=ats,
+        locations=parsed_locations,
+    )
+    result = catalog_add_company(
+        name,
+        careers_url,
+        country_keys[0] if country_keys else None,
+        country_keys=country_keys,
+        ats_hint=ats_hint,
+        locations=parsed_locations,
+    )
+    company_name = (result.get("name") or name).strip()
+    slug = repo.company_slug(company_name)
+    country_key = (result.get("country") or "").strip().lower()
+    return AddCompanyResult(
+        country=country_key,
+        country_label=(result.get("country_label") or COUNTRY_LABELS.get(country_key, country_key)),
+        name=company_name,
+        company_slug=slug,
+        careers_url=(result.get("careers_url") or careers_url).strip(),
+        ats_type=(result.get("ats_type") or "").strip(),
+        ats_url=(result.get("ats_url") or "").strip(),
+        city=(result.get("city") or "").strip(),
+        size=(result.get("size") or "").strip(),
+        matching_jobs_count=len(result.get("matching_jobs") or []),
+        workspace_path=f"/company/{country_key}/{slug}",
+    )
 
 
 def mark_job_applied(

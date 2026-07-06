@@ -41,6 +41,20 @@ def test_sync_company_board_persists_fetch_problem_flags(seeded_catalog_v2):
     assert reloaded.get("fetch_problem_date") == "2025-06-03"
 
 
+def test_sync_company_board_persists_description_text(seeded_catalog_v2):
+    company = get_company("uk", "Acme Backend Ltd")
+    assert company is not None
+    jobs = list(company["matching_jobs"])
+    jobs[0]["description_text"] = "We are hiring a senior backend engineer with Go experience."
+    company["matching_jobs"] = jobs
+    sync_company_board_to_catalog("uk", company)
+
+    reloaded = get_company("uk", "Acme Backend Ltd")
+    assert reloaded is not None
+    match = next(j for j in reloaded["matching_jobs"] if j["url"] == jobs[0]["url"])
+    assert match["description_text"] == jobs[0]["description_text"]
+
+
 def test_get_job_by_url_prefers_exact_match_within_company(seeded_catalog_v2):
     company = get_company("uk", "Acme Backend Ltd")
     assert company is not None

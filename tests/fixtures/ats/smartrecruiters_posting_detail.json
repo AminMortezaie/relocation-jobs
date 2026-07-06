@@ -1,0 +1,29 @@
+{
+  "id": "744000128882669",
+  "name": "AI Software Engineer – Python (m/f/x)",
+  "location": {
+    "city": "Munich",
+    "country": "Germany",
+    "fullLocation": "Munich, Germany"
+  },
+  "jobAd": {
+    "sections": {
+      "companyDescription": {
+        "title": "Company Description",
+        "text": "<p>Scalable Capital is a leading digital investment platform.</p>"
+      },
+      "jobDescription": {
+        "title": "Job Description",
+        "text": "<p>As an AI Software Engineer, you will help design scalable backend systems.</p><ul><li>Develop AI/LLM services</li></ul>"
+      },
+      "qualifications": {
+        "title": "Qualifications",
+        "text": "<ul><li>Several years of Python experience</li></ul>"
+      },
+      "additionalInformation": {
+        "title": "Additional Information",
+        "text": "<p>International relocation support is provided if required.</p>"
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@
   <title>Company — Relocation Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=46" />
+  <link rel="stylesheet" href="/static/styles.css?v=51" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
@@ -78,6 +78,16 @@
                 <p class="company-position-meta" id="companyPositionMeta"></p>
               </div>
               <div class="company-position-actions">
+                <button
+                  type="button"
+                  class="header-secondary-btn"
+                  id="companyJdToggleBtn"
+                  hidden
+                  aria-expanded="false"
+                  aria-controls="companyJdPanel"
+                >
+                  Show job description
+                </button>
                 <button type="button" class="header-secondary-btn" id="companyRenderBtn">Re-render PDF</button>
                 <a class="header-secondary-btn" id="companyOpenPdf" href="#" target="_blank" rel="noopener noreferrer" hidden>Open PDF</a>
                 <a class="header-primary-btn" id="companyDownloadPdf" href="#" download="resume.pdf">Download PDF</a>
@@ -87,6 +97,19 @@
                 <span id="companyApplyHintText"></span>
                 <a class="company-apply-url" id="companyApplyUrl" href="#" target="_blank" rel="noopener noreferrer"></a>
               </p>
+            </div>
+
+            <div class="company-jd-panel" id="companyJdPanel" hidden>
+              <h3 class="company-preview-label">Job description</h3>
+              <div class="company-jd-view" id="companyJdView" hidden></div>
+              <div class="company-jd-empty" id="companyJdEmpty" hidden>
+                <p class="company-jd-missing hint" id="companyJdMissing">
+                  No job description stored for this role yet. Fetch it from the posting URL.
+                </p>
+                <button type="button" class="header-secondary-btn" id="companyJdFetchBtn">
+                  Fetch job description
+                </button>
+              </div>
             </div>
 
             <div class="company-preview-grid">
@@ -118,6 +141,6 @@
 
   <div class="toast" id="companyToast"></div>
 
-  <script type="module" src="/static/js/company.js?v=8"></script>
+  <script type="module" src="/static/js/company.js?v=13"></script>
 </body>
 </html>

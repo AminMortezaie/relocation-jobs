@@ -9,6 +9,7 @@ from tests.mcp.test_mcp_service import JOB_URL
 COMPANY = "Acme Backend Ltd"
 COUNTRY = "uk"
 FAKE_PDF = b"%PDF-1.4 test"
+JOB_URL_B = "https://boards.greenhouse.io/acmebackend/jobs/789012?gh_jid=789012"
 
 
 def test_list_company_applications_merges_catalog_and_mcp(
@@ -34,6 +35,30 @@ def test_list_company_applications_merges_catalog_and_mcp(
     assert match.has_pdf is True
     assert match.master_resume_slug == "go"
     assert match.pdf_filename == "test_user_acme_backend_ltd.pdf"
+
+
+def test_list_company_applications_excludes_not_for_me(
+    v2_auth_client, seeded_catalog_v2, mcp_documents,
+):
+    from relocation_jobs.catalog.repo import get_company
+
+    company = get_company("uk", COMPANY)
+    visible_url = company["matching_jobs"][0]["url"]
+    hidden_url = company["matching_jobs"][1]["url"]
+    v2_auth_client.post(
+        "/api/jobs/not-for-me",
+        json={
+            "country": COUNTRY,
+            "company": COMPANY,
+            "url": hidden_url,
+            "not_for_me": True,
+        },
+    )
+
+    payload = service.list_company_applications(COUNTRY, COMPANY, user_id=1)
+    urls = {p.url for p in payload.positions}
+    assert visible_url in urls
+    assert hidden_url not in urls
 
 
 def test_list_company_applications_resolves_slug(
@@ -105,6 +130,86 @@ def test_save_application_tex_updates_content(seeded_catalog_v2, mcp_documents):
 
     tex = service.read_application_tex(idem_key, user_id=1)
     assert "Senior Go Developer" in tex.content
+
+
+def test_position_description_api(v2_auth_client, seeded_catalog_v2, mcp_documents):
+    from relocation_jobs.catalog.repo import get_company, sync_company_board_to_catalog
+
+    company = get_company("uk", COMPANY)
+    assert company is not None
+    jobs = list(company["matching_jobs"])
+    jobs[0]["description_text"] = "Build APIs and mentor engineers."
+    company["matching_jobs"] = jobs
+    sync_company_board_to_catalog(COUNTRY, company)
+
+    saved = service.save_tailored_tex_for_job(
+        COUNTRY,
+        COMPANY,
+        JOB_URL,
+        GO_MASTER_TEX,
+        master_resume_slug="go",
+        user_id=1,
+    )
+    idem_key = saved["idempotency_key"]
+
+    detail = v2_auth_client.get(f"/api/mcp/positions/{idem_key}/description")
+    assert detail.status_code == 200
+    body = detail.get_json()
+    assert body["has_description"] is True
+    assert body["needs_fetch"] is False
+    assert "Build APIs" in body["description_text"]
+    assert "<p>" in body["description_html"]
+    assert body["company"] == COMPANY
+
+    list_payload = service.list_company_applications(COUNTRY, COMPANY, user_id=1)
+    match = next(p for p in list_payload.positions if p.idempotency_key == idem_key)
+    assert match.has_description is True
+
+
+def test_position_description_needs_fetch_when_empty(
+    v2_auth_client, seeded_catalog_v2, mcp_documents,
+):
+    from relocation_jobs.catalog.repo import get_company
+
+    company = get_company(COUNTRY, COMPANY)
+    second = company["matching_jobs"][1]
+    detail = v2_auth_client.get(
+        f"/api/mcp/positions/{second['idempotency_key']}/description",
+    )
+    assert detail.status_code == 200
+    body = detail.get_json()
+    assert body["has_description"] is False
+    assert body["needs_fetch"] is True
+
+
+def test_position_fetch_description_stores_text(
+    v2_auth_client, seeded_catalog_v2, mcp_documents, monkeypatch,
+):
+    from relocation_jobs.catalog.repo import get_company
+
+    company = get_company(COUNTRY, COMPANY)
+    second = company["matching_jobs"][1]
+    idem_key = second["idempotency_key"]
+    job_url = second["url"]
+
+    monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
+    monkeypatch.setattr("relocation_jobs.web.routes.mcp.HTTPX_AVAILABLE", True)
+
+    def fake_fetch(url, ats_type=None):
+        assert url == job_url
+        return "Senior backend role with Go, Postgres, and distributed systems."
+
+    monkeypatch.setattr(
+        "relocation_jobs.mcp.service.fetch_job_description",
+        fake_fetch,
+    )
+
+    fetched = v2_auth_client.post(f"/api/mcp/positions/{idem_key}/fetch-description")
+    assert fetched.status_code == 200
+    body = fetched.get_json()
+    assert body["has_description"] is True
+    assert body["needs_fetch"] is False
+    assert "distributed systems" in body["description_text"]
 
 
 def test_company_applications_api(v2_auth_client, seeded_catalog_v2, mcp_documents):
@@ -188,6 +293,8 @@ def test_list_company_applications_finds_tex_when_country_mixed_case(
 
 def test_company_applications_routes_require_auth(v2_client):
     assert v2_client.get("/api/mcp/companies/uk/acme/applications").status_code == 401
+    assert v2_client.get("/api/mcp/positions/some-key/description").status_code == 401
+    assert v2_client.post("/api/mcp/positions/some-key/fetch-description").status_code == 401
     assert v2_client.get("/api/mcp/applications/some-key/tex").status_code == 401
     assert v2_client.put("/api/mcp/applications/some-key/tex", json={"content": "x"}).status_code == 401
 

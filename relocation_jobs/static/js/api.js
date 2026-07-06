@@ -238,6 +238,10 @@ export async function markWrongLocation(country, company, url) {
   return setNotForMe(country, company, url, true, "wrong_location");
 }
 
+export async function markExpired(country, company, url) {
+  return setNotForMe(country, company, url, true, "expired");
+}
+
 export async function restoreJob(country, company, url) {
   return setNotForMe(country, company, url, false);
 }
@@ -408,7 +412,7 @@ export async function toggleLookingToApply(country, company, url, lookingToApply
     toast(data.error || "Could not save");
     return null;
   }
-  applyJobMutation(country, company, url, idempotencyKey, data);
+  applyJobMutation(country, company, url, idempotencyKey, data, { pin: false });
   return data;
 }
 
@@ -644,6 +648,20 @@ export async function fetchConfig() {
 export async function fetchCountries() {
   const res = await apiFetch("/api/countries");
   return res.json();
+}
+
+export async function addCustomCountry(label) {
+  const res = await apiFetch("/api/countries", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ label }),
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    toast(data.error || "Could not add country");
+    return null;
+  }
+  return data.country || null;
 }
 
 export async function fetchCities(country = "all") {

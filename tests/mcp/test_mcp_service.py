@@ -11,6 +11,27 @@ from tests.mcp.conftest import GO_MASTER_TEX, JAVA_MASTER_TEX
 JOB_URL = "https://boards.greenhouse.io/acmebackend/jobs/123456?gh_jid=123456"
 
 
+def test_get_job_context_includes_description(seeded_catalog_v2, mcp_documents):
+    from relocation_jobs.catalog.repo import get_company, sync_company_board_to_catalog
+
+    company = get_company("uk", "Acme Backend Ltd")
+    assert company is not None
+    jobs = list(company["matching_jobs"])
+    jobs[0]["description_text"] = "Senior backend role with distributed systems experience."
+    company["matching_jobs"] = jobs
+    sync_company_board_to_catalog("uk", company)
+
+    os.environ["MCP_USERNAME"] = "admin"
+    ctx = service.get_job_context(
+        "uk",
+        "Acme Backend Ltd",
+        JOB_URL,
+        user_id=1,
+    )
+    assert ctx.has_description is True
+    assert "distributed systems" in ctx.description_text
+
+
 def test_get_job_context(seeded_catalog_v2, mcp_documents):
     os.environ["MCP_USERNAME"] = "admin"
     ctx = service.get_job_context(

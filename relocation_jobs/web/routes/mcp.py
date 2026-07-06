@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from urllib.parse import quote
 
 from flask import Response, g, jsonify, request
@@ -7,9 +8,14 @@ from flask import Response, g, jsonify, request
 from pydantic import ValidationError
 
 from relocation_jobs.core.auth import login_required
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
+from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.mcp import service as mcp_service
 from relocation_jobs.mcp.types import ApplicationProfile
+
+
+def _scrape_enabled() -> bool:
+    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
 
 
 def register(app):
@@ -103,7 +109,7 @@ def register(app):
     @login_required
     def api_mcp_company_applications(country: str, company: str):
         country_key = country.strip().lower()
-        if country_key not in SUPPORTED_COUNTRIES:
+        if country_key not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
         try:
             payload = mcp_service.list_company_applications(
@@ -114,6 +120,35 @@ def register(app):
         except LookupError as exc:
             return jsonify({"error": str(exc)}), 404
         return jsonify(payload.model_dump())
+
+    @app.get("/api/mcp/positions/<path:idempotency_key>/description")
+    @login_required
+    def api_mcp_position_description(idempotency_key: str):
+        try:
+            detail = mcp_service.get_position_description(idempotency_key)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        return jsonify(detail.model_dump())
+
+    @app.post("/api/mcp/positions/<path:idempotency_key>/fetch-description")
+    @login_required
+    def api_mcp_position_fetch_description(idempotency_key: str):
+        if not _scrape_enabled():
+            return jsonify({
+                "error": (
+                    "Scraping is disabled on this host. "
+                    "Run scrapes locally, then sync catalog to Postgres."
+                ),
+            }), 503
+        if not HTTPX_AVAILABLE:
+            return jsonify({"error": "httpx is not installed. Run: pip install httpx"}), 503
+        try:
+            detail = mcp_service.fetch_and_store_position_description(idempotency_key)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        return jsonify(detail.model_dump())
 
     @app.get("/api/mcp/applications/<path:idempotency_key>")
     @login_required

@@ -229,5 +229,6 @@ Catalog writes are **batch** (scrape, build). User writes are **small** (single 
 - [schemas.md](schemas.md) — `CountryCatalog`, `MatchingJob`, `JobStatusUpdate`
 - [catalog-seed-test-failure.md](catalog-seed-test-failure.md) — why tests must reset catalog, not assume an empty DB
 - [board.md](board.md) — sort and pagination on top of flattened catalog rows
+- [board-read-model-proposal.md](board-read-model-proposal.md) — proposal to persist per-user board projection for fast reads (not implemented)
 
 When adding a feature, ask: **“Is this a fact about the job on the internet, or a fact about what this user did?”** The first goes to catalog; the second to tracking.

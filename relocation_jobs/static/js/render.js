@@ -185,19 +185,42 @@ function companyHasCollapsedPositions(company) {
 }
 
 function companyCityLabels(company) {
+  const splitJoined = (text) => {
+    const trimmed = (text || "").trim();
+    if (!trimmed) return [];
+    if (trimmed.includes(" · ")) {
+      return trimmed.split(" · ").map((part) => part.trim()).filter(Boolean);
+    }
+    return trimmed.split(",").map((part) => part.trim()).filter(Boolean);
+  };
   if (Array.isArray(company.cities) && company.cities.length) {
-    return company.cities;
+    const labels = [];
+    for (const city of company.cities) {
+      labels.push(...splitJoined(city));
+    }
+    if (labels.length) return labels;
   }
   const single = (company.city || "").trim();
   if (!single) return [];
-  return single.split(",").map((part) => part.trim()).filter(Boolean);
+  return splitJoined(single);
 }
 
 function companyLocationLabels(company) {
   if (Array.isArray(company.locations) && company.locations.length) {
-    return company.locations.map(
+    const labels = company.locations.map(
       (loc) => loc.label || `${loc.city} (${loc.country_label || loc.country})`
     );
+    const out = [];
+    for (const label of labels) {
+      const trimmed = (label || "").trim();
+      if (!trimmed) continue;
+      if (trimmed.includes(" · ")) {
+        out.push(...trimmed.split(" · ").map((part) => part.trim()).filter(Boolean));
+      } else {
+        out.push(trimmed);
+      }
+    }
+    return out;
   }
   return companyCityLabels(company);
 }
@@ -266,6 +289,7 @@ export function sortJobsForDisplay(jobs) {
 
 export const HIDE_REASONS = [
   { id: "not_for_me", label: "Not for me", desc: "Role doesn't fit your goals", tone: "not-for-me" },
+  { id: "expired", label: "Expired", desc: "Posting closed or no longer available", tone: "expired" },
   { id: "wrong_location", label: "Wrong location", desc: "City or region isn't relevant", tone: "wrong-location" },
   { id: "no_relocation", label: "No relocation", desc: "No visa or relocation support", tone: "no-relocation" },
 ];

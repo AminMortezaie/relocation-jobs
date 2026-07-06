@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from flask import request
 
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
-
 
 def query_bool(name: str) -> bool:
     return request.args.get(name, "").lower() in ("1", "true", "yes")

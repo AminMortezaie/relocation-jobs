@@ -27,6 +27,32 @@ def _copy_location_fields(target: dict, *sources: dict) -> None:
         target["locations"] = locations
 
 
+def _apply_board_location(target: dict, scraped: dict, old: dict) -> None:
+    scraped_loc = (scraped.get("location") or "").strip()
+    if scraped_loc:
+        target["location"] = scraped_loc
+        scraped_locs = scraped.get("locations")
+        if isinstance(scraped_locs, list) and scraped_locs:
+            target["locations"] = scraped_locs
+        return
+    _copy_location_fields(target, old)
+
+
+def job_has_listing_location(job: dict) -> bool:
+    if (job.get("location") or "").strip():
+        return True
+    locations = job.get("locations")
+    return isinstance(locations, list) and bool(locations)
+
+
+def apply_fetched_location(job: dict, location: str) -> None:
+    if job_has_listing_location(job):
+        return
+    loc = (location or "").strip()
+    if loc:
+        job["location"] = loc
+
+
 def _index_existing_by_key(existing: list[dict]) -> dict[str, dict]:
     by_key: dict[str, dict] = {}
     for job in existing:
@@ -51,7 +77,10 @@ def _update_from_scrape(old: dict, scraped: dict, key: str, seen_at: str) -> dic
         out["visa_sponsorship"] = old["visa_sponsorship"]
     elif scraped.get("visa_sponsorship") is not None:
         out["visa_sponsorship"] = scraped["visa_sponsorship"]
-    _copy_location_fields(out, scraped, old)
+    description = (scraped.get("description_text") or "").strip() or (old.get("description_text") or "").strip()
+    if description:
+        out["description_text"] = description
+    _apply_board_location(out, scraped, old)
     return out
 
 

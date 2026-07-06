@@ -1224,6 +1224,32 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   gap: 0.5rem 1rem;
 }
 
+.company-locations-wrap {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  max-width: 100%;
+}
+
+.expand-cities-btn {
+  padding: 0.2rem 0.45rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent-hover);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.expand-cities-btn:hover {
+  background: rgba(91, 141, 239, 0.12);
+}
+
 .company-meta span::before { content: "·"; margin-right: 0.5rem; color: var(--border); }
 .company-meta span:first-child::before { content: none; margin: 0; }
 
@@ -1763,6 +1789,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   color: var(--muted);
 }
 
+.hide-reason-trigger--expired {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+}
+
 .hide-reason-trigger:hover:not(:disabled) {
   filter: brightness(1.08);
 }
@@ -1858,6 +1890,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .hide-reason-option--not-for-me .hide-reason-option-dot { background: var(--warn); }
 .hide-reason-option--wrong-location .hide-reason-option-dot { background: #5eead4; }
 .hide-reason-option--no-relocation .hide-reason-option-dot { background: var(--muted); }
+.hide-reason-option--expired .hide-reason-option-dot { background: #94a3b8; }
 
 .hide-reason-option-text {
   display: flex;
@@ -2471,6 +2504,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   background: rgba(45, 212, 191, 0.12);
   color: #5eead4;
   border-color: rgba(45, 212, 191, 0.2);
+}
+
+.badge.expired {
+  background: rgba(148, 163, 184, 0.14);
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.25);
 }
 
 .restore-job-btn {
@@ -3613,6 +3652,10 @@ body.fetch-modal-open {
   align-items: center;
   gap: 0.4rem;
   margin-top: 0.55rem;
+}
+
+.add-company-country-panel .custom-city-add-row {
+  margin-top: 0.65rem;
 }
 
 .add-company-location-group-panel .custom-city-add-row {
@@ -5737,6 +5780,93 @@ body.scroll-locked {
 .company-position-meta {
   margin: 0.25rem 0 0;
   font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.company-jd-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.company-jd-view {
+  margin: 0;
+  max-height: 20rem;
+  overflow: auto;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.company-jd-view h1,
+.company-jd-view h2,
+.company-jd-view h3,
+.company-jd-view h4 {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.company-jd-view h1:first-child,
+.company-jd-view h2:first-child,
+.company-jd-view h3:first-child,
+.company-jd-view h4:first-child,
+.company-jd-view p:first-child {
+  margin-top: 0;
+}
+
+.company-jd-view p {
+  margin: 0 0 0.7rem;
+}
+
+.company-jd-view ul,
+.company-jd-view ol {
+  margin: 0 0 0.8rem;
+  padding-left: 1.25rem;
+}
+
+.company-jd-view li {
+  margin: 0.25rem 0;
+}
+
+.company-jd-view li::marker {
+  color: var(--accent);
+}
+
+.company-jd-view strong,
+.company-jd-view b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.company-jd-view em,
+.company-jd-view i {
+  color: var(--muted);
+}
+
+.company-jd-view a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.company-jd-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.company-jd-missing {
+  margin: 0;
   color: var(--muted);
 }
 

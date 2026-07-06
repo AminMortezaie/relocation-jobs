@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from relocation_jobs.core.db import db_read
-from relocation_jobs.core.location_tags import COUNTRY_LABELS
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.location_tags import country_label
+from relocation_jobs.core.paths import supported_countries
 
 
 def _row_dict(row) -> dict:
@@ -212,7 +212,7 @@ def get_catalog_overview() -> dict:
         stored_visa = int(stored.get("stored_visa_jobs") or 0)
         countries.append({
             "country": country,
-            "label": COUNTRY_LABELS.get(country, country),
+            "label": country_label(country),
             "companies": companies_count,
             "jobs": stored_jobs,
             "visa_jobs": stored_visa,
@@ -255,7 +255,7 @@ def get_catalog_overview() -> dict:
         )
         meta_by_country[country] = {
             "country": country,
-            "label": COUNTRY_LABELS.get(country, (country or "").title()),
+            "label": country_label(country or ""),
             "source": row.get("source"),
             "catalog_imported": row.get("fetched"),
             "last_fetch": last_fetch,

@@ -10,6 +10,7 @@ from relocation_jobs.scrape.boards.deel import fetch_deel_board
 from relocation_jobs.scrape.ats_resolve import ensure_company_ats
 from relocation_jobs.scrape.boards.generic import fetch_generic_board
 from relocation_jobs.scrape.boards.greenhouse import fetch_greenhouse_board
+from relocation_jobs.scrape.boards.hibob import fetch_hibob_board
 from relocation_jobs.scrape.boards.http_sync import (
     fetch_applytojob_board,
     fetch_bamboo_board,
@@ -45,6 +46,7 @@ _BOARD_FETCHERS: dict[str, BoardFetcher] = {
     "epam": fetch_epam_board,
     "greenhouse": fetch_greenhouse_board,
     "greenhouse_eu": fetch_greenhouse_board,
+    "hibob": fetch_hibob_board,
     "hirehive": fetch_hirehive_board,
     "jibe": fetch_jibe_board,
     "job_shop": fetch_job_shop_board,

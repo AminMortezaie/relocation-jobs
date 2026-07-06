@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 from flask import jsonify
 
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.paths import supported_countries
 
 _JOB_MUTATION_ERROR_RULES: tuple[Callable[[tuple[str, str, str]], tuple | None], ...] = (
     lambda ctx: (
@@ -17,7 +17,7 @@ _JOB_MUTATION_ERROR_RULES: tuple[Callable[[tuple[str, str, str]], tuple | None],
         jsonify({"error": f"Unknown country: {ctx[0]}"}),
         400,
     )
-    if ctx[0] not in SUPPORTED_COUNTRIES
+    if ctx[0] not in supported_countries()
     else None,
     lambda ctx: (
         jsonify({"error": "company and url are required"}),

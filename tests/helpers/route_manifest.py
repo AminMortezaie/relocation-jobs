@@ -13,7 +13,7 @@ PANEL_API_ROUTES: dict[str, frozenset[str]] = {
     "/api/auth/logout": frozenset({"POST"}),
     "/api/auth/register": frozenset({"POST"}),
     "/api/config": frozenset({"GET"}),
-    "/api/countries": frozenset({"GET"}),
+    "/api/countries": frozenset({"GET", "POST"}),
     "/api/ats-types": frozenset({"GET"}),
     "/api/cities": frozenset({"GET"}),
     "/api/locations": frozenset({"GET", "POST"}),

@@ -133,7 +133,7 @@ def test_hide_not_for_me_does_not_pin_job(v2_auth_client, seeded_catalog_v2):
     assert not hidden.get("pinned")
 
 
-def test_pin_replaces_previous_job_pin_in_same_company(v2_auth_client, seeded_catalog_v2):
+def test_pin_allows_multiple_pins_in_same_company(v2_auth_client, seeded_catalog_v2):
     board = v2_auth_client.get("/api/board?country=uk").get_json()
     co = _acme(board)
     first_job, second_job = co["jobs"][0], co["jobs"][1]
@@ -149,6 +149,29 @@ def test_pin_replaces_previous_job_pin_in_same_company(v2_auth_client, seeded_ca
 
     board2 = v2_auth_client.get("/api/board?country=uk").get_json()
     acme = _acme(board2)
-    pinned_jobs = [j for j in acme["jobs"] if j.get("pinned")]
-    assert len(pinned_jobs) == 1
-    assert pinned_jobs[0]["url"] == second_job["url"]
+    pinned_urls = {j["url"] for j in acme["jobs"] if j.get("pinned")}
+    assert pinned_urls == {first_job["url"], second_job["url"]}
+
+
+def test_unpin_one_job_keeps_other_pins(v2_auth_client, seeded_catalog_v2):
+    board = v2_auth_client.get("/api/board?country=uk").get_json()
+    co = _acme(board)
+    first_job, second_job = co["jobs"][0], co["jobs"][1]
+
+    v2_auth_client.post(
+        "/api/jobs/pin",
+        json={"country": "uk", "company": co["name"], "url": first_job["url"], "pinned": True},
+    )
+    v2_auth_client.post(
+        "/api/jobs/pin",
+        json={"country": "uk", "company": co["name"], "url": second_job["url"], "pinned": True},
+    )
+    v2_auth_client.patch(
+        "/api/jobs/pin",
+        json={"country": "uk", "company": co["name"], "url": first_job["url"], "pinned": False},
+    )
+
+    board2 = v2_auth_client.get("/api/board?country=uk").get_json()
+    acme = _acme(board2)
+    pinned_urls = {j["url"] for j in acme["jobs"] if j.get("pinned")}
+    assert pinned_urls == {second_job["url"]}

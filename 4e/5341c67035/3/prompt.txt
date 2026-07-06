@@ -1,0 +1,61 @@
+what do you think if we add elastic search for the filters to this project.
+
+read the skills and just tell me your idea about.
+
+---
+
+what do you think if we add elastic search for the filters to this project.
+
+read the skills and just tell me your idea about.
+
+---
+
+if you want to remove this time to query db everytime and maybe takes about 2 seconds to update the board for each state changes we make, what would be the first solution for it.
+
+i will not give you advice to use elastic, i want you to think about and tell me how to take this to under second and find in just milliseconds?
+
+---
+
+if you want to remove this time to query db everytime and maybe takes about 2 seconds to update the board for each state changes we make, what would be the first solution for it.
+
+i will not give you advice to use elastic, i want you to think about and tell me how to take this to under second and find in just milliseconds?
+
+---
+
+I just told you that read the skills before applying any ideas in your mind to understand and get it that For example, every estate change Maybe. The majority of state changes in our application make our application something different. For example, think about the situation that I for example, marked some positions in some companies that is wrong location or maybe expired or anything else, and the timestamp for that position was the newest timestamp in that company. And maybe that company shouldn't be shown In the job board in that position, and instantly the application is starting to reproduce the job panel after applying this state. So some of the states are crucial and necessary to update the whole board, whole job panel, and it means that when we have the pagination, if we didn't have any pagination We could have Have some states and mutations just by updating the you know The job panel without taking the risk to Scan the table again. It's a necessity in our application because we have this requirement in our application. We need to update instantly, for example, if we you know, mark a position in, for example, in twenty-six company That isn't, that isn't for me. And it was the Most recent position for that company, and the job board needs to be updated instantly, and we can't handle this without doing this. Another you know, optimization might be you know, loading the full job board and not by paginated you know, version. Firstly, when the application starts up and it's a bad decision because the user needs to be waited for the whole applications, whole positions for the first time. And this is a completely trade-off. Another thing that you didn't take care of it is to, if we hold the job board in our memory and muting a situation that we can't you know, apply to the database after doing the stuff doing the first on our job board and now we need to preserve the data on database. So the The problem here is clear. We can't update the database and the data might be stale and might be corrupted. So we can't do it on memory and we need to Be free of this problem. Now, by this you know, aspect of this code, what would be your real suggestion for this application? Maybe some of the you know, recommended solutions for this, for example, client-side filter, sort, and pagination can be real risk for our application to not preserve the real estate on our application, on, on a database, maybe. So I just suggested Elastic Search for this to just update And, you know, searching more faster, and also everything might be better. Or maybe you can suggest me something in Postgres. I, I don't, I know that the Postgres have some abilities and capabilities to you know, handle this search, for example, cursor-based or any other things. You need to think deeply. We have pay generation, we have To change the states and some of the states can be really risky for application, and we can't using some caches. Maybe on Redis or, you know, on the client side, maybe Redis is better because we can trust more on, you know, Redis, but on client side might be really suffering from problems that I mentioned before. Think deeply and tell me your idea about the architectural design in this part, and also I will you know, insist on reading the skills before because I just created this these skills to have the code something unified and, you know, something that is reliable and not fragile and you might you know, suggest me some solutions that might be fragile, like, for example, client-side filter or something like this. And I mentioned the problems and the trade-offs we had in this application, and you need to take care of all of them
+
+---
+
+write down your proposal to make this feature in docs folder and then we think of it.
+
+also you need to think deeply and search on internet to find the most reliable solution in this case because it might be a little tricky and cannot suggest something without any searching.
+
+you have no access to write codes there till i tell you about.
+
+---
+
+write down your proposal to make this feature in docs folder and then we think of it.
+
+also you need to think deeply and search on internet to find the most reliable solution in this case because it might be a little tricky and cannot suggest something without any searching.
+
+you have no access to write codes there till i tell you about.
+
+---
+
+I just had a project was re-leaderboard. And It was based on Redis' ZSET and some other functionalities and We were updating the user points. Completely real time, and I think that it can be used on this project also for the ranking of the companies. We can do this in real time using something like Redis to You know, have some rankings for the companies and completely and instantly when something updates, change the point and reorder the you know, the company in our job board. So it's an o it's another solution for this problem and which can be achieved And with the usage, with, with using the Redis.
+
+---
+
+I think that it, it can simply Add something to this project because we have lots of filters and we can you know, have some points for the companies and the the most thing that we, we are thinking about is about the companies sorting and all the things is completely related to this part of our application. So if we point companies through out these filters and these state changes, we can simply you know, rank the companies again and again. And keeping the data on Redis cache. Can we make this board with the pagination So easier and a-also so fa-more faster and no need to call the database and Every time, and also if, if you are calling the database, it's not related to our UI and UX, it's related to our backend system and It can shift during the background you know, changes, and no need to change the UI and Redis can fully serve our application with the pagination and all the things completely by that And I think that Redis can really help to this application because we are you know, suffering from a problem that is calling the database and database round trips that can be really harmful for our application to call again and again, and Redis can do it so simpler.
+
+---
+
+I think that it, it can simply Add something to this project because we have lots of filters and we can you know, have some points for the companies and the the most thing that we, we are thinking about is about the companies sorting and all the things is completely related to this part of our application. So if we point companies through out these filters and these state changes, we can simply you know, rank the companies again and again. And keeping the data on Redis cache. Can we make this board with the pagination So easier and a-also so fa-more faster and no need to call the database and Every time, and also if, if you are calling the database, it's not related to our UI and UX, it's related to our backend system and It can shift during the background you know, changes, and no need to change the UI and Redis can fully serve our application with the pagination and all the things completely by that And I think that Redis can really help to this application because we are you know, suffering from a problem that is calling the database and database round trips that can be really harmful for our application to call again and again, and Redis can do it so simpler.
+
+---
+
+add what you think by this explaination to your proposal and then we make decision on it.
+
+---
+
+add what you think by this explaination to your proposal and then we make decision on it.

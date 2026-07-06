@@ -1,0 +1,9 @@
+the job is fetched wrongly in this position.
+pply at the original posting: https://epilot.recruitee.com/o/senior-product-engineer-fullstack
+JOB DESCRIPTION
+
+are you ready to be a technology leader in the saas space? join epilot! we are looking for product minded engineers not only coders. we're seeking builders who bridge technical expertise with product strategy. if you're passionate about impactful software, apply now! (learn more about our understanding of being a product engineer here ) epilot is building a saas product to sell complex products online, focusing on solving ecommerce in the rapidly transforming energy market. our mission: make selling complex energy products as easy as selling a pair of shoes online. as software engineer at epilot you will be a driving force in shaping this mission. what makes working as a software engineer at epilot so special? our unique engineering culture is defined by a few core engineering principles. we "epilots" are a team of experts from the fields of software development, energy management, product management and sales. in order to bring our solution even faster to the top in the energy world, we are looking for you as a senior product engineer (full stack) .
+
+---
+
+run this

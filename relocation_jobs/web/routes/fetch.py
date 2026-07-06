@@ -7,7 +7,7 @@ from flask import g, jsonify, request
 from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILABLE, MAX_CONCURRENCY
 from relocation_jobs.core.auth import admin_required, login_required
 from relocation_jobs.core.location_tags import country_label
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
+from relocation_jobs.core.paths import country_archive_filename, supported_countries
 from relocation_jobs.db import is_user_admin
 from relocation_jobs.web import deps
 from relocation_jobs.fetch import repo as fetch_repo
@@ -118,7 +118,7 @@ def register(app):
             "run_id": run_id,
             "country": country,
             "ats_type": ats_type,
-            "file": COUNTRY_ARCHIVE_FILENAMES[country],
+            "file": country_archive_filename(country),
             "concurrency": workers,
             "message": (
                 f"Started scraping {country_label(country)} "

@@ -8,7 +8,7 @@ from relocation_jobs.catalog.repo import (
     load_country_meta,
 )
 from relocation_jobs.core.location_tags import country_label, sync_company_location_fields
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
+from relocation_jobs.core.paths import country_archive_filename, supported_countries
 from relocation_jobs.users.repo import (
     load_company_tracking,
     load_job_status_history,
@@ -80,7 +80,7 @@ def load_country(country_key: str, *, cache: dict[str, dict] | None = None) -> d
 
 
 def _file_meta_row(country_key: str, data: dict) -> dict | None:
-    filename = COUNTRY_ARCHIVE_FILENAMES.get(country_key)
+    filename = country_archive_filename(country_key)
     if not filename:
         return None
     if not data.get("companies") and not data.get("source"):

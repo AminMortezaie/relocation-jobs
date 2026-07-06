@@ -206,6 +206,19 @@ function companyCityLabels(company) {
 }
 
 function companyLocationLabels(company) {
+  const dedupe = (labels) => {
+    const seen = new Set();
+    const out = [];
+    for (const label of labels) {
+      const trimmed = (label || "").trim();
+      if (!trimmed) continue;
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(trimmed);
+    }
+    return out;
+  };
   if (Array.isArray(company.locations) && company.locations.length) {
     const labels = company.locations.map(
       (loc) => loc.label || `${loc.city} (${loc.country_label || loc.country})`
@@ -220,9 +233,9 @@ function companyLocationLabels(company) {
         out.push(trimmed);
       }
     }
-    return out;
+    return dedupe(out);
   }
-  return companyCityLabels(company);
+  return dedupe(companyCityLabels(company));
 }
 
 function formatCompanyCities(company) {

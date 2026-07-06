@@ -9,7 +9,7 @@ import httpx
 from relocation_jobs.core.ats_detection import HEADERS
 from relocation_jobs.core.ats_constants import MAX_CONCURRENCY
 from relocation_jobs.core.scrape_cancel import FetchCancelled, clear_cancel_checker, set_cancel_checker
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES
+from relocation_jobs.core.paths import country_archive_filename
 from relocation_jobs.fetch import repo as fetch_repo
 from relocation_jobs.fetch.country_runner import run_country_fetch
 from relocation_jobs.fetch.log import log_event
@@ -496,7 +496,7 @@ def start_company_fetch(
     _reap_zombie_fetch()
     if fetch_is_running():
         raise RuntimeError("A fetch is already running")
-    file_name = COUNTRY_ARCHIVE_FILENAMES[country_key]
+    file_name = country_archive_filename(country_key)
     with _fetch_lock:
         run_id = _reset_fetch_state(
             user_id=user_id,
@@ -536,7 +536,7 @@ def start_country_fetch(
     if fetch_is_running():
         raise RuntimeError("A fetch is already running")
     workers = max(1, min(int(concurrency), MAX_CONCURRENCY))
-    file_name = COUNTRY_ARCHIVE_FILENAMES[country_key]
+    file_name = country_archive_filename(country_key)
     with _fetch_lock:
         run_id = _reset_fetch_state(
             user_id=user_id,

@@ -38,6 +38,7 @@ from relocation_jobs.core.job_identity import (
 )
 from relocation_jobs.core.location_tags import (
     COUNTRY_LABELS,
+    _strip_country_suffix,
     normalize_location,
     sync_company_location_fields,
 )
@@ -116,11 +117,13 @@ def find_job_in_data(data: dict, company_name: str, job_url: str) -> dict | None
 # ---------------------------------------------------------------------------
 
 def _clean_city(raw: str, country_key: str) -> str:
-    city = raw.strip()
+    city = _strip_country_suffix(raw.strip())
     pat = _CITY_SUFFIX.get(country_key)
     if pat:
         city = pat.sub("", city).strip()
-    return city.split(",")[0].strip() if city else ""
+    if "," in city:
+        city = city.split(",", 1)[0].strip()
+    return _strip_country_suffix(city)
 
 
 def _build_locations(

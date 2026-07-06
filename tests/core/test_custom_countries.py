@@ -42,3 +42,29 @@ def test_custom_country_allows_custom_city(tmp_data_dir):
         "label": "Barcelona (Spain)",
     }
     assert normalize_location("spain", "Barcelona") == loc
+
+
+def test_country_archive_filename_for_custom_country():
+    from relocation_jobs.core.paths import country_archive_filename
+
+    assert country_archive_filename("uk") == "uk_companies.json"
+    assert country_archive_filename("ireland") == "ireland_companies.json"
+
+
+def test_normalize_location_strips_custom_country_suffix(tmp_data_dir):
+    add_custom_country("Ireland")
+    loc = normalize_location("ireland", "Dublin (Ireland)")
+    assert loc is not None
+    assert loc["city"] == "Dublin"
+    assert loc["label"] == "Dublin (Ireland)"
+
+
+def test_sync_company_location_fields_no_double_suffix(tmp_data_dir):
+    from relocation_jobs.core.location_tags import sync_company_location_fields
+
+    add_custom_country("Ireland")
+    company = {"locations": [{"country": "ireland", "city": "Dublin (Ireland)"}]}
+    sync_company_location_fields(company, catalog_country="ireland")
+    assert company["city"] == "Dublin (Ireland)"
+    assert len(company["locations"]) == 1
+    assert company["locations"][0]["city"] == "Dublin"

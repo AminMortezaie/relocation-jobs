@@ -374,8 +374,21 @@ _COUNTRY_SUFFIX_RE = re.compile(
 
 
 def _strip_country_suffix(city: str) -> str:
-    """Remove trailing ``(Country)`` labels from city strings."""
-    stripped = _COUNTRY_SUFFIX_RE.sub("", city).strip()
+    stripped = (city or "").strip()
+    if not stripped:
+        return stripped
+    changed = True
+    while changed:
+        changed = False
+        next_val = _COUNTRY_SUFFIX_RE.sub("", stripped).strip()
+        if next_val != stripped:
+            stripped = next_val
+            changed = True
+        for label in sorted(all_country_labels().values(), key=len, reverse=True):
+            suffix = f" ({label})"
+            if stripped.casefold().endswith(suffix.casefold()):
+                stripped = stripped[: -len(suffix)].strip()
+                changed = True
     return stripped or city
 
 
@@ -416,7 +429,16 @@ def normalize_locations(
 
     def add(country: str, city: str) -> None:
         loc = normalize_location(country, city)
-        if not loc or loc["key"] in seen:
+        if not loc:
+            return
+        country_key = loc["country"]
+        incoming_keys = city_match_keys(loc["city"])
+        for existing in out:
+            if existing["country"] != country_key:
+                continue
+            if city_match_keys(existing["city"]) & incoming_keys:
+                return
+        if loc["key"] in seen:
             return
         seen.add(loc["key"])
         out.append(loc)

@@ -6,8 +6,8 @@ from flask import g, jsonify, request
 
 from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import login_required
-from relocation_jobs.core.location_tags import COUNTRY_LABELS
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
+from relocation_jobs.core.location_tags import country_label
+from relocation_jobs.core.paths import country_archive_filename, supported_countries
 from relocation_jobs.catalog.repo import get_company
 from relocation_jobs.fetch.runner import (
     _fetch_lock,
@@ -393,6 +393,6 @@ def register(app):
             "run_id": run_id,
             "country": country,
             "company": company,
-            "file": COUNTRY_ARCHIVE_FILENAMES.get(country, ""),
-            "message": f"Fetching jobs for {company} ({COUNTRY_LABELS.get(country, country)})",
+            "file": country_archive_filename(country),
+            "message": f"Fetching jobs for {company} ({country_label(country)})",
         })

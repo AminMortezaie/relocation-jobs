@@ -28,18 +28,32 @@ function flattenJoinedLabels(labels) {
   return out;
 }
 
+function dedupeLocationLabels(labels) {
+  const seen = new Set();
+  const out = [];
+  for (const label of labels) {
+    const trimmed = (label || "").trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(trimmed);
+  }
+  return out;
+}
+
 function companyLocationLabels(company) {
   if (Array.isArray(company.locations) && company.locations.length) {
     const labels = company.locations.map(
       (loc) => loc.label || `${loc.city} (${loc.country_label || loc.country})`,
     );
-    return flattenJoinedLabels(labels);
+    return dedupeLocationLabels(flattenJoinedLabels(labels));
   }
   if (Array.isArray(company.cities) && company.cities.length) {
-    const labels = flattenJoinedLabels(company.cities);
+    const labels = dedupeLocationLabels(flattenJoinedLabels(company.cities));
     if (labels.length) return labels;
   }
-  return splitLocationText(company.city);
+  return dedupeLocationLabels(splitLocationText(company.city));
 }
 
 const CITY_PREVIEW_LIMIT = 3;

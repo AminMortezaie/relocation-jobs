@@ -30,6 +30,13 @@ COUNTRY_ARCHIVE_FILENAMES: dict[str, str] = {
 }
 
 
+def country_archive_filename(country_key: str) -> str:
+    key = (country_key or "").strip().lower()
+    if not key:
+        return ""
+    return COUNTRY_ARCHIVE_FILENAMES.get(key, f"{key}_companies.json")
+
+
 def data_dir() -> Path:
     raw = os.environ.get("PANEL_DATA_DIR", "").strip()
     if raw:

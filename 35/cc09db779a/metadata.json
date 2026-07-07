@@ -1,0 +1,20 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "35cc09db779a",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "relocation_jobs/scrape/boards/generic.py",
+    "relocation_jobs/scrape/dom_listing.py",
+    "tests/scrape/test_dom_listing.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/35/cc09db779a/0/metadata.json",
+      "transcript": "/35/cc09db779a/0/full.jsonl",
+      "content_hash": "/35/cc09db779a/0/content_hash.txt",
+      "prompt": "/35/cc09db779a/0/prompt.txt"
+    }
+  ]
+}

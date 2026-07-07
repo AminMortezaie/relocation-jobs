@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "da4275b59ac4",
+  "session_id": "34152046-7279-4f93-99c5-ebe97472ef34",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-07T01:21:24.32236Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/scrape/boards/bol.py",
+    "tests/scrape/test_bol_board.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "703c89f956a4",
+  "checkpoint_transcript_start": 123,
+  "transcript_lines_at_start": 123,
+  "session_metrics": {
+    "turn_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-07T01:21:24.317523Z",
+    "agent_lines": 123,
+    "agent_removed": 60,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 123,
+    "total_lines_changed": 183,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

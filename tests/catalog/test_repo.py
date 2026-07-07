@@ -1,7 +1,14 @@
 from __future__ import annotations
 
 from relocation_jobs.core.job_identity import job_idempotency_key
-from relocation_jobs.catalog.repo import get_company, get_job_by_url, sync_company_board_to_catalog
+from relocation_jobs.catalog.repo import (
+    get_company,
+    get_job_by_url,
+    list_country_company_stubs,
+    load_country_catalog,
+    sync_company_board_to_catalog,
+)
+from relocation_jobs.catalog.writes import upsert_company
 
 
 def test_sync_company_board_appends_job(seeded_catalog_v2):
@@ -66,3 +73,27 @@ def test_get_job_by_url_prefers_exact_match_within_company(seeded_catalog_v2):
     assert get_job_by_url(url_b, company_name="Acme Backend Ltd", country_key="uk")["url"] == url_b
     assert job_idempotency_key(alias) == job_idempotency_key(url_a)
     assert job_idempotency_key(url_a) != job_idempotency_key(url_b)
+
+
+def test_custom_country_catalog_without_meta(db, tmp_data_dir):
+    from relocation_jobs.core.location_tags import add_custom_country
+
+    add_custom_country("Armenia")
+    upsert_company(
+        "armenia",
+        {
+            "name": "Armenia Fetch Co",
+            "careers_url": "https://example.com/careers",
+            "ats_type": "greenhouse",
+            "matching_jobs": [],
+            "sources": ["panel"],
+        },
+    )
+
+    stubs = list_country_company_stubs("armenia")
+    assert [item["name"] for item in stubs] == ["Armenia Fetch Co"]
+
+    catalog = load_country_catalog("armenia")
+    assert catalog is not None
+    assert len(catalog["companies"]) == 1
+    assert catalog["total"] == 1

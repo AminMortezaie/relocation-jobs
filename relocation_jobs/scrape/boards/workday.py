@@ -1,7 +1,33 @@
 from __future__ import annotations
 
-from relocation_jobs.core.ats_detection import HEADERS, _workday_api_and_base
+from urllib.parse import urlparse
+
+from relocation_jobs.core.ats_detection import (
+    HEADERS,
+    _parse_workday_board_url,
+    _workday_api_and_base,
+)
 from relocation_jobs.scrape.listing import listing_job
+
+
+def workday_job_detail_api_url(url: str) -> str | None:
+    parsed = urlparse((url or "").split("?")[0])
+    host = (parsed.hostname or "").lower()
+    if "myworkdayjobs.com" not in host and "myworkdaysite.com" not in host:
+        return None
+    parts = [part for part in parsed.path.split("/") if part]
+    if "job" not in parts:
+        return None
+    job_idx = parts.index("job")
+    if job_idx < 1 or job_idx >= len(parts) - 1:
+        return None
+    job_slug = parts[-1]
+    board = _parse_workday_board_url(host, parts[:job_idx])
+    if not board:
+        return None
+    tenant, site, _locale = board
+    scheme = parsed.scheme or "https"
+    return f"{scheme}://{host}/wday/cxs/{tenant}/{site}/job/{job_slug}"
 
 
 async def fetch_workday_board(client, board_url: str, company: dict) -> list[dict]:

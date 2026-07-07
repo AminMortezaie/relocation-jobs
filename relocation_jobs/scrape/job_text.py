@@ -17,6 +17,7 @@ from relocation_jobs.scrape.boards.smartrecruiters import (
     smartrecruiters_location_text,
     smartrecruiters_posting_detail_url,
 )
+from relocation_jobs.scrape.boards.workday import workday_job_detail_api_url
 from relocation_jobs.scrape.descriptions import html_to_readable
 
 
@@ -178,6 +179,32 @@ def fetch_hibob_job_text(url: str) -> str:
     return fetch_hibob_job_detail(url).text
 
 
+def fetch_workday_job_detail(url: str) -> JobFetchResult:
+    api = workday_job_detail_api_url(url)
+    if not api:
+        return _empty_fetch()
+    try:
+        response = requests.get(
+            api,
+            headers={**HEADERS, "Accept": "application/json"},
+            timeout=15,
+        )
+        if not response.ok:
+            return _empty_fetch()
+        info = response.json().get("jobPostingInfo") or {}
+        html = (info.get("jobDescription") or "").strip()
+        if not html:
+            return _empty_fetch()
+        location = (info.get("location") or "").strip()
+        return JobFetchResult(html_to_readable(html), location)
+    except Exception:
+        return _empty_fetch()
+
+
+def fetch_workday_job_text(url: str) -> str:
+    return fetch_workday_job_detail(url).text
+
+
 _JOB_DETAIL_FETCHERS = {
     "greenhouse": fetch_greenhouse_job_detail,
     "greenhouse_eu": fetch_greenhouse_job_detail,
@@ -187,6 +214,7 @@ _JOB_DETAIL_FETCHERS = {
     "ashby": fetch_ashby_job_detail,
     "hibob": fetch_hibob_job_detail,
     "smartrecruiters": fetch_smartrecruiters_job_detail,
+    "workday": fetch_workday_job_detail,
 }
 
 

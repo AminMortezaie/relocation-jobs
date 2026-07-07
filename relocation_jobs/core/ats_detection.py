@@ -218,6 +218,61 @@ def _scan_html_for_ats(html: str) -> tuple[str | None, str | None]:
     return None, None
 
 
+def _recruitee_slug_from_board_url(ats_url: str) -> str:
+    m = re.search(r"([a-z0-9-]+)\.recruitee\.com", ats_url or "", re.I)
+    return m.group(1).lower() if m else ""
+
+
+def _recruitee_board_exists(slug: str) -> bool:
+    if not slug:
+        return False
+    try:
+        response = requests.get(
+            f"https://{slug}.recruitee.com/api/offers/",
+            headers=HEADERS,
+            timeout=8,
+        )
+        return response.status_code == 200
+    except Exception:
+        return False
+
+
+def _accept_url_ats_detection(
+    ats_type: str | None,
+    ats_url: str | None,
+) -> tuple[str | None, str | None]:
+    if not ats_type:
+        return None, None
+    if ats_type == "recruitee":
+        slug = _recruitee_slug_from_board_url(ats_url or "")
+        if slug and not _recruitee_board_exists(slug):
+            return None, None
+    return ats_type, ats_url
+
+
+def _detect_teamtailor_embedded(html: str, page_url: str) -> tuple[str | None, str | None]:
+    hay = html.lower()
+    if "teamtailor-cdn.com" not in hay and "teamtailor.com" not in hay:
+        return None, None
+    match = re.search(r"([a-z0-9-]+)\.teamtailor\.com", html, re.I)
+    if match:
+        slug = match.group(1).lower()
+        if slug not in ("www", "api", "careers", "app", "assets-aws"):
+            return "teamtailor", f"https://{slug}.teamtailor.com/jobs"
+    parsed = urlparse(page_url)
+    host = (parsed.hostname or "").lower()
+    if host.startswith("careers.") and host.count(".") >= 2:
+        return "teamtailor", page_url.split("?")[0].rstrip("/")
+    return None, None
+
+
+def _scan_page_for_ats(html: str, page_url: str) -> tuple[str | None, str | None]:
+    found = _scan_html_for_ats(html)
+    if found[0]:
+        return found
+    return _detect_teamtailor_embedded(html, page_url)
+
+
 def _follow_meta_refresh(html: str, page_url: str) -> str | None:
     m = _META_REFRESH_RE.search(html)
     if not m:
@@ -433,7 +488,10 @@ def _detect_recruitee_from_careers_host(careers_url: str) -> tuple[str | None, s
     slug = m.group(1)
     if slug in ("www", "jobs", "apply"):
         return None, None
-    return "recruitee", f"https://{slug}.recruitee.com/"
+    board_url = f"https://{slug}.recruitee.com/"
+    if not _recruitee_board_exists(slug):
+        return None, None
+    return "recruitee", board_url
 
 
 def _detect_recruitee_board_url(careers_url: str) -> tuple[str | None, str | None]:
@@ -576,7 +634,7 @@ def detect_ats_via_playwright(
 
 def detect_ats_static(careers_url: str, *, _depth: int = 0) -> tuple[str | None, str | None]:
     """Fast static HTML fetch — no JS, no Playwright."""
-    url_detected = _detect_ats_from_careers_url(careers_url)
+    url_detected = _accept_url_ats_detection(*_detect_ats_from_careers_url(careers_url))
     if url_detected[0]:
         return url_detected
 
@@ -592,7 +650,7 @@ def detect_ats_static(careers_url: str, *, _depth: int = 0) -> tuple[str | None,
     except Exception:
         return None, None
 
-    found = _scan_html_for_ats(html)
+    found = _scan_page_for_ats(html, page_url)
     if found[0]:
         return found
 
@@ -822,7 +880,7 @@ async def detect_ats_static_async(
     _depth: int = 0,
 ) -> tuple[str | None, str | None]:
     """Async variant used by scrape_jobs bulk fetch."""
-    url_detected = _detect_ats_from_careers_url(careers_url)
+    url_detected = _accept_url_ats_detection(*_detect_ats_from_careers_url(careers_url))
     if url_detected[0]:
         return url_detected
 
@@ -833,7 +891,7 @@ async def detect_ats_static_async(
     except Exception:
         return None, None
 
-    found = _scan_html_for_ats(html)
+    found = _scan_page_for_ats(html, page_url)
     if found[0]:
         return found
 

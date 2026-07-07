@@ -12,11 +12,6 @@ from relocation_jobs.core.job_identity import (
 )
 from relocation_jobs.core.location_tags import sync_company_location_fields
 
-_COUNTRY_META_FIELDS = frozenset({
-    "source", "fetched", "updated", "jobs_fetched", "total", "last_fetch_new_jobs",
-})
-
-
 def _row(row) -> dict:
     return dict(row) if row else {}
 
@@ -121,13 +116,13 @@ def _load_country_from_db(country_key: str) -> dict | None:
             "SELECT * FROM country_meta WHERE country = %s",
             (country_key,),
         ).fetchone()
-        if meta_row is None:
-            return None
-        meta = _row(meta_row)
         company_rows = conn.execute(
             "SELECT * FROM companies WHERE country = %s ORDER BY name",
             (country_key,),
         ).fetchall()
+        if meta_row is None and not company_rows:
+            return None
+        meta = _row(meta_row) if meta_row is not None else {}
         ids = [int(_row(c)["id"]) for c in company_rows]
         jobs_by_id: dict[int, list[dict]] = defaultdict(list)
         if ids:
@@ -307,11 +302,6 @@ def load_catalog_companies_page(
 
 def list_country_company_stubs(country_key: str) -> list[dict]:
     with db_read() as conn:
-        if conn.execute(
-            "SELECT 1 FROM country_meta WHERE country = %s",
-            (country_key,),
-        ).fetchone() is None:
-            return []
         rows = conn.execute(
             """
             SELECT c.name, c.ats_type,
@@ -324,6 +314,8 @@ def list_country_company_stubs(country_key: str) -> list[dict]:
             """,
             (country_key,),
         ).fetchall()
+    if not rows:
+        return []
     return [
         {
             "name": _row(row)["name"],
@@ -560,14 +552,9 @@ def _replace_company_job_rows(conn, company_id: int, full_board: list[dict]) -> 
 
 
 def _patch_country_meta_on_conn(conn, country_key: str, **fields) -> None:
-    updates = {k: v for k, v in fields.items() if k in _COUNTRY_META_FIELDS and v is not None}
-    if not updates:
-        return
-    columns = ", ".join(f"{col} = %s" for col in updates)
-    conn.execute(
-        f"UPDATE country_meta SET {columns} WHERE country = %s",
-        (*updates.values(), country_key),
-    )
+    from relocation_jobs.catalog.writes import ensure_country_meta
+
+    ensure_country_meta(conn, country_key, **fields)
 
 
 def patch_country_catalog_meta(country_key: str, **fields) -> None:

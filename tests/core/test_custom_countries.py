@@ -6,6 +6,7 @@ from relocation_jobs.core.location_tags import (
     add_custom_city,
     add_custom_country,
     all_country_labels,
+    ensure_country_key,
     load_custom_countries,
     normalize_location,
     supported_country_keys,
@@ -29,6 +30,12 @@ def test_add_custom_country_returns_builtin_match(tmp_data_dir):
 def test_add_custom_country_rejects_empty(tmp_data_dir):
     with pytest.raises(ValueError, match="required"):
         add_custom_country("")
+
+
+def test_ensure_country_key_registers_unknown(tmp_data_dir):
+    assert ensure_country_key("armenia") == "armenia"
+    assert load_custom_countries() == {"armenia": "Armenia"}
+    assert ensure_country_key("armenia") == "armenia"
 
 
 def test_custom_country_allows_custom_city(tmp_data_dir):

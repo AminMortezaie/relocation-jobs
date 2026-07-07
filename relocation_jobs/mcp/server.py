@@ -199,9 +199,15 @@ def mark_applied(country: str, company: str, url: str, applied: bool = True) -> 
 
 @mcp.tool()
 def list_supported_countries() -> str:
-    """List catalog country keys (germany, netherlands, uk, portugal) for add_company."""
+    """List catalog country keys for add_company (built-ins plus any custom countries)."""
     items = service.list_supported_countries()
     return _json([item.model_dump() for item in items])
+
+
+@mcp.tool()
+def add_country(label: str) -> str:
+    """Register a custom catalog country (e.g. Armenia) before add_company, or let add_company auto-register from country key."""
+    return _json(service.add_country(label).model_dump())
 
 
 @mcp.tool()

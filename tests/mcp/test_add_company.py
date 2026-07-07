@@ -93,6 +93,28 @@ def test_add_company_with_custom_country(db, monkeypatch, tmp_data_dir):
     assert stored is not None
 
 
+def test_add_company_auto_registers_unknown_country(db, monkeypatch, tmp_data_dir):
+    from relocation_jobs.core.location_tags import load_custom_countries
+
+    _patch_company_enrichment(monkeypatch)
+    result = service.add_company(
+        "MCP Armenia Co",
+        "https://www.jetbrains.com/careers/jobs/",
+        country="armenia",
+    )
+    assert result.country == "armenia"
+    assert result.country_label == "Armenia"
+    assert load_custom_countries() == {"armenia": "Armenia"}
+    stored = get_company("armenia", "MCP Armenia Co")
+    assert stored is not None
+
+
+def test_add_country(db, tmp_data_dir):
+    result = service.add_country("Armenia")
+    assert result.id == "armenia"
+    assert result.label == "Armenia"
+
+
 def test_add_company_parses_locations_json(db, monkeypatch):
     _patch_company_enrichment(monkeypatch)
     result = service.add_company(

@@ -42,6 +42,32 @@ def upsert_country_meta(conn, country_key: str, meta: dict) -> None:
     )
 
 
+def ensure_country_meta(conn, country_key: str, **fields) -> None:
+    allowed = {"source", "fetched", "updated", "jobs_fetched", "total", "last_fetch_new_jobs"}
+    updates = {k: v for k, v in fields.items() if k in allowed and v is not None}
+    row = conn.execute(
+        "SELECT * FROM country_meta WHERE country = %s",
+        (country_key,),
+    ).fetchone()
+    if row is None:
+        meta = {
+            "source": "",
+            "fetched": "",
+            "updated": today(),
+            "jobs_fetched": "",
+            "total": 0,
+            "last_fetch_new_jobs": 0,
+        }
+        meta.update(updates)
+        upsert_country_meta(conn, country_key, meta)
+        return
+    if not updates:
+        return
+    meta = row_dict(row)
+    meta.update(updates)
+    upsert_country_meta(conn, country_key, meta)
+
+
 def upsert_company_and_jobs(
     conn,
     country_key: str,
@@ -212,6 +238,12 @@ def upsert_company(country_key: str, company: dict, *, updated: str | None = Non
     ts = updated or today()
     with db_transaction() as conn:
         upsert_company_and_jobs(conn, country_key, company, updated=ts)
+        count_row = conn.execute(
+            "SELECT COUNT(*) AS n FROM companies WHERE country = %s",
+            (country_key,),
+        ).fetchone()
+        total = int(row_dict(count_row).get("n") or 0)
+        ensure_country_meta(conn, country_key, updated=ts, total=total)
     invalidate_country_cache(country_key)
 
 

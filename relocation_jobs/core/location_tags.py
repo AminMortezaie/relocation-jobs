@@ -151,6 +151,16 @@ def add_custom_country(label: str) -> dict:
     return {"id": country_key, "label": country_label_text}
 
 
+def ensure_country_key(country_key: str) -> str:
+    key = normalize_country_key(country_key)
+    if not key:
+        raise ValueError("Country is required")
+    if key in supported_country_keys():
+        return key
+    add_custom_country(key.replace("-", " ").title())
+    return key
+
+
 def load_custom_cities(*, use_cache: bool = True) -> dict[str, list[str]]:
     """Return user-added picker cities keyed by country."""
     global _custom_cities_cache

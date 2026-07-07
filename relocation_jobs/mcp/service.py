@@ -13,8 +13,12 @@ from relocation_jobs.catalog.repo import (
 )
 from relocation_jobs.companies.service import add_company as catalog_add_company
 from relocation_jobs.companies.service import list_ats_types as catalog_list_ats_types
-from relocation_jobs.core.location_tags import COUNTRY_LABELS, all_country_labels
-from relocation_jobs.core.paths import supported_countries
+from relocation_jobs.core.location_tags import (
+    COUNTRY_LABELS,
+    add_custom_country,
+    all_country_labels,
+    ensure_country_key,
+)
 from relocation_jobs.scrape.descriptions import format_job_description
 from relocation_jobs.scrape.job_text import fetch_job_description
 from relocation_jobs.core.db import _normalize_url
@@ -715,14 +719,11 @@ def _validate_add_company_inputs(
             if (item or "").strip()
         ]
         for key in country_keys:
-            if key not in supported_countries():
-                raise ValueError(f"Unknown country: {key}")
+            ensure_country_key(key)
     else:
         country_hint = (country or "").strip().lower()
         if country_hint and country_hint not in ("", "auto", "all"):
-            if country_hint not in supported_countries():
-                raise ValueError(f"Unknown country: {country_hint}")
-            country_keys = [country_hint]
+            country_keys = [ensure_country_key(country_hint)]
 
     if locations is not None and not isinstance(locations, list):
         raise ValueError("locations must be an array")
@@ -740,6 +741,11 @@ def list_supported_countries() -> list[SupportedCountry]:
         SupportedCountry(id=key, label=label)
         for key, label in sorted(all_country_labels().items())
     ]
+
+
+def add_country(label: str) -> SupportedCountry:
+    result = add_custom_country(label)
+    return SupportedCountry(id=result["id"], label=result["label"])
 
 
 def list_ats_types() -> list[AtsTypeOption]:

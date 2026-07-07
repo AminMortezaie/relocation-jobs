@@ -38,6 +38,8 @@ from relocation_jobs.core.job_identity import (
 )
 from relocation_jobs.core.location_tags import (
     COUNTRY_LABELS,
+    country_label,
+    ensure_country_key,
     _strip_country_suffix,
     normalize_location,
     sync_company_location_fields,
@@ -429,10 +431,15 @@ def add_company(
     careers_url = normalize_careers_url(careers_url)
     hint = None
     if country_keys:
-        cleaned_keys = [k.strip().lower() for k in country_keys if k.strip().lower() in supported_countries()]
+        cleaned_keys: list[str] = []
+        for item in country_keys:
+            key = (item or "").strip().lower()
+            if not key:
+                continue
+            cleaned_keys.append(ensure_country_key(key))
         hint = cleaned_keys[0] if cleaned_keys else None
     elif country_key and country_key not in ("auto", "all", ""):
-        hint = country_key.strip().lower()
+        hint = ensure_country_key(country_key.strip().lower())
 
     resolved_country, _meta = resolve_country_key(name, careers_url, hint=hint)
     if resolved_country not in supported_countries():
@@ -451,7 +458,7 @@ def add_company(
 
     return {
         "country": resolved_country,
-        "country_label": COUNTRY_LABELS.get(resolved_country, resolved_country),
+        "country_label": country_label(resolved_country),
         **company,
     }
 

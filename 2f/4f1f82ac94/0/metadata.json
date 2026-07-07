@@ -1,0 +1,105 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "2f4f1f82ac94",
+  "session_id": "34152046-7279-4f93-99c5-ebe97472ef34",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-07T01:11:22.198185Z",
+  "branch": "main",
+  "checkpoints_count": 5,
+  "save_step_count": 5,
+  "files_touched": [
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/catalog/writes.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/scrape/boards/workday.py",
+    "relocation_jobs/scrape/job_text.py",
+    "tests/catalog/test_repo.py",
+    "tests/core/test_ats_detection.py",
+    "tests/core/test_custom_countries.py",
+    "tests/mcp/test_add_company.py",
+    "tests/scrape/test_workday_job_text.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "002bc6e42d61",
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-07T01:11:22.194108Z",
+    "agent_lines": 269,
+    "agent_removed": 34,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 5,
+    "total_committed": 269,
+    "total_lines_changed": 308,
+    "agent_percentage": 98.37662337662337,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 115,
+      "user_lines_removed": 30,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "frontend/src/CompanyCard.jsx": 17,
+        "relocation_jobs/companies/service.py": 5,
+        "relocation_jobs/core/location_tags.py": 25,
+        "relocation_jobs/core/paths.py": 7,
+        "relocation_jobs/fetch/runner.py": 3,
+        "relocation_jobs/panel/service.py": 2,
+        "relocation_jobs/static/dist/board.js": 9,
+        "relocation_jobs/static/js/render.js": 15,
+        "relocation_jobs/web/routes/companies.py": 4,
+        "relocation_jobs/web/routes/fetch.py": 2,
+        "tests/core/test_custom_countries.py": 26
+      },
+      "user_removed_per_file": {
+        "frontend/src/CompanyCard.jsx": 3,
+        "relocation_jobs/companies/service.py": 2,
+        "relocation_jobs/core/location_tags.py": 3,
+        "relocation_jobs/fetch/runner.py": 3,
+        "relocation_jobs/panel/service.py": 2,
+        "relocation_jobs/static/dist/board.js": 9,
+        "relocation_jobs/static/js/render.js": 2,
+        "relocation_jobs/web/routes/companies.py": 4,
+        "relocation_jobs/web/routes/fetch.py": 2
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 69,
+      "agent_lines_removed": 11
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 69,
+      "agent_lines_removed": 11
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 141,
+      "agent_lines_removed": 33
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 242,
+      "agent_lines_removed": 38
+    }
+  ]
+}

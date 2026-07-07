@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "2f4f1f82ac94",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 5,
+  "files_touched": [
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/catalog/writes.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/scrape/boards/workday.py",
+    "relocation_jobs/scrape/job_text.py",
+    "tests/catalog/test_repo.py",
+    "tests/core/test_ats_detection.py",
+    "tests/core/test_custom_countries.py",
+    "tests/mcp/test_add_company.py",
+    "tests/scrape/test_workday_job_text.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/2f/4f1f82ac94/0/metadata.json",
+      "transcript": "/2f/4f1f82ac94/0/full.jsonl",
+      "content_hash": "/2f/4f1f82ac94/0/content_hash.txt",
+      "prompt": "/2f/4f1f82ac94/0/prompt.txt"
+    }
+  ]
+}

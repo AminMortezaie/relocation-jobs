@@ -218,6 +218,109 @@ def list_ats_types() -> str:
 
 
 @mcp.tool()
+def add_position(
+    country: str,
+    company: str,
+    title: str,
+    url: str,
+    location: str = "",
+    description_text: str = "",
+    posted_at: str = "",
+    overwrite: bool = False,
+) -> str:
+    """Add a position to an existing company and store its job description in the catalog.
+
+    Use when a role is visible outside the company careers site (e.g. LinkedIn only).
+    Company must already exist (add_company first).
+
+    Required: country, company (name or slug), title, posting url.
+    description_text: paste the full JD from the posting. Required for LinkedIn / Indeed /
+    Glassdoor URLs (panel fetch will not work). For ATS URLs it is optional — omit only if
+    you will fetch the JD on the panel or call save_position_description later.
+    posted_at: when the role was posted (YYYY-MM-DD or ISO datetime). Required for LinkedIn /
+    Indeed / Glassdoor — use the date shown on the listing, not today's date. Drives board
+    sort (stored as fetched/last_seen).
+    Optional: location, overwrite (when true and the URL already exists, replace title,
+    location, description, and/or posted_at instead of merging).
+
+    Returns canonical url, idempotency_key, posted_at, has_description, needs_description,
+    needs_fetch, and workspace_path. Call get_job_context next for reframe phases.
+    """
+    return _json(service.add_position(
+        country,
+        company,
+        title,
+        url,
+        location=location,
+        description_text=description_text,
+        posted_at=posted_at,
+        overwrite=overwrite,
+    ))
+
+
+@mcp.tool()
+def save_position_description(
+    country: str,
+    company: str,
+    url: str,
+    description_text: str,
+    overwrite: bool = False,
+) -> str:
+    """Store or update a job description for an existing catalog position.
+
+    Default: merge with existing text (append or replace when the new paste is fuller).
+    Set overwrite=true to replace the stored JD entirely (use to fix mistakes). Pass an
+    empty description_text with overwrite=true to clear the JD.
+    """
+    return _json(service.save_position_description(
+        country,
+        company,
+        url,
+        description_text,
+        overwrite=overwrite,
+    ))
+
+
+@mcp.tool()
+def update_position(
+    country: str,
+    company: str,
+    url: str,
+    title: str = "",
+    new_url: str = "",
+    location: str = "",
+    description_text: str = "",
+    clear_description: bool = False,
+    posted_at: str = "",
+) -> str:
+    """Overwrite catalog fields for an existing position (fix mistaken saves).
+
+    Identify the role by country, company, and current url. Pass only fields to change;
+    omitted fields stay as-is. description_text replaces the full JD (not merged).
+    posted_at sets the real posting date (YYYY-MM-DD or ISO datetime) for board sort.
+    Set clear_description=true to wipe the JD. new_url updates the posting link and
+    idempotency key (use get_job_context afterward for the canonical url).
+    """
+    optional_title = title.strip() or None
+    optional_url = new_url.strip() or None
+    optional_location = location if location else None
+    optional_description = description_text.strip() if description_text.strip() else None
+    optional_posted_at = posted_at.strip() if posted_at.strip() else None
+
+    return _json(service.update_position(
+        country,
+        company,
+        url,
+        title=optional_title,
+        new_url=optional_url,
+        location=optional_location,
+        description_text=optional_description,
+        clear_description=clear_description,
+        posted_at=optional_posted_at,
+    ))
+
+
+@mcp.tool()
 def add_company(
     name: str,
     careers_url: str,

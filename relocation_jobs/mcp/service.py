@@ -4,14 +4,17 @@ import json
 import os
 import tempfile
 from pathlib import Path
+from urllib.parse import urlparse
 
 from relocation_jobs.catalog.repo import (
     get_company,
     get_job_by_idempotency_key,
     get_job_by_url,
     update_job_description_text,
+    update_matching_job_fields,
 )
 from relocation_jobs.companies.service import add_company as catalog_add_company
+from relocation_jobs.companies.service import add_manual_jobs as catalog_add_manual_jobs
 from relocation_jobs.companies.service import list_ats_types as catalog_list_ats_types
 from relocation_jobs.core.location_tags import (
     COUNTRY_LABELS,
@@ -19,15 +22,17 @@ from relocation_jobs.core.location_tags import (
     all_country_labels,
     ensure_country_key,
 )
+from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.scrape.descriptions import format_job_description
 from relocation_jobs.scrape.job_text import fetch_job_description
 from relocation_jobs.core.db import _normalize_url
-from relocation_jobs.core.job_identity import job_idempotency_key
+from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
 from relocation_jobs.db.users import get_user_by_username
 from relocation_jobs.mcp import repo, render, validate
 from relocation_jobs.mcp.names import application_pdf_filename, master_pdf_filename
 from relocation_jobs.mcp.types import (
     AddCompanyResult,
+    AddPositionResult,
     ApplicationProfile,
     ApplicationQueueItem,
     ApplicationTexDetail,
@@ -38,7 +43,9 @@ from relocation_jobs.mcp.types import (
     MasterResumeSummary,
     PositionDescription,
     RenderResult,
+    SavePositionDescriptionResult,
     SupportedCountry,
+    UpdatePositionResult,
     ValidationResult,
 )
 from relocation_jobs.core.location_tags import job_fails_office_location_gate
@@ -46,7 +53,139 @@ from relocation_jobs.panel.tracking import resolve_track
 from relocation_jobs.positions.service import set_job_applied
 from relocation_jobs.positions.state import position_view_from_row
 from relocation_jobs.positions.types import PositionBucket
+from relocation_jobs.shared.timestamps import job_fetched_ts, normalize_posted_at
 from relocation_jobs.users.repo import load_job_tracking
+
+
+_MIN_JD_CHARS = 80
+_NON_FETCHABLE_POSTING_HOSTS = frozenset({
+    "linkedin.com",
+    "indeed.com",
+    "glassdoor.com",
+})
+
+
+def _posting_host(url: str) -> str:
+    return (urlparse(normalize_job_url(url)).hostname or "").lower()
+
+
+def _non_fetchable_posting_url(url: str) -> bool:
+    host = _posting_host(url)
+    return host in _NON_FETCHABLE_POSTING_HOSTS
+
+
+def _merge_job_description(existing: str, new: str) -> str:
+    current = (existing or "").strip()
+    incoming = (new or "").strip()
+    if not incoming:
+        return current
+    if not current:
+        return incoming
+    if incoming == current:
+        return current
+    if incoming in current:
+        return current
+    if current in incoming:
+        return incoming
+    return f"{current}\n\n---\n\n{incoming}"
+
+
+def _persist_job_description(
+    idempotency_key: str,
+    description_text: str,
+    *,
+    existing: str = "",
+    overwrite: bool = False,
+) -> bool:
+    key = (idempotency_key or "").strip()
+    incoming = (description_text or "").strip()
+    if overwrite:
+        if incoming == (existing or "").strip():
+            return False
+        return update_job_description_text(key, incoming)
+    merged = _merge_job_description(existing, description_text)
+    if not merged or merged == (existing or "").strip():
+        return False
+    return update_job_description_text(key, merged)
+
+
+def _resolve_catalog_position(
+    country_key: str,
+    company: str,
+    url: str,
+) -> tuple[str, dict]:
+    company_name = resolve_company_for_workspace(country_key, company)
+    cleaned_url = (url or "").strip()
+    job = get_job_by_url(
+        cleaned_url,
+        company_name=company_name,
+        country_key=country_key,
+    )
+    if job is None:
+        raise LookupError(f"Position not found: {cleaned_url}")
+    return company_name, job
+
+
+def _position_result_from_job(
+    *,
+    country_key: str,
+    company_name: str,
+    job: dict,
+    updated_fields: list[str] | None = None,
+) -> UpdatePositionResult:
+    desc_fields = _job_description_fields(job)
+    has_description = bool(desc_fields.get("has_description"))
+    canonical_url = (job.get("url") or "").strip()
+    slug = repo.company_slug(company_name)
+    idem_key = (job.get("idempotency_key") or "").strip()
+    return UpdatePositionResult(
+        country=country_key,
+        company=company_name,
+        company_slug=slug,
+        title=(job.get("title") or "").strip(),
+        url=canonical_url,
+        idempotency_key=idem_key,
+        location=(job.get("location") or "").strip(),
+        has_description=has_description,
+        needs_description=not has_description,
+        description_chars=len((job.get("description_text") or "")),
+        updated_fields=updated_fields or [],
+        posted_at=job_fetched_ts(job),
+        workspace_path=f"/company/{country_key}/{slug}",
+    )
+
+
+def _validate_manual_jd(description_text: str, *, url: str) -> str:
+    cleaned = (description_text or "").strip()
+    if _non_fetchable_posting_url(url):
+        if len(cleaned) < _MIN_JD_CHARS:
+            raise ValueError(
+                "description_text is required for LinkedIn and similar postings — "
+                f"paste the full job description (at least {_MIN_JD_CHARS} characters)"
+            )
+    return cleaned
+
+
+def _validate_posted_at(posted_at: str, *, url: str) -> str:
+    cleaned = (posted_at or "").strip()
+    if _non_fetchable_posting_url(url):
+        if not cleaned:
+            raise ValueError(
+                "posted_at is required for LinkedIn and similar postings — "
+                "use the posting date from the listing (YYYY-MM-DD or ISO datetime)"
+            )
+        return normalize_posted_at(cleaned)
+    if not cleaned:
+        return ""
+    return normalize_posted_at(cleaned)
+
+
+def _apply_posted_at_to_job(job: dict, posted_at: str) -> None:
+    if not posted_at:
+        return
+    job["posted_at"] = posted_at
+    job["fetched"] = posted_at
+    job["last_seen"] = posted_at
 
 
 def resolve_user_id() -> int:
@@ -166,6 +305,7 @@ def get_job_context(
         has_description=bool(description["has_description"]),
         needs_fetch=bool(description["needs_fetch"]),
         description_html=str(description.get("description_html") or ""),
+        posted_at=job_fetched_ts(job),
     )
 
 
@@ -793,6 +933,243 @@ def add_company(
         size=(result.get("size") or "").strip(),
         matching_jobs_count=len(result.get("matching_jobs") or []),
         workspace_path=f"/company/{country_key}/{slug}",
+    )
+
+
+def add_position(
+    country: str,
+    company: str,
+    title: str,
+    url: str,
+    *,
+    location: str = "",
+    description_text: str = "",
+    posted_at: str = "",
+    overwrite: bool = False,
+) -> AddPositionResult:
+    country_key = (country or "").strip().lower()
+    if not country_key or country_key == "all":
+        raise ValueError("country is required (not 'all')")
+    if country_key not in supported_countries():
+        raise ValueError(f"Unknown country: {country_key}")
+
+    cleaned_title = (title or "").strip()
+    cleaned_url = (url or "").strip()
+    if not cleaned_title:
+        raise ValueError("title is required")
+    if not cleaned_url:
+        raise ValueError("url is required")
+
+    cleaned_description = _validate_manual_jd(description_text, url=cleaned_url)
+    cleaned_posted_at = _validate_posted_at(posted_at, url=cleaned_url)
+
+    company_name = resolve_company_for_workspace(country_key, company)
+    job: dict = {"title": cleaned_title, "url": cleaned_url}
+    cleaned_location = (location or "").strip()
+    if cleaned_location:
+        job["location"] = cleaned_location
+    if cleaned_description:
+        job["description_text"] = cleaned_description
+    _apply_posted_at_to_job(job, cleaned_posted_at)
+
+    before_job = get_job_by_url(
+        cleaned_url,
+        company_name=company_name,
+        country_key=country_key,
+    )
+    already_existed = before_job is not None
+    before_description = (before_job or {}).get("description_text") or ""
+
+    result = catalog_add_manual_jobs(country_key, company_name, [job])
+    added = 0 if already_existed else int(result.get("added") or 0)
+
+    stored = get_job_by_url(
+        cleaned_url,
+        company_name=company_name,
+        country_key=country_key,
+    )
+    if stored is None:
+        raise LookupError(f"Position not found after add: {cleaned_url}")
+
+    idem_key = (stored.get("idempotency_key") or "").strip()
+    description_saved = False
+    if already_existed and overwrite:
+        stored = update_matching_job_fields(
+            country_key,
+            company_name,
+            lookup_url=cleaned_url,
+            title=cleaned_title,
+            location=cleaned_location if location else None,
+            description_text=cleaned_description if description_text else None,
+            posted_at=cleaned_posted_at if cleaned_posted_at else None,
+        ) or stored
+        description_saved = bool(description_text)
+    elif already_existed and cleaned_posted_at and cleaned_posted_at != job_fetched_ts(before_job or {}):
+        stored = update_matching_job_fields(
+            country_key,
+            company_name,
+            lookup_url=cleaned_url,
+            posted_at=cleaned_posted_at,
+        ) or stored
+    if cleaned_description and not (already_existed and overwrite):
+        description_saved = _persist_job_description(
+            idem_key,
+            cleaned_description,
+            existing=before_description,
+            overwrite=overwrite,
+        )
+        if description_saved:
+            stored = get_job_by_url(
+                cleaned_url,
+                company_name=company_name,
+                country_key=country_key,
+            ) or stored
+
+    desc_fields = _job_description_fields(stored or {})
+    has_description = bool(desc_fields.get("has_description"))
+    description_chars = len((stored or {}).get("description_text") or "")
+    canonical_url = (stored.get("url") or cleaned_url).strip()
+    slug = repo.company_slug(company_name)
+    return AddPositionResult(
+        added=added,
+        already_existed=already_existed,
+        country=country_key,
+        country_label=(result.get("country_label") or COUNTRY_LABELS.get(country_key, country_key)),
+        company=company_name,
+        company_slug=slug,
+        title=(stored.get("title") or cleaned_title).strip(),
+        url=canonical_url,
+        idempotency_key=idem_key,
+        location=(stored.get("location") or cleaned_location).strip(),
+        has_description=has_description,
+        needs_description=not has_description,
+        needs_fetch=not has_description and not _non_fetchable_posting_url(canonical_url),
+        description_chars=description_chars,
+        description_saved=description_saved,
+        total_positions=int(result.get("total") or 0),
+        posted_at=job_fetched_ts(stored or {}),
+        workspace_path=f"/company/{country_key}/{slug}",
+    )
+
+
+def save_position_description(
+    country: str,
+    company: str,
+    url: str,
+    description_text: str,
+    *,
+    overwrite: bool = False,
+) -> SavePositionDescriptionResult:
+    country_key = (country or "").strip().lower()
+    cleaned_url = (url or "").strip()
+    cleaned_description = (description_text or "").strip()
+    if not cleaned_description and not overwrite:
+        raise ValueError("description_text is required")
+    if cleaned_description and len(cleaned_description) < _MIN_JD_CHARS and not overwrite:
+        raise ValueError(f"description_text is too short (need at least {_MIN_JD_CHARS} characters)")
+
+    company_name, job = _resolve_catalog_position(country_key, company, cleaned_url)
+
+    idem_key = (job.get("idempotency_key") or "").strip()
+    before = (job.get("description_text") or "").strip()
+    saved = _persist_job_description(
+        idem_key,
+        cleaned_description,
+        existing=before,
+        overwrite=overwrite,
+    )
+    stored = get_job_by_url(
+        cleaned_url,
+        company_name=company_name,
+        country_key=country_key,
+    ) or job
+    desc_fields = _job_description_fields(stored)
+    has_description = bool(desc_fields.get("has_description"))
+    after = (stored.get("description_text") or "").strip()
+    return SavePositionDescriptionResult(
+        country=country_key,
+        company=company_name,
+        url=(stored.get("url") or cleaned_url).strip(),
+        idempotency_key=idem_key,
+        has_description=has_description,
+        needs_fetch=not has_description,
+        description_chars=len(after),
+        description_saved=saved,
+        appended=saved and not overwrite and bool(before) and after != before and before in after,
+        overwritten=saved and overwrite,
+    )
+
+
+def update_position(
+    country: str,
+    company: str,
+    url: str,
+    *,
+    title: str | None = None,
+    new_url: str | None = None,
+    location: str | None = None,
+    description_text: str | None = None,
+    clear_description: bool = False,
+    posted_at: str | None = None,
+) -> UpdatePositionResult:
+    country_key = (country or "").strip().lower()
+    if not country_key or country_key == "all":
+        raise ValueError("country is required (not 'all')")
+
+    company_name, job = _resolve_catalog_position(country_key, company, url)
+    lookup_url = (url or "").strip()
+
+    updated_fields: list[str] = []
+    patch_title = (title or "").strip() if title is not None else None
+    patch_url = (new_url or "").strip() if new_url is not None else None
+    patch_location = location if location is not None else None
+    patch_description: str | None = None
+    patch_posted_at: str | None = None
+    if clear_description:
+        patch_description = ""
+        updated_fields.append("description_text")
+    elif description_text is not None:
+        patch_description = (description_text or "").strip()
+        updated_fields.append("description_text")
+    if posted_at is not None:
+        patch_posted_at = normalize_posted_at(posted_at)
+        updated_fields.append("posted_at")
+
+    if patch_title is not None:
+        if not patch_title:
+            raise ValueError("title cannot be empty")
+        updated_fields.append("title")
+    if patch_url is not None:
+        if not patch_url:
+            raise ValueError("new_url cannot be empty")
+        updated_fields.append("url")
+    if patch_location is not None:
+        updated_fields.append("location")
+
+    if not updated_fields:
+        raise ValueError(
+            "at least one field to update is required "
+            "(title, new_url, location, description_text, posted_at, or clear_description)"
+        )
+
+    stored = update_matching_job_fields(
+        country_key,
+        company_name,
+        lookup_url=lookup_url,
+        title=patch_title,
+        url=patch_url,
+        location=patch_location,
+        description_text=patch_description,
+        posted_at=patch_posted_at,
+    )
+    if stored is None:
+        raise LookupError(f"Position not found: {lookup_url}")
+
+    return _position_result_from_job(
+        country_key=country_key,
+        company_name=company_name,
+        job=stored,
+        updated_fields=updated_fields,
     )
 
 

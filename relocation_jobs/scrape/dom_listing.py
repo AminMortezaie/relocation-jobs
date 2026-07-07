@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,6 +15,9 @@ _GENERIC_LINK_LABELS = frozenset({
 })
 
 _JOB_DETAIL_PATH = re.compile(r"/job[s]?/", re.I)
+_CAREERS_INDEX_SEGMENTS = frozenset({
+    "careers", "jobs", "job-openings", "vacancies", "vacatures",
+})
 _LISTING_NOISE_URL = re.compile(r"/jobs/show_more\b", re.I)
 _JUNK_LISTING_TITLE = re.compile(
     r"^(show\s+\d+\s+more|load\s+more|view\s+all(\s+jobs)?|see\s+all(\s+jobs)?)$",
@@ -83,6 +86,24 @@ def _is_listing_noise_url(url: str) -> bool:
     return bool(_LISTING_NOISE_URL.search(url or ""))
 
 
+def _is_careers_detail_url(url: str) -> bool:
+    parts = [part for part in (urlparse(url).path or "").split("/") if part]
+    if len(parts) < 2:
+        return False
+    if parts[0].casefold() not in _CAREERS_INDEX_SEGMENTS:
+        return False
+    slug = parts[-1].casefold().removesuffix(".html")
+    if slug in _CAREERS_INDEX_SEGMENTS:
+        return False
+    if len(parts) == 2 and slug in {"en", "nl", "de", "fr", "es", "it"}:
+        return False
+    return bool(slug)
+
+
+def _is_job_detail_url(url: str) -> bool:
+    return bool(_JOB_DETAIL_PATH.search(url or "")) or _is_careers_detail_url(url)
+
+
 def _collect_listing_job_links(soup, page_url: str) -> dict[str, str]:
     candidates: dict[str, str] = {}
     for anchor in soup.find_all("a", href=True):
@@ -91,7 +112,7 @@ def _collect_listing_job_links(soup, page_url: str) -> dict[str, str]:
             continue
         if _is_listing_noise_url(full_url):
             continue
-        if not _JOB_DETAIL_PATH.search(full_url):
+        if not _is_job_detail_url(full_url):
             continue
         guess = _title_from_listing_anchor(anchor)
         if _JUNK_LISTING_TITLE.match(_normalize_title(guess)):

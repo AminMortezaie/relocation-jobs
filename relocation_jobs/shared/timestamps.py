@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import date, datetime
+
 
 def normalize_ts_for_sort(ts: str) -> str:
     ts = (ts or "").strip()
@@ -8,6 +10,30 @@ def normalize_ts_for_sort(ts: str) -> str:
     if len(ts) == 10 and ts[4] == "-" and ts[7] == "-":
         return f"{ts}T00:00:00"
     return ts.replace("Z", "+00:00")
+
+
+def normalize_posted_at(raw: str) -> str:
+    text = (raw or "").strip()
+    if not text:
+        raise ValueError("posted_at is required")
+    if len(text) == 10 and text[4] == "-" and text[7] == "-":
+        date.fromisoformat(text)
+        return text
+    normalized = text.replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise ValueError(
+            f"posted_at must be YYYY-MM-DD or ISO datetime (got {raw!r})"
+        ) from exc
+    if (
+        dt.hour == 0
+        and dt.minute == 0
+        and dt.second == 0
+        and dt.microsecond == 0
+    ):
+        return dt.date().isoformat()
+    return dt.isoformat()
 
 
 def job_fetched_ts(job: dict) -> str:

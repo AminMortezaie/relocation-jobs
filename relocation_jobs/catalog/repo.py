@@ -435,6 +435,102 @@ def update_job_description_text(idempotency_key: str, description_text: str) -> 
     return row is not None
 
 
+def update_matching_job_fields(
+    country_key: str,
+    company_name: str,
+    *,
+    lookup_url: str = "",
+    idempotency_key: str = "",
+    title: str | None = None,
+    url: str | None = None,
+    location: str | None = None,
+    description_text: str | None = None,
+    posted_at: str | None = None,
+) -> dict | None:
+    from relocation_jobs.catalog.cache import invalidate_country_cache
+
+    country = (country_key or "").strip().lower()
+    company = (company_name or "").strip()
+    if not country or not company:
+        raise ValueError("country and company are required")
+
+    lookup_key = (idempotency_key or "").strip()
+    if not lookup_key:
+        lookup_key = job_idempotency_key(lookup_url)
+    if not lookup_key:
+        raise ValueError("url or idempotency_key is required")
+
+    sets: list[str] = []
+    params: list = []
+
+    if title is not None:
+        sets.append("title = %s")
+        params.append((title or "").strip())
+    if location is not None:
+        sets.append("location = %s")
+        params.append((location or "").strip())
+    if description_text is not None:
+        sets.append("description_text = %s")
+        params.append((description_text or "").strip())
+    if posted_at is not None:
+        stamp = (posted_at or "").strip()
+        sets.append("fetched = %s")
+        params.append(stamp)
+        sets.append("last_seen = %s")
+        params.append(stamp)
+    if url is not None:
+        normalized = normalize_job_url(url)
+        if not normalized:
+            raise ValueError("url is invalid")
+        identity = stamp_job_identity({"url": normalized})
+        new_key = (identity.get("idempotency_key") or "").strip()
+        if not new_key:
+            raise ValueError("url is invalid")
+        sets.append("url = %s")
+        params.append(normalized)
+        sets.append("idempotency_key = %s")
+        params.append(new_key)
+        lookup_key_for_return = new_key
+    else:
+        lookup_key_for_return = lookup_key
+
+    if not sets:
+        raise ValueError("at least one field to update is required")
+
+    with db_transaction() as conn:
+        company_row = conn.execute(
+            "SELECT id FROM companies WHERE country = %s AND lower(name) = lower(%s)",
+            (country, company),
+        ).fetchone()
+        if company_row is None:
+            return None
+        company_id = _row(company_row)["id"]
+        params.extend([company_id, lookup_key])
+        row = conn.execute(
+            f"""
+            UPDATE matching_jobs
+            SET {", ".join(sets)}
+            WHERE company_id = %s AND idempotency_key = %s
+            RETURNING idempotency_key, title, url, location, description_text
+            """,
+            tuple(params),
+        ).fetchone()
+    if row is None:
+        return None
+    invalidate_country_cache(country)
+    updated = _row(row)
+    return get_job_by_url(
+        updated.get("url") or lookup_url,
+        company_name=company,
+        country_key=country,
+    ) or {
+        **updated,
+        "company_name": company,
+        "country": country,
+        "idempotency_key": updated.get("idempotency_key") or lookup_key_for_return,
+    }
+
+
 def _upsert_company_catalog_row(
     conn,
     country_key: str,

@@ -575,11 +575,26 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
         raise ValueError(f"Unknown country: {country_key}")
 
     ts = today()
-    to_add = [
-        {"title": (j.get("title") or "").strip(), "url": normalize_job_url(j.get("url") or ""), "fetched": ts, "last_seen": ts}
-        for j in jobs
-        if (j.get("title") or "").strip() and normalize_job_url(j.get("url") or "")
-    ]
+    to_add = []
+    for j in jobs:
+        title = (j.get("title") or "").strip()
+        url = normalize_job_url(j.get("url") or "")
+        if not title or not url:
+            continue
+        posted = (j.get("posted_at") or j.get("fetched") or "").strip() or ts
+        row = {
+            "title": title,
+            "url": url,
+            "fetched": posted,
+            "last_seen": (j.get("last_seen") or "").strip() or posted,
+        }
+        location = (j.get("location") or "").strip()
+        if location:
+            row["location"] = location
+        description = (j.get("description_text") or "").strip()
+        if description:
+            row["description_text"] = description
+        to_add.append(row)
     if not to_add:
         raise ValueError("No valid jobs to add")
 

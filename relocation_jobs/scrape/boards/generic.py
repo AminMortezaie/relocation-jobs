@@ -28,6 +28,8 @@ async def fetch_generic_board(
     playwright_fallback: PlaywrightFallback | None = None,
 ) -> list[dict]:
     page_url = (company.get("careers_url") or board_url or "").strip()
+    if "#" in page_url:
+        page_url = page_url.split("#", 1)[0]
     if not page_url:
         return []
 

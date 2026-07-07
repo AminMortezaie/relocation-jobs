@@ -76,6 +76,7 @@ class JobContext(BaseSchema):
     description_html: str = ""
     has_description: bool = False
     needs_fetch: bool = False
+    posted_at: str = ""
 
 
 class PositionDescription(BaseSchema):
@@ -160,4 +161,57 @@ class AddCompanyResult(BaseSchema):
     city: str = ""
     size: str = ""
     matching_jobs_count: int = 0
+    workspace_path: str = ""
+
+
+class AddPositionResult(BaseSchema):
+    ok: bool = True
+    added: int = 0
+    already_existed: bool = False
+    country: str
+    country_label: str
+    company: str
+    company_slug: str
+    title: str
+    url: str
+    idempotency_key: str = ""
+    location: str = ""
+    has_description: bool = False
+    needs_description: bool = False
+    needs_fetch: bool = False
+    description_chars: int = 0
+    description_saved: bool = False
+    total_positions: int = 0
+    posted_at: str = ""
+    workspace_path: str = ""
+
+
+class SavePositionDescriptionResult(BaseSchema):
+    ok: bool = True
+    country: str
+    company: str
+    url: str
+    idempotency_key: str = ""
+    has_description: bool = False
+    needs_fetch: bool = False
+    description_chars: int = 0
+    description_saved: bool = False
+    appended: bool = False
+    overwritten: bool = False
+
+
+class UpdatePositionResult(BaseSchema):
+    ok: bool = True
+    country: str
+    company: str
+    company_slug: str
+    title: str = ""
+    url: str = ""
+    idempotency_key: str = ""
+    location: str = ""
+    has_description: bool = False
+    needs_description: bool = False
+    description_chars: int = 0
+    updated_fields: list[str] = Field(default_factory=list)
+    posted_at: str = ""
     workspace_path: str = ""

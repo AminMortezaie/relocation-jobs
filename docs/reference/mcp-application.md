@@ -1,6 +1,6 @@
 # MCP application assistant (v0)
 
-**Last updated:** 2026-07-02
+**Last updated:** 2026-07-07
 
 Plan and reference for the `relocation_jobs/mcp/` domain: a local MCP server for **Claude Desktop** that prepares tailored resume PDFs for jobs on the panel. v0 does **not** submit applications automatically and does **not** use the Claude API — Claude Desktop (subscription) does the resume reframing in chat; this app supplies data, validation, PDF rendering, and board state updates.
 
@@ -90,6 +90,9 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 | `list_supported_countries` | Country keys for `add_company` (germany, netherlands, uk, portugal) |
 | `list_ats_types` | ATS ids for `add_company` (`auto` detects from careers URL) |
 | `add_company` | Add employer to catalog — same flow as panel **Add company** (name, careers URL, optional country/ATS/locations) |
+| `add_position` | Add a role to an **existing** company — stores JD in catalog (required for LinkedIn) |
+| `save_position_description` | Store or append JD for an existing position (`overwrite=true` replaces) |
+| `update_position` | Overwrite title, url, location, and/or JD on an existing position |
 
 ### Panel integration (company workspace)
 
@@ -247,6 +250,57 @@ add_company(
 ```
 
 Returns `workspace_path` (e.g. `/company/germany/example-gmbh`) for the panel company workspace. After adding, run a **Fetch** on the panel (or `scrape_jobs.py`) to load open roles.
+
+#### Add a position (manual / LinkedIn-only)
+
+When a company is already in the catalog but a role only appears elsewhere (e.g. LinkedIn), **add the role and its JD in one step**. The JD is stored in Postgres and returned by `get_job_context` — same as a panel-fetched description.
+
+```text
+add_position(
+  country="uk",
+  company="brightpattern",           # name or slug
+  title="Senior Backend Engineer",
+  url="https://www.linkedin.com/jobs/view/1234567890",
+  location="London, UK",             # optional
+  description_text="Full JD paste…",  # required for LinkedIn / Indeed / Glassdoor
+  posted_at="2025-06-15"             # required for LinkedIn / Indeed / Glassdoor (listing date)
+)
+```
+
+**Flow**
+
+```mermaid
+flowchart LR
+  A[User shares LinkedIn role + JD in chat] --> B[add_position with description_text]
+  B --> C[get_job_context — has_description true]
+  C --> D[Reframe pipeline phases]
+```
+
+- **LinkedIn / Indeed / Glassdoor:** `description_text` and **`posted_at`** are **required**. Paste the full posting text and the **date shown on the listing** (`YYYY-MM-DD` or ISO datetime) — not today's date. Stored as `fetched` / `last_seen` for board sort.
+- **Direct ATS URL:** `description_text` optional — omit only if you will **Fetch job description** on the panel or call `save_position_description` before phase 1.
+- **Duplicate URL:** idempotent add; fuller JD replaces or appends to an existing description.
+- **Follow-up JD in chat:** `save_position_description(country, company, url, description_text)` merges into the catalog row.
+- **Fix mistakes:** `update_position(...)` overwrites title, `new_url`, location, and/or `description_text`; `save_position_description(..., overwrite=true)` replaces the JD only.
+
+Returns `has_description`, `needs_description`, `needs_fetch`, `description_saved`, `posted_at`, canonical `url`, and `workspace_path`. Then `get_job_context` / `save_tailored_tex` use the returned `url`.
+
+#### Fix / overwrite catalog data
+
+```text
+update_position(
+  country="armenia",
+  company="bright-pattern",
+  url="<current posting url from get_job_context>",
+  title="Corrected title",              # optional
+  new_url="https://…",                  # optional — fixes wrong link
+  location="Yerevan, Armenia",           # optional
+  description_text="Full corrected JD…",  # optional — replaces, does not merge
+  posted_at="2025-06-15",                # optional — fix posting date
+  clear_description=false                 # true to wipe JD
+)
+
+save_position_description(country, company, url, description_text, overwrite=true)
+```
 
 #### Paste into Claude Desktop
 

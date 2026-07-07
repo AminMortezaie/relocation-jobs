@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "b5dbe3d62c77",
+  "session_id": "20ab44f7-f063-4876-a770-a256435f95fa",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-07T16:52:54.247847Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/admin/service.py",
+    "tests/conftest.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "fd5d279cfedc",
+  "checkpoint_transcript_start": 129,
+  "transcript_lines_at_start": 129,
+  "session_metrics": {
+    "turn_count": 14
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-07T16:52:54.244291Z",
+    "agent_lines": 9,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 9,
+    "total_lines_changed": 9,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

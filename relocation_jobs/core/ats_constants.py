@@ -75,7 +75,7 @@ ATS_TYPE_CHOICES: tuple[tuple[str, str], ...] = (
     ("hibob", "HiBob"),
 )
 
-BOL_CAREERS_API = "https://careers.bol.com/wp-json/wp/v2/hggns/multilanguage_vacature_search"
+BOL_CAREERS_API = "https://careers.bol.com/api/v1/jobs/"
 
 # Companies where auto-detection fails or returns a bad slug (embed, proxy).
 KNOWN_ATS: dict[str, tuple[str, str]] = {

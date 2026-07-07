@@ -2,7 +2,8 @@
 
 A job-search tool for backend and software engineering roles at tech companies that offer visa or relocation sponsorship. Company lists are sourced from [relocate.me](https://relocate.me); each employer's ATS (Applicant Tracking System) is auto-detected and jobs are scraped into a shared catalog. A Flask web panel lets you track applications per user and prepare tailored resume PDFs per position.
 
-**Supported countries:** Germany, Netherlands, UK, Portugal.
+**Production:** [https://kuchup.com](https://kuchup.com) (EC2 + Cloudflare)  
+**Supported countries:** Germany, Netherlands, UK, Portugal, plus custom countries (e.g. Armenia, Ireland) via the panel — stored in Postgres (and Redis when configured).
 
 > **Contributors:** [`docs/contributing.md`](docs/contributing.md) · [`docs/`](docs/README.md)
 
@@ -40,6 +41,7 @@ Copy `.env.example` to `.env` before running locally.
 | Variable | Purpose |
 |----------|---------|
 | `DATABASE_URL` | **Required.** Postgres URL — AWS EC2 (see `.env.example`) or local instance |
+| `REDIS_URL` | Optional. Country label cache on EC2 (`scripts/ec2_redis.sh`); Postgres fallback when unset |
 | `PANEL_SECRET_KEY` | Flask session signing |
 | `PANEL_ADMIN_USER` / `PANEL_ADMIN_PASSWORD` | Bootstrap admin on first run |
 | `PANEL_SCRAPE_ENABLED` | Set to `0` on Render free tier (512 MB RAM); `1` locally for fetch |
@@ -126,7 +128,8 @@ web/server.py         ← Flask API (catalog + per-user tracking)
 
 | Store | Contents |
 |-------|----------|
-| **Postgres** (`DATABASE_URL`) | Catalog, users, tracking, fetch runs — AWS EC2 in production |
+| **Postgres** (`DATABASE_URL`) | Catalog, users, tracking, fetch runs, custom countries — AWS EC2 in production |
+| **Redis** (`REDIS_URL`) | Country label cache (optional; EC2 colocated with panel) |
 | `companies/*.json` | Git archive only — not read at runtime |
 | `data/custom_cities.json` | User-added cities (`PANEL_DATA_DIR`) |
 
@@ -200,19 +203,45 @@ pytest --cov --cov-report=term-missing   # coverage (90% gate on business module
 
 Tests use an in-memory Postgres mock — no live ATS or Postgres in CI. Business rules: [`docs/reference/business-rules.md`](docs/reference/business-rules.md).
 
-## Deployment (Render)
+## Deployment
 
-`render.yaml` targets Render's **free** web tier. Scraping is disabled in production (`PANEL_SCRAPE_ENABLED=0`).
+Production runs on **one AWS EC2 instance** (Postgres + Redis + panel + Caddy). Full ops guide: [`docs/operations/ec2-panel.md`](docs/operations/ec2-panel.md).
 
-**Workflow:** scrape locally → push to GitHub → Render redeploys. Runtime state lives in Postgres (AWS EC2).
+### Production stack (EC2)
 
-### One-time setup
+| Layer | Role |
+|-------|------|
+| **Postgres** (`pg`) | Catalog, users, tracking, custom countries |
+| **Redis** (`relocation-redis`) | Country registry cache when `REDIS_URL` is set |
+| **Panel** (`relocation-panel`) | Gunicorn on port 10000 (`Dockerfile.ec2`, scrape disabled) |
+| **Caddy** (`relocation-caddy`) | TLS + reverse proxy for `kuchup.com` / `www` |
+| **Cloudflare** | DNS, optional proxy (orange cloud) to hide origin IP |
 
-1. Ensure AWS Postgres is running and `DATABASE_URL` points to the Elastic IP.
-2. Run `./scripts/aws_postgres_migrate.sh sync-sg` so Render can reach port 5432.
-3. Push repo to GitHub; in Render: **New → Blueprint** → connect the repo.
-4. Set env vars: `DATABASE_URL`, `PANEL_ADMIN_PASSWORD`.
-5. Deploy and sign in at `https://<your-service>.onrender.com`.
+**Why EC2 instead of Render alone:** the panel and database live on the same host, so board API latency dropped from minutes (Render → remote Postgres) to seconds. Scraping still runs **locally** on your laptop (`PANEL_SCRAPE_ENABLED=1`).
+
+### Deploy / update panel
+
+Requires `aws-postgres.env`, SSH key at `~/Downloads/relocation.pem`:
+
+```bash
+./scripts/ec2_app_deploy.sh deploy   # build frontend, rsync, docker build, restart panel + Caddy
+./scripts/ec2_app_deploy.sh sync     # frontend build + rsync only (static files via volume mount)
+./scripts/ec2_app_deploy.sh status   # containers + health check
+```
+
+`sync` runs `cd frontend && npm run build` so `relocation_jobs/static/dist/board.js` is included (the React board bundle). Static files are mounted into the panel container — no image rebuild needed for UI-only changes.
+
+**Domain (Cloudflare):** A records `@` and `www` → Elastic IP from `aws-postgres.env`. Caddy auto-issues Let's Encrypt certs. Direct IP access returns 404; use `https://kuchup.com` only. To hide the origin IP: orange-cloud proxy + restrict security group ports 80/443 to [Cloudflare IPs](https://www.cloudflare.com/ips-v4) — see [lock-down steps](docs/operations/ec2-panel.md#lock-down-origin-domain-only-hide-ip).
+
+**Redis on EC2:** `./scripts/ec2_redis.sh` — set `REDIS_URL` in local `.env` and in deploy env.
+
+**Postgres access:** `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes.
+
+### Render (legacy)
+
+`render.yaml` targets Render's **free** web tier with scraping disabled. Optional fallback until full EC2 cutover; same `DATABASE_URL` / `REDIS_URL` as EC2.
+
+**Workflow:** scrape locally → `./scripts/ec2_app_deploy.sh deploy` (or push + Render redeploy if still using Render).
 
 ### Local Docker smoke test
 
@@ -230,6 +259,14 @@ docker run --rm -p 8080:10000 \
 All contributor docs: **[`docs/README.md`](docs/README.md)**
 
 ## Troubleshooting
+
+**`dig` / `curl` cannot resolve domain locally**
+
+Public DNS may already work (`dig @1.1.1.1 kuchup.com A`) while your home router DNS is stale. Flush macOS cache (`sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`) or set DNS to `1.1.1.1` / `8.8.8.8`. Do not use `ping https://domain` — use `ping kuchup.com` or `curl -I https://kuchup.com`.
+
+**Board empty on EC2 but API works**
+
+Rebuild and sync the React bundle: `cd frontend && npm run build` then `./scripts/ec2_app_deploy.sh sync`. The deploy script builds frontend automatically; static files are served from a volume mount.
 
 **Company returns 0 jobs but has openings**
 

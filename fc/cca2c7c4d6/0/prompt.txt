@@ -1,0 +1,73 @@
+panel on render not going up currently.
+
+---
+
+its working now but i can feel it goes more time than expected.
+do you think that if we transfer to EC2 everything goes better or not?
+
+---
+
+its working now but i can feel it goes more time than expected.
+do you think that if we transfer to EC2 everything goes better or not?
+
+---
+
+just transfer to EC2 the enviroment, i just bought a domain for it and it hosts on cloudflare, its kuchup.com you can add to project documents.
+
+now its bought on cloudflare and you need to run on EC2 then we will attach the domain to it simply.
+
+so please run the application on EC2 now.
+
+---
+
+no company loading
+
+---
+
+no company loading
+
+---
+
+great its a breakthrough now.
+cause the load time is going too low.
+
+now we need to attach domain to it.
+guide me to do the setting on cloudflare
+
+---
+
+how to close the ip fetch on internet?
+can i do this to now show anything on internet to not expose my ip on internet and just can do with domain?
+
+---
+
+how to close the ip fetch on internet?
+can i do this to now show anything on internet to not expose my ip on internet and just can do with domain?
+
+---
+
+yes update it please.
+
+---
+
+yes update it please.
+
+---
+
+why you used caddy and didnot use nginx?
+
+---
+
+why you used caddy and didnot use nginx?
+
+---
+
+@/Users/amin/.cursor/projects/Users-amin-dev-p-projects-armenia-resume/terminals/87.txt:36-37 after 5 minutes it shows this but on internet i can open it up
+
+---
+
+update the document on what we did to put on github readme.
+
+---
+
+name 'get_catalog_overview' is not defined

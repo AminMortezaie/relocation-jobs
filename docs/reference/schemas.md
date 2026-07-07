@@ -41,4 +41,4 @@ Pydantic models live in `relocation_jobs/schemas/`. Postgres JSON/JSONB columns 
 
 ## Naming note
 
-Country keys (`uk`, `germany`, …) are defined in `core/paths.SUPPORTED_COUNTRIES`. Legacy git-archive filenames (`uk_companies.json`, …) are `COUNTRY_ARCHIVE_FILENAMES` only — not read at runtime.
+Country keys (`uk`, `germany`, …) live in Postgres `custom_countries` (seeded defaults + user-added). Legacy git-archive filenames (`uk_companies.json`, …) are `COUNTRY_ARCHIVE_FILENAMES` only — not read at runtime.

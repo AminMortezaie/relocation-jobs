@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.catalog.repo import (
     get_company,
@@ -75,6 +77,7 @@ def test_get_job_by_url_prefers_exact_match_within_company(seeded_catalog_v2):
     assert job_idempotency_key(url_a) != job_idempotency_key(url_b)
 
 
+@pytest.mark.fresh_db
 def test_custom_country_catalog_without_meta(db, tmp_data_dir):
     from relocation_jobs.core.location_tags import add_custom_country
 

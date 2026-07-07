@@ -9,7 +9,7 @@ import sys
 from relocation_jobs.catalog.repo import load_country_catalog
 from relocation_jobs.core.db import get_connection
 from relocation_jobs.core.location_tags import job_fails_office_location_gate, sync_company_location_fields
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.panel.tracking import resolve_track
 from relocation_jobs.positions import repo as positions_repo
 from relocation_jobs.positions.types import TrackingFlags
@@ -30,7 +30,7 @@ def _should_mark(track: dict | None) -> bool:
 
 
 def find_wrong_location_jobs(*, country_key: str | None = None) -> list[dict]:
-    countries = [country_key] if country_key else list(SUPPORTED_COUNTRIES)
+    countries = [country_key] if country_key else sorted(supported_countries())
     hits: list[dict] = []
     for country in countries:
         data = load_country_catalog(country)
@@ -99,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true", help="List matches without writing")
     args = parser.parse_args(argv)
 
-    if args.country and args.country not in SUPPORTED_COUNTRIES:
+    if args.country and args.country not in supported_countries():
         print(f"Unknown country: {args.country}", file=sys.stderr)
         return 1
 

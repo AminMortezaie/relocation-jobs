@@ -37,7 +37,6 @@ from relocation_jobs.core.job_identity import (
     normalize_job_url,
 )
 from relocation_jobs.core.location_tags import (
-    COUNTRY_LABELS,
     country_label,
     ensure_country_key,
     _strip_country_suffix,
@@ -491,7 +490,7 @@ def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
 
     return {
         "country": country_key,
-        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "country_label": country_label(country_key),
         "company": new_name,
         "previous_name": canonical_old,
     }
@@ -525,7 +524,7 @@ def update_company_careers(
 
     return {
         "country": country_key,
-        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "country_label": country_label(country_key),
         "company": canonical_name,
         "careers_url": careers_url,
         "ats_type": fields.get("ats_type", company.get("ats_type", "")),
@@ -559,7 +558,7 @@ def update_company_city(
 
     return {
         "country": country_key,
-        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "country_label": country_label(country_key),
         "company": company["name"],
         "city": temp.get("city") or "",
         "cities": temp.get("cities") or [],
@@ -607,7 +606,7 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
 
     return {
         "country": country_key,
-        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "country_label": country_label(country_key),
         "company": company["name"],
         "added": new_count,
         "total": existing_total + new_count,
@@ -655,7 +654,7 @@ def set_company_fetch_problem(
 
     return {
         "country": country_key,
-        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "country_label": country_label(country_key),
         "company": canonical_name,
         "fetch_problem": result_fp,
         "fetch_problem_date": result_fpd,
@@ -686,7 +685,7 @@ def remove_company(country_key: str, company_name: str) -> dict:
 
     return {
         "country": country_key,
-        "country_label": COUNTRY_LABELS.get(country_key, country_key),
+        "country_label": country_label(country_key),
         "company": canonical_name,
         "removed_jobs": removed_jobs,
     }

@@ -16,15 +16,15 @@ from relocation_jobs.core.location_tags import (
 def test_add_custom_country_persists(tmp_data_dir):
     saved = add_custom_country("Spain")
     assert saved == {"id": "spain", "label": "Spain"}
-    assert load_custom_countries() == {"spain": "Spain"}
+    assert load_custom_countries()["spain"] == "Spain"
     assert "spain" in supported_country_keys()
     assert all_country_labels()["spain"] == "Spain"
 
 
-def test_add_custom_country_returns_builtin_match(tmp_data_dir):
+def test_add_custom_country_returns_existing_country(tmp_data_dir):
     saved = add_custom_country("Germany")
     assert saved == {"id": "germany", "label": "Germany"}
-    assert load_custom_countries() == {}
+    assert load_custom_countries()["germany"] == "Germany"
 
 
 def test_add_custom_country_rejects_empty(tmp_data_dir):
@@ -34,7 +34,7 @@ def test_add_custom_country_rejects_empty(tmp_data_dir):
 
 def test_ensure_country_key_registers_unknown(tmp_data_dir):
     assert ensure_country_key("armenia") == "armenia"
-    assert load_custom_countries() == {"armenia": "Armenia"}
+    assert load_custom_countries()["armenia"] == "Armenia"
     assert ensure_country_key("armenia") == "armenia"
 
 
@@ -75,3 +75,32 @@ def test_sync_company_location_fields_no_double_suffix(tmp_data_dir):
     assert company["city"] == "Dublin (Ireland)"
     assert len(company["locations"]) == 1
     assert company["locations"][0]["city"] == "Dublin"
+
+
+def test_catalog_country_keys_surface_without_custom_row(db):
+    from relocation_jobs.catalog.writes import upsert_company
+    from relocation_jobs.core.db import db_transaction
+    from relocation_jobs.core.location_tags import all_country_labels, supported_country_keys
+
+    upsert_company(
+        "georgia",
+        {
+            "name": "Georgia Catalog Co",
+            "careers_url": "https://example.com/careers",
+            "ats_type": "generic",
+        },
+    )
+    try:
+        assert "georgia" in supported_country_keys()
+        assert all_country_labels()["georgia"] == "Georgia"
+    finally:
+        with db_transaction() as conn:
+            conn.execute(
+                """
+                DELETE FROM matching_jobs
+                WHERE company_id IN (SELECT id FROM companies WHERE country = %s)
+                """,
+                ("georgia",),
+            )
+            conn.execute("DELETE FROM companies WHERE country = %s", ("georgia",))
+            conn.execute("DELETE FROM country_meta WHERE country = %s", ("georgia",))

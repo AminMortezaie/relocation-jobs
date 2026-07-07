@@ -3,8 +3,8 @@ from __future__ import annotations
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from relocation_jobs.core.location_tags import (
-    COUNTRY_LABELS,
     company_expected_locations,
+    country_label,
     normalize_country_key,
 )
 
@@ -16,7 +16,7 @@ def _location_search_labels(company: dict, *, catalog_country: str = "") -> list
         country = normalize_country_key(str(loc.get("country") or ""))
         label = (
             str(loc.get("country_label") or "").strip()
-            or COUNTRY_LABELS.get(country, "")
+            or country_label(country)
         )
         if not label or label in seen:
             continue
@@ -26,7 +26,7 @@ def _location_search_labels(company: dict, *, catalog_country: str = "") -> list
         return labels
     if catalog_country:
         country = normalize_country_key(catalog_country)
-        label = COUNTRY_LABELS.get(country, "")
+        label = country_label(country)
         if label:
             return [label]
     return []

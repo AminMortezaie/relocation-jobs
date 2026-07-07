@@ -27,7 +27,7 @@ def _patch_company_enrichment(monkeypatch):
 def test_list_supported_countries():
     items = service.list_supported_countries()
     ids = {item.id for item in items}
-    assert ids == {"germany", "netherlands", "portugal", "uk"}
+    assert {"germany", "netherlands", "portugal", "uk"} <= ids
     assert all(item.label for item in items)
 
 
@@ -104,7 +104,7 @@ def test_add_company_auto_registers_unknown_country(db, monkeypatch, tmp_data_di
     )
     assert result.country == "armenia"
     assert result.country_label == "Armenia"
-    assert load_custom_countries() == {"armenia": "Armenia"}
+    assert load_custom_countries()["armenia"] == "Armenia"
     stored = get_company("armenia", "MCP Armenia Co")
     assert stored is not None
 

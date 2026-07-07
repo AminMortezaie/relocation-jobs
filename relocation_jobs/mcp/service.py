@@ -17,9 +17,9 @@ from relocation_jobs.companies.service import add_company as catalog_add_company
 from relocation_jobs.companies.service import add_manual_jobs as catalog_add_manual_jobs
 from relocation_jobs.companies.service import list_ats_types as catalog_list_ats_types
 from relocation_jobs.core.location_tags import (
-    COUNTRY_LABELS,
     add_custom_country,
     all_country_labels,
+    country_label,
     ensure_country_key,
 )
 from relocation_jobs.core.paths import supported_countries
@@ -923,7 +923,7 @@ def add_company(
     country_key = (result.get("country") or "").strip().lower()
     return AddCompanyResult(
         country=country_key,
-        country_label=(result.get("country_label") or COUNTRY_LABELS.get(country_key, country_key)),
+        country_label=(result.get("country_label") or country_label(country_key)),
         name=company_name,
         company_slug=slug,
         careers_url=(result.get("careers_url") or careers_url).strip(),
@@ -1034,7 +1034,7 @@ def add_position(
         added=added,
         already_existed=already_existed,
         country=country_key,
-        country_label=(result.get("country_label") or COUNTRY_LABELS.get(country_key, country_key)),
+        country_label=(result.get("country_label") or country_label(country_key)),
         company=company_name,
         company_slug=slug,
         title=(stored.get("title") or cleaned_title).strip(),

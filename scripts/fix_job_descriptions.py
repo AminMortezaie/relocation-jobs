@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
 
 from relocation_jobs.catalog.repo import update_job_description_text
 from relocation_jobs.core.db import db_read
-from relocation_jobs.core.paths import SUPPORTED_COUNTRIES
+from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.scrape.descriptions import (
     needs_ashby_refetch,
     needs_getyourguide_refetch,
@@ -158,7 +158,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    if args.country and args.country not in SUPPORTED_COUNTRIES:
+    if args.country and args.country not in supported_countries():
         print(f"Unknown country: {args.country}", file=sys.stderr)
         return 1
 

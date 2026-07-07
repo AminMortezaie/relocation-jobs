@@ -33,7 +33,7 @@ from bs4 import BeautifulSoup
 
 from relocation_jobs.catalog.repo import load_country_catalog as load_country_catalog_db
 from relocation_jobs.catalog.writes import save_country_catalog as save_country_catalog_db
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
 from relocation_jobs.core.slug import slug_from_name
 
 from playwright.sync_api import sync_playwright
@@ -344,7 +344,8 @@ def discover_careers_url(company: dict) -> str:
 
 def _resolve_country_key(country: str) -> str:
     alias = country.lower()
-    if alias in SUPPORTED_COUNTRIES:
+    known = supported_countries()
+    if alias in known:
         return alias
     filename = COUNTRY_CLI_ALIASES.get(alias)
     if filename:
@@ -352,7 +353,7 @@ def _resolve_country_key(country: str) -> str:
             if name == filename:
                 return key
     raise SystemExit(
-        f"Unknown country '{country}'. Use: {', '.join(sorted(SUPPORTED_COUNTRIES))}"
+        f"Unknown country '{country}'. Use: {', '.join(sorted(known))}"
     )
 
 

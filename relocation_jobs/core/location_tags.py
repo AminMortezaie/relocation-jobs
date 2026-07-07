@@ -12,13 +12,6 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 from relocation_jobs.core.paths import data_dir, ensure_data_dir
 
-COUNTRY_LABELS: dict[str, str] = {
-    "germany": "Germany",
-    "netherlands": "Netherlands",
-    "uk": "United Kingdom",
-    "portugal": "Portugal",
-}
-
 SUGGESTED_CITIES: dict[str, tuple[str, ...]] = {
     "germany": (
         "Berlin", "Munich", "Hamburg", "Frankfurt", "Frankfurt am Main", "Cologne", "Düsseldorf",
@@ -66,49 +59,28 @@ def load_custom_countries(*, use_cache: bool = True) -> dict[str, str]:
     if use_cache and _custom_countries_cache is not None:
         return _custom_countries_cache
 
-    path = custom_countries_path()
-    raw: object = {}
-    if path.is_file():
-        try:
-            raw = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            raw = {}
+    from relocation_jobs.catalog.custom_countries import load_country_labels_store
 
-    parsed: dict[str, str] = {}
-    if isinstance(raw, dict):
-        for country, label in raw.items():
-            country_key = normalize_country_key(str(country))
-            if not country_key or country_key in COUNTRY_LABELS:
-                continue
-            if not isinstance(label, str):
-                continue
-            country_label_text = label.strip()
-            if not country_label_text:
-                continue
-            parsed[country_key] = country_label_text
-
+    parsed = load_country_labels_store()
     if use_cache:
         _custom_countries_cache = parsed
     return parsed
 
 
 def save_custom_countries(data: dict[str, str]) -> None:
-    ensure_data_dir()
-    ordered = {
-        key: data[key].strip()
-        for key in sorted(data)
-        if key not in COUNTRY_LABELS and data[key].strip()
-    }
-    custom_countries_path().write_text(
-        json.dumps(ordered, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
+    from relocation_jobs.catalog.custom_countries import save_country_labels_store
+
+    save_country_labels_store(data)
     _invalidate_custom_countries_cache()
 
 
 def all_country_labels() -> dict[str, str]:
-    merged = dict(COUNTRY_LABELS)
-    merged.update(load_custom_countries())
+    from relocation_jobs.catalog.custom_countries import list_catalog_country_keys
+
+    merged = dict(load_custom_countries())
+    for key in list_catalog_country_keys():
+        if key not in merged:
+            merged[key] = key.replace("-", " ").title()
     return merged
 
 
@@ -136,17 +108,15 @@ def add_custom_country(label: str) -> dict:
     if not country_key:
         raise ValueError("Invalid country name")
 
-    for key, existing in COUNTRY_LABELS.items():
-        if key == country_key or existing.casefold() == country_label_text.casefold():
-            return {"id": key, "label": existing}
-
     with _custom_countries_lock:
         data = load_custom_countries()
         for key, existing in data.items():
             if key == country_key or existing.casefold() == country_label_text.casefold():
                 return {"id": key, "label": existing}
-        data[country_key] = country_label_text
-        save_custom_countries(data)
+        from relocation_jobs.catalog.custom_countries import upsert_custom_country
+
+        upsert_custom_country(country_key, country_label_text)
+        _invalidate_custom_countries_cache()
 
     return {"id": country_key, "label": country_label_text}
 
@@ -375,14 +345,6 @@ def job_location_fields(job: dict) -> dict:
     return fields
 
 
-_COUNTRY_SUFFIX_RE = re.compile(
-    r"(?:\s*\((?:"
-    + "|".join(re.escape(lbl) for lbl in COUNTRY_LABELS.values())
-    + r")\))+\s*$",
-    re.I,
-)
-
-
 def _strip_country_suffix(city: str) -> str:
     stripped = (city or "").strip()
     if not stripped:
@@ -390,10 +352,6 @@ def _strip_country_suffix(city: str) -> str:
     changed = True
     while changed:
         changed = False
-        next_val = _COUNTRY_SUFFIX_RE.sub("", stripped).strip()
-        if next_val != stripped:
-            stripped = next_val
-            changed = True
         for label in sorted(all_country_labels().values(), key=len, reverse=True):
             suffix = f" ({label})"
             if stripped.casefold().endswith(suffix.casefold()):

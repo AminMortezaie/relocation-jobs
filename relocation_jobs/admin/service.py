@@ -10,17 +10,21 @@ from relocation_jobs.core.ats_constants import (
     MAX_CONCURRENCY,
 )
 from relocation_jobs.core.location_tags import SUGGESTED_CITIES, all_country_labels, load_custom_cities, load_custom_countries
-from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, SUPPORTED_COUNTRIES, data_dir
+from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, country_archive_filename, data_dir, supported_countries
 from relocation_jobs.db import admin_tracking_totals, list_users_with_stats, user_count
-from relocation_jobs.catalog.stats import get_catalog_overview
+from relocation_jobs.catalog.custom_countries import countries_use_redis
+from relocation_jobs.core.redis_client import ping_redis, redis_enabled
 from relocation_jobs.fetch import repo as fetch_repo
 
 
 def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
     custom = load_custom_cities()
-    archives = [COUNTRY_ARCHIVE_FILENAMES[key] for key in sorted(SUPPORTED_COUNTRIES)]
+    archives = [country_archive_filename(key) for key in sorted(supported_countries())]
     return {
         "database": "postgres",
+        "redis": "connected" if countries_use_redis() else ("configured" if redis_enabled() else "off"),
+        "redis_ping": ping_redis() if redis_enabled() else False,
+        "countries_store": "redis" if countries_use_redis() else "postgres",
         "data_dir": str(data_dir()),
         "scrape_enabled": scrape_enabled,
         "allow_register": os.environ.get("PANEL_ALLOW_REGISTER", "").lower()

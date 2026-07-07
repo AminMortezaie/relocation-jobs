@@ -241,6 +241,9 @@ def init_db(*, force: bool = False) -> None:
     from relocation_jobs.core.migrations import _migrate_schema
 
     init_catalog_schema()
+    from relocation_jobs.catalog.custom_countries import init_countries_store
+
+    init_countries_store()
     with db_transaction() as conn:
         conn.execute(
             """

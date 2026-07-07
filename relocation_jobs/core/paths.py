@@ -10,12 +10,6 @@ PACKAGE_DIR = PROJECT_ROOT / "relocation_jobs"
 COMPANIES_DIR = PROJECT_ROOT / "companies"
 STATIC_DIR = PACKAGE_DIR / "static"
 
-# Country keys supported at runtime (Postgres catalog).
-SUPPORTED_COUNTRIES: frozenset[str] = frozenset(
-    {"germany", "netherlands", "uk", "portugal"}
-)
-
-
 def supported_countries() -> frozenset[str]:
     from relocation_jobs.core.location_tags import supported_country_keys
 

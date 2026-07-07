@@ -68,6 +68,11 @@ def init_catalog_schema() -> None:
                 UNIQUE(company_id, idempotency_key)
             );
 
+            CREATE TABLE IF NOT EXISTS custom_countries (
+                country TEXT PRIMARY KEY,
+                label TEXT NOT NULL
+            );
+
             CREATE INDEX IF NOT EXISTS idx_companies_country ON companies(country);
             CREATE INDEX IF NOT EXISTS idx_jobs_company ON matching_jobs(company_id);
             CREATE INDEX IF NOT EXISTS idx_jobs_idempotency ON matching_jobs(idempotency_key);
@@ -82,6 +87,13 @@ def init_catalog_schema() -> None:
         run_migration_once(conn, "catalog_extra_columns_v1", _apply_catalog_extra_columns)
         run_migration_once(conn, "catalog_jsonb_columns_v1", migrate_columns_to_jsonb)
         run_migration_once(conn, "catalog_job_description_v1", _ensure_job_description_column)
+        from relocation_jobs.catalog.custom_countries import (
+            migrate_custom_countries_from_json,
+            seed_default_countries,
+        )
+
+        run_migration_once(conn, "custom_countries_seed_defaults_v1", seed_default_countries)
+        run_migration_once(conn, "custom_countries_json_import_v1", migrate_custom_countries_from_json)
 
 
 def _ensure_job_description_column(conn) -> None:

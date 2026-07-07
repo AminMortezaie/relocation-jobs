@@ -78,6 +78,16 @@ def reset_custom_cities_cache():
     _invalidate_custom_cities_cache()
     _invalidate_custom_countries_cache()
     invalidate_country_cache()
+    try:
+        from relocation_jobs.core.db import db_transaction, get_connection
+
+        get_connection().execute("DELETE FROM custom_countries")
+        with db_transaction() as conn:
+            from relocation_jobs.catalog.custom_countries import seed_default_countries
+
+            seed_default_countries(conn)
+    except Exception:
+        pass
     yield
     _invalidate_custom_cities_cache()
     _invalidate_custom_countries_cache()

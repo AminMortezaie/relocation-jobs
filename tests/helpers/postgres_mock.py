@@ -135,6 +135,7 @@ class FakePgConnection:
         "matching_jobs",
         "companies",
         "country_meta",
+        "custom_countries",
         "users",
     )
 

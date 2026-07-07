@@ -13,6 +13,7 @@ from relocation_jobs.core.location_tags import SUGGESTED_CITIES, all_country_lab
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, country_archive_filename, data_dir, supported_countries
 from relocation_jobs.db import admin_tracking_totals, list_users_with_stats, user_count
 from relocation_jobs.catalog.custom_countries import countries_use_redis
+from relocation_jobs.catalog.stats import get_catalog_overview
 from relocation_jobs.core.redis_client import ping_redis, redis_enabled
 from relocation_jobs.fetch import repo as fetch_repo
 

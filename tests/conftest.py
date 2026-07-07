@@ -68,6 +68,14 @@ def _session_postgres(_session_env):
 
 
 @pytest.fixture(autouse=True)
+def _tests_use_postgres_countries(monkeypatch):
+    monkeypatch.delenv("REDIS_URL", raising=False)
+    from relocation_jobs.core.redis_client import reset_redis_client
+
+    reset_redis_client()
+
+
+@pytest.fixture(autouse=True)
 def reset_custom_cities_cache():
     from relocation_jobs.catalog.cache import invalidate_country_cache
     from relocation_jobs.core.location_tags import (

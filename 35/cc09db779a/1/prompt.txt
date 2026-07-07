@@ -1,0 +1,89 @@
+add a feature to mcp can add a position to my app.
+
+for example in brightpattern we have a position that just in linkedin and not in company website but i've seen it and not i get by the claude and want to add to the application but claude has no mcp function to do this.
+
+i think we're going to make mcp day by day more bigger and maybe all the affairs that a human can do might be in mcp later.
+
+cause the AI agent can do anything that human can do.
+
+we need to think about this later.
+
+maybe we should have a proposal like we did before for other features to how can AI agent can directly do anything that a human can do.
+
+read the skills and docs to have better insight in system and then add this feature to app.
+
+---
+
+restart the server to apply changes.
+
+---
+
+restart the server to apply changes.
+
+---
+
+also one thing is missing i think.
+when claude adds a new position, JD should be appneded to our app.
+so maybe the flow a little bit is different and might be thought more.
+what do you think about it?
+can you add some values to this?
+
+---
+
+restart the server and also update mcp-reframe-skill to append this feature to claude know what to add and how.
+
+---
+
+update the zip file to apply there. you can find it on dist folder
+
+---
+
+update the zip file to apply there. you can find it on dist folder
+
+---
+
+update the zip file.
+
+---
+
+claude added with this response.
+Added. Bright Pattern is now in your catalog under Armenia, with the full JD stored (`has_description: true`).
+
+- Workspace: `/company/armenia/bright-pattern`
+- Position: Senior Backend Developer (Golang)
+
+Say the word when you want to start the CV tailoring pipeline (phase 1) for this one.
+
+but i cannot see the position in board.
+
+---
+
+you need to add a ability to mcp to can overwrite everything by claude like JD or other things might be mistaken during saving the data.
+do it and then restart the panel and i will restart the claude next
+
+---
+
+you need to add a ability to mcp to can overwrite everything by claude like JD or other things might be mistaken during saving the data.
+do it and then restart the panel and i will restart the claude next
+
+---
+
+also you need to add a field to add the real timestamp of job position if the claude going to add a position.
+cause when we're adding a linkedin job it has exact timestamp.
+
+read the skills before
+
+---
+
+also you need to add a field to add the real timestamp of job position if the claude going to add a position.
+cause when we're adding a linkedin job it has exact timestamp.
+
+read the skills before
+
+---
+
+I reviewed the full MCP skill doc — there's no timestamp/posted-date field anywhere in the schema (`add_position`, `update_position`, `save_position_description` only take `title`, `url`, `location`, `description_text`). The catalog tables (`mcp_applications`, `mcp_master_resumes`, `mcp_user_documents`) don't expose a "posted date" field to MCP tools at all.
+
+So I don't have a way to set that from chat — it's not that I'm missing a parameter, it's genuinely not part of what these tools write. If the panel has a date field on the position (visible at `/company/armenia/bright-pattern` or `/company/armenia/provectus`), that'd need to be edited there directly, or it may just be auto-set to "added on" date server-side and not user-editable at all.
+
+Want me to do anything else with these two entries in the meantime (e.g. start the tailoring pipeline for one of them)?

@@ -3,11 +3,21 @@
   "checkpoint_id": "35cc09db779a",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 2,
+  "checkpoints_count": 12,
   "files_touched": [
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
     "relocation_jobs/scrape/boards/generic.py",
     "relocation_jobs/scrape/dom_listing.py",
-    "tests/scrape/test_dom_listing.py"
+    "relocation_jobs/shared/timestamps.py",
+    "tests/mcp/test_add_position.py",
+    "tests/mcp/test_update_position.py",
+    "tests/scrape/test_dom_listing.py",
+    "tests/shared/test_timestamps.py"
   ],
   "sessions": [
     {
@@ -15,6 +25,12 @@
       "transcript": "/35/cc09db779a/0/full.jsonl",
       "content_hash": "/35/cc09db779a/0/content_hash.txt",
       "prompt": "/35/cc09db779a/0/prompt.txt"
+    },
+    {
+      "metadata": "/35/cc09db779a/1/metadata.json",
+      "transcript": "/35/cc09db779a/1/full.jsonl",
+      "content_hash": "/35/cc09db779a/1/content_hash.txt",
+      "prompt": "/35/cc09db779a/1/prompt.txt"
     }
   ]
 }

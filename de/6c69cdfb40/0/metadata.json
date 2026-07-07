@@ -1,0 +1,158 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "de6c69cdfb40",
+  "session_id": "20ab44f7-f063-4876-a770-a256435f95fa",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-07T16:48:27.906004Z",
+  "branch": "main",
+  "checkpoints_count": 13,
+  "save_step_count": 12,
+  "files_touched": [
+    ".env.example",
+    "docs/reference/schemas.md",
+    "relocation_jobs/admin/service.py",
+    "relocation_jobs/build_companies.py",
+    "relocation_jobs/catalog/custom_countries.py",
+    "relocation_jobs/catalog/schema.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/db.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/core/paths.py",
+    "relocation_jobs/core/redis_client.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/scrape/board_url.py",
+    "requirements.txt",
+    "scripts/ec2_redis.sh",
+    "scripts/exclude_stray_board_jobs.py",
+    "scripts/fix_job_descriptions.py",
+    "scripts/mark_wrong_location_jobs.py",
+    "tests/catalog/test_countries_redis.py",
+    "tests/catalog/test_repo.py",
+    "tests/conftest.py",
+    "tests/core/test_custom_countries.py",
+    "tests/helpers/postgres_mock.py",
+    "tests/mcp/test_add_company.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "a541f9b7d908",
+  "session_metrics": {
+    "turn_count": 13
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-07T16:48:27.901249Z",
+    "agent_lines": 471,
+    "agent_removed": 91,
+    "human_added": 40,
+    "human_modified": 8,
+    "human_removed": 0,
+    "total_committed": 517,
+    "total_lines_changed": 610,
+    "agent_percentage": 92.1311475409836,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 151,
+      "agent_lines_removed": 32
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 151,
+      "agent_lines_removed": 32
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 151,
+      "agent_lines_removed": 32
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 151,
+      "agent_lines_removed": 32
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 210,
+      "agent_lines_removed": 96
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 210,
+      "agent_lines_removed": 96
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 513,
+      "agent_lines_removed": 97
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 513,
+      "agent_lines_removed": 97
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 12,
+      "user_lines_removed": 2,
+      "agent_lines_added": 513,
+      "agent_lines_removed": 97,
+      "user_added_per_file": {
+        "scripts/ec2_redis.sh": 12
+      },
+      "user_removed_per_file": {
+        "scripts/ec2_redis.sh": 2
+      }
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 12,
+      "user_lines_removed": 2,
+      "agent_lines_added": 513,
+      "agent_lines_removed": 97,
+      "user_added_per_file": {
+        "scripts/ec2_redis.sh": 12
+      },
+      "user_removed_per_file": {
+        "scripts/ec2_redis.sh": 2
+      }
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 12,
+      "user_lines_removed": 2,
+      "agent_lines_added": 513,
+      "agent_lines_removed": 97,
+      "user_added_per_file": {
+        "scripts/ec2_redis.sh": 12
+      },
+      "user_removed_per_file": {
+        "scripts/ec2_redis.sh": 2
+      }
+    }
+  ]
+}

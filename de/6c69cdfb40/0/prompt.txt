@@ -1,0 +1,71 @@
+its a weired problem on render server and it might be a real problem.
+I just added Armenia as new country in my application and i have it on my local app, but on render i dont have it.
+
+what do you think about it?
+
+---
+
+quickly apply proper fix on it.
+
+---
+
+verifu
+
+---
+
+why you added custom countries files?
+
+---
+
+i cannot understand why we have the frozen set of some countries there?
+
+---
+
+day by day the need to redis in more clear here.
+its a complete shit design.
+it should be removed as soon as you can
+
+---
+
+we should add redis in this point, and also transfer the whole project to EC2 cause its going to shit.
+its a completely production level application and doing these shit on it might be dangerous.
+
+its needed to be reviewed as soon as possible.
+
+just in case we need to add redis and transfer this simple responsibities to it and then we will transfer the whole job board as we have the proposal there.
+
+---
+
+i think in this moment we need to add a simple redis to out project hosts on EC2 and then apply this countries logic which is small to it then we will decide on later migration to whole EC2.
+
+---
+
+ok tell me how to apply redis on EC2 and connect to it now.
+
+---
+
+you need to go to $HOME/Downloads and then ssh -i relocation.pem ec2-user@3.76.111.159 to ssh to server.
+
+---
+
+you need to go to $HOME/Downloads and then ssh -i relocation.pem ec2-user@3.76.111.159 to ssh to server.
+
+---
+
+add to env.
+
+---
+
+ok is this working on app or not?
+
+---
+
+ok is this working on app or not?
+
+---
+
+restart the server
+
+---
+
+restart the server

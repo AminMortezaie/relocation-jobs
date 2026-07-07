@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "de6c69cdfb40",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 13,
+  "files_touched": [
+    ".env.example",
+    "docs/reference/schemas.md",
+    "relocation_jobs/admin/service.py",
+    "relocation_jobs/build_companies.py",
+    "relocation_jobs/catalog/custom_countries.py",
+    "relocation_jobs/catalog/schema.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/db.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/core/paths.py",
+    "relocation_jobs/core/redis_client.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/scrape/board_url.py",
+    "requirements.txt",
+    "scripts/ec2_redis.sh",
+    "scripts/exclude_stray_board_jobs.py",
+    "scripts/fix_job_descriptions.py",
+    "scripts/mark_wrong_location_jobs.py",
+    "tests/catalog/test_countries_redis.py",
+    "tests/catalog/test_repo.py",
+    "tests/conftest.py",
+    "tests/core/test_custom_countries.py",
+    "tests/helpers/postgres_mock.py",
+    "tests/mcp/test_add_company.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/de/6c69cdfb40/0/metadata.json",
+      "transcript": "/de/6c69cdfb40/0/full.jsonl",
+      "content_hash": "/de/6c69cdfb40/0/content_hash.txt",
+      "prompt": "/de/6c69cdfb40/0/prompt.txt"
+    }
+  ]
+}

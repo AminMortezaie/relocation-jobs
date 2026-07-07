@@ -16,3 +16,4 @@ data/
 **/.DS_Store
 /dist/
 /dist/mcp-resume-reframe-for-claude.zip
+/deploy/

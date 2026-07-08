@@ -1,0 +1,109 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "cda9b29dc7ef",
+  "session_id": "9a8f40c5-b864-415b-8753-d67154b278cf",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T02:37:46.641422Z",
+  "branch": "main",
+  "checkpoints_count": 12,
+  "save_step_count": 10,
+  "files_touched": [
+    "relocation_jobs/catalog/locations.py",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/static/js/data.js",
+    "relocation_jobs/static/js/dialogs.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "tests/web/test_catalog_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "2f236998f96a",
+  "session_metrics": {
+    "turn_count": 12
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T02:37:46.63718Z",
+    "agent_lines": 152,
+    "agent_removed": 28,
+    "human_added": 46,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 198,
+    "total_lines_changed": 232,
+    "agent_percentage": 77.58620689655173,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 354,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 354,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 354,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 501,
+      "agent_lines_removed": 44
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 501,
+      "agent_lines_removed": 44
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 501,
+      "agent_lines_removed": 44
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 851,
+      "agent_lines_removed": 73
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 862,
+      "agent_lines_removed": 79
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1101,
+      "agent_lines_removed": 118
+    }
+  ]
+}

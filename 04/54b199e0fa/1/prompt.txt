@@ -1,0 +1,21 @@
+also the master projects has this problem, the problem for master resume resolved  which we resloved for the master resuems see the git diff and resolve for master project
+
+---
+
+also the master projects has this problem, the problem for master resume resolved  which we resloved for the master resuems see the git diff and resolve for master project
+
+---
+
+there is a simple bug in application data section and the pdf is not showing on preview with default zoom and showing smaller.
+
+read the skills and fix this simple bug
+
+this is the real problem.
+
+---
+
+there is a simple bug in application data section and the pdf is not showing on preview with default zoom and showing smaller.
+
+read the skills and fix this simple bug
+
+this is the real problem.

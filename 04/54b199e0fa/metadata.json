@@ -3,7 +3,7 @@
   "checkpoint_id": "0454b199e0fa",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
+  "checkpoints_count": 3,
   "files_touched": [
     "relocation_jobs/admin/service.py",
     "relocation_jobs/static/apply.html",
@@ -18,6 +18,12 @@
       "transcript": "/04/54b199e0fa/0/full.jsonl",
       "content_hash": "/04/54b199e0fa/0/content_hash.txt",
       "prompt": "/04/54b199e0fa/0/prompt.txt"
+    },
+    {
+      "metadata": "/04/54b199e0fa/1/metadata.json",
+      "transcript": "/04/54b199e0fa/1/full.jsonl",
+      "content_hash": "/04/54b199e0fa/1/content_hash.txt",
+      "prompt": "/04/54b199e0fa/1/prompt.txt"
     }
   ],
   "token_usage": {

@@ -1,0 +1,88 @@
+based on this project and codebase-mcp and skills you have please write down a complete explaination of what we did in this project i want to add my resume.
+
+it doesnt matter how long it is, i just want to cover the all the aspects of this and get understand the people what i did in this project.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+do it now and give me md file.
+
+---
+
+do it now and give me md file.
+
+---
+
+I though that we can add a new section to master resume which is a different part, in our masters.
+
+we can add some projects description like this.
+
+please plan this.
+
+---
+
+I though that we can add a new section to master resume which is a different part, in our masters.
+
+we can add some projects description like this.
+
+please plan this.
+
+---
+
+No, it's not a seperated resume.
+
+its a different part, its projects master part.
+
+we will introduce and write down some projects like this.
+
+and when we want to use master resume we can see the full description of projects and use them to reframe better for each application.
+
+plan to implement this feature.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+restart server
+
+---
+
+restart server
+
+---
+
+make it latex format not md format
+
+---
+
+restart panel
+
+---
+
+also add a button to generate pdf like we have for master resumes
+
+---
+
+edit kuchup description and save again with correct latex format and also explain completely, dont think about adding in resume.
+you want to write down all the things you know about this project a comperhensive explaination.
+
+---
+
+update the readme of project you can do it better now.
+
+---
+
+add this new part to mcp skill and update the zip file to claude understand it.
+
+---
+
+add this new part to mcp skill and update the zip file to claude understand it.

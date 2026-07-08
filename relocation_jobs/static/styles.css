@@ -4948,8 +4948,13 @@ body.screen-loading #loadingBar {
 
 /* ── Company card fade-in ──────────────────────────────── */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  /* Opacity-only fade — intentionally no `transform`. Animating transform and
+     holding it via `both`/forwards fill leaves a matrix on the card (even the
+     identity), which makes it a containing block for position:fixed popovers
+     (ATS / hide-reason / referral) — offsetting them and clipping them under
+     the card's overflow:hidden. A pure fade avoids any lingering transform. */
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .company-card {

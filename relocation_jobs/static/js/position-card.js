@@ -170,6 +170,7 @@ class PositionCard extends HTMLElement {
   _apply(data) {
     if (!data) return;
     this._job = { ...this._job, ...data };
+    this.render();
     this._dispatch("mutated", { job: this._job, apiData: data });
   }
 
@@ -193,8 +194,8 @@ class PositionCard extends HTMLElement {
       rejected, ...(this._job.idempotency_key ? { idempotency_key: this._job.idempotency_key } : {}),
     });
     if (!data) return;
-    this._apply(data);
     if (rejected) { this._variant = "rejected"; this._toast("Marked as rejected"); }
+    this._apply(data);
   }
 
   async _toggleLookingToApply() {
@@ -239,8 +240,8 @@ class PositionCard extends HTMLElement {
       not_for_me: true, reason,
     });
     if (!data) return;
-    this._apply(data);
     this._variant = "not_for_me";
+    this._apply(data);
     this._toast(`Hidden · ${notForMeReasonMeta(reason).label}`);
   }
 
@@ -250,8 +251,8 @@ class PositionCard extends HTMLElement {
       not_for_me: false,
     });
     if (!data) return;
-    this._apply(data);
     this._variant = "open";
+    this._apply(data);
     this._toast("Role restored");
   }
 
@@ -260,8 +261,8 @@ class PositionCard extends HTMLElement {
       country: this._job.country, company: this._job.company, url: this._job.url,
     });
     if (!data) return;
-    this._apply(data);
     this._variant = "open";
+    this._apply(data);
     this._toast("Moved back to open positions");
   }
 
@@ -627,7 +628,7 @@ class PositionCard extends HTMLElement {
     const trigger = wrap.querySelector(".hide-reason-trigger");
     if (!popover || !trigger) return;
     const open = popover.hidden;
-    this._closeAllPopovers(open ? this._getHideWrapId(wrap) : null);
+    this._closeAllPopovers(open ? wrap : null);
     trigger.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) {
       popover.hidden = false;

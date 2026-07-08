@@ -1230,20 +1230,6 @@ def _query_empty_company_count(conn) -> int:
     return int((_row(row) or {}).get("n") or 0)
 
 
-def _query_ats_distribution(conn) -> list[dict]:
-    rows = conn.execute(
-        """
-        SELECT
-            COALESCE(NULLIF(TRIM(ats_type), ''), '(unset)') AS ats_type,
-            COUNT(*) AS companies
-        FROM companies
-        GROUP BY COALESCE(NULLIF(TRIM(ats_type), ''), '(unset)')
-        ORDER BY companies DESC, ats_type ASC
-        """
-    ).fetchall()
-    return [_row(r) for r in rows]
-
-
 def _query_fetch_problem_companies(conn, limit: int = 100) -> list[dict]:
     rows = conn.execute(
         """
@@ -1302,7 +1288,6 @@ def load_catalog_stats() -> dict:
             "company_rows": _query_company_stats_by_country(conn),
             "job_rows": _query_job_counts_by_country(conn),
             "empty_companies": _query_empty_company_count(conn),
-            "ats_rows": _query_ats_distribution(conn),
             "problem_rows": _query_fetch_problem_companies(conn),
             "meta_rows": _query_country_meta(conn),
             "latest_job_by_country": _query_latest_job_fetches_by_country(conn),
@@ -1340,7 +1325,6 @@ def _empty_catalog_overview() -> dict:
             "empty_companies": 0,
             "missing_locations": 0,
         },
-        "by_ats": [],
         "fetch_problem_companies": [],
         "country_meta": [],
     }
@@ -1455,10 +1439,6 @@ def get_catalog_overview() -> dict:
         jobs_by_country,
         stats["empty_companies"],
     )
-    by_ats = [
-        {"ats_type": row["ats_type"], "companies": int(row.get("companies") or 0)}
-        for row in stats["ats_rows"]
-    ]
     fetch_problem_companies = [
         {
             "country": row.get("country"),
@@ -1473,7 +1453,6 @@ def get_catalog_overview() -> dict:
         "has_data": True,
         "countries": countries,
         "totals": totals,
-        "by_ats": by_ats,
         "fetch_problem_companies": fetch_problem_companies,
         "country_meta": _overview_country_meta(
             stats["meta_rows"],

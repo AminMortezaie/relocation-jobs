@@ -56,25 +56,18 @@ async def fetch_join_board(client, board_url: str, company: dict) -> list[dict]:
     if slug_from_page:
         slug = slug_from_page
     if company_id:
-        api_items: list[dict] = []
-        page = 1
-        while page <= 20:
+        try:
             api_response = await client.get(
                 f"https://join.com/api/public/companies/{company_id}/jobs",
                 headers={**HEADERS, "Accept": "application/json"},
-                params={"page": page, "pageSize": 100},
+                params={"page": 1, "pageSize": 50},
                 timeout=15.0,
             )
             api_response.raise_for_status()
             data = api_response.json()
-            batch = list(data.get("items") or [])
-            if not batch:
-                break
-            api_items.extend(batch)
-            page_count = int((data.get("pagination") or {}).get("pageCount") or 1)
-            if page >= page_count:
-                break
-            page += 1
+            api_items = list(data.get("items") or [])
+        except Exception:
+            api_items = []
         if api_items:
             items = api_items
     return join_jobs_from_items(items, slug)

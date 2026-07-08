@@ -147,18 +147,6 @@ function renderCatalog(data) {
     )
     .join("");
 
-  const atsRows = (data.by_ats || [])
-    .slice(0, 12)
-    .map(
-      (row) => `
-      <tr>
-        ${adminCell(`<code>${escapeHtml(row.ats_type)}</code>`, "ATS")}
-        ${adminCell(row.companies, "Companies")}
-      </tr>
-    `
-    )
-    .join("");
-
   $("adminCatalog").innerHTML = `
     <section class="admin-panel">
       <h2 class="admin-panel-title">Catalog by country</h2>
@@ -172,17 +160,6 @@ function renderCatalog(data) {
           </thead>
           <tbody>${countryRows || '<tr><td colspan="6">No data</td></tr>'}</tbody>
         </table>
-      </div>
-      <div class="admin-split">
-        <div>
-          <h3 class="admin-subheading">ATS breakdown</h3>
-          <div class="admin-table-wrap">
-            <table class="admin-table admin-table--responsive">
-              <thead><tr><th>ATS</th><th>Companies</th></tr></thead>
-              <tbody>${atsRows || '<tr><td colspan="2">No ATS data</td></tr>'}</tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </section>
   `;

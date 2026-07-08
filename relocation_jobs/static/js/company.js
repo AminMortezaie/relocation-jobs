@@ -439,6 +439,53 @@ async function saveTex() {
   }
 }
 
+function positionCardVariant(position) {
+  if (position.not_for_me) return "not_for_me";
+  if (position.rejected) return "rejected";
+  return "open";
+}
+
+function normalizePositionForCard(position) {
+  return {
+    ...position,
+    country: routeCountry || "",
+    company: companyName || "",
+    visa_sponsorship: false,
+    waiting_referral: false,
+    waiting_referral_date: "",
+    referral_linkedin_url: "",
+    seen: false,
+    seen_date: "",
+    fetched: position.tailored_tex_updated_at || position.pdf_updated_at || position.cover_letter_tex_updated_at || position.cover_letter_pdf_updated_at || "",
+    last_seen: "",
+    applied_date: position.applied ? (position.tailored_tex_updated_at || position.pdf_updated_at || "") : "",
+    applied_at: "",
+    applied_history: [],
+    applied_events: [],
+    rejected_date: position.rejected ? (position.tailored_tex_updated_at || position.pdf_updated_at || "") : "",
+    rejected_history: [],
+    looking_to_apply_date: "",
+    pinned_at: "",
+    job_city: position.location || "",
+    not_for_me: false,
+    not_for_me_date: "",
+    not_for_me_reason: "",
+  };
+}
+
+function renderPositionCard(position) {
+  const container = $("companyPositionCardContainer");
+  if (!container) return;
+  let card = container.querySelector("position-card");
+  if (!card) {
+    card = document.createElement("position-card");
+    container.appendChild(card);
+  }
+  const normalized = normalizePositionForCard(position);
+  card.job = normalized;
+  card.variant = positionCardVariant(normalized);
+}
+
 async function loadPositionDetail(idempotencyKey, position, { quiet = false } = {}) {
   selectedKey = idempotencyKey;
   texEditing = false;
@@ -459,6 +506,7 @@ async function loadPositionDetail(idempotencyKey, position, { quiet = false } = 
   ].filter(Boolean);
   $("companyPositionMeta").textContent = metaParts.join(" · ");
   updateJdToggleButton(position);
+  renderPositionCard(position);
 
   const hasUrl = Boolean(position.url);
   const applyLink = $("companyApplyLink");
@@ -706,6 +754,21 @@ function bindEvents() {
     const btn = event.target.closest(".company-position-item");
     if (!btn) return;
     selectPosition(btn.dataset.key);
+  });
+  $("companyDetailBody")?.addEventListener("position-state-changed", async (event) => {
+    const { detail } = event;
+    if (detail.type === "auth-required") {
+      showLogin();
+      return;
+    }
+    if (detail.type === "error") {
+      showError(detail.message || "Position state update failed");
+      return;
+    }
+    if (detail.message) {
+      showToast(detail.message);
+    }
+    await refreshPositionsAfterRender();
   });
 }
 

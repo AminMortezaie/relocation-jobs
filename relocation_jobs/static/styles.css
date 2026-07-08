@@ -4559,13 +4559,6 @@ body.fetch-modal-open {
   font-size: 0.78rem;
 }
 
-.admin-split {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
 .admin-dl {
   display: grid;
   grid-template-columns: minmax(120px, 180px) 1fr;
@@ -5320,10 +5313,6 @@ body.scroll-locked {
 
   .admin-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .admin-split {
-    grid-template-columns: 1fr;
   }
 
   .admin-dl {

@@ -1,6 +1,6 @@
 /** DOM event listeners for the jobs panel. */
 
-import { state, companyKey } from "./state.js";
+import { state, companyKey, findCompany, onUnauthorized } from "./state.js";
 import { $, toast, atsScoreTone, isNarrowViewport, debounce, SEARCH_DEBOUNCE_MS } from "./utils.js";
 import {
   removeCompany,
@@ -18,6 +18,7 @@ import {
 import { pinJob } from "./api.js";
 import { loadJobs, loadCities, ensureLocationsLoaded } from "./data.js";
 import { loadBoard } from "./board.js";
+import { patchJobOnBoard, hideJobAsNotForMe, restoreJobToOpen } from "./job-board.js";
 import {
   renderCompanies,
   toggleCompanyCollapse,
@@ -341,6 +342,8 @@ function markSeenFromPositionCard(card) {
 
 function bindHideReasonPopoverEvents() {
   document.addEventListener("click", async (e) => {
+    if (e.target.closest("position-card")) return;
+
     const hideReasonTrigger = e.target.closest(".hide-reason-trigger");
     if (hideReasonTrigger) {
       e.stopPropagation();
@@ -504,6 +507,7 @@ async function submitAtsScoreFromCard(card, atsScore) {
 
 function bindAtsPopoverEvents() {
   document.addEventListener("input", (e) => {
+    if (e.target.closest("position-card")) return;
     const slider = e.target.closest(".ats-score-slider");
     if (slider) {
       const wrap = resolveAtsWrap(slider);
@@ -523,6 +527,7 @@ function bindAtsPopoverEvents() {
   });
 
   document.addEventListener("change", (e) => {
+    if (e.target.closest("position-card")) return;
     const number = e.target.closest(".ats-score-number");
     if (!number) return;
     const wrap = resolveAtsWrap(number);
@@ -530,6 +535,7 @@ function bindAtsPopoverEvents() {
   });
 
   document.addEventListener("keydown", async (e) => {
+    if (e.target.closest("position-card")) return;
     if (e.key !== "Enter") return;
     const number = e.target.closest(".ats-score-number");
     if (!number) return;
@@ -547,6 +553,7 @@ function bindAtsPopoverEvents() {
   });
 
   document.addEventListener("click", async (e) => {
+    if (e.target.closest("position-card")) return;
     const atsTrigger = e.target.closest(".ats-score-trigger");
     if (atsTrigger) {
       e.stopPropagation();
@@ -603,7 +610,26 @@ function bindAtsPopoverEvents() {
 }
 
 function bindJobsListEvents() {
+  $("jobs").addEventListener("position-state-changed", (e) => {
+    const { detail } = e;
+    if (detail.type === "auth-required") { onUnauthorized(); return; }
+    if (detail.type === "toast" && detail.message) toast(detail.message);
+    if (detail.type === "mutated" && detail.apiData) {
+      if (detail.apiData.not_for_me === true) {
+        const co = findCompany(detail.country, detail.company);
+        if (co) hideJobAsNotForMe(co, detail.url, detail.idempotencyKey, detail.apiData.not_for_me_reason || null);
+      } else if (detail.apiData.not_for_me === false) {
+        const co = findCompany(detail.country, detail.company);
+        if (co) restoreJobToOpen(co, detail.url, detail.idempotencyKey);
+      } else {
+        patchJobOnBoard(detail.country, detail.company, detail.url, detail.idempotencyKey, detail.apiData);
+      }
+    }
+  });
+
   $("jobs").addEventListener("click", async (e) => {
+    if (e.target.closest("position-card")) return;
+
     const collapseBtn = e.target.closest(".collapse-company-btn");
     if (collapseBtn) {
       const card = collapseBtn.closest(".company-card");

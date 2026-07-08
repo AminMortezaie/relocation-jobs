@@ -1,0 +1,62 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "0454b199e0fa",
+  "session_id": "d1be427a-0819-49e2-9ada-2e96f3881022",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T23:47:52.495628Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/admin/service.py",
+    "relocation_jobs/static/apply.html",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/apply.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/admin.py"
+  ],
+  "agent": "Claude Code",
+  "model": "default",
+  "turn_id": "553fcb79c2ef",
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T23:47:52.492785Z",
+    "agent_lines": 20,
+    "agent_removed": 7,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 6,
+    "total_committed": 20,
+    "total_lines_changed": 33,
+    "agent_percentage": 81.81818181818183,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 36,
+      "user_lines_removed": 6,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/static/apply.html": 2,
+        "relocation_jobs/static/js/apply.js": 17,
+        "relocation_jobs/static/styles.css": 5,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/apply.html": 2,
+        "relocation_jobs/static/styles.css": 4
+      }
+    }
+  ]
+}

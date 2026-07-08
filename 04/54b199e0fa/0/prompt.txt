@@ -1,0 +1,13 @@
+there is a simple bug in showing recent fetched jobs in admin panel.         
+
+ Root cause: get_recently_fetched_jobs uses datetime.now(timezone.utc) for the "today" boundary, but     
+     enrichment uses date.today() (local timezone, UTC+4 on this machine). When the local date is ahead of   
+     UTC, the query WHERE j.fetched >= UTC_today includes BOTH the user's yesterday AND today jobs,          
+     because both have fetched ≥ the UTC date string.                                                        
+                                                                                                             
+     The fix is to accept a timezone parameter from the frontend (already collected for other endpoints)     
+     and use local_day_utc_bounds to compute the correct UTC range, consistent with the rest of the          
+     codebase.                            
+
+
+fix it now

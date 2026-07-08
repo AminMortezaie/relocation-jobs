@@ -214,7 +214,7 @@ Catalog writes are **batch** (scrape, build). User writes are **small** (single 
 
 | Concern | Location |
 |---------|----------|
-| Catalog CRUD / sync | `catalog/repo.py`, `catalog/writes.py` |
+| Catalog CRUD / sync | `catalog/repo.py` |
 | Scrape → catalog | `scrape/merge.py`, `scrape/enrich.py` |
 | Load tracking | `users/repo.py` (`load_job_tracking`, `load_company_tracking`) |
 | Merge + partition | `panel/flatten.py`, `panel/tracking.py` |

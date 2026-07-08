@@ -9,21 +9,21 @@ from functools import wraps
 from flask import g, jsonify, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from relocation_jobs.db import init_db
+from relocation_jobs.users.repo import (
+    create_user,
+    get_user_by_id,
+    get_user_by_username,
+    is_user_admin,
+    update_user_password,
+    user_count,
+)
+
 _PASSWORD_HASH_METHOD = "pbkdf2:sha256"
 
 
 def _hash_password(password: str) -> str:
     return generate_password_hash(password, method=_PASSWORD_HASH_METHOD)
-
-from relocation_jobs.db import (
-    create_user,
-    get_user_by_id,
-    get_user_by_username,
-    init_db,
-    is_user_admin,
-    update_user_password,
-    user_count,
-)
 
 
 def secret_key() -> str:

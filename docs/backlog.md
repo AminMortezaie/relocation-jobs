@@ -104,6 +104,39 @@ Soft delete means every hide that affects the board should have a durable `job_t
 
 ---
 
+## Fetch pipeline queue (Kafka / Postgres / Redis Streams)
+
+**Status:** planned (proposal written)  
+**Priority:** low (until fetch scale or reliability bites)  
+**Context:** Fetch/scrape is the only async workload. Today it uses in-process threads, a global `fetch_runs` mutex, and sequential countries in the EC2 scheduler. No message broker. See [reference/kafka-fetch-pipeline-proposal.md](reference/kafka-fetch-pipeline-proposal.md).
+
+### Problem / goal
+
+- Durable per-company work units with retry (survive worker crash).
+- Optional scale-out beyond one `t4g.micro` worker.
+- Decouple scheduler enqueue from execute without blocking on global `running` row.
+- **Not** a goal: async board, MCP, or user tracking.
+
+### Approach (summary)
+
+1. **Default:** stay on status quo until measured pain.
+2. **First queue step:** Postgres `fetch_jobs` + `FOR UPDATE SKIP LOCKED` (same EC2, no new service).
+3. **Optional:** Redis Streams for progress fan-out (Redis already on host).
+4. **Kafka:** only if multiple consumer types or many worker replicas are required.
+5. **Code layout if events:** `core/kafka_client.py` + `events/` domain; producers at `fetch/scheduler` + `web/routes/fetch`; consumers in `scripts/*_worker.py`; keep `fetch_runs` audit.
+
+### Decision pending
+
+- **A** status quo vs **B** Postgres queue vs **C** Redis Streams vs **D** Kafka
+
+### Done when
+
+- [ ] Proposal approved (broker choice in doc resolved)
+- [ ] Baseline metrics: cycle duration, busy skips, orphan reaps
+- [ ] If implemented: fetch tests + EC2 deploy runbook updated
+
+---
+
 ## Template for new items
 
 ```markdown

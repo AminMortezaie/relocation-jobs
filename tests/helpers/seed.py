@@ -7,7 +7,7 @@ from pathlib import Path
 from relocation_jobs.core.job_identity import job_idempotency_key, stamp_job_identity
 from relocation_jobs.catalog.repo import get_company
 from relocation_jobs.catalog.repo import sync_company_board_to_catalog
-from relocation_jobs.catalog.writes import save_country_catalog
+from relocation_jobs.catalog.repo import sync_country_catalog
 from relocation_jobs.scrape.merge import merge_matching_jobs
 
 
@@ -17,7 +17,7 @@ def seed_country(country_key: str, fixture_path: Path) -> dict:
         for job in company.get("matching_jobs") or []:
             stamp_job_identity(job)
             job.setdefault("idempotency_key", job_idempotency_key(job.get("url", "")))
-    save_country_catalog(country_key, data)
+    sync_country_catalog(country_key, data)
     return data
 
 

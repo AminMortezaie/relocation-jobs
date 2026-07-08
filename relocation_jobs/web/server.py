@@ -5,9 +5,18 @@ import os
 from flask import Flask, request, send_from_directory
 
 from relocation_jobs.core.auth import init_auth
+from relocation_jobs.core.db import get_connection
 from relocation_jobs.core.paths import PROJECT_ROOT, STATIC_DIR
+from relocation_jobs.db import init_db
 from relocation_jobs.db.migrate import apply_v2_migrations
+from relocation_jobs.fetch import repo as fetch_repo
+from relocation_jobs.fetch.log import configure_fetch_logging
 from relocation_jobs.web.routes import register_routes
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
 
 ROOT = PROJECT_ROOT
 STATIC = STATIC_DIR
@@ -22,17 +31,8 @@ def bootstrap_app() -> None:
     if _bootstrapped:
         return
     STATIC.mkdir(exist_ok=True)
-    try:
-        from dotenv import load_dotenv
-
+    if load_dotenv is not None:
         load_dotenv(ROOT / ".env")
-    except ImportError:
-        pass
-    from relocation_jobs.core.db import get_connection
-    from relocation_jobs.db import init_db
-    from relocation_jobs.fetch import repo as fetch_repo
-    from relocation_jobs.fetch.log import configure_fetch_logging
-
     init_db()
     configure_fetch_logging()
     apply_v2_migrations(get_connection())

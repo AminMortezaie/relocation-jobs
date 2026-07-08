@@ -5,7 +5,8 @@
 #   ./scripts/ec2_app_deploy.sh sync     # rsync repo to EC2
 #   ./scripts/ec2_app_deploy.sh deploy   # build + run panel + Caddy
 #   ./scripts/ec2_app_deploy.sh open-sg  # open HTTP/HTTPS on security group
-#   ./scripts/ec2_app_deploy.sh status   # container + health check
+#   ./scripts/ec2_app_deploy.sh status      # container + health check
+#   ./scripts/ec2_app_deploy.sh worker-logs # tail fetch scheduler logs
 #
 # Requires: aws-postgres.env, SSH key at ~/Downloads/relocation.pem
 
@@ -19,6 +20,8 @@ EC2_SSH_USER="${EC2_SSH_USER:-ec2-user}"
 EC2_SSH_KEY="${EC2_SSH_KEY:-$HOME/Downloads/relocation.pem}"
 PANEL_IMAGE=relocation-panel:ec2
 PANEL_CONTAINER=relocation-panel
+WORKER_IMAGE=relocation-fetch-worker:ec2
+WORKER_CONTAINER=relocation-fetch-worker
 CADDY_CONTAINER=relocation-caddy
 PANEL_PORT=10000
 
@@ -155,9 +158,30 @@ docker run -d --name ${PANEL_CONTAINER} --restart unless-stopped \\
   -e PANEL_ADMIN_USER=admin \\
   -e PANEL_ADMIN_PASSWORD='${admin_pass}' \\
   -e PANEL_ALLOW_REGISTER=0 \\
+  -e FETCH_SCHEDULE_ENABLED=1 \\
+  -e FETCH_SCHEDULE_INTERVAL_HOURS=6 \\
+  -e FETCH_SCHEDULE_CONCURRENCY=4 \\
   -e DATABASE_URL='${db_url}' \\
   -e REDIS_URL='${redis_url}' \\
   ${PANEL_IMAGE}
+EOF
+
+  log "Building ${WORKER_IMAGE} on EC2 (Playwright, may take several minutes)..."
+  ssh_cmd "cd ${REMOTE_DIR} && docker build -f Dockerfile.ec2-worker -t ${WORKER_IMAGE} ."
+
+  log "Starting fetch worker container..."
+  ssh_cmd bash -s <<EOF
+set -euo pipefail
+docker rm -f ${WORKER_CONTAINER} 2>/dev/null || true
+docker run -d --name ${WORKER_CONTAINER} --restart unless-stopped \\
+  -e PANEL_SCRAPE_ENABLED=1 \\
+  -e FETCH_SCHEDULE_ENABLED=1 \\
+  -e FETCH_SCHEDULE_INTERVAL_HOURS=6 \\
+  -e FETCH_SCHEDULE_CONCURRENCY=4 \\
+  -e PANEL_ADMIN_USER=admin \\
+  -e PANEL_ADMIN_PASSWORD='${admin_pass}' \\
+  -e DATABASE_URL='${db_url}' \\
+  ${WORKER_IMAGE}
 EOF
 
   log "Starting Caddy reverse proxy..."
@@ -179,10 +203,38 @@ EOF
 
 cmd_status() {
   load_state
+  local domain="${PANEL_DOMAIN:-kuchup.com}"
+  local panel_code domain_code ip_code
+
   ssh_cmd "docker ps --filter name=relocation- --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
-  log "Health (via Elastic IP):"
-  curl -sf -o /dev/null -w "  http://${ELASTIC_IP}/api/auth/status -> %{http_code}\n" \
-    --max-time 30 "http://${ELASTIC_IP}/api/auth/status" || log "  health check failed (DNS/Caddy still starting?)"
+  log "Fetch worker logs (last 20 lines):"
+  ssh_cmd "docker logs ${WORKER_CONTAINER} --tail 20 2>&1" || log "  worker not running"
+
+  log "Panel health (localhost:${PANEL_PORT} on EC2):"
+  panel_code="$(ssh_cmd "curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:${PANEL_PORT}/api/auth/status" 2>/dev/null || echo 000)"
+  if [[ "$panel_code" == "200" ]]; then
+    log "  http://127.0.0.1:${PANEL_PORT}/api/auth/status -> ${panel_code} (OK)"
+  else
+    log "  http://127.0.0.1:${PANEL_PORT}/api/auth/status -> ${panel_code} (FAILED)"
+  fi
+
+  log "Panel health (via domain):"
+  domain_code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "https://${domain}/api/auth/status" 2>/dev/null || echo 000)"
+  if [[ "$domain_code" == "200" ]]; then
+    log "  https://${domain}/api/auth/status -> ${domain_code} (OK)"
+  else
+    log "  https://${domain}/api/auth/status -> ${domain_code} (check DNS/TLS if deploy just finished)"
+  fi
+
+  log "Origin lock-down (Elastic IP, expect 404):"
+  ip_code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "http://${ELASTIC_IP}/api/auth/status" 2>/dev/null || echo 000)"
+  log "  http://${ELASTIC_IP}/api/auth/status -> ${ip_code}"
+}
+
+cmd_worker_logs() {
+  load_state
+  local tail_n="${2:-100}"
+  ssh_cmd "docker logs ${WORKER_CONTAINER} --tail ${tail_n} -f 2>&1"
 }
 
 case "${1:-deploy}" in
@@ -190,5 +242,6 @@ case "${1:-deploy}" in
   deploy) cmd_deploy ;;
   open-sg) cmd_open_sg ;;
   status) load_state; cmd_status ;;
-  *) die "Usage: $0 {sync|deploy|open-sg|status}" ;;
+  worker-logs) cmd_worker_logs "$@" ;;
+  *) die "Usage: $0 {sync|deploy|open-sg|status|worker-logs}" ;;
 esac

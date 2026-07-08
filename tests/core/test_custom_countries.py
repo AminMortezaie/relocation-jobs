@@ -78,7 +78,7 @@ def test_sync_company_location_fields_no_double_suffix(tmp_data_dir):
 
 
 def test_catalog_country_keys_surface_without_custom_row(db):
-    from relocation_jobs.catalog.writes import upsert_company
+    from relocation_jobs.catalog.repo import upsert_company
     from relocation_jobs.core.db import db_transaction
     from relocation_jobs.core.location_tags import all_country_labels, supported_country_keys
 

@@ -43,6 +43,7 @@ pip install -r requirements-dev.txt
 python3 -m playwright install chromium
 cp .env.example .env
 # Set DATABASE_URL, PANEL_SECRET_KEY, PANEL_ADMIN_USER, PANEL_ADMIN_PASSWORD
+# (use <ELASTIC_IP> from gitignored aws-postgres.env — never commit real hosts/passwords)
 
 PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py
 # → http://127.0.0.1:5051

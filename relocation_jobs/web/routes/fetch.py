@@ -8,15 +8,11 @@ from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILA
 from relocation_jobs.core.auth import admin_required, login_required
 from relocation_jobs.core.location_tags import country_label
 from relocation_jobs.core.paths import country_archive_filename, supported_countries
-from relocation_jobs.db import is_user_admin
+from relocation_jobs.users.repo import is_user_admin
 from relocation_jobs.web import deps
 from relocation_jobs.fetch import repo as fetch_repo
+from relocation_jobs.fetch import state as fetch_state
 from relocation_jobs.fetch.runner import (
-    _fetch_lock,
-    _reap_zombie_fetch,
-    build_fetch_status,
-    fetch_is_running,
-    request_fetch_cancel,
     start_country_fetch,
 )
 from relocation_jobs.fetch.types import AttemptStatus
@@ -30,17 +26,17 @@ def register(app):
     @app.get("/api/fetch/status")
     @login_required
     def api_fetch_status():
-        return jsonify(build_fetch_status())
+        return jsonify(fetch_state.build_fetch_status())
 
     @app.post("/api/fetch/cancel")
     @login_required
     def api_fetch_cancel():
-        status = build_fetch_status()
+        status = fetch_state.build_fetch_status()
         if not status.get("running"):
             return jsonify({"error": "No fetch is running"}), 400
         if not status.get("company") and not is_user_admin(g.user_id):
             return jsonify({"error": "Admin access required"}), 403
-        ok, err = request_fetch_cancel()
+        ok, err = fetch_state.request_fetch_cancel()
         if not ok:
             return jsonify({"error": err or "No fetch is running"}), 400
         return jsonify({"ok": True})
@@ -94,10 +90,8 @@ def register(app):
         if ats_type and ats_type not in valid_ats:
             return jsonify({"error": f"Unknown ATS type: {ats_type}"}), 400
 
-        with _fetch_lock:
-            _reap_zombie_fetch()
-            if fetch_is_running():
-                return jsonify({"error": "A fetch is already running"}), 409
+        if not fetch_state.guard_fetch_start():
+            return jsonify({"error": "A fetch is already running"}), 409
 
         try:
             run_id = start_country_fetch(

@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Awaitable, Callable
 from datetime import date
 
 from relocation_jobs.core.scrape_cancel import FetchCancelled
 from relocation_jobs.fetch import repo
+from relocation_jobs.fetch.ports import ProcessCompany
 from relocation_jobs.fetch.types import AttemptStatus
-
-ProcessCompany = Callable[..., Awaitable[tuple[str, int]]]
 _ERROR_RE = re.compile(r" — Error: (.+)$")
 
 
@@ -54,7 +52,7 @@ async def fetch_company(
     *,
     country_key: str,
     process_company: ProcessCompany,
-    persist_board,
+    sync_board,
     enrich_only: bool,
     skip_enriched: bool,
     enrich_concurrency: int,
@@ -74,7 +72,7 @@ async def fetch_company(
             company,
             index,
             total,
-            persist_board=persist_board,
+            sync_board=sync_board,
             enrich_only=enrich_only,
             skip_enriched=skip_enriched,
             enrich_concurrency=enrich_concurrency,

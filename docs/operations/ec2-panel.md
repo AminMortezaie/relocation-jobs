@@ -2,7 +2,7 @@
 
 **Domain:** [kuchup.com](https://kuchup.com) (Cloudflare)  
 **Server:** same EC2 instance as Postgres + Redis (`aws-postgres.env` → `ELASTIC_IP`)  
-**Status:** panel + Caddy on EC2; Render optional legacy until cutover
+**Status:** panel + fetch worker + Caddy on EC2; Render optional legacy until cutover
 
 ---
 
@@ -13,9 +13,10 @@
 | Postgres | `pg` | 5432 |
 | Redis | `relocation-redis` | 6379 |
 | Panel (gunicorn) | `relocation-panel` | 127.0.0.1:10000 |
+| Fetch worker (scheduler) | `relocation-fetch-worker` | — |
 | Caddy (TLS + reverse proxy) | `relocation-caddy` | 80, 443 |
 
-Panel talks to Postgres/Redis via Docker bridge gateway `172.17.0.1` (localhost on the host).
+Panel talks to Postgres/Redis via Docker bridge gateway `172.17.0.1` (localhost on the host). The fetch worker only needs Postgres; it runs country scrapes every **6 hours** (sequential countries, concurrency **4**).
 
 ---
 
@@ -24,13 +25,23 @@ Panel talks to Postgres/Redis via Docker bridge gateway `172.17.0.1` (localhost 
 From repo root (SSH key `~/Downloads/relocation.pem`, `aws-postgres.env` present):
 
 ```bash
-./scripts/ec2_app_deploy.sh deploy   # rsync + docker build + restart
-./scripts/ec2_app_deploy.sh status # containers + health check
+./scripts/ec2_app_deploy.sh deploy        # rsync + build panel + worker + Caddy
+./scripts/ec2_app_deploy.sh status        # containers + health check + worker logs
+./scripts/ec2_app_deploy.sh worker-logs   # follow fetch scheduler logs
 ```
 
 `deploy` also opens security group ports **80** and **443**.
 
-Image: `Dockerfile.ec2` (slim — no Playwright browser; `PANEL_SCRAPE_ENABLED=0`). Scrape locally with `PANEL_SCRAPE_ENABLED=1` on your laptop.
+| Image | Dockerfile | Role |
+|-------|------------|------|
+| `relocation-panel:ec2` | `Dockerfile.ec2` | Slim panel — no Playwright; `PANEL_SCRAPE_ENABLED=0` |
+| `relocation-fetch-worker:ec2` | `Dockerfile.ec2-worker` | Playwright + 6h scheduler; writes to shared Postgres |
+
+Manual scrape from your laptop still works (`PANEL_SCRAPE_ENABLED=1`); the worker skips a cycle if another fetch is already running (`fetch_runs.status = running`).
+
+**Worker env (set by deploy):** `FETCH_SCHEDULE_ENABLED=1`, `FETCH_SCHEDULE_INTERVAL_HOURS=6`, `FETCH_SCHEDULE_CONCURRENCY=4`. Optional override: `FETCH_SCHEDULE_COUNTRIES=uk,netherlands`.
+
+On `t4g.micro`, if the worker OOMs during fetch, lower concurrency to `2` or upsize the instance.
 
 ---
 
@@ -150,6 +161,7 @@ cd ~/Downloads
 ssh -i relocation.pem ec2-user@<ELASTIC_IP>
 docker ps
 docker logs relocation-panel --tail 50
+docker logs relocation-fetch-worker --tail 50
 docker logs relocation-caddy --tail 50
 ```
 

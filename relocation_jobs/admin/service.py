@@ -11,11 +11,18 @@ from relocation_jobs.core.ats_constants import (
 )
 from relocation_jobs.core.location_tags import SUGGESTED_CITIES, all_country_labels, load_custom_cities, load_custom_countries
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, country_archive_filename, data_dir, supported_countries
-from relocation_jobs.db import admin_tracking_totals, list_users_with_stats, user_count
+from relocation_jobs.users.repo import list_users_with_stats, user_count
 from relocation_jobs.catalog.custom_countries import countries_use_redis
-from relocation_jobs.catalog.stats import get_catalog_overview
+from relocation_jobs.catalog.repo import get_catalog_overview
 from relocation_jobs.core.redis_client import ping_redis, redis_enabled
 from relocation_jobs.fetch import repo as fetch_repo
+from relocation_jobs.fetch.scheduler import (
+    schedule_concurrency,
+    schedule_enabled,
+    schedule_interval_hours,
+)
+from relocation_jobs.panel.service import flatten_companies_for_stats
+from relocation_jobs.panel.stats import compute_stats
 
 
 def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
@@ -47,12 +54,47 @@ def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
     }
 
 
+def get_worker_status(*, fetch_state: dict | None, scrape_enabled: bool) -> dict:
+    return {
+        "fetch": fetch_state or {"running": False},
+        "last_country_run": fetch_repo.latest_finished_country_run(),
+        "panel_scrape_enabled": scrape_enabled,
+        "schedule_enabled": schedule_enabled(),
+        "schedule_interval_hours": schedule_interval_hours(),
+        "schedule_concurrency": schedule_concurrency(),
+        "schedule_countries": (os.environ.get("FETCH_SCHEDULE_COUNTRIES") or "").strip(),
+    }
+
+
+def compute_admin_panel_stats(
+    *,
+    user_id: int,
+    country_key: str | None = None,
+    location: str | None = None,
+    ats_type: str | None = None,
+    timezone_name: str | None = None,
+) -> dict:
+    companies, file_meta, fetch_problem_count = flatten_companies_for_stats(
+        country_key,
+        location=location,
+        ats_type=ats_type,
+        user_id=user_id,
+    )
+    return compute_stats(
+        companies,
+        file_meta,
+        fetch_problem_count=fetch_problem_count,
+        user_id=user_id,
+        country_key=country_key,
+        timezone_name=timezone_name,
+    )
+
+
 def get_admin_overview(*, fetch_state: dict | None = None) -> dict:
     catalog = get_catalog_overview()
     return {
         "users": user_count(),
         "catalog": catalog["totals"],
-        "tracking": admin_tracking_totals(),
         "fetch": fetch_state or {"running": False},
     }
 
@@ -62,16 +104,16 @@ def get_admin_dashboard(
     fetch_state: dict | None = None,
     scrape_enabled: bool,
     httpx_available: bool,
-    fetch_runs_limit: int = 50,
+    fetch_runs_limit: int = 15,
 ) -> dict:
     catalog = get_catalog_overview()
     return {
-        "overview": {
-            "users": user_count(),
-            "catalog": catalog["totals"],
-            "tracking": admin_tracking_totals(),
-            "fetch": fetch_state or {"running": False},
-        },
+        "user_count": user_count(),
+        "worker": get_worker_status(
+            fetch_state=fetch_state,
+            scrape_enabled=scrape_enabled,
+        ),
+        "panel_stats": None,
         "catalog": catalog,
         "users": {"users": list_users_with_stats()},
         "runs": {"runs": fetch_repo.list_all_fetch_runs(limit=fetch_runs_limit)},

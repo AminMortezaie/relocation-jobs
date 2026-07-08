@@ -17,6 +17,7 @@ from relocation_jobs.catalog.repo import (
 from relocation_jobs.fetch import repo as fetch_repo
 from relocation_jobs.fetch.log import log_event
 from relocation_jobs.fetch.pipeline import fetch_and_persist_company
+from relocation_jobs.fetch.client import make_fetch_client
 from relocation_jobs.scrape.merge import now_iso
 
 
@@ -70,10 +71,6 @@ def _fetch_one_thread(
     enrich_concurrency: int,
     on_company_result: Callable[[str, int, list[dict]], None] | None = None,
 ) -> tuple[str, int, bool, str | None]:
-    """Run a single company fetch in its own thread with its own event loop.
-
-    Returns (name, new_jobs, was_cancelled, log_message).
-    """
     check_cancel = _cancel_checker(run_id)
     set_cancel_checker(check_cancel)
     try:
@@ -84,8 +81,7 @@ def _fetch_one_thread(
             return name, 0, False, f"[{index}/{total}] {name} — skipped (not in catalog)"
 
         async def _inner():
-            from relocation_jobs.fetch.runner import _make_fetch_client
-            async with _make_fetch_client(concurrency=http_concurrency) as client:
+            async with make_fetch_client(concurrency=http_concurrency) as client:
                 return await fetch_and_persist_company(
                     client, country_key, name, fetch_run_id=run_id,
                     enrich_concurrency=enrich_concurrency,

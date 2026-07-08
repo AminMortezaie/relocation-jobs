@@ -37,7 +37,7 @@
       <header class="admin-header">
         <div class="admin-header-left">
           <h1 class="app-title">Admin</h1>
-          <p class="admin-subtitle">Catalog, users, scraping ops, and system config</p>
+          <p class="admin-subtitle">Catalog, users, fetch worker status, and system config</p>
         </div>
         <div class="admin-header-actions">
           <a href="/" class="header-secondary-btn admin-nav-link">Job panel</a>
@@ -48,38 +48,7 @@
 
       <div id="adminError" class="admin-error" hidden></div>
 
-      <section class="admin-panel admin-fetch-panel" id="adminFetchSection">
-        <h2 class="admin-panel-title">Country fetch</h2>
-        <p class="hint admin-fetch-hint">Scrape all companies in a country. Per-company fetch stays on the job panel.</p>
-        <p class="hint admin-fetch-disabled" id="adminFetchDisabledHint" hidden>
-          Scraping is disabled on this host — run fetches locally against Postgres, then use the panel.
-        </p>
-        <div class="admin-fetch-controls">
-          <label class="admin-fetch-field">
-            <span>Country</span>
-            <select id="adminFetchCountry" class="header-select"></select>
-          </label>
-          <label class="admin-fetch-field">
-            <span>ATS</span>
-            <select id="adminFetchAts" class="header-select">
-              <option value="all">All ATS in country</option>
-            </select>
-          </label>
-          <label class="admin-fetch-field">
-            <span>Parallel companies</span>
-            <input type="number" id="adminFetchConcurrency" class="scrape-setting-input" min="1" max="64" value="16" />
-          </label>
-          <label class="admin-fetch-check">
-            <input type="checkbox" id="adminFetchSkipFilled" />
-            Skip companies that already have jobs
-          </label>
-          <div class="admin-fetch-actions">
-            <button type="button" class="header-primary-btn" id="adminFetchStartBtn">Fetch country</button>
-          </div>
-        </div>
-      </section>
-
-      <div id="adminOverview" class="admin-section"></div>
+      <div id="adminWorkerSection" class="admin-section"></div>
       <div id="adminPanelStats" class="admin-section"></div>
       <div id="adminCatalog" class="admin-section"></div>
       <div id="adminFetchProblems" class="admin-section"></div>
@@ -88,8 +57,6 @@
       <div id="adminConfig" class="admin-section"></div>
     </div>
   </div>
-
-  <div class="toast admin-fetch-toast" id="adminFetchToast"></div>
 
   <div class="dialog-backdrop fetch-panel-backdrop" id="adminFetchBackdrop" aria-hidden="true">
     <div class="fetch-panel" id="adminFetchPanel" role="dialog" aria-modal="true" aria-labelledby="adminFetchTitle">
@@ -142,6 +109,6 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/admin.js?v=7"></script>
+  <script type="module" src="/static/js/admin.js?v=10"></script>
 </body>
 </html>

@@ -2,11 +2,61 @@ from __future__ import annotations
 
 from relocation_jobs.core.job_identity import job_idempotency_key
 from relocation_jobs.core.db import _normalize_url, _utc_now, db_transaction, get_connection
-from relocation_jobs.positions.tracking_resolve import (
-    resolve_tracking_url,
-    tracking_urls_for_job,
-)
 from relocation_jobs.users.history import append_status_event, status_history_for_job
+
+
+def resolve_tracking_url(
+    conn,
+    user_id: int,
+    country: str,
+    company_name: str,
+    job_url: str,
+) -> str:
+    job_url = _normalize_url(job_url)
+    job_key = job_idempotency_key(job_url)
+    if not job_key:
+        return job_url
+    rows = conn.execute(
+        """
+        SELECT job_url FROM job_tracking
+        WHERE user_id = %s AND country = %s AND company_name = %s
+        """,
+        (user_id, country, company_name),
+    ).fetchall()
+    alias = job_url
+    for row in rows:
+        stored = _normalize_url(row.get("job_url", ""))
+        if stored == job_url:
+            return job_url
+        if job_idempotency_key(stored) == job_key:
+            alias = stored
+    return alias
+
+
+def tracking_urls_for_job(
+    conn,
+    user_id: int,
+    country: str,
+    company_name: str,
+    job_url: str,
+) -> set[str]:
+    canonical_url = _normalize_url(job_url)
+    urls = {canonical_url}
+    job_key = job_idempotency_key(canonical_url)
+    if not job_key:
+        return urls
+    rows = conn.execute(
+        """
+        SELECT job_url FROM job_tracking
+        WHERE user_id = %s AND country = %s AND company_name = %s
+        """,
+        (user_id, country, company_name),
+    ).fetchall()
+    for row in rows:
+        stored = _normalize_url(row.get("job_url", ""))
+        if job_idempotency_key(stored) == job_key:
+            urls.add(stored)
+    return urls
 
 
 def _base_result(company_name: str, job_url: str, country: str, **extra) -> dict:
@@ -182,11 +232,13 @@ def set_not_for_me(
                 """
                 INSERT INTO job_tracking (
                     user_id, country, company_name, job_url,
-                    not_for_me, not_for_me_date, not_for_me_reason, updated_at
-                ) VALUES (%s, %s, %s, %s, 1, %s, %s, %s)
+                    not_for_me, not_for_me_date, not_for_me_reason,
+                    location_gate_override, updated_at
+                ) VALUES (%s, %s, %s, %s, 1, %s, %s, 0, %s)
                 ON CONFLICT (user_id, country, company_name, job_url) DO UPDATE SET
                     not_for_me = 1, not_for_me_date = EXCLUDED.not_for_me_date,
-                    not_for_me_reason = EXCLUDED.not_for_me_reason, updated_at = EXCLUDED.updated_at
+                    not_for_me_reason = EXCLUDED.not_for_me_reason,
+                    location_gate_override = 0, updated_at = EXCLUDED.updated_at
                 """,
                 (user_id, country, company_name, storage_url, date_only, hide_reason, now),
             )
@@ -194,18 +246,40 @@ def set_not_for_me(
                 company_name, storage_url, country,
                 not_for_me=True, not_for_me_date=date_only, not_for_me_reason=hide_reason,
             )
-        for url in tracking_urls_for_job(
-            conn, user_id, country, company_name, canonical_url,
-        ):
+        else:
+            urls = tracking_urls_for_job(
+                conn, user_id, country, company_name, canonical_url,
+            )
+            urls.add(storage_url)
+            if canonical_url:
+                urls.add(canonical_url)
+            for url in urls:
+                conn.execute(
+                    """
+                    UPDATE job_tracking
+                    SET not_for_me = 0, not_for_me_date = NULL, not_for_me_reason = NULL,
+                        location_gate_override = 1, updated_at = %s
+                    WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                    """,
+                    (now, user_id, country, company_name, url),
+                )
             conn.execute(
                 """
-                UPDATE job_tracking
-                SET not_for_me = 0, not_for_me_date = NULL, not_for_me_reason = NULL, updated_at = %s
-                WHERE user_id = %s AND country = %s AND company_name = %s AND job_url = %s
+                INSERT INTO job_tracking (
+                    user_id, country, company_name, job_url,
+                    not_for_me, not_for_me_date, not_for_me_reason,
+                    location_gate_override, updated_at
+                ) VALUES (%s, %s, %s, %s, 0, NULL, NULL, 1, %s)
+                ON CONFLICT (user_id, country, company_name, job_url) DO UPDATE SET
+                    not_for_me = 0, not_for_me_date = NULL, not_for_me_reason = NULL,
+                    location_gate_override = 1, updated_at = EXCLUDED.updated_at
                 """,
-                (now, user_id, country, company_name, url),
+                (user_id, country, company_name, storage_url, now),
             )
-    return _base_result(company_name, storage_url, country, not_for_me=False)
+    return _base_result(
+        company_name, storage_url, country,
+        not_for_me=False, location_gate_override=True,
+    )
 
 
 def set_looking_to_apply(
@@ -582,3 +656,69 @@ def load_wrong_location_hides(user_id: int, country_key: str | None = None) -> l
             (user_id,),
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+def set_company_applied(
+    user_id: int,
+    country: str,
+    company_name: str,
+    applied: bool,
+) -> dict:
+    now = _utc_now()
+    with db_transaction() as conn:
+        if applied:
+            conn.execute(
+                """
+                INSERT INTO company_tracking (
+                    user_id, country, company_name,
+                    company_applied, company_applied_date, updated_at
+                ) VALUES (%s, %s, %s, 1, %s, %s)
+                ON CONFLICT (user_id, country, company_name) DO UPDATE SET
+                    company_applied = 1,
+                    company_applied_date = EXCLUDED.company_applied_date,
+                    updated_at = EXCLUDED.updated_at
+                """,
+                (user_id, country, company_name, now[:10], now),
+            )
+            applied_date = now[:10]
+        else:
+            conn.execute(
+                """
+                UPDATE company_tracking
+                SET company_applied = 0, company_applied_date = NULL, updated_at = %s
+                WHERE user_id = %s AND country = %s AND company_name = %s
+                """,
+                (now, user_id, country, company_name),
+            )
+            applied_date = ""
+    return {
+        "company_applied": applied,
+        "company_applied_date": applied_date if applied else "",
+        "company": company_name,
+        "country": country,
+    }
+
+
+def rename_company_tracking(country: str, old_name: str, new_name: str) -> None:
+    with db_transaction() as conn:
+        for table in ("job_status_events", "job_tracking", "company_tracking"):
+            conn.execute(
+                f"""
+                UPDATE {table}
+                SET company_name = %s
+                WHERE country = %s AND company_name = %s
+                """,
+                (new_name, country, old_name),
+            )
+
+
+def clear_company_tracking(country: str, company_name: str) -> None:
+    with db_transaction() as conn:
+        conn.execute(
+            "DELETE FROM job_tracking WHERE country = %s AND company_name = %s",
+            (country, company_name),
+        )
+        conn.execute(
+            "DELETE FROM company_tracking WHERE country = %s AND company_name = %s",
+            (country, company_name),
+        )

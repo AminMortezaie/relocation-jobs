@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
-from typing import Optional
-
 from relocation_jobs.catalog.repo import get_company
 from relocation_jobs.catalog.repo import sync_company_board_to_catalog
 from relocation_jobs.fetch import service as fetch_service
+from relocation_jobs.fetch.ports import (
+    BoardEnricher,
+    BoardFetcher,
+    OnCompanyResult,
+    OnReview,
+)
 from relocation_jobs.scrape.board import fetch_ats_board
 from relocation_jobs.scrape.company import process_company
 from relocation_jobs.scrape.enrich import enrich_jobs
-
-FetchBoard = Callable[..., Awaitable[list[dict]]]
-EnrichBoard = Callable[..., Awaitable[list[dict]]]
-OnReview = Optional[Callable[[dict], None]]
 
 
 async def fetch_and_persist_company(
@@ -20,8 +19,8 @@ async def fetch_and_persist_company(
     country_key: str,
     company_name: str,
     *,
-    fetch_board: FetchBoard | None = None,
-    enrich_board: EnrichBoard | None = None,
+    fetch_board: BoardFetcher | None = None,
+    enrich_board: BoardEnricher | None = None,
     enrich_only: bool = False,
     skip_enriched: bool = False,
     enrich_concurrency: int = 8,
@@ -34,17 +33,17 @@ async def fetch_and_persist_company(
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
 
-    def persist_board() -> None:
+    def sync_board() -> None:
         sync_company_board_to_catalog(country_key, company)
 
-    board_fetch = fetch_board or fetch_ats_board
-    board_enrich = enrich_board if enrich_board is not None else enrich_jobs
+    board_fetch: BoardFetcher = fetch_board or fetch_ats_board
+    board_enrich: BoardEnricher = enrich_board if enrich_board is not None else enrich_jobs
 
     async def _fetch_board(proc_client, proc_company: dict, **kwargs) -> list[dict]:
         return await board_fetch(
             proc_client,
             proc_company,
-            persist_board=persist_board,
+            sync_board=sync_board,
             **kwargs,
         )
 
@@ -62,7 +61,7 @@ async def fetch_and_persist_company(
             total,
             fetch_board=_fetch_board,
             enrich_board=board_enrich,
-            persist_board=persist_board,
+            sync_board=sync_board,
             enrich_only=enrich_only,
             skip_enriched=skip_enriched,
             enrich_concurrency=enrich_concurrency,
@@ -79,7 +78,7 @@ async def fetch_and_persist_company(
         1,
         country_key=country_key,
         process_company=process,
-        persist_board=persist_board,
+        sync_board=sync_board,
         enrich_only=enrich_only,
         skip_enriched=skip_enriched,
         enrich_concurrency=enrich_concurrency,

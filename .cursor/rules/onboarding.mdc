@@ -13,5 +13,6 @@ alwaysApply: true
 - **Tests:** `pytest tests -o addopts=`
 - **Postgres:** AWS EC2 Docker (not Neon)
 - **Do not commit** unless the user explicitly asks
+- **Public repo:** never put real Elastic IPs, `DATABASE_URL`, or passwords in docs — use `<ELASTIC_IP>` / placeholders; live values only in gitignored `.env` / `aws-postgres.env`
 
 Editing Python under `relocation_jobs/` also loads `v2-coding.mdc` (layer rules, module layout).

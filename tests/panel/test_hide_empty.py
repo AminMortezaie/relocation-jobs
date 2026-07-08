@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from relocation_jobs.panel.flatten import _skip_company_after_jobs
+from relocation_jobs.panel.flatten_rules import skip_company_after_jobs
 from relocation_jobs.panel.service import flatten_companies_page
 from relocation_jobs.panel.types import FlattenFilters
 from relocation_jobs.positions.types import PositionFilters
@@ -12,7 +12,7 @@ from relocation_jobs.positions.types import PositionFilters
 
 def test_hide_empty_skips_not_for_me_only():
     filters = FlattenFilters(hide_empty=True)
-    assert _skip_company_after_jobs(
+    assert skip_company_after_jobs(
         filters=filters,
         jobs=[],
         not_for_me_jobs=[{"url": "https://example.com/jobs/1"}],
@@ -23,7 +23,7 @@ def test_hide_empty_skips_not_for_me_only():
 
 def test_hide_empty_skips_rejected_only():
     filters = FlattenFilters(hide_empty=True)
-    assert _skip_company_after_jobs(
+    assert skip_company_after_jobs(
         filters=filters,
         jobs=[],
         not_for_me_jobs=[],
@@ -34,7 +34,7 @@ def test_hide_empty_skips_rejected_only():
 
 def test_hide_empty_keeps_open_jobs():
     filters = FlattenFilters(hide_empty=True)
-    assert _skip_company_after_jobs(
+    assert skip_company_after_jobs(
         filters=filters,
         jobs=[{"url": "https://example.com/jobs/1"}],
         not_for_me_jobs=[],
@@ -48,7 +48,7 @@ def test_hide_empty_keeps_rejected_only_when_rejections_filter_active():
         hide_empty=True,
         position_filters=PositionFilters(rejected_only=True),
     )
-    assert _skip_company_after_jobs(
+    assert skip_company_after_jobs(
         filters=filters,
         jobs=[],
         not_for_me_jobs=[],

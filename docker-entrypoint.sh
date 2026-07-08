@@ -2,7 +2,7 @@
 set -e
 python3 -c "
 from relocation_jobs.db import init_db
-from relocation_jobs.catalog.stats import catalog_has_data
+from relocation_jobs.catalog.repo import catalog_has_data
 from relocation_jobs.core.auth import bootstrap_admin
 init_db()
 bootstrap_admin()

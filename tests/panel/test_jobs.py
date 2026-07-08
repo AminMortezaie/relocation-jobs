@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from relocation_jobs.panel.flatten import partition_stored_jobs
+from relocation_jobs.panel.flatten_jobs import partition_stored_jobs
 from relocation_jobs.positions.types import PositionFilters
 
 

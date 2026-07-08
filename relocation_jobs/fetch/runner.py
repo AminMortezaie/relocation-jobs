@@ -2,343 +2,21 @@ from __future__ import annotations
 
 import asyncio
 import threading
-from datetime import datetime, timezone
 
-import httpx
-
-from relocation_jobs.core.ats_detection import HEADERS
 from relocation_jobs.core.ats_constants import MAX_CONCURRENCY
 from relocation_jobs.core.scrape_cancel import FetchCancelled, clear_cancel_checker, set_cancel_checker
 from relocation_jobs.core.paths import country_archive_filename
 from relocation_jobs.fetch import repo as fetch_repo
+from relocation_jobs.fetch import state as fetch_state
+from relocation_jobs.fetch.client import make_fetch_client
 from relocation_jobs.fetch.country_runner import run_country_fetch
 from relocation_jobs.fetch.log import log_event
 from relocation_jobs.fetch.pipeline import fetch_and_persist_company
 
 
-def _make_fetch_client(concurrency: int = 16) -> httpx.AsyncClient:
-    return httpx.AsyncClient(
-        headers=HEADERS,
-        timeout=httpx.Timeout(15.0),
-        follow_redirects=True,
-        limits=httpx.Limits(
-            max_connections=concurrency + 4,
-            max_keepalive_connections=concurrency,
-        ),
-    )
-
-_fetch_lock = threading.RLock()
-_fetch_thread: threading.Thread | None = None
-_fetch_state: dict = {
-    "running": False,
-    "run_id": None,
-    "country": None,
-    "company": None,
-    "ats_type": None,
-    "file": None,
-    "started_at": None,
-    "finished_at": None,
-    "exit_code": None,
-    "concurrency": None,
-    "result_line": None,
-    "cancel_requested": False,
-    "cancelled": False,
-    "progress": {},
-    "activity": {},
-    "activity_log": [],
-    "log": [],
-    "review_jobs": None,
-    "new_jobs_total": 0,
-    "last_fetch_run": None,
-}
-
-
-def _utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-
-
-def _idle_fetch_status() -> dict:
-    return {
-        "running": False,
-        "run_id": None,
-        "country": None,
-        "company": None,
-        "ats_type": None,
-        "file": None,
-        "started_at": None,
-        "finished_at": None,
-        "exit_code": None,
-        "concurrency": None,
-        "result_line": None,
-        "cancel_requested": False,
-        "cancelled": False,
-        "progress": {},
-        "activity": {},
-        "activity_log": [],
-        "log": [],
-        "review_jobs": None,
-        "new_jobs_total": 0,
-        "last_fetch_run": None,
-    }
-
-
-def _status_from_row(row: dict | None) -> dict:
-    if not row:
-        return _idle_fetch_status()
-    running = row.get("status") == "running"
-    return {
-        "running": running,
-        "run_id": row.get("id"),
-        "country": row.get("country"),
-        "company": row.get("company_name"),
-        "ats_type": row.get("ats_type"),
-        "file": row.get("file"),
-        "started_at": row.get("started_at"),
-        "finished_at": row.get("finished_at"),
-        "exit_code": row.get("exit_code"),
-        "concurrency": row.get("concurrency"),
-        "result_line": row.get("result_line"),
-        "cancel_requested": bool(row.get("cancel_requested")),
-        "cancelled": bool(row.get("cancelled")),
-        "progress": dict(row.get("progress") or {}),
-        "activity": dict(row.get("activity") or {}),
-        "activity_log": list(row.get("activity_log") or []),
-        "log": list(row.get("log") or []),
-        "review_jobs": row.get("review_jobs"),
-        "new_jobs_total": int(row.get("new_jobs") or 0),
-        "last_fetch_run": None if running else row,
-    }
-
-
-def _memory_status() -> dict:
-    with _fetch_lock:
-        return {
-            "running": bool(_fetch_state.get("running")),
-            "run_id": _fetch_state.get("run_id"),
-            "country": _fetch_state.get("country"),
-            "company": _fetch_state.get("company"),
-            "ats_type": _fetch_state.get("ats_type"),
-            "file": _fetch_state.get("file"),
-            "started_at": _fetch_state.get("started_at"),
-            "finished_at": _fetch_state.get("finished_at"),
-            "exit_code": _fetch_state.get("exit_code"),
-            "concurrency": _fetch_state.get("concurrency"),
-            "result_line": _fetch_state.get("result_line"),
-            "cancel_requested": bool(_fetch_state.get("cancel_requested")),
-            "cancelled": bool(_fetch_state.get("cancelled")),
-            "progress": dict(_fetch_state.get("progress") or {}),
-            "activity": dict(_fetch_state.get("activity") or {}),
-            "activity_log": list(_fetch_state.get("activity_log") or []),
-            "log": list(_fetch_state.get("log") or []),
-            "review_jobs": _fetch_state.get("review_jobs"),
-            "new_jobs_total": int(_fetch_state.get("new_jobs_total") or 0),
-            "last_fetch_run": _fetch_state.get("last_fetch_run"),
-        }
-
-
-def _sync_live_to_db() -> None:
-    with _fetch_lock:
-        run_id = _fetch_state.get("run_id")
-        if not run_id:
-            return
-        snapshot = {
-            "progress": dict(_fetch_state.get("progress") or {}),
-            "activity": dict(_fetch_state.get("activity") or {}),
-            "activity_log": list(_fetch_state.get("activity_log") or []),
-            "log": list(_fetch_state.get("log") or []),
-            "review_jobs": _fetch_state.get("review_jobs"),
-            "cancel_requested": bool(_fetch_state.get("cancel_requested")),
-            "new_jobs": int(_fetch_state.get("new_jobs_total") or 0),
-            "result_line": _fetch_state.get("result_line"),
-            "concurrency": _fetch_state.get("concurrency"),
-        }
-    fetch_repo.update_fetch_run_live(
-        int(run_id),
-        progress=snapshot["progress"],
-        activity=snapshot["activity"],
-        activity_log=snapshot["activity_log"],
-        log=snapshot["log"],
-        review_jobs=snapshot["review_jobs"],
-        cancel_requested=snapshot["cancel_requested"],
-        new_jobs=snapshot["new_jobs"],
-        result_line=snapshot["result_line"],
-    )
-
-
-def _reap_zombie_fetch() -> None:
-    should_finalize = False
-    with _fetch_lock:
-        if _fetch_state.get("running"):
-            thread = _fetch_thread
-            if thread is None:
-                return
-            if thread.is_alive():
-                return
-            _fetch_state["running"] = False
-            if _fetch_state.get("exit_code") is None:
-                _fetch_state["exit_code"] = 1
-                _fetch_state["log"].append("Fetch thread stopped unexpectedly")
-            if not _fetch_state.get("finished_at"):
-                _fetch_state["finished_at"] = _utc_now()
-            should_finalize = bool(_fetch_state.get("run_id"))
-    if should_finalize:
-        _persist_fetch_run()
-    with _fetch_lock:
-        local_running = bool(_fetch_state.get("running"))
-    if not local_running:
-        fetch_repo.reap_orphan_running_fetch_runs()
-
-
-def _persist_fetch_run(run_id: int | None = None) -> None:
-    with _fetch_lock:
-        rid = run_id or _fetch_state.get("run_id")
-        if not rid:
-            return
-        payload = {
-            "finished_at": _fetch_state.get("finished_at") or _utc_now(),
-            "exit_code": _fetch_state.get("exit_code"),
-            "cancelled": bool(_fetch_state.get("cancelled")),
-            "new_jobs": int(_fetch_state.get("new_jobs_total") or 0),
-            "concurrency": _fetch_state.get("concurrency"),
-            "companies_done": int((_fetch_state.get("progress") or {}).get("current") or 0),
-            "companies_total": int((_fetch_state.get("progress") or {}).get("total") or 0),
-            "result_line": _fetch_state.get("result_line"),
-            "progress": dict(_fetch_state.get("progress") or {}),
-            "activity": dict(_fetch_state.get("activity") or {}),
-            "activity_log": list(_fetch_state.get("activity_log") or []),
-            "log": list(_fetch_state.get("log") or []),
-            "review_jobs": _fetch_state.get("review_jobs"),
-        }
-    row = fetch_repo.finalize_fetch_run(int(rid), **payload)
-    with _fetch_lock:
-        _fetch_state["last_fetch_run"] = row
-        _fetch_state["run_id"] = None
-
-
-def build_fetch_status() -> dict:
-    _reap_zombie_fetch()
-    with _fetch_lock:
-        if _fetch_state.get("running"):
-            return _memory_status()
-        if _fetch_state.get("last_fetch_run") is not None:
-            return _memory_status()
-    row = fetch_repo.get_running_fetch_run()
-    if row:
-        return _status_from_row(row)
-    return _idle_fetch_status()
-
-
-def fetch_is_running() -> bool:
-    _reap_zombie_fetch()
-    with _fetch_lock:
-        if _fetch_state.get("running"):
-            return True
-    return fetch_repo.get_running_fetch_run() is not None
-
-
-def request_fetch_cancel() -> tuple[bool, str | None]:
-    with _fetch_lock:
-        if not _fetch_state.get("running"):
-            row = fetch_repo.get_running_fetch_run()
-            if not row:
-                return False, "No fetch is running"
-            fetch_repo.request_fetch_run_cancel(int(row["id"]))
-            return True, None
-        _fetch_state["cancel_requested"] = True
-        run_id = _fetch_state.get("run_id")
-    if run_id:
-        fetch_repo.request_fetch_run_cancel(int(run_id))
-    _sync_live_to_db()
-    return True, None
-
-
-def _reset_fetch_state(
-    *,
-    user_id: int,
-    country: str,
-    file_name: str,
-    concurrency: int,
-    company: str | None = None,
-    ats_type: str | None = None,
-) -> int:
-    global _fetch_thread
-    _fetch_thread = None
-    started_at = _utc_now()
-    row = fetch_repo.create_fetch_run(
-        user_id=user_id,
-        country=country,
-        company_name=company,
-        file_name=file_name,
-        concurrency=concurrency,
-        ats_type=ats_type,
-        started_at=started_at,
-    )
-    run_id = int(row["id"])
-    _fetch_state.clear()
-    _fetch_state.update({
-        "running": True,
-        "run_id": run_id,
-        "country": country,
-        "company": company,
-        "ats_type": ats_type,
-        "file": file_name,
-        "concurrency": concurrency,
-        "started_at": started_at,
-        "finished_at": None,
-        "exit_code": None,
-        "result_line": None,
-        "cancel_requested": False,
-        "cancelled": False,
-        "progress": {"current": 0, "total": 0, "company": None, "status": "", "company_results": []},
-        "activity": {"message": "", "detail": ""},
-        "activity_log": [],
-        "log": [],
-        "review_jobs": None,
-        "new_jobs_total": 0,
-        "last_fetch_run": None,
-    })
-    _sync_live_to_db()
-    return run_id
-
-
-def _on_country_progress(progress: dict) -> None:
-    with _fetch_lock:
-        prev = dict(_fetch_state.get("progress") or {})
-        company_results = prev.get("company_results") or progress.get("company_results") or []
-        merged = dict(progress)
-        if company_results:
-            merged["company_results"] = list(company_results)
-        _fetch_state["progress"] = merged
-    _sync_live_to_db()
-
-
-def _on_company_result(company_name: str, new_count: int, jobs: list[dict]) -> None:
-    if new_count <= 0:
-        return
-    with _fetch_lock:
-        _fetch_state["new_jobs_total"] = int(_fetch_state.get("new_jobs_total") or 0) + int(new_count)
-        progress = dict(_fetch_state.get("progress") or {})
-        results = list(progress.get("company_results") or [])
-        results.append({
-            "company": company_name,
-            "new_count": int(new_count),
-            "jobs": list(jobs or []),
-        })
-        progress["company_results"] = results
-        _fetch_state["progress"] = progress
-    _sync_live_to_db()
-
-
 def _append_log(line: str) -> None:
-    with _fetch_lock:
-        _fetch_state["log"].append(line)
+    fetch_state.append_log_line(line)
     log_event(line)
-
-
-def _on_review(payload: dict) -> None:
-    with _fetch_lock:
-        _fetch_state["review_jobs"] = payload
-    _sync_live_to_db()
 
 
 def _country_fetch_worker(
@@ -356,7 +34,7 @@ def _country_fetch_worker(
     try:
         async def _run():
             nonlocal new_jobs_total, companies_done, cancelled
-            async with _make_fetch_client(concurrency=concurrency) as client:
+            async with make_fetch_client(concurrency=concurrency) as client:
                 return await run_country_fetch(
                     client,
                     country_key,
@@ -364,9 +42,9 @@ def _country_fetch_worker(
                     skip_filled=skip_filled,
                     ats_type=ats_type,
                     concurrency=concurrency,
-                    on_progress=_on_country_progress,
+                    on_progress=fetch_state.update_progress,
                     on_log=_append_log,
-                    on_company_result=_on_company_result,
+                    on_company_result=fetch_state.record_company_result,
                 )
 
         new_jobs_total, companies_done, cancelled = asyncio.run(_run())
@@ -376,30 +54,34 @@ def _country_fetch_worker(
         exit_code = 1
     finally:
         finish_line = None
-        with _fetch_lock:
+
+        def _finish(st: dict) -> None:
+            nonlocal finish_line
             if cancelled:
-                _fetch_state["cancelled"] = True
-                _fetch_state["exit_code"] = 130
+                st["cancelled"] = True
+                st["exit_code"] = 130
                 finish_line = "Cancelled by user"
             else:
-                _fetch_state["exit_code"] = exit_code
+                st["exit_code"] = exit_code
                 finish_line = "Finished (exit 0)" if exit_code == 0 else f"Finished (exit {exit_code})"
-            _fetch_state["new_jobs_total"] = new_jobs_total
-            prog = dict(_fetch_state.get("progress") or {})
+            st["new_jobs_total"] = new_jobs_total
+            prog = dict(st.get("progress") or {})
             total = int(prog.get("total") or 0)
             if total > 0 and not cancelled:
-                _fetch_state["progress"] = {**prog, "current": total, "status": "done"}
+                st["progress"] = {**prog, "current": total, "status": "done"}
             if finish_line:
-                _fetch_state["log"].append(finish_line)
-            _fetch_state["result_line"] = (
+                st["log"].append(finish_line)
+            st["result_line"] = (
                 f"Done {companies_done} companies, {new_jobs_total} new jobs"
                 if exit_code == 0
                 else finish_line
             )
-            _fetch_state["running"] = False
-            _fetch_state["finished_at"] = _utc_now()
-        _sync_live_to_db()
-        _persist_fetch_run(run_id)
+            st["running"] = False
+            st["finished_at"] = fetch_state.utc_now()
+
+        fetch_state.mutate_state(_finish)
+        fetch_state.sync_live_to_db()
+        fetch_state.persist_fetch_run(run_id)
 
 
 def _company_fetch_worker(
@@ -414,21 +96,19 @@ def _company_fetch_worker(
     result_message = ""
     set_cancel_checker(lambda: fetch_repo.fetch_run_cancel_requested(run_id))
     try:
-        with _fetch_lock:
-            _fetch_state["progress"] = {
+        fetch_state.mutate_state(lambda st: st.update({
+            "progress": {
                 "current": 0,
                 "total": 1,
                 "company": company_name,
                 "status": "fetching",
-            }
-        _sync_live_to_db()
+            },
+        }))
+        fetch_state.sync_live_to_db()
         _append_log(f"Fetching {company_name}")
 
-        def _on_company_review(payload: dict) -> None:
-            _on_review(payload)
-
         async def _run() -> tuple[str, int]:
-            async with _make_fetch_client(concurrency=8) as client:
+            async with make_fetch_client(concurrency=8) as client:
                 return await fetch_and_persist_company(
                     client,
                     country_key,
@@ -436,7 +116,7 @@ def _company_fetch_worker(
                     fetch_run_id=run_id,
                     enrich_concurrency=8,
                     review_mode=True,
-                    on_review=_on_company_review,
+                    on_review=fetch_state.set_review_jobs,
                 )
 
         result_message, new_jobs_total = asyncio.run(_run())
@@ -455,35 +135,39 @@ def _company_fetch_worker(
     finally:
         clear_cancel_checker()
         finish_line = None
-        with _fetch_lock:
+
+        def _finish(st: dict) -> None:
+            nonlocal finish_line
             if cancelled:
-                _fetch_state["cancelled"] = True
-                _fetch_state["exit_code"] = 130
+                st["cancelled"] = True
+                st["exit_code"] = 130
                 finish_line = "Cancelled by user"
             else:
-                _fetch_state["exit_code"] = exit_code
+                st["exit_code"] = exit_code
                 finish_line = "Finished (exit 0)" if exit_code == 0 else f"Finished (exit {exit_code})"
-            _fetch_state["new_jobs_total"] = new_jobs_total
+            st["new_jobs_total"] = new_jobs_total
             if exit_code == 0 and not cancelled:
-                _fetch_state["progress"] = {
+                st["progress"] = {
                     "current": 1,
                     "total": 1,
                     "company": company_name,
                     "status": "done",
                 }
-            if _fetch_state.get("review_jobs") is None:
-                _fetch_state["review_jobs"] = {"included": [], "filtered": []}
+            if st.get("review_jobs") is None:
+                st["review_jobs"] = {"included": [], "filtered": []}
             if finish_line:
-                _fetch_state["log"].append(finish_line)
-            _fetch_state["result_line"] = (
+                st["log"].append(finish_line)
+            st["result_line"] = (
                 result_message
                 if exit_code == 0 and result_message
                 else finish_line
             )
-            _fetch_state["running"] = False
-            _fetch_state["finished_at"] = _utc_now()
-        _sync_live_to_db()
-        _persist_fetch_run(run_id)
+            st["running"] = False
+            st["finished_at"] = fetch_state.utc_now()
+
+        fetch_state.mutate_state(_finish)
+        fetch_state.sync_live_to_db()
+        fetch_state.persist_fetch_run(run_id)
 
 
 def start_company_fetch(
@@ -492,33 +176,34 @@ def start_company_fetch(
     country_key: str,
     company_name: str,
 ) -> int:
-    global _fetch_thread
-    _reap_zombie_fetch()
-    if fetch_is_running():
+    fetch_state.reap_zombie_fetch()
+    if fetch_state.fetch_is_running():
         raise RuntimeError("A fetch is already running")
     file_name = country_archive_filename(country_key)
-    with _fetch_lock:
-        run_id = _reset_fetch_state(
+    with fetch_state.fetch_lock():
+        run_id = fetch_state.reset_for_run(
             user_id=user_id,
             country=country_key,
             file_name=file_name,
             concurrency=1,
             company=company_name,
         )
-        _fetch_state["progress"] = {
-            "current": 0,
-            "total": 1,
-            "company": company_name,
-            "status": "starting",
-        }
+        fetch_state.mutate_state(lambda st: st.update({
+            "progress": {
+                "current": 0,
+                "total": 1,
+                "company": company_name,
+                "status": "starting",
+            },
+        }))
         thread = threading.Thread(
             target=_company_fetch_worker,
             args=(country_key, company_name),
             kwargs={"run_id": run_id},
             daemon=True,
         )
-        _fetch_thread = thread
-    _sync_live_to_db()
+        fetch_state.set_fetch_thread(thread)
+    fetch_state.sync_live_to_db()
     thread.start()
     return run_id
 
@@ -531,14 +216,13 @@ def start_country_fetch(
     ats_type: str | None = None,
     concurrency: int = 1,
 ) -> int:
-    global _fetch_thread
-    _reap_zombie_fetch()
-    if fetch_is_running():
+    fetch_state.reap_zombie_fetch()
+    if fetch_state.fetch_is_running():
         raise RuntimeError("A fetch is already running")
     workers = max(1, min(int(concurrency), MAX_CONCURRENCY))
     file_name = country_archive_filename(country_key)
-    with _fetch_lock:
-        run_id = _reset_fetch_state(
+    with fetch_state.fetch_lock():
+        run_id = fetch_state.reset_for_run(
             user_id=user_id,
             country=country_key,
             file_name=file_name,
@@ -556,7 +240,7 @@ def start_country_fetch(
             },
             daemon=True,
         )
-        _fetch_thread = thread
+        fetch_state.set_fetch_thread(thread)
     thread.start()
     return run_id
 
@@ -567,7 +251,7 @@ async def run_single_company_fetch_async(
     *,
     fetch_run_id: int | None = None,
 ) -> tuple[str, int]:
-    async with httpx.AsyncClient() as client:
+    async with make_fetch_client(concurrency=8) as client:
         return await fetch_and_persist_company(
             client,
             country_key,

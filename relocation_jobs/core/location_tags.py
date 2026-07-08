@@ -34,6 +34,8 @@ _custom_cities_lock = threading.Lock()
 _custom_cities_cache: dict[str, list[str]] | None = None
 _custom_countries_lock = threading.Lock()
 _custom_countries_cache: dict[str, str] | None = None
+_country_labels_cache: dict[str, str] | None = None
+_country_suffix_labels_cache: tuple[str, ...] | None = None
 
 
 def custom_cities_path() -> Path:
@@ -50,8 +52,16 @@ def _invalidate_custom_cities_cache() -> None:
 
 
 def _invalidate_custom_countries_cache() -> None:
-    global _custom_countries_cache
+    global _custom_countries_cache, _country_labels_cache, _country_suffix_labels_cache
     _custom_countries_cache = None
+    _country_labels_cache = None
+    _country_suffix_labels_cache = None
+
+
+def invalidate_country_labels_cache() -> None:
+    global _country_labels_cache, _country_suffix_labels_cache
+    _country_labels_cache = None
+    _country_suffix_labels_cache = None
 
 
 def load_custom_countries(*, use_cache: bool = True) -> dict[str, str]:
@@ -75,12 +85,17 @@ def save_custom_countries(data: dict[str, str]) -> None:
 
 
 def all_country_labels() -> dict[str, str]:
+    global _country_labels_cache
+    if _country_labels_cache is not None:
+        return _country_labels_cache
+
     from relocation_jobs.catalog.custom_countries import list_catalog_country_keys
 
     merged = dict(load_custom_countries())
     for key in list_catalog_country_keys():
         if key not in merged:
             merged[key] = key.replace("-", " ").title()
+    _country_labels_cache = merged
     return merged
 
 
@@ -345,6 +360,15 @@ def job_location_fields(job: dict) -> dict:
     return fields
 
 
+def _sorted_country_suffix_labels() -> tuple[str, ...]:
+    global _country_suffix_labels_cache
+    if _country_suffix_labels_cache is None:
+        _country_suffix_labels_cache = tuple(
+            sorted(all_country_labels().values(), key=len, reverse=True)
+        )
+    return _country_suffix_labels_cache
+
+
 def _strip_country_suffix(city: str) -> str:
     stripped = (city or "").strip()
     if not stripped:
@@ -352,7 +376,7 @@ def _strip_country_suffix(city: str) -> str:
     changed = True
     while changed:
         changed = False
-        for label in sorted(all_country_labels().values(), key=len, reverse=True):
+        for label in _sorted_country_suffix_labels():
             suffix = f" ({label})"
             if stripped.casefold().endswith(suffix.casefold()):
                 stripped = stripped[: -len(suffix)].strip()

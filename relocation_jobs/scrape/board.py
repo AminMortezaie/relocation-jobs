@@ -88,11 +88,11 @@ async def fetch_ats_board(
     client,
     company: dict,
     *,
-    persist_board=None,
+    sync_board=None,
     **kwargs,
 ) -> list[dict]:
     name = company.get("name") or "company"
-    await ensure_company_ats(client, company, persist_board=persist_board)
+    await ensure_company_ats(client, company, sync_board=sync_board)
     ats_type = (company.get("ats_type") or "").strip().lower()
     board_url = (company.get("ats_url") or company.get("careers_url") or "").strip()
     if not board_url:

@@ -9,6 +9,12 @@ import sys
 
 from relocation_jobs.core.auth import _hash_password
 from relocation_jobs.core.paths import PROJECT_ROOT
+from relocation_jobs.db import init_db
+from relocation_jobs.users.repo import (
+    get_user_by_username,
+    rename_user,
+    update_user_password,
+)
 
 
 def _load_env() -> None:
@@ -41,8 +47,6 @@ def main() -> int:
     if not args.password:
         print("Password required (argument or PANEL_ADMIN_PASSWORD in .env)", file=sys.stderr)
         return 1
-
-    from relocation_jobs.db import get_user_by_username, init_db, rename_user, update_user_password
 
     init_db()
     username = args.username.strip()

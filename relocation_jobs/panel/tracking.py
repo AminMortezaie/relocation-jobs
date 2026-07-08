@@ -30,6 +30,37 @@ def tracking_key(country: str, company: str, url: str) -> tuple[str, str, str]:
     return (country, company, normalize_job_url(url))
 
 
+def build_tracking_alias_index(
+    job_tracking: dict[tuple[str, str, str], dict],
+) -> dict[tuple[str, str, str], dict]:
+    index: dict[tuple[str, str, str], dict] = {}
+    for (country, company, url), track in job_tracking.items():
+        key = job_idempotency_key(url)
+        if not key:
+            continue
+        slot = (country, company, key)
+        if slot not in index:
+            index[slot] = track
+    return index
+
+
+def resolve_track_flags(
+    job_tracking: dict[tuple[str, str, str], dict],
+    alias_index: dict[tuple[str, str, str], dict],
+    *,
+    country: str,
+    company_name: str,
+    job: dict,
+) -> dict:
+    direct = job_tracking.get(tracking_key(country, company_name, job.get("url", "")))
+    if direct is not None:
+        return direct
+    job_key = job_idempotency_key_for_job(job)
+    if not job_key:
+        return {}
+    return alias_index.get((country, company_name, job_key), {})
+
+
 def resolve_track(
     job_tracking: dict,
     *,

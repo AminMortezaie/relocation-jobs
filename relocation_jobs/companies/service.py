@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 
 from relocation_jobs.core.slug import slug_from_name
 from relocation_jobs.catalog.repo import get_company
-from relocation_jobs.catalog.writes import (
+from relocation_jobs.catalog.repo import (
     delete_company,
     insert_jobs,
     rename_company_in_catalog,
@@ -25,12 +25,7 @@ from relocation_jobs.catalog.writes import (
     upsert_company as upsert_company_catalog,
 )
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
-from relocation_jobs.db.companies import (
-    clear_company_tracking,
-    rename_company_tracking,
-    set_company_applied_db,
-    set_company_awaiting_response_db,
-)
+from relocation_jobs.positions import repo as positions_repo
 from relocation_jobs.core.job_identity import (
     job_idempotency_key,
     job_idempotency_key_for_job,
@@ -486,7 +481,7 @@ def rename_company(country_key: str, company_name: str, new_name: str) -> dict:
 
     canonical_old = company["name"]
     rename_company_in_catalog(country_key, canonical_old, new_name)
-    rename_company_tracking(country_key, canonical_old, new_name)
+    positions_repo.rename_company_tracking(country_key, canonical_old, new_name)
 
     return {
         "country": country_key,
@@ -681,7 +676,7 @@ def remove_company(country_key: str, company_name: str) -> dict:
     canonical_name = company["name"]
     removed_jobs = len(company.get("matching_jobs") or [])
     delete_company(country_key, canonical_name)
-    clear_company_tracking(country_key, canonical_name)
+    positions_repo.clear_company_tracking(country_key, canonical_name)
 
     return {
         "country": country_key,
@@ -705,7 +700,7 @@ def set_company_applied(
     company = get_company(country_key, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
-    return set_company_applied_db(user_id, country_key, company["name"], applied)
+    return positions_repo.set_company_applied(user_id, country_key, company["name"], applied)
 
 
 def set_company_awaiting_response(
@@ -718,4 +713,6 @@ def set_company_awaiting_response(
     company = get_company(country_key, company_name)
     if company is None:
         raise LookupError(f"Company not found: {company_name}")
-    return set_company_awaiting_response_db(user_id, country_key, company["name"], awaiting)
+    return positions_repo.set_company_awaiting_response(
+        user_id, country_key, company["name"], awaiting,
+    )

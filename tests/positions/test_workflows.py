@@ -176,6 +176,41 @@ class TestNotForMe:
         assert url in _urls(acme["jobs"])
         assert url not in _urls(acme["not_for_me_jobs"])
 
+    def test_restore_overrides_read_time_wrong_location_gate(self, seeded_catalog_v2, test_user):
+        from relocation_jobs.catalog.repo import update_matching_job_fields
+        from relocation_jobs.catalog.serialize import cities_json_from_company, locations_json_from_company
+        from relocation_jobs.core.db import db_transaction
+        from relocation_jobs.core.location_tags import sync_company_location_fields
+
+        uid = test_user["id"]
+        company, url, _ = _company_and_jobs(seeded_catalog_v2)
+
+        co_dict = {
+            "name": company,
+            "locations": [{"country": "uk", "city": "London"}],
+        }
+        sync_company_location_fields(co_dict, catalog_country="uk")
+        loc_json = locations_json_from_company(co_dict, catalog_country="uk")
+        cities_json = cities_json_from_company(co_dict)
+        with db_transaction() as conn:
+            conn.execute(
+                """
+                UPDATE companies SET locations_json = %s, cities_json = %s
+                WHERE country = %s AND name = %s
+                """,
+                (loc_json, cities_json, "uk", company),
+            )
+        update_matching_job_fields("uk", company, lookup_url=url, location="Paris, France")
+
+        acme = _acme(_flatten(uid))
+        assert url in _urls(acme["not_for_me_jobs"])
+        assert url not in _urls(acme["jobs"])
+
+        positions.set_job_not_for_me("uk", company, url, user_id=uid, not_for_me=False)
+        acme = _acme(_flatten(uid))
+        assert url in _urls(acme["jobs"])
+        assert url not in _urls(acme["not_for_me_jobs"])
+
 
 @pytest.mark.integration
 class TestUrlAliasTracking:

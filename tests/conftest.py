@@ -81,10 +81,12 @@ def reset_custom_cities_cache():
     from relocation_jobs.core.location_tags import (
         _invalidate_custom_cities_cache,
         _invalidate_custom_countries_cache,
+        invalidate_country_labels_cache,
     )
 
     _invalidate_custom_cities_cache()
     _invalidate_custom_countries_cache()
+    invalidate_country_labels_cache()
     invalidate_country_cache()
     try:
         from relocation_jobs.core.db import db_transaction, get_connection
@@ -106,15 +108,13 @@ def reset_custom_cities_cache():
 def _app_schema(db):
     from relocation_jobs.core.db import get_connection
     from relocation_jobs.db.migrate import apply_v2_migrations
-    from relocation_jobs.fetch import runner as fetch_runner
+    from relocation_jobs.fetch import state as fetch_state
     from relocation_jobs.fetch.repo import clear_running_fetch_runs_for_tests
 
     apply_v2_migrations(get_connection())
     get_connection().execute("DELETE FROM company_fetch_attempts")
     clear_running_fetch_runs_for_tests()
-    with fetch_runner._fetch_lock:
-        fetch_runner._fetch_state.clear()
-        fetch_runner._fetch_state.update(fetch_runner._idle_fetch_status())
+    fetch_state.reset_for_tests()
     yield
 
 
@@ -176,7 +176,7 @@ def client(app):
 def auth_client(client, db):
     import relocation_jobs.core.auth as auth_mod
     import relocation_jobs.core.db as core
-    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.users.repo import get_user_by_username
 
     core._pg_conn = core.get_connection()
     if get_user_by_username("admin") is None:
@@ -214,10 +214,10 @@ def sample_country_data():
 
 @pytest.fixture
 def seeded_catalog(db, sample_country_data):
-    from relocation_jobs.catalog.writes import save_country_catalog
+    from relocation_jobs.catalog.repo import sync_country_catalog
 
     data = copy.deepcopy(sample_country_data)
-    save_country_catalog("uk", data)
+    sync_country_catalog("uk", data)
     return data
 
 
@@ -230,7 +230,7 @@ def seeded_catalog_v2(db):
 
 @pytest.fixture
 def test_user(db):
-    from relocation_jobs.db import create_user
+    from relocation_jobs.users.repo import create_user
     from tests.helpers.passwords import hash_test_password
 
     return create_user("testuser", hash_test_password("testpass123"))

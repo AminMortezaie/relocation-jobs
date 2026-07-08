@@ -32,7 +32,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from relocation_jobs.catalog.repo import load_country_catalog as load_country_catalog_db
-from relocation_jobs.catalog.writes import save_country_catalog as save_country_catalog_db
+from relocation_jobs.catalog.repo import sync_country_catalog as sync_country_catalog_db
 from relocation_jobs.core.paths import COUNTRY_ARCHIVE_FILENAMES, supported_countries
 from relocation_jobs.core.slug import slug_from_name
 
@@ -367,7 +367,7 @@ def load_country(country: str) -> tuple[dict, str]:
 
 def save_country(country_key: str, data: dict) -> None:
     data["companies"] = sort_companies(data["companies"])
-    save_country_catalog_db(country_key, data)
+    sync_country_catalog_db(country_key, data)
 
 
 def main() -> None:

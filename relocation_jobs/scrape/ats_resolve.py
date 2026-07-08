@@ -19,7 +19,7 @@ from relocation_jobs.core.ats_detection import (
     _smartrecruiters_company_id,
 )
 
-PersistBoard = Optional[Callable[[], None]]
+SyncBoard = Optional[Callable[[], None]]
 
 
 def effective_cached_ats(company: dict) -> tuple[str | None, str]:
@@ -42,7 +42,7 @@ def _finalize_detected_ats(name: str, ats_type: str | None, ats_url: str) -> tup
     return ats_type, ats_url
 
 
-def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) -> None:
+def apply_known_ats_override(company: dict, sync_board: SyncBoard = None) -> None:
     name = company.get("name", "")
     cached = (company.get("ats_type") or "").strip()
     careers_url = company.get("careers_url") or ""
@@ -52,8 +52,8 @@ def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) 
             known_type, known_url = KNOWN_ATS[name]
             company["ats_type"] = known_type
             company["ats_url"] = known_url
-            if persist_board:
-                persist_board()
+            if sync_board:
+                sync_board()
         return
 
     if (not cached or cached == "generic") and careers_url:
@@ -64,8 +64,8 @@ def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) 
             if host in lowered:
                 company["ats_type"] = "greenhouse"
                 company["ats_url"] = f"https://boards.greenhouse.io/{board}"
-                if persist_board:
-                    persist_board()
+                if sync_board:
+                    sync_board()
                 return
 
     smartrecruiters = _detect_smartrecruiters_from_careers_url(careers_url)
@@ -75,8 +75,8 @@ def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) 
         if cached != "smartrecruiters" or cached_id != expected_id:
             company["ats_type"] = smartrecruiters[0]
             company["ats_url"] = smartrecruiters[1]
-            if persist_board:
-                persist_board()
+            if sync_board:
+                sync_board()
             return
 
     if careers_url and not cached:
@@ -96,8 +96,8 @@ def apply_known_ats_override(company: dict, persist_board: PersistBoard = None) 
             if ats_type:
                 company["ats_type"] = ats_type
                 company["ats_url"] = ats_url
-                if persist_board:
-                    persist_board()
+                if sync_board:
+                    sync_board()
                 break
 
 
@@ -105,7 +105,7 @@ def persist_detected_ats(
     company: dict,
     ats_type: str | None,
     ats_url: str,
-    persist_board: PersistBoard = None,
+    sync_board: SyncBoard = None,
 ) -> str:
     if ats_type:
         company["ats_type"] = ats_type
@@ -113,8 +113,8 @@ def persist_detected_ats(
     else:
         company["ats_type"] = ""
         company["ats_url"] = ""
-    if persist_board:
-        persist_board()
+    if sync_board:
+        sync_board()
     return ats_type or "generic"
 
 
@@ -122,10 +122,10 @@ async def ensure_company_ats(
     client,
     company: dict,
     *,
-    persist_board: PersistBoard = None,
+    sync_board: SyncBoard = None,
 ) -> None:
     del client
-    apply_known_ats_override(company, persist_board)
+    apply_known_ats_override(company, sync_board)
     cached = (company.get("ats_type") or "").strip().lower()
     if cached == "generic":
         return
@@ -151,4 +151,4 @@ async def ensure_company_ats(
     ats_type, ats_url = _finalize_detected_ats(name, ats_type or None, ats_url or "")
     if not ats_type:
         ats_type = "generic"
-    persist_detected_ats(company, ats_type, ats_url or "", persist_board)
+    persist_detected_ats(company, ats_type, ats_url or "", sync_board)

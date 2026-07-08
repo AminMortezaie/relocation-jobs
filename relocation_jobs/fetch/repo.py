@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 from relocation_jobs.core.db import db_transaction, get_connection
 from relocation_jobs.fetch.types import AttemptStatus, CompanyFetchAttempt
+from relocation_jobs.users.applied import local_day_utc_bounds
 
 
 def _utc_now() -> str:
@@ -224,8 +225,6 @@ def sum_new_jobs_today(
     country: str | None = None,
     timezone_name: str | None = None,
 ) -> int:
-    from relocation_jobs.users.applied import local_day_utc_bounds
-
     start_utc, end_utc = local_day_utc_bounds(timezone_name)
     sql = """
         SELECT COALESCE(SUM(new_jobs), 0) AS total
@@ -267,6 +266,26 @@ def list_all_fetch_runs(
         data["username"] = row.get("username")
         out.append(data)
     return out
+
+
+def latest_finished_country_run() -> dict | None:
+    row = get_connection().execute(
+        """
+        SELECT f.*, u.username
+        FROM fetch_runs f
+        JOIN users u ON u.id = f.user_id
+        WHERE f.status != 'running'
+          AND f.scope = 'country'
+          AND (f.company_name IS NULL OR TRIM(f.company_name) = '')
+        ORDER BY f.finished_at DESC, f.id DESC
+        LIMIT 1
+        """
+    ).fetchone()
+    if not row:
+        return None
+    data = _fetch_run_row_to_dict(row)
+    data["username"] = row.get("username")
+    return data
 
 
 def get_running_fetch_run() -> dict | None:

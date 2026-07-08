@@ -6,6 +6,8 @@ __pycache__/
 claude_desktop_config.json
 .env.neon-backup-*
 aws-postgres.env
+# SSH keys and local infra state (never commit real hosts/passwords)
+*.pem
 data/
 .idea/
 .coverage

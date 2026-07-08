@@ -16,7 +16,7 @@ def test_fetch_attempts_empty(v2_auth_client, seeded_catalog_v2):
 
 
 def test_fetch_history(v2_auth_client, seeded_catalog_v2, db):
-    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.fetch import repo as fetch_repo
 
     del db
@@ -48,12 +48,15 @@ def test_admin_dashboard(v2_auth_client, seeded_catalog_v2):
     resp = v2_auth_client.get("/api/admin/dashboard?limit=10")
     assert resp.status_code == 200
     payload = resp.get_json()
-    assert "overview" in payload
+    assert "worker" in payload
+    assert "panel_stats" in payload
+    assert payload["panel_stats"] is None
     assert "catalog" in payload
     assert payload["catalog"]["has_data"] is True
     assert "users" in payload
     assert "runs" in payload
     assert "config" in payload
+    assert "overview" not in payload
 
 
 def test_admin_panel_stats(v2_auth_client, seeded_catalog_v2):
@@ -63,7 +66,8 @@ def test_admin_panel_stats(v2_auth_client, seeded_catalog_v2):
     assert stats["total_jobs"] == 2
     assert stats["companies_with_jobs"] == 1
     assert "positions_applied" in stats
-    assert "not_for_me" not in stats
+    assert "positions_not_for_me" in stats
+    assert stats["positions_not_for_me"] == 0
 
 
 def test_admin_panel_stats_open_roles_exclude_applied_and_not_for_me(
@@ -90,12 +94,13 @@ def test_admin_panel_stats_open_roles_exclude_applied_and_not_for_me(
     assert stats["total_jobs"] == 0
     assert stats["companies_with_jobs"] == 0
     assert stats["positions_applied"] == 1
+    assert stats["positions_not_for_me"] == 1
 
 
 def test_admin_panel_stats_new_jobs_today_from_fetch_runs(v2_auth_client, seeded_catalog_v2):
     from datetime import datetime, timezone
 
-    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.fetch import repo as fetch_repo
 
     user_id = get_user_by_username("admin")["id"]

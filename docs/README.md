@@ -1,6 +1,6 @@
 # Documentation
 
-**Last updated:** 2026-07-07
+**Last updated:** 2026-07-08
 
 All project docs live under `docs/`. [README](../README.md) at the repo root covers product setup and usage only.
 
@@ -17,9 +17,12 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Change job apply / reject / hide behavior | [reference/business-rules.md](reference/business-rules.md) |
 | Work on board sort, pagination, newest | [reference/board.md](reference/board.md) |
 | Board performance / read-model design (proposal) | [reference/board-read-model-proposal.md](reference/board-read-model-proposal.md) |
+| Fetch pipeline queue / Kafka placement (proposal) | [reference/kafka-fetch-pipeline-proposal.md](reference/kafka-fetch-pipeline-proposal.md) |
 | Catalog vs per-user tracking (design) | [reference/catalog-pattern.md](reference/catalog-pattern.md) |
 | Panel / admin statistics | [reference/stats.md](reference/stats.md) |
 | Test failures / catalog seed in tests | [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md) |
+| Board hung / slow load (2026-07 postmortem) | [reference/board-load-performance-incident.md](reference/board-load-performance-incident.md) |
+| Secrets / no real IPs in public docs | [reference/rules.md](reference/rules.md#secrets-and-documentation) · `.env` / `aws-postgres.env` gitignored |
 | MCP apply assistant (Claude Desktop, v0) | [reference/mcp-application.md](reference/mcp-application.md) |
 | Company workspace (CV/PDF on panel) | [reference/company-workspace.md](reference/company-workspace.md) |
 | **Production panel (EC2, kuchup.com)** | [operations/ec2-panel.md](operations/ec2-panel.md) |
@@ -38,6 +41,7 @@ docs/
     architecture.md           data flow, package layout, panel read path
     board.md                  pagination, “newest first” sort, timestamps
     board-read-model-proposal.md  board performance: projection table, cursors (proposal)
+    kafka-fetch-pipeline-proposal.md  fetch/scrape work queue, Kafka placement (proposal)
     stats.md                  admin/user stats definitions
     business-rules.md         job buckets, orphans, apply/reject/not-for-me
     rules.md                  v2 coding standards (SQL in repo.py)

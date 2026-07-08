@@ -239,7 +239,10 @@ def load_application_summaries(
     country: str | None = None,
 ) -> dict[str, dict]:
     sql = """
-        SELECT idempotency_key, tailored_tex, pdf_bytes, master_resume_slug
+        SELECT idempotency_key,
+               (tailored_tex IS NOT NULL AND TRIM(tailored_tex) <> '') AS has_tailored_tex,
+               (pdf_bytes IS NOT NULL AND LENGTH(pdf_bytes) > 0) AS has_pdf,
+               master_resume_slug
         FROM mcp_applications
         WHERE user_id = %s
     """
@@ -255,8 +258,8 @@ def load_application_summaries(
         if not key:
             continue
         summaries[key] = {
-            "has_tailored_tex": bool((row.get("tailored_tex") or "").strip()),
-            "has_pdf": bool(row.get("pdf_bytes")),
+            "has_tailored_tex": bool(row.get("has_tailored_tex")),
+            "has_pdf": bool(row.get("has_pdf")),
             "master_resume_slug": (row.get("master_resume_slug") or "").strip(),
         }
     return summaries

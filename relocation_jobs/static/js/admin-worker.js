@@ -1,56 +1,11 @@
-/** Country-wide fetch controls for the admin panel. */
+/** Fetch worker status + live progress modal for admin. */
 
-import {
-  cancelFetchRequest,
-  fetchAtsTypes,
-  fetchConfig,
-  fetchCountries,
-  getFetchStatus,
-  startFetchRequest,
-} from "./api.js";
-import { $, escapeHtml, formatActivityBadge, formatFetchDuration, parseFetchTimestamp, elapsedSecondsBetween, elapsedSecondsSince } from "./utils.js";
+import { cancelFetchRequest, getFetchStatus } from "./api.js";
+import { $, escapeHtml, formatActivityBadge, formatFetchDuration, elapsedSecondsBetween, elapsedSecondsSince } from "./utils.js";
 
 let pollTimer = null;
 let fetchBusy = false;
-let scrapeConfig = { default_concurrency: 16, max_concurrency: 64, scrape_enabled: true };
-
-function toast(message) {
-  const el = $("adminFetchToast");
-  if (!el) return;
-  el.textContent = message;
-  el.classList.add("show");
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => el.classList.remove("show"), 3200);
-}
-
-function countryLabel(countryId) {
-  const sel = $("adminFetchCountry");
-  if (!sel) return countryId || "";
-  const opt = [...sel.options].find((o) => o.value === countryId);
-  return opt?.textContent?.trim() || countryId || "";
-}
-
-function atsLabel(atsId) {
-  if (!atsId || atsId === "all") return "";
-  const sel = $("adminFetchAts");
-  if (!sel) return atsId;
-  const opt = [...sel.options].find((o) => o.value === atsId);
-  return opt?.textContent?.trim() || atsId;
-}
-
-function fetchScopeSubtitle(country, atsType, concurrency) {
-  const parts = [countryLabel(country)];
-  const ats = atsLabel(atsType);
-  if (ats) parts.push(ats);
-  if (concurrency) parts.push(`${concurrency} parallel workers`);
-  return parts.join(" · ");
-}
-
-function setFetchBusy(busy) {
-  fetchBusy = busy;
-  const startBtn = $("adminFetchStartBtn");
-  if (startBtn) startBtn.disabled = busy || scrapeConfig.scrape_enabled === false;
-}
+let workerListenersBound = false;
 
 function appendLog(text) {
   const log = $("adminFetchLog");
@@ -118,10 +73,7 @@ function updateFetchRunMeta(st, { running = false, fetchRun = null } = {}) {
 
   if (startedEl) startedEl.textContent = formatActivityBadge(startedAt);
 
-  const newJobs = Math.max(
-    0,
-    Number(fetchRun?.new_jobs ?? st?.new_jobs_total) || 0,
-  );
+  const newJobs = Math.max(0, Number(fetchRun?.new_jobs ?? st?.new_jobs_total) || 0);
   if (newJobsEl) {
     newJobsEl.textContent = newJobs === 1 ? "1 role" : `${newJobs} roles`;
   }
@@ -196,9 +148,12 @@ function showPanel({ title, subtitle }) {
   if (log) log.hidden = true;
   const activity = $("adminFetchActivity");
   if (activity) activity.hidden = false;
-  $("adminFetchCancelBtn").hidden = false;
-  $("adminFetchCancelBtn").disabled = false;
-  $("adminFetchCancelBtn").textContent = "Cancel";
+  const cancelBtn = $("adminFetchCancelBtn");
+  if (cancelBtn) {
+    cancelBtn.hidden = false;
+    cancelBtn.disabled = false;
+    cancelBtn.textContent = "Cancel";
+  }
 }
 
 function hidePanel() {
@@ -209,7 +164,7 @@ function hidePanel() {
   document.body.classList.remove("fetch-modal-open");
 }
 
-function finishPanel({ title, subtitle, cancelled = false, failed = false, fetchRun = null, fetchStatus = null }) {
+function finishPanel({ title, subtitle, cancelled = false, fetchRun = null, fetchStatus = null }) {
   $("adminFetchTitle").textContent = title;
   $("adminFetchSubtitle").textContent = subtitle;
   updateFetchRunMeta(fetchStatus, { running: false, fetchRun });
@@ -233,11 +188,10 @@ function applyFetchStatus(st) {
   const progressStatus = progress.status || "";
 
   if (st.running) {
-    const n = st.concurrency || $("adminFetchConcurrency")?.value || scrapeConfig.default_concurrency;
     $("adminFetchTitle").textContent = st.ats_type
-      ? `Fetching ${atsLabel(st.ats_type)} companies`
+      ? `Fetching ${st.ats_type} companies`
       : "Fetching companies";
-    $("adminFetchSubtitle").textContent = fetchScopeSubtitle(st.country, st.ats_type, n);
+    $("adminFetchSubtitle").textContent = st.country || "In progress";
     updateProgress({
       current,
       total,
@@ -265,21 +219,10 @@ function applyFetchStatus(st) {
     newJobsTotal: st.new_jobs_total,
   });
 
-  const newJobsTotal = Math.max(0, Number(st.new_jobs_total) || 0);
-  const newJobsNote = newJobsTotal > 0
-    ? `${newJobsTotal} new role${newJobsTotal === 1 ? "" : "s"} from this fetch`
-    : "";
-  const resultSubtitle = st.result_line
-    ? st.result_line.replace(/^\[\d+\/\d+\]\s*/, "").replace(/^Done\s+/, "")
-    : "Catalog updated";
-
   finishPanel({
     title: cancelled ? "Fetch cancelled" : (failed ? "Fetch finished with errors" : "Fetch complete"),
-    subtitle: cancelled
-      ? (newJobsNote ? `${newJobsNote} · completed companies were saved.` : "Completed companies were saved.")
-      : (newJobsNote || resultSubtitle),
+    subtitle: st.result_line || "Catalog updated",
     cancelled,
-    failed,
     fetchRun: st.last_fetch_run || null,
     fetchStatus: st,
   });
@@ -291,20 +234,13 @@ function pollFetchStatus() {
 
   async function tick() {
     const st = await getFetchStatus();
-    // Ignore per-company fetches from the job panel — admin modal is country-scoped only.
     if (st.company && st.running) return;
     const result = applyFetchStatus(st);
     if (!result.done) return;
 
     clearInterval(pollTimer);
     pollTimer = null;
-    setFetchBusy(false);
-
-    const doneSt = result.st;
-    const cancelled = doneSt.cancelled || doneSt.exit_code === 130;
-    if (cancelled) toast("Fetch cancelled — progress saved");
-    else if (doneSt.exit_code === 0) toast(doneSt.result_line || "Fetch complete");
-    else toast(doneSt.result_line || "Fetch failed — see log");
+    fetchBusy = false;
 
     if (typeof window.adminReloadDashboard === "function") {
       await window.adminReloadDashboard();
@@ -315,75 +251,12 @@ function pollFetchStatus() {
   pollTimer = setInterval(tick, 800);
 }
 
-async function startCountryFetch() {
-  const country = $("adminFetchCountry")?.value;
-  const atsType = $("adminFetchAts")?.value || "all";
-  if (!country) {
-    toast("Select a country.");
-    return;
-  }
-  if (fetchBusy) {
-    toast("A fetch is already running.");
-    return;
-  }
-  if (scrapeConfig.scrape_enabled === false) {
-    toast("Scraping is disabled on this host.");
-    return;
-  }
-
-  setFetchBusy(true);
-  showPanel({
-    title: atsType !== "all" ? `Fetching ${atsLabel(atsType)} companies` : "Fetching companies",
-    subtitle: fetchScopeSubtitle(country, atsType),
-  });
-
-  try {
-    const concurrency = Math.max(
-      1,
-      Math.min(
-        parseInt($("adminFetchConcurrency")?.value, 10) || scrapeConfig.default_concurrency,
-        scrapeConfig.max_concurrency || 64,
-      ),
-    );
-    localStorage.setItem("panel_concurrency", String(concurrency));
-    if (atsType !== "all") {
-      localStorage.setItem("panel_ats", atsType);
-    }
-    $("adminFetchSubtitle").textContent = fetchScopeSubtitle(country, atsType, concurrency);
-
-    const data = await startFetchRequest({
-      country,
-      ats_type: atsType !== "all" ? atsType : undefined,
-      skip_filled: Boolean($("adminFetchSkipFilled")?.checked),
-      concurrency,
-    });
-    if (!data) {
-      setFetchBusy(false);
-      finishPanel({ title: "Fetch failed", subtitle: "Could not start fetch.", failed: true });
-      return;
-    }
-    pollFetchStatus();
-  } catch {
-    toast("Network error");
-    setFetchBusy(false);
-    finishPanel({ title: "Fetch failed", subtitle: "Network error.", failed: true });
-  }
-}
-
 async function cancelCountryFetch() {
-  let active = fetchBusy;
-  if (!active) {
-    try {
-      const st = await getFetchStatus();
-      if (!st?.running || st.company) return;
-      active = true;
-      fetchBusy = true;
-    } catch {
-      return;
-    }
+  if (!fetchBusy) {
+    const st = await getFetchStatus();
+    if (!st?.running) return;
+    fetchBusy = true;
   }
-  if (!active) return;
-
   $("adminFetchCancelBtn").disabled = true;
   $("adminFetchCancelBtn").textContent = "Cancelling…";
   const ok = await cancelFetchRequest();
@@ -395,62 +268,100 @@ async function cancelCountryFetch() {
   pollFetchStatus();
 }
 
-export async function initAdminFetch() {
-  scrapeConfig = await fetchConfig();
-  const [countries, atsTypes] = await Promise.all([fetchCountries(), fetchAtsTypes()]);
-  const countrySel = $("adminFetchCountry");
-  if (countrySel) {
-    countrySel.innerHTML = countries
-      .filter((c) => c.id !== "all")
-      .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`)
-      .join("");
-    const saved = localStorage.getItem("panel_country");
-    if (saved && saved !== "all") countrySel.value = saved;
-  }
-
-  const atsSel = $("adminFetchAts");
-  if (atsSel) {
-    atsSel.innerHTML = [
-      `<option value="all">All ATS in country</option>`,
-      `<option value="generic">Generic / unknown</option>`,
-      ...atsTypes.map((t) =>
-        `<option value="${escapeHtml(t.id)}">${escapeHtml(t.label)}</option>`
-      ),
-    ].join("");
-    const savedAts = localStorage.getItem("panel_ats");
-    if (savedAts) atsSel.value = savedAts;
-  }
-
-  const concurrencyInput = $("adminFetchConcurrency");
-  if (concurrencyInput) {
-    concurrencyInput.max = scrapeConfig.max_concurrency || 64;
-    const saved = localStorage.getItem("panel_concurrency");
-    concurrencyInput.value = saved || scrapeConfig.default_concurrency || 16;
-  }
-
-  const disabled = scrapeConfig.scrape_enabled === false;
-  const hint = $("adminFetchDisabledHint");
-  if (hint) hint.hidden = !disabled;
-  if ($("adminFetchStartBtn")) $("adminFetchStartBtn").disabled = disabled;
-
-  $("adminFetchStartBtn")?.addEventListener("click", startCountryFetch);
-  $("adminFetchCancelBtn")?.addEventListener("click", cancelCountryFetch);
-  $("adminFetchCloseBtn")?.addEventListener("click", hidePanel);
-  $("adminFetchBackdrop")?.addEventListener("click", (e) => {
-    if (e.target === $("adminFetchBackdrop") && !fetchBusy) hidePanel();
-  });
-
-  const st = await getFetchStatus();
-  if (st.running && !st.company) {
-    setFetchBusy(true);
-    showPanel({
-      title: st.ats_type ? `Fetching ${atsLabel(st.ats_type)} companies` : "Fetching companies",
-      subtitle: fetchScopeSubtitle(st.country, st.ats_type),
-    });
-    pollFetchStatus();
-  }
+function formatRunSummary(run) {
+  if (!run) return "—";
+  const country = escapeHtml(run.country || "?");
+  const newJobs = Number(run.new_jobs) || 0;
+  const when = formatActivityBadge(run.finished_at || run.started_at || "");
+  return `${country} · ${newJobs} new · ${when}`;
 }
 
-export function isAdminFetchBusy() {
-  return fetchBusy;
+export function renderWorkerStatus(worker) {
+  const mount = $("adminWorkerSection");
+  if (!mount || !worker) return;
+
+  const fetch = worker.fetch || {};
+  const lastRun = worker.last_country_run;
+  const running = Boolean(fetch.running);
+  const statusLabel = running
+    ? `Running — ${escapeHtml(fetch.country || "?")}${fetch.ats_type ? ` · ${escapeHtml(fetch.ats_type)}` : ""}`
+    : "Idle";
+  const scheduleOn = worker.schedule_enabled !== false;
+  const interval = worker.schedule_interval_hours ?? 6;
+  const concurrency = worker.schedule_concurrency ?? 4;
+  const countries = (worker.schedule_countries || "").trim()
+    || "all supported countries";
+  const panelScrape = worker.panel_scrape_enabled;
+
+  mount.innerHTML = `
+    <section class="admin-panel admin-fetch-panel">
+      <h2 class="admin-panel-title">Fetch worker</h2>
+      <p class="hint admin-fetch-hint">
+        Country scrapes run on the <code>relocation-fetch-worker</code> container
+        ${scheduleOn ? `every ${interval}h` : "when enabled"} (concurrency ${concurrency}).
+        ${panelScrape ? "This host can also start manual fetches." : "Manual fetch is disabled on this panel host."}
+      </p>
+      <div class="stats-grid admin-stats-grid admin-worker-grid">
+        <div class="stat-card ${running ? "stat-card--accent" : ""}">
+          <div class="value">${statusLabel}</div>
+          <div class="label">Current fetch</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">${formatRunSummary(lastRun)}</div>
+          <div class="label">Last country fetch</div>
+        </div>
+        <div class="stat-card stat-card--muted">
+          <div class="value">${escapeHtml(countries)}</div>
+          <div class="label">Scheduled countries</div>
+        </div>
+      </div>
+      ${running ? `<p class="hint"><button type="button" class="link-btn" id="adminWorkerViewProgress">View live progress</button></p>` : ""}
+    </section>
+  `;
+
+  $("adminWorkerViewProgress")?.addEventListener("click", () => {
+    fetchBusy = true;
+    showPanel({
+      title: fetch.ats_type ? `Fetching ${fetch.ats_type} companies` : "Fetching companies",
+      subtitle: fetch.country || "In progress",
+    });
+    pollFetchStatus();
+  });
+}
+
+export async function initAdminWorker(worker) {
+  renderWorkerStatus(worker);
+
+  if (!workerListenersBound) {
+    workerListenersBound = true;
+    $("adminFetchCancelBtn")?.addEventListener("click", cancelCountryFetch);
+    $("adminFetchCloseBtn")?.addEventListener("click", hidePanel);
+    $("adminFetchBackdrop")?.addEventListener("click", (e) => {
+      if (e.target === $("adminFetchBackdrop") && !fetchBusy) hidePanel();
+    });
+  }
+
+  const fetch = worker?.fetch || {};
+  if (fetch.running && !fetch.company) {
+    fetchBusy = true;
+    showPanel({
+      title: fetch.ats_type ? `Fetching ${fetch.ats_type} companies` : "Fetching companies",
+      subtitle: fetch.country || "In progress",
+    });
+    pollFetchStatus();
+  } else {
+    try {
+      const st = await getFetchStatus();
+      if (st.running && !st.company) {
+        fetchBusy = true;
+        showPanel({
+          title: st.ats_type ? `Fetching ${st.ats_type} companies` : "Fetching companies",
+          subtitle: st.country || "In progress",
+        });
+        pollFetchStatus();
+      }
+    } catch {
+      /* ignore */
+    }
+  }
 }

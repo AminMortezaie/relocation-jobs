@@ -1,26 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from collections.abc import Callable
 
-from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
-from relocation_jobs.core.location_tags import (
-    company_matches_location_filter,
-    company_visible_for_country_filter,
-    job_fails_office_location_gate,
-)
-from relocation_jobs.panel.tracking import (
-    catalog_not_for_me,
-    job_dict,
-    resolve_track,
-    tracked_job_dict,
-    tracking_key,
-)
+from relocation_jobs.core.job_identity import normalize_job_url
+from relocation_jobs.core.location_tags import company_visible_for_country_filter
+from relocation_jobs.panel.flatten_jobs import partition_stored_jobs, partition_stored_jobs_for_stats
+from relocation_jobs.panel.flatten_orphans import append_tracked_orphans, append_tracked_orphans_for_stats
+from relocation_jobs.panel.flatten_rules import skip_company_after_jobs, skip_company_before_jobs
+from relocation_jobs.panel.tracking import tracking_key
 from relocation_jobs.panel.types import FlattenFilters
-from relocation_jobs.positions.state import derive_bucket, passes_position_filters, position_view_from_row
-from relocation_jobs.positions.types import PositionBucket, PositionFilters, TrackingFlags
-from relocation_jobs.shared.coerce import as_bool
-from relocation_jobs.shared.predicates import any_of
 from relocation_jobs.shared.timestamps import company_newest_job_fetched
 
 
@@ -33,206 +21,6 @@ class PanelContext:
     mcp_applications: dict = field(default_factory=dict)
 
 
-@dataclass(frozen=True)
-class _OrphanTrackContext:
-    country_key: str
-    company_name: str
-    t_country: str
-    t_company: str
-    t_url: str
-    track: dict
-    listed_urls: set[str]
-    listed_keys: set[str]
-
-
-@dataclass(frozen=True)
-class _CompanySkipContext:
-    company: dict
-    filters: FlattenFilters
-    country_key: str
-    country_filter: str | None
-    location_filter: str | None
-    header: dict
-
-
-@dataclass(frozen=True)
-class _CompanySkipAfterContext:
-    filters: FlattenFilters
-    jobs: list[dict]
-    not_for_me_jobs: list[dict]
-    rejected_jobs: list[dict]
-    header: dict
-
-
-_ORPHAN_TRACK_SKIP_RULES: tuple[Callable[[_OrphanTrackContext], bool], ...] = (
-    lambda ctx: ctx.t_country != ctx.country_key or ctx.t_company != ctx.company_name,
-    lambda ctx: bool(ctx.track.get("not_for_me")),
-    lambda ctx: not (
-        ctx.track.get("applied")
-        or as_bool(ctx.track.get("rejected"))
-        or ctx.track.get("looking_to_apply")
-    ),
-    lambda ctx: ctx.t_url in ctx.listed_urls,
-    lambda ctx: bool(ctx.t_url and job_idempotency_key(ctx.t_url) in ctx.listed_keys),
-)
-
-
-_COMPANY_SKIP_BEFORE_RULES: tuple[Callable[[_CompanySkipContext], bool], ...] = (
-    lambda ctx: bool(
-        ctx.country_filter
-        and ctx.country_filter != "all"
-        and not company_visible_for_country_filter(
-            ctx.company, ctx.country_filter, catalog_country=ctx.country_key,
-        )
-    ),
-    lambda ctx: bool(
-        ctx.location_filter
-        and not company_matches_location_filter(
-            ctx.company, ctx.location_filter, catalog_country=ctx.country_key,
-        )
-    ),
-    lambda ctx: bool(ctx.filters.ats_type and _company_ats_type(ctx.company) != ctx.filters.ats_type),
-    lambda ctx: bool(ctx.filters.hide_applied and ctx.header["company_applied"]),
-    lambda ctx: bool(
-        ctx.filters.fetch_ok_only
-        and not (ctx.company.get("fetch_ok") and not ctx.company.get("fetch_problem"))
-    ),
-    lambda ctx: bool(ctx.filters.fetch_problem_only and not ctx.company.get("fetch_problem")),
-)
-
-
-_COMPANY_SKIP_AFTER_RULES: tuple[Callable[[_CompanySkipAfterContext], bool], ...] = (
-    lambda ctx: bool(ctx.filters.visa_only and not ctx.jobs and not ctx.rejected_jobs),
-    lambda ctx: bool(ctx.filters.position_filters.rejected_only and not ctx.rejected_jobs),
-    lambda ctx: bool(
-        (ctx.filters.position_filters.applied_only or ctx.filters.position_filters.looking_to_apply_only)
-        and not ctx.jobs
-    ),
-    lambda ctx: bool(
-        ctx.filters.hide_empty
-        and not ctx.jobs
-        and not (ctx.filters.position_filters.rejected_only and ctx.rejected_jobs)
-    ),
-    lambda ctx: bool(ctx.filters.not_applied_only and (ctx.header["company_applied"] or not ctx.jobs)),
-)
-
-
-def _company_ats_type(company: dict) -> str:
-    return (company.get("ats_type") or "").strip() or "generic"
-
-
-def _not_for_me_entry(
-    job: dict,
-    *,
-    company_name: str,
-    company: dict,
-    country_key: str,
-    country_label: str,
-    job_tracking: dict | None,
-    status_history: dict | None,
-    mcp_applications: dict | None,
-    wrong_location: bool,
-) -> dict:
-    entry = job_dict(
-        job,
-        company_name=company_name,
-        company=company,
-        country_key=country_key,
-        country_label=country_label,
-        job_tracking=job_tracking,
-        status_history=status_history,
-        mcp_applications=mcp_applications,
-    )
-    if wrong_location:
-        entry["not_for_me"] = True
-        if not entry.get("not_for_me_reason"):
-            entry["not_for_me_reason"] = "wrong_location"
-    return entry
-
-
-def partition_stored_jobs(
-    stored_jobs: list[dict],
-    *,
-    user_id: int | None,
-    job_tracking: dict,
-    company_name: str,
-    company: dict,
-    country_key: str,
-    country_label: str,
-    status_history: dict,
-    mcp_applications: dict | None,
-    visa_only: bool,
-    position_filters: PositionFilters,
-) -> tuple[list[dict], list[dict], list[dict], int, int]:
-    jobs: list[dict] = []
-    not_for_me_jobs: list[dict] = []
-    rejected_jobs: list[dict] = []
-    positions_not_for_me = 0
-    positions_hidden_by_visa = 0
-
-    for job in stored_jobs:
-        fails_gate, _ = job_fails_office_location_gate(job, company, catalog_country=country_key)
-        wrong_location = fails_gate
-
-        if user_id:
-            track = resolve_track(
-                job_tracking, country=country_key, company_name=company_name, job=job,
-            )
-            view = position_view_from_row(track, wrong_location=wrong_location)
-            if view.bucket == PositionBucket.NOT_FOR_ME:
-                positions_not_for_me += 1
-                not_for_me_jobs.append(_not_for_me_entry(
-                    job,
-                    company_name=company_name,
-                    company=company,
-                    country_key=country_key,
-                    country_label=country_label,
-                    job_tracking=job_tracking,
-                    status_history=status_history,
-                    mcp_applications=mcp_applications,
-                    wrong_location=wrong_location,
-                ))
-                continue
-        elif catalog_not_for_me(job) or wrong_location:
-            positions_not_for_me += 1
-            not_for_me_jobs.append(_not_for_me_entry(
-                job,
-                company_name=company_name,
-                company=company,
-                country_key=country_key,
-                country_label=country_label,
-                job_tracking=None,
-                status_history=None,
-                mcp_applications=mcp_applications,
-                wrong_location=wrong_location,
-            ))
-            continue
-
-        if visa_only and job.get("visa_sponsorship") is not True:
-            positions_hidden_by_visa += 1
-            continue
-
-        job_entry = job_dict(
-            job,
-            company_name=company_name,
-            company=company,
-            country_key=country_key,
-            country_label=country_label,
-            job_tracking=job_tracking if user_id else None,
-            status_history=status_history if user_id else None,
-            mcp_applications=mcp_applications if user_id else None,
-        )
-        flags = TrackingFlags.from_job_panel_dict(job_entry)
-        if derive_bucket(flags) == PositionBucket.REJECTED:
-            rejected_jobs.append(job_entry)
-            continue
-        if not passes_position_filters(flags, position_filters):
-            continue
-        jobs.append(job_entry)
-
-    return jobs, not_for_me_jobs, rejected_jobs, positions_not_for_me, positions_hidden_by_visa
-
-
 def sort_pinned_jobs_first(jobs: list[dict]) -> list[dict]:
     if not jobs:
         return jobs
@@ -240,60 +28,6 @@ def sort_pinned_jobs_first(jobs: list[dict]) -> list[dict]:
     rest = [job for job in jobs if not job.get("pinned")]
     pinned.sort(key=lambda job: (job.get("pinned_at") or ""), reverse=True)
     return pinned + rest
-
-
-def _append_tracked_orphans(
-    jobs: list[dict],
-    rejected_jobs: list[dict],
-    *,
-    country_key: str,
-    company_name: str,
-    company: dict,
-    country_label: str,
-    job_tracking: dict,
-    status_history: dict,
-    mcp_applications: dict | None,
-    visa_only: bool,
-    position_filters: PositionFilters,
-) -> None:
-    listed_urls = {normalize_job_url(j.get("url", "")) for j in jobs}
-    listed_urls.update(normalize_job_url(j.get("url", "")) for j in rejected_jobs)
-    listed_keys = {job_idempotency_key(j.get("url", "")) for j in jobs if j.get("url")}
-    listed_keys.update(
-        job_idempotency_key(j.get("url", "")) for j in rejected_jobs if j.get("url")
-    )
-    listed_keys.discard("")
-    for (t_country, t_company, t_url), track in job_tracking.items():
-        ctx = _OrphanTrackContext(
-            country_key=country_key,
-            company_name=company_name,
-            t_country=t_country,
-            t_company=t_company,
-            t_url=t_url,
-            track=track,
-            listed_urls=listed_urls,
-            listed_keys=listed_keys,
-        )
-        if any_of(ctx, _ORPHAN_TRACK_SKIP_RULES):
-            continue
-        job_entry = tracked_job_dict(
-            track,
-            company_name=company_name,
-            company=company,
-            country_key=country_key,
-            country_label=country_label,
-            status_history=status_history,
-            mcp_applications=mcp_applications,
-        )
-        if visa_only and job_entry.get("visa_sponsorship") is not True:
-            continue
-        if job_entry.get("rejected"):
-            rejected_jobs.append(job_entry)
-            continue
-        flags = TrackingFlags.from_job_panel_dict(job_entry)
-        if not passes_position_filters(flags, position_filters):
-            continue
-        jobs.append(job_entry)
 
 
 def _derive_company_applied(
@@ -366,44 +100,6 @@ def _company_header_state(
         "board_pinned": board_pinned,
         "board_pinned_at": board_pinned_at,
     }
-
-
-def _skip_company_before_jobs(
-    company: dict,
-    *,
-    filters: FlattenFilters,
-    country_key: str,
-    country_filter: str | None,
-    location_filter: str | None,
-    header: dict,
-) -> bool:
-    ctx = _CompanySkipContext(
-        company=company,
-        filters=filters,
-        country_key=country_key,
-        country_filter=country_filter,
-        location_filter=location_filter,
-        header=header,
-    )
-    return any_of(ctx, _COMPANY_SKIP_BEFORE_RULES)
-
-
-def _skip_company_after_jobs(
-    *,
-    filters: FlattenFilters,
-    jobs: list[dict],
-    not_for_me_jobs: list[dict],
-    rejected_jobs: list[dict],
-    header: dict,
-) -> bool:
-    ctx = _CompanySkipAfterContext(
-        filters=filters,
-        jobs=jobs,
-        not_for_me_jobs=not_for_me_jobs,
-        rejected_jobs=rejected_jobs,
-        header=header,
-    )
-    return any_of(ctx, _COMPANY_SKIP_AFTER_RULES)
 
 
 def _build_company_row(
@@ -485,7 +181,7 @@ def _visible_jobs(
         position_filters=filters.position_filters,
     )
     if ctx.user_id:
-        _append_tracked_orphans(
+        append_tracked_orphans(
             jobs,
             rejected,
             country_key=country_key,
@@ -526,7 +222,7 @@ def flatten_company(
         job_tracking=ctx.job_tracking,
         company_tracking=ctx.company_tracking,
     )
-    if _skip_company_before_jobs(
+    if skip_company_before_jobs(
         company,
         filters=filters,
         country_key=country_key,
@@ -545,7 +241,7 @@ def flatten_company(
         country_label=country_label,
         filters=filters,
     )
-    if _skip_company_after_jobs(
+    if skip_company_after_jobs(
         filters=filters,
         jobs=jobs,
         not_for_me_jobs=not_for_me,
@@ -568,3 +264,138 @@ def flatten_company(
         positions_hidden_by_visa=hidden,
         user_id=ctx.user_id,
     )
+
+
+def preview_board_company(
+    company: dict,
+    *,
+    country_key: str,
+    country_label: str,
+    filters: FlattenFilters,
+    ctx: PanelContext,
+) -> tuple[str, str, dict] | None:
+    company_name = company.get("name", "")
+    if filters.country_key and filters.country_key != "all":
+        if not company_visible_for_country_filter(
+            company, filters.country_key, catalog_country=country_key,
+        ):
+            return None
+
+    stored_jobs = company.get("matching_jobs") or []
+    header = _company_header_state(
+        user_id=ctx.user_id,
+        country_key=country_key,
+        company_name=company_name,
+        company=company,
+        stored_jobs=stored_jobs,
+        job_tracking=ctx.job_tracking,
+        company_tracking=ctx.company_tracking,
+    )
+    if skip_company_before_jobs(
+        company,
+        filters=filters,
+        country_key=country_key,
+        country_filter=filters.country_key,
+        location_filter=filters.location_filter,
+        header=header,
+    ):
+        return None
+
+    jobs, not_for_me, rejected, _nfm_count, _hidden = _visible_jobs(
+        stored_jobs=stored_jobs,
+        ctx=ctx,
+        company_name=company_name,
+        company=company,
+        country_key=country_key,
+        country_label=country_label,
+        filters=filters,
+    )
+    if skip_company_after_jobs(
+        filters=filters,
+        jobs=jobs,
+        not_for_me_jobs=not_for_me,
+        rejected_jobs=rejected,
+        header=header,
+    ):
+        return None
+
+    sort_ts = company_newest_job_fetched(jobs, company)
+    return sort_ts, country_key, company
+
+
+def summarize_company_for_stats(
+    company: dict,
+    *,
+    country_key: str,
+    filters: FlattenFilters,
+    ctx: PanelContext,
+    alias_index: dict[tuple[str, str, str], dict],
+) -> dict | None:
+    company_name = company.get("name", "")
+    if filters.country_key and filters.country_key != "all":
+        if not company_visible_for_country_filter(
+            company, filters.country_key, catalog_country=country_key,
+        ):
+            return None
+
+    stored_jobs = company.get("matching_jobs") or []
+    header = _company_header_state(
+        user_id=ctx.user_id,
+        country_key=country_key,
+        company_name=company_name,
+        company=company,
+        stored_jobs=stored_jobs,
+        job_tracking=ctx.job_tracking,
+        company_tracking=ctx.company_tracking,
+    )
+    if skip_company_before_jobs(
+        company,
+        filters=filters,
+        country_key=country_key,
+        country_filter=filters.country_key,
+        location_filter=filters.location_filter,
+        header=header,
+    ):
+        return None
+
+    jobs, rejected, not_for_me_count = partition_stored_jobs_for_stats(
+        stored_jobs,
+        user_id=ctx.user_id,
+        job_tracking=ctx.job_tracking,
+        alias_index=alias_index,
+        company_name=company_name,
+        company=company,
+        country_key=country_key,
+        visa_only=filters.visa_only,
+        position_filters=filters.position_filters,
+    )
+    if ctx.user_id:
+        append_tracked_orphans_for_stats(
+            jobs,
+            rejected,
+            country_key=country_key,
+            company_name=company_name,
+            job_tracking=ctx.job_tracking,
+            visa_only=filters.visa_only,
+            position_filters=filters.position_filters,
+        )
+    if skip_company_after_jobs(
+        filters=filters,
+        jobs=jobs,
+        not_for_me_jobs=[],
+        rejected_jobs=rejected,
+        header=header,
+    ):
+        return None
+
+    sort_ts = company_newest_job_fetched(jobs, company)
+    return {
+        "country": country_key,
+        "jobs": jobs,
+        "positions_rejected": len(rejected),
+        "positions_not_for_me": not_for_me_count,
+        "company_applied": header["company_applied"],
+        "positions_applied_all": header["positions_applied_all"],
+        "newest_job_fetched": sort_ts,
+        "latest_fetched": sort_ts,
+    }

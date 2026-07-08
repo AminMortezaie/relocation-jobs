@@ -7,3 +7,4 @@ data/
 .idea/
 *.md.bak
 scripts/
+!scripts/fetch_scheduler_worker.py

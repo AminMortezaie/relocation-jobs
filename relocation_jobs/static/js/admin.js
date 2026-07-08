@@ -1,7 +1,7 @@
 /** Admin dashboard — catalog ops, users, fetch history, system config. */
 
-import { initAdminFetch } from "./admin-scrape.js";
-import { buildStatsDashboardHtml } from "./stats-dashboard.js";
+import { initAdminWorker } from "./admin-worker.js";
+import { buildAdminStatsHtml } from "./stats-dashboard.js";
 import { $, escapeHtml, escapeAttr, setLoadingProgress, finishLoadingProgress, formatActivityBadge } from "./utils.js";
 
 function skeletonRows(n = 4) {
@@ -17,18 +17,18 @@ function skeletonStatCards(n = 4) {
 }
 
 function showAdminSkeletons() {
-  const overview = $("adminOverview");
+  const worker = $("adminWorkerSection");
   const panelStats = $("adminPanelStats");
   const catalog = $("adminCatalog");
   const users = $("adminUsers");
   const runs = $("adminFetchRuns");
   const config = $("adminConfig");
+  if (worker) worker.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(3)}</div>`;
   if (panelStats) panelStats.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(4)}</div>`;
-  if (overview) overview.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(6)}</div>`;
   if (catalog) catalog.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(5)}</div>`;
-  if (users)   users.innerHTML   = `<div class="skeleton-admin-table">${skeletonRows(3)}</div>`;
-  if (runs)    runs.innerHTML    = `<div class="skeleton-admin-table">${skeletonRows(6)}</div>`;
-  if (config)  config.innerHTML  = `<div class="skeleton-admin-table">${skeletonRows(4)}</div>`;
+  if (users) users.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(3)}</div>`;
+  if (runs) runs.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(4)}</div>`;
+  if (config) config.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(3)}</div>`;
 }
 
 function formatTs(value) {
@@ -53,17 +53,6 @@ function formatTs(value) {
   const match = v.match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))/);
   if (match) return `${match[1]} ${match[2]}`;
   return v.split(/[T+]/)[0] || v;
-}
-
-function statCard(value, label, { accent = false, muted = false } = {}) {
-  const classes = [
-    "stat-card",
-    accent ? "stat-card--accent" : "",
-    muted ? "stat-card--muted" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-  return `<div class="${classes}"><div class="value">${value}</div><div class="label">${escapeHtml(label)}</div></div>`;
 }
 
 function adminCell(value, label) {
@@ -106,40 +95,25 @@ function showAdmin() {
   $("adminContent").classList.remove("hidden");
 }
 
-function renderPanelStats(stats) {
+function renderPanelStats(stats, userCount) {
   const mount = $("adminPanelStats");
   if (!mount) return;
   mount.innerHTML = `
     <section class="admin-panel">
-      <h2 class="admin-panel-title">Your panel stats</h2>
-      <p class="hint">Full-catalog totals for your account (not limited to the current board page or filters).</p>
-      ${buildStatsDashboardHtml(stats, { escapeHtml, formatActivityBadge })}
+      <h2 class="admin-panel-title">Your pipeline</h2>
+      <p class="hint">Actionable roles for your account across the full catalog. Stored roles in Postgres may be higher.</p>
+      <p class="hint admin-pipeline-meta">${userCount ?? 1} user${userCount === 1 ? "" : "s"} · open roles exclude applied, rejected, and not-for-me</p>
+      ${buildAdminStatsHtml(stats, { escapeHtml, formatActivityBadge })}
     </section>
   `;
 }
 
-function renderOverview(data) {
-  const catalog = data.catalog || {};
-  const tracking = data.tracking || {};
-  const fetch = data.fetch || {};
-  const fetchLabel = fetch.running
-    ? `Running (${escapeHtml(fetch.country || "?")}${fetch.ats_type ? ` · ${escapeHtml(fetch.ats_type)}` : ""}${fetch.company ? ` · ${escapeHtml(fetch.company)}` : ""})`
-    : "Idle";
-
-  $("adminOverview").innerHTML = `
-    <section class="admin-panel">
-      <h2 class="admin-panel-title">Overview</h2>
-      <div class="stats-grid admin-stats-grid">
-        ${statCard(data.users ?? 0, "Users", { accent: true })}
-        ${statCard(catalog.companies ?? 0, "Companies")}
-        ${statCard(catalog.jobs ?? 0, "Catalog roles")}
-        ${statCard(catalog.fetch_problems ?? 0, "Fetch issues")}
-        ${statCard(tracking.applied_positions ?? 0, "Applied (all users)")}
-        ${statCard(tracking.tracking_rows ?? 0, "Tracking rows")}
-        ${statCard(fetchLabel, "Scrape", { muted: true })}
-      </div>
-    </section>
-  `;
+function lastFetchByCountry(countryMeta) {
+  const map = {};
+  for (const row of countryMeta || []) {
+    if (row.country) map[row.country] = row.last_fetch || "";
+  }
+  return map;
 }
 
 function renderCatalog(data) {
@@ -154,29 +128,18 @@ function renderCatalog(data) {
     return;
   }
 
+  const lastFetch = lastFetchByCountry(data.country_meta);
+
   const countryRows = (data.countries || [])
     .map(
       (row) => `
       <tr>
         ${adminCell(escapeHtml(row.label), "Country")}
         ${adminCell(row.companies, "Companies")}
-        ${adminCell(row.jobs, "Jobs")}
+        ${adminCell(row.jobs, "Stored roles")}
         ${adminCell(row.visa_jobs, "Visa")}
-        ${adminCell(row.fetch_problems, "Fetch issues")}
+        ${adminCell(escapeHtml(formatTs(lastFetch[row.country] || "")), "Last fetch")}
         ${adminCell(row.missing_locations, "No locations")}
-      </tr>
-    `
-    )
-    .join("");
-
-  const metaRows = (data.country_meta || [])
-    .map(
-      (row) => `
-      <tr>
-        ${adminCell(escapeHtml(row.label), "Country")}
-        ${adminCell(escapeHtml(formatTs(row.last_fetch)), "Last fetch")}
-        ${adminCell(row.last_fetch_new_jobs, "New jobs")}
-        ${adminCell(row.total, "Total co.")}
       </tr>
     `
     )
@@ -197,26 +160,18 @@ function renderCatalog(data) {
   $("adminCatalog").innerHTML = `
     <section class="admin-panel">
       <h2 class="admin-panel-title">Catalog by country</h2>
+      <p class="hint">Raw Postgres counts — not filtered by your tracking state.</p>
       <div class="admin-table-wrap">
         <table class="admin-table admin-table--responsive">
           <thead>
             <tr>
-              <th>Country</th><th>Companies</th><th>Jobs</th><th>Visa</th><th>Fetch issues</th><th>No locations</th>
+              <th>Country</th><th>Companies</th><th>Stored roles</th><th>Visa</th><th>Last fetch</th><th>No locations</th>
             </tr>
           </thead>
           <tbody>${countryRows || '<tr><td colspan="6">No data</td></tr>'}</tbody>
         </table>
       </div>
       <div class="admin-split">
-        <div>
-          <h3 class="admin-subheading">Last fetch meta</h3>
-          <div class="admin-table-wrap">
-            <table class="admin-table admin-table--responsive">
-              <thead><tr><th>Country</th><th>Last fetch</th><th>New jobs</th><th>Total co.</th></tr></thead>
-              <tbody>${metaRows || '<tr><td colspan="4">No meta</td></tr>'}</tbody>
-            </table>
-          </div>
-        </div>
         <div>
           <h3 class="admin-subheading">ATS breakdown</h3>
           <div class="admin-table-wrap">
@@ -227,11 +182,6 @@ function renderCatalog(data) {
           </div>
         </div>
       </div>
-      <p class="hint admin-footnote">
-        Empty companies: ${data.totals?.empty_companies ?? 0} ·
-        Visa roles: ${data.totals?.visa_jobs ?? 0} ·
-        Stored roles: ${data.totals?.stored_jobs ?? data.totals?.jobs ?? 0}
-      </p>
     </section>
   `;
 
@@ -274,10 +224,9 @@ function renderUsers(data) {
       <tr>
         ${adminCell(`${escapeHtml(user.username)}${user.is_admin ? ' <span class="admin-badge">admin</span>' : ""}`, "Username")}
         ${adminCell(formatTs(user.created_at), "Created")}
-        ${adminCell(user.tracking_rows, "Tracking")}
         ${adminCell(user.applied_positions, "Applied")}
         ${adminCell(user.rejected_positions, "Rejected")}
-        ${adminCell(user.not_for_me_positions, "Hidden")}
+        ${adminCell(user.not_for_me_positions, "Not for me")}
         ${adminCell(user.fetch_runs, "Fetches")}
       </tr>
     `
@@ -291,10 +240,10 @@ function renderUsers(data) {
         <table class="admin-table admin-table--responsive">
           <thead>
             <tr>
-              <th>Username</th><th>Created</th><th>Tracking</th><th>Applied</th><th>Rejected</th><th>Hidden</th><th>Fetches</th>
+              <th>Username</th><th>Created</th><th>Applied</th><th>Rejected</th><th>Not for me</th><th>Fetches</th>
             </tr>
           </thead>
-          <tbody>${rows || '<tr><td colspan="7">No users</td></tr>'}</tbody>
+          <tbody>${rows || '<tr><td colspan="6">No users</td></tr>'}</tbody>
         </table>
       </div>
     </section>
@@ -323,7 +272,6 @@ function renderFetchRuns(data) {
           ${adminCell(run.new_jobs ?? 0, "New")}
           ${adminCell(run.duration_seconds != null ? `${Math.round(run.duration_seconds)}s` : "—", "Duration")}
           ${adminCell(escapeHtml(status), "Status")}
-          ${adminCell(`<span class="admin-url">${escapeHtml(run.result_line || "—")}</span>`, "Result")}
         </tr>
       `;
     })
@@ -331,78 +279,72 @@ function renderFetchRuns(data) {
 
   $("adminFetchRuns").innerHTML = `
     <section class="admin-panel">
-      <h2 class="admin-panel-title">Fetch runs (all users)</h2>
-      <div class="admin-table-wrap">
-        <table class="admin-table admin-table--responsive">
-          <thead>
-            <tr><th>Started</th><th>User</th><th>Target</th><th>New</th><th>Duration</th><th>Status</th><th>Result</th></tr>
-          </thead>
-          <tbody>${rows || '<tr><td colspan="7">No fetch runs yet</td></tr>'}</tbody>
-        </table>
-      </div>
+      <details class="admin-details">
+        <summary>Recent fetch runs (${(data.runs || []).length})</summary>
+        <div class="admin-table-wrap">
+          <table class="admin-table admin-table--responsive">
+            <thead>
+              <tr><th>Started</th><th>User</th><th>Target</th><th>New</th><th>Duration</th><th>Status</th></tr>
+            </thead>
+            <tbody>${rows || '<tr><td colspan="6">No fetch runs yet</td></tr>'}</tbody>
+          </table>
+        </div>
+      </details>
     </section>
   `;
 }
 
 function renderConfig(data) {
-  const keywordList = (items) =>
-    items.map((item) => `<code>${escapeHtml(item)}</code>`).join(", ");
-
-  const customCities = Object.entries(data.custom_cities || {})
-    .map(([country, cities]) => `${escapeHtml(country)}: ${(cities || []).length}`)
-    .join(" · ");
+  const redisLabel = data.countries_store === "redis" && data.redis_ping
+    ? "redis (connected)"
+    : escapeHtml(data.countries_store || "—");
 
   $("adminConfig").innerHTML = `
     <section class="admin-panel">
-      <h2 class="admin-panel-title">System config</h2>
+      <h2 class="admin-panel-title">System</h2>
       <dl class="admin-dl">
         <dt>Database</dt><dd>${escapeHtml(data.database)}</dd>
-        <dt>Data dir</dt><dd><code>${escapeHtml(data.data_dir)}</code></dd>
-        <dt>Scrape enabled</dt><dd>${data.scrape_enabled ? "yes" : "no"}</dd>
+        <dt>Countries store</dt><dd>${redisLabel}</dd>
+        <dt>Scrape on this host</dt><dd>${data.scrape_enabled ? "enabled" : "disabled (worker only)"}</dd>
         <dt>Registration</dt><dd>${data.allow_register ? "open" : "closed"}</dd>
-        <dt>HTTPX</dt><dd>${data.httpx_available ? "available" : "missing"}</dd>
         <dt>Concurrency</dt><dd>default ${data.default_concurrency}, max ${data.max_concurrency}</dd>
-        <dt>Archives</dt><dd>${(data.archives || []).map((a) => `<code>${escapeHtml(a)}</code>`).join(" ") || "—"}</dd>
-        <dt>Known ATS overrides</dt><dd>${data.known_ats_count} companies</dd>
-        <dt>Custom cities</dt><dd>${customCities || "none"}</dd>
       </dl>
-      <details class="admin-details">
-        <summary>Include keywords (${(data.include_keywords || []).length})</summary>
-        <p class="admin-keywords">${keywordList(data.include_keywords || [])}</p>
-      </details>
-      <details class="admin-details">
-        <summary>Exclude keywords (${(data.exclude_keywords || []).length})</summary>
-        <p class="admin-keywords">${keywordList(data.exclude_keywords || [])}</p>
-      </details>
-      <details class="admin-details">
-        <summary>Known ATS companies</summary>
-        <p class="admin-keywords">${keywordList(data.known_ats_companies || [])}</p>
-      </details>
     </section>
   `;
-}
-
-async function loadPanelStats() {
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  const stats = await apiGet(`/api/admin/panel-stats?timezone=${encodeURIComponent(tz)}`);
-  renderPanelStats(stats);
 }
 
 async function loadDashboard() {
   $("adminError").hidden = true;
   showAdminSkeletons();
   setLoadingProgress(15);
-  const [data] = await Promise.all([
-    apiGet("/api/admin/dashboard?limit=50"),
-    loadPanelStats(),
-  ]);
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const data = await apiGet(`/api/admin/dashboard?limit=15&timezone=${encodeURIComponent(tz)}`);
   setLoadingProgress(80);
-  renderOverview(data.overview);
   renderCatalog(data.catalog);
   renderUsers(data.users);
   renderFetchRuns(data.runs);
   renderConfig(data.config);
+  await initAdminWorker(data.worker);
   finishLoadingProgress();
+  void loadPanelStats(data.user_count, tz);
+}
+
+async function loadPanelStats(userCount, timezone) {
+  const mount = $("adminPanelStats");
+  if (!mount) return;
+  try {
+    const stats = await apiGet(
+      `/api/admin/panel-stats?timezone=${encodeURIComponent(timezone)}`,
+    );
+    renderPanelStats(stats, userCount);
+  } catch (err) {
+    mount.innerHTML = `
+      <section class="admin-panel">
+        <h2 class="admin-panel-title">Your pipeline</h2>
+        <p class="hint admin-error">${escapeHtml(err.message || "Could not load pipeline stats")}</p>
+      </section>
+    `;
+  }
 }
 
 window.adminReloadDashboard = loadDashboard;
@@ -445,7 +387,6 @@ async function submitLogin(event) {
     }
     $("adminLoginPassword").value = "";
     showAdmin();
-    await initAdminFetch();
     await loadDashboard();
   } catch {
     $("adminLoginError").textContent = "Network error";
@@ -471,7 +412,6 @@ async function init() {
 
   if (await refreshAuth()) {
     try {
-      await initAdminFetch();
       await loadDashboard();
     } catch (err) {
       $("adminError").hidden = false;

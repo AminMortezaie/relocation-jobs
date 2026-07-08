@@ -19,8 +19,6 @@ Tests: `pytest tests -o addopts=`. Do not commit unless the user asks.
 | `*/repo.py`, `db/migrate.py` | **Yes — only here** |
 | `*/service.py`, `*/pipeline.py`, `web/routes/*`, `shared/` | No |
 
-Known violation: SQL still in `users/history.py` and `users/applied.py` — move to `users/repo.py`.
-
 ## Module order (do not interleave)
 
 1. Imports  
@@ -42,11 +40,11 @@ No section banners (`# --- types ---`), no narrating block comments, no docstrin
 
 ## Naming
 
-No `save_fn` / generic `persist()` — use explicit names like `sync_company_board_to_catalog`.
+No `sync_board` / generic `persist()` without context — use explicit names like `sync_company_board_to_catalog`.
 
 ## Imports
 
-Top of module only. No `try/except ImportError`. No imports inside functions (fix existing violations in `fetch/runner.py`, `positions/repo.py`).
+Top of module only. No `try/except ImportError`. No imports inside functions (fix existing violations in `positions/repo.py`).
 
 ## Data
 

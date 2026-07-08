@@ -85,6 +85,15 @@ def _apply_job_tracking_columns(conn) -> None:
     )
 
 
+def _apply_location_gate_override_column(conn) -> None:
+    conn.execute(
+        """
+        ALTER TABLE job_tracking
+        ADD COLUMN IF NOT EXISTS location_gate_override INTEGER NOT NULL DEFAULT 0
+        """
+    )
+
+
 def _migrate_schema(conn) -> None:
     """Add columns introduced after initial deploy."""
     run_migration_once(conn, "job_tracking_columns_v1", _apply_job_tracking_columns)
@@ -100,6 +109,7 @@ def _migrate_schema(conn) -> None:
     run_migration_once(conn, "mcp_master_resumes_v2", _migrate_mcp_master_resumes_v2)
     run_migration_once(conn, "mcp_master_resumes_pdf_v1", _migrate_mcp_master_resumes_pdf_v1)
     run_migration_once(conn, "mcp_applications_country_lower_v1", _migrate_mcp_applications_country_lower)
+    run_migration_once(conn, "location_gate_override_v1", _apply_location_gate_override_column)
 
 
 def _migrate_fetch_runs_live_state(conn) -> None:
@@ -317,9 +327,6 @@ def _ensure_status_events_table(conn) -> None:
 
 def _backfill_job_status_events(conn) -> None:
     """Seed history rows from legacy single applied_date / rejected_date columns."""
-    # Lazy import to avoid circular dependency (events → core → migrations → events).
-    from relocation_jobs.db.events import _append_job_status_event
-
     rows = conn.execute(
         """
         SELECT user_id, country, company_name, job_url, applied, applied_date,

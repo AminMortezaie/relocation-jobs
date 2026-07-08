@@ -27,7 +27,7 @@ from relocation_jobs.scrape.descriptions import format_job_description
 from relocation_jobs.scrape.job_text import fetch_job_description
 from relocation_jobs.core.db import _normalize_url
 from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
-from relocation_jobs.db.users import get_user_by_username
+from relocation_jobs.users.repo import get_user_by_username
 from relocation_jobs.mcp import repo, render, validate
 from relocation_jobs.mcp.names import application_pdf_filename, master_pdf_filename
 from relocation_jobs.mcp.types import (
@@ -51,7 +51,7 @@ from relocation_jobs.mcp.types import (
 from relocation_jobs.core.location_tags import job_fails_office_location_gate
 from relocation_jobs.panel.tracking import resolve_track
 from relocation_jobs.positions.service import set_job_applied
-from relocation_jobs.positions.state import position_view_from_row
+from relocation_jobs.positions.state import effective_wrong_location, position_view_from_row
 from relocation_jobs.positions.types import PositionBucket
 from relocation_jobs.shared.timestamps import job_fetched_ts, normalize_posted_at
 from relocation_jobs.users.repo import load_job_tracking
@@ -396,6 +396,7 @@ def list_company_applications(
         wrong_location, _ = job_fails_office_location_gate(
             job, company_row, catalog_country=country_key,
         )
+        wrong_location = effective_wrong_location(fails_gate=wrong_location, track=track)
         if position_view_from_row(track, wrong_location=wrong_location).bucket == PositionBucket.NOT_FOR_ME:
             continue
         catalog_url = (job.get("url") or "").strip()

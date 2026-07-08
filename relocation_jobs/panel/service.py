@@ -4,6 +4,7 @@ from relocation_jobs.catalog.repo import (
     count_catalog_companies,
     count_fetch_problems,
     load_catalog_companies_page,
+    load_catalog_for_countries,
     load_country_catalog,
     load_country_meta,
 )
@@ -15,7 +16,8 @@ from relocation_jobs.users.repo import (
     load_job_tracking,
 )
 from relocation_jobs.mcp import repo as mcp_repo
-from relocation_jobs.panel.flatten import PanelContext, flatten_company
+from relocation_jobs.panel.flatten import PanelContext, flatten_company, summarize_company_for_stats
+from relocation_jobs.panel.tracking import build_tracking_alias_index
 from relocation_jobs.panel.types import FlattenFilters
 from relocation_jobs.shared.timestamps import normalize_ts_for_sort
 
@@ -41,7 +43,13 @@ def _normalize_board_sort(sort: str | None) -> str:
     return key if key in ("newest", "name") else "newest"
 
 
-def load_context(user_id: int | None, country_key: str | None = None) -> PanelContext:
+def load_context(
+    user_id: int | None,
+    country_key: str | None = None,
+    *,
+    include_history: bool = True,
+    include_mcp: bool = True,
+) -> PanelContext:
     if not user_id:
         return PanelContext(user_id=None)
     scope_country = country_key if country_key and country_key != "all" else None
@@ -49,10 +57,13 @@ def load_context(user_id: int | None, country_key: str | None = None) -> PanelCo
         user_id=user_id,
         job_tracking=load_job_tracking(user_id, country=scope_country),
         company_tracking=load_company_tracking(user_id, country=scope_country),
-        status_history=load_job_status_history(user_id, country=scope_country),
-        mcp_applications=mcp_repo.load_application_summaries(
-            user_id,
-            country=scope_country,
+        status_history=(
+            load_job_status_history(user_id, country=scope_country)
+            if include_history else {}
+        ),
+        mcp_applications=(
+            mcp_repo.load_application_summaries(user_id, country=scope_country)
+            if include_mcp else {}
         ),
     )
 
@@ -167,6 +178,55 @@ def flatten_companies(
     return flatten_with_filters(filters)
 
 
+def flatten_companies_for_stats(
+    country_key: str | None = None,
+    *,
+    location: str | None = None,
+    ats_type: str | None = None,
+    user_id: int | None = None,
+) -> tuple[list[dict], list[dict], int]:
+    filters = FlattenFilters.from_kwargs(
+        country_key=country_key,
+        user_id=user_id,
+        location=location,
+        ats_type=ats_type,
+    )
+    country_keys = _country_keys_for_filters(filters)
+    catalog_by_country = load_catalog_for_countries(country_keys, include_descriptions=False)
+    file_meta = _collect_file_meta(country_keys)
+    ctx = load_context(
+        filters.user_id,
+        filters.country_key,
+        include_history=False,
+        include_mcp=False,
+    )
+    alias_index = (
+        build_tracking_alias_index(ctx.job_tracking)
+        if ctx.user_id else {}
+    )
+    companies_out: list[dict] = []
+    fetch_problem_count = 0
+
+    for key in country_keys:
+        data = catalog_by_country.get(key)
+        if not data or (not data.get("companies") and not data.get("source")):
+            continue
+        for company in data.get("companies", []):
+            if company.get("fetch_problem"):
+                fetch_problem_count += 1
+            row = summarize_company_for_stats(
+                company,
+                country_key=key,
+                filters=filters,
+                ctx=ctx,
+                alias_index=alias_index,
+            )
+            if row:
+                companies_out.append(row)
+
+    return companies_out, file_meta, fetch_problem_count
+
+
 def flatten_companies_page(
     filters: FlattenFilters,
     *,
@@ -274,38 +334,29 @@ def _flatten_companies_page_by_activity(
     country_keys = _country_keys_for_filters(filters)
     file_meta = _collect_file_meta(country_keys)
     search_key = (search or "").strip().lower() or None
-    total_catalog = count_catalog_companies(
+    fetch_problem_count = count_fetch_problems(country_keys)
+    catalog_by_country = load_catalog_for_countries(
         country_keys,
+        include_descriptions=False,
         ats_type=filters.ats_type,
         search=search_key,
     )
-    fetch_problem_count = count_fetch_problems(country_keys)
     visible_rows: list[dict] = []
-    catalog_offset = 0
-    batch_size = 50
-
-    while catalog_offset < total_catalog:
-        batch = load_catalog_companies_page(
-            country_keys,
-            offset=catalog_offset,
-            limit=batch_size,
-            ats_type=filters.ats_type,
-            search=search_key,
-        )
-        if not batch:
-            break
-        for country_key, company in batch:
-            label = country_label(country_key)
+    for key in country_keys:
+        data = catalog_by_country.get(key)
+        if not data:
+            continue
+        label = country_label(key)
+        for company in data.get("companies", []):
             row = flatten_company(
                 company,
-                country_key=country_key,
+                country_key=key,
                 country_label=label,
                 filters=filters,
                 ctx=ctx,
             )
             if row:
                 visible_rows.append(row)
-        catalog_offset += len(batch)
 
     _sort_board_page_rows(visible_rows)
     start = max(visible_offset, 0)

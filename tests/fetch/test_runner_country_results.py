@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from relocation_jobs.fetch import runner as fetch_runner
+from relocation_jobs.fetch import state as fetch_state
 
 
 def test_on_company_result_updates_live_new_jobs_and_progress():
-    with fetch_runner._fetch_lock:
-        fetch_runner._fetch_state.clear()
-        fetch_runner._fetch_state.update({
+    fetch_state.reset_for_tests()
+    with fetch_state.fetch_lock():
+        fetch_state.mutate_state(lambda st: st.update({
             "running": True,
             "run_id": None,
             "new_jobs_total": 0,
@@ -17,9 +17,9 @@ def test_on_company_result_updates_live_new_jobs_and_progress():
                 "status": "done",
                 "company_results": [],
             },
-        })
+        }))
 
-    fetch_runner._on_company_result(
+    fetch_state.record_company_result(
         "Acme",
         2,
         [
@@ -28,9 +28,10 @@ def test_on_company_result_updates_live_new_jobs_and_progress():
         ],
     )
 
-    with fetch_runner._fetch_lock:
-        assert fetch_runner._fetch_state["new_jobs_total"] == 2
-        results = fetch_runner._fetch_state["progress"]["company_results"]
+    with fetch_state.fetch_lock():
+        status = fetch_state.memory_status()
+        assert status["new_jobs_total"] == 2
+        results = status["progress"]["company_results"]
         assert len(results) == 1
         assert results[0]["company"] == "Acme"
         assert results[0]["new_count"] == 2
@@ -38,9 +39,9 @@ def test_on_company_result_updates_live_new_jobs_and_progress():
 
 
 def test_on_country_progress_preserves_company_results():
-    with fetch_runner._fetch_lock:
-        fetch_runner._fetch_state.clear()
-        fetch_runner._fetch_state.update({
+    fetch_state.reset_for_tests()
+    with fetch_state.fetch_lock():
+        fetch_state.mutate_state(lambda st: st.update({
             "progress": {
                 "current": 1,
                 "total": 3,
@@ -50,17 +51,17 @@ def test_on_country_progress_preserves_company_results():
                     {"company": "Acme", "new_count": 1, "jobs": [{"title": "Role", "url": "https://x"}]},
                 ],
             },
-        })
+        }))
 
-    fetch_runner._on_country_progress({
+    fetch_state.update_progress({
         "current": 2,
         "total": 3,
         "company": "Beta",
         "status": "fetching",
     })
 
-    with fetch_runner._fetch_lock:
-        progress = fetch_runner._fetch_state["progress"]
+    with fetch_state.fetch_lock():
+        progress = fetch_state.memory_status()["progress"]
         assert progress["current"] == 2
         assert progress["company"] == "Beta"
         assert len(progress["company_results"]) == 1

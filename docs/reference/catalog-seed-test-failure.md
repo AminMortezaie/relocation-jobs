@@ -89,7 +89,7 @@ Before the fix, `tests/helpers/seed.py` did this:
 
 Step 2 refreshed Acme (and would create missing fixture companies) but **never deleted** AAA Older Fetch. Seeding was **additive**, not a full sync.
 
-`save_country_catalog` in `catalog/writes.py` already had the right semantics for production imports:
+`sync_country_catalog` in `catalog/repo.py` already had the right semantics for production imports:
 
 - Upsert every company in the payload.
 - **`DELETE FROM companies WHERE country = ? AND name NOT IN (fixture names)`**
@@ -104,7 +104,7 @@ The test helper simply was not using it.
 
 1. Deep-copies the fixture (so tests cannot mutate the on-disk JSON).
 2. Stamps job identity fields on jobs.
-3. Calls **`save_country_catalog(country_key, data)`** — full sync, including removal of stray companies.
+3. Calls **`sync_country_catalog(country_key, data)`** — full sync, including removal of stray companies.
 
 Every test that depends on `seeded_catalog_v2` gets the same UK catalog: one company, two jobs, as in `tests/fixtures/country_uk_minimal.json`.
 
@@ -125,7 +125,7 @@ pytest tests               # 131 passed with -n auto
 
 **When adding catalog data in a test:**
 
-- Use `seeded_catalog_v2` / `save_country_catalog` so the next test starts clean, or
+- Use `seeded_catalog_v2` / `sync_country_catalog` so the next test starts clean, or
 - Delete your rows in teardown, or
 - Mark the test with `@pytest.mark.fresh_db` if you need a full wipe (slower).
 
@@ -137,9 +137,9 @@ Do not assume `sync_company_board_to_catalog` alone leaves a clean country for t
 
 | File | Role |
 |------|------|
-| `tests/helpers/seed.py` | Fix: `save_country_catalog` |
+| `tests/helpers/seed.py` | Fix: `sync_country_catalog` |
 | `tests/web/test_board_api.py` | Tests that added AAA Older Fetch |
 | `tests/fixtures/country_uk_minimal.json` | Canonical UK seed |
-| `relocation_jobs/catalog/writes.py` | `save_country_catalog` delete-absent logic |
+| `relocation_jobs/catalog/repo.py` | `sync_country_catalog` delete-absent logic |
 | `tests/conftest.py` | `db` / `seeded_catalog_v2` fixtures |
 | `tests/helpers/postgres_mock.py` | `clear_tracking` vs `clear_data` |

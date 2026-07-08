@@ -9,4 +9,4 @@
 | Run commands | [CLAUDE.md](CLAUDE.md) |
 
 **Code:** `relocation_jobs/` · **Panel:** port **5051** · **Tests:** `pytest tests -o addopts=`  
-**Do not commit** unless explicitly asked.
+**Do not commit** unless explicitly asked. **Public repo:** no real IPs/passwords in docs — use `<ELASTIC_IP>` placeholders; secrets in gitignored `.env` / `aws-postgres.env`.

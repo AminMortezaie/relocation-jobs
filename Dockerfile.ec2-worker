@@ -1,0 +1,26 @@
+# EC2 fetch worker (Playwright + scheduled country fetches).
+FROM python:3.12-bookworm
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PANEL_DATA_DIR=/tmp/panel-data \
+    PANEL_SCRAPE_ENABLED=1 \
+    FETCH_SCHEDULE_ENABLED=1 \
+    FETCH_SCHEDULE_INTERVAL_HOURS=6 \
+    FETCH_SCHEDULE_CONCURRENCY=4
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt \
+    && playwright install --with-deps chromium
+
+COPY . .
+
+RUN mkdir -p /tmp/panel-data
+
+CMD ["python3", "scripts/fetch_scheduler_worker.py"]

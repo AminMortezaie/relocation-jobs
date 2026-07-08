@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from relocation_jobs.positions.types import PositionBucket, PositionFilters, PositionView, TrackingFlags
+from relocation_jobs.shared.coerce import as_bool
 from relocation_jobs.shared.predicates import all_of
 
 _BUCKET_RULES: tuple[
@@ -20,6 +21,14 @@ _POSITION_FILTER_RULES: tuple[Callable[[tuple[TrackingFlags, PositionFilters]], 
     lambda ctx: not (ctx[1].rejected_only and not ctx[0].rejected),
     lambda ctx: not (ctx[1].looking_to_apply_only and not ctx[0].looking_to_apply),
 )
+
+
+def effective_wrong_location(*, fails_gate: bool, track: dict | None) -> bool:
+    if not fails_gate:
+        return False
+    if track and as_bool(track.get("location_gate_override")):
+        return False
+    return True
 
 
 def derive_bucket(

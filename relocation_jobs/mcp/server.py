@@ -4,7 +4,7 @@ import json
 
 from mcp.server.fastmcp import FastMCP
 
-from relocation_jobs.db.users import get_user_by_id
+from relocation_jobs.users.repo import get_user_by_id
 from relocation_jobs.mcp import repo as mcp_repo
 from relocation_jobs.mcp import service
 from relocation_jobs.mcp.types import ApplicationProfile

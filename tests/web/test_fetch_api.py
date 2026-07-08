@@ -8,7 +8,7 @@ from relocation_jobs.scrape.boards.greenhouse import greenhouse_jobs_api_url
 
 
 def test_jobs_stats_recent_fetch_runs(v2_auth_client, seeded_catalog_v2, db):
-    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.fetch import repo as fetch_repo
 
     del db
@@ -71,7 +71,7 @@ async def test_run_single_company_fetch_greenhouse(seeded_catalog_v2):
 @pytest.mark.asyncio
 @respx.mock
 async def test_country_fetch_runner(seeded_catalog_v2, db):
-    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.catalog.repo import get_company
     from relocation_jobs.fetch import repo as fetch_repo
     from relocation_jobs.fetch.country_runner import run_country_fetch
@@ -145,7 +145,7 @@ def test_companies_fetch_api(v2_auth_client, seeded_catalog_v2, monkeypatch):
 
 
 def test_company_fetch_worker_integration(seeded_catalog_v2, db, monkeypatch):
-    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.catalog.repo import get_company
     from relocation_jobs.fetch import repo as fetch_repo
     from relocation_jobs.fetch.runner import _company_fetch_worker
@@ -198,8 +198,8 @@ def test_company_fetch_worker_integration(seeded_catalog_v2, db, monkeypatch):
 def test_companies_fetch_409_when_busy(v2_auth_client, seeded_catalog_v2, monkeypatch):
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
     monkeypatch.setattr(
-        "relocation_jobs.web.routes.companies.fetch_is_running",
-        lambda: True,
+        "relocation_jobs.fetch.state.guard_fetch_start",
+        lambda: False,
     )
 
     resp = v2_auth_client.post(
@@ -211,7 +211,7 @@ def test_companies_fetch_409_when_busy(v2_auth_client, seeded_catalog_v2, monkey
 
 
 def test_country_fetch_reaps_orphan_running_row(v2_auth_client, seeded_catalog_v2, monkeypatch):
-    from relocation_jobs.db import get_user_by_username
+    from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.fetch import repo as fetch_repo
 
     monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "1")
@@ -251,7 +251,7 @@ def test_country_fetch_disabled(v2_auth_client, monkeypatch):
 
 
 def test_fetch_status_includes_review_jobs_after_company_fetch(v2_auth_client, monkeypatch):
-    from relocation_jobs.fetch import runner as fetch_runner
+    from relocation_jobs.fetch import state as fetch_state
 
     review = {
         "included": [{"title": "Backend Engineer", "url": "https://example.com/jobs/1"}],
@@ -263,9 +263,9 @@ def test_fetch_status_includes_review_jobs_after_company_fetch(v2_auth_client, m
             },
         ],
     }
-    with fetch_runner._fetch_lock:
-        fetch_runner._fetch_state.clear()
-        fetch_runner._fetch_state.update({
+    fetch_state.reset_for_tests()
+    with fetch_state.fetch_lock():
+        fetch_state.mutate_state(lambda st: st.update({
             "running": False,
             "run_id": None,
             "country": "germany",
@@ -280,7 +280,7 @@ def test_fetch_status_includes_review_jobs_after_company_fetch(v2_auth_client, m
             "log": ["Finished (exit 0)"],
             "new_jobs_total": 0,
             "last_fetch_run": {"id": 99, "country": "germany", "company_name": "Celonis"},
-        })
+        }))
 
     status = v2_auth_client.get("/api/fetch/status").get_json()
     assert status["company"] == "Celonis"

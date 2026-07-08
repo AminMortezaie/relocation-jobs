@@ -15,18 +15,16 @@ How we build `relocation_jobs/`. Also read [`parity.md`](parity.md).
 
 **Do not** put `conn.execute`, `db_transaction`, or `get_connection` outside a domain’s `repo.py` (and `db/migrate.py` for app schema).
 
-**Known violation:** `users/history.py` and `users/applied.py` still contain SQL — move into `users/repo.py`.
-
 **Do not** import legacy shims or duplicate SQL outside repos.
 
-**OK to import** `relocation_jobs.core.*` and `relocation_jobs.db.init_db` from the app entry/bootstrap only.
+**OK to import** `relocation_jobs.core.*` and `relocation_jobs.db.init_db` (bootstrap only). Domain repos (`users/repo.py`, `positions/repo.py`, etc.) — import directly, not via `db/__init__.py`.
 
 ## Imports
 
 - Top of module, unconditionally.
 - No `try/except ImportError` for optional dependencies.
 - No imports inside function bodies — fix structure instead of lazy imports.
-- **Known violations:** `fetch/runner.py` (`httpx`), `positions/repo.py` (`get_connection` in one function), bootstrap lazy imports in `web/server.py`.
+- **Known violations:** `positions/repo.py` (`get_connection` in one function), bootstrap lazy imports in `web/server.py`.
 
 ## File and module shape
 
@@ -66,10 +64,8 @@ Names should state **what** and **when**, not generic verbs.
 | Avoid | Prefer |
 |-------|--------|
 | `writes.py`, `save_company` | `repo.sync_company_board_to_catalog` |
-| `persist()`, `save_fn` in cross-layer APIs | `sync_company_board_to_catalog` at scrape/fetch boundaries |
+| `sync_board` callback in cross-layer APIs | `sync_company_board_to_catalog` at scrape/fetch boundaries |
 | `touch_*` without context | `patch_country_catalog_meta` |
-
-**Known violation:** `save_fn` still used in `scrape/company.py`, `fetch/pipeline.py`, `fetch/service.py`.
 
 ## Control flow (branching)
 
@@ -102,7 +98,7 @@ Names should state **what** and **when**, not generic verbs.
 
 - **`pytest tests`** during application work.
 - **`tests/<domain>/`** mirrors domains; seed via `tests/helpers/seed.py`.
-- **`seed_country()`** must sync the full fixture (`save_country_catalog`) — see [catalog-seed-test-failure.md](catalog-seed-test-failure.md).
+- **`seed_country()`** must sync the full fixture (`sync_country_catalog` in `catalog/repo.py`) — see [catalog-seed-test-failure.md](catalog-seed-test-failure.md).
 - Map position/panel behavior to [`business-rules.md`](business-rules.md).
 - Business rules for catalog board sync: `tests/catalog/test_repo.py`.
 
@@ -121,11 +117,9 @@ Names should state **what** and **when**, not generic verbs.
 
 ## Known violations (fix in this order)
 
-1. SQL outside repo: `users/history.py`, `users/applied.py`
-2. Long functions: `panel/flatten.py`, `fetch/runner.py`, `fetch/repo.py`, `web/routes/jobs.py`, `web/routes/fetch.py`
-3. `save_fn` naming in scrape/fetch stack
-4. Lazy imports in `fetch/runner.py`, `positions/repo.py`
-5. Empty shim: `web/routes/catalog.py`
+1. Long functions: `catalog/repo.py`, `fetch/repo.py`, `fetch/country_runner.py`, `panel/flatten_jobs.py`, `web/routes/jobs.py`
+2. Lazy imports in `positions/repo.py`
+3. Empty shim: `web/routes/catalog.py`
 
 ## Roadmap
 
@@ -139,18 +133,32 @@ Names should state **what** and **when**, not generic verbs.
 ```
 relocation_jobs/
   shared/       coerce, schema, timestamps, predicates
-  catalog/      repo, lookup, writes, schema
+  catalog/      repo, lookup, schema, cache
   users/        repo, history, applied
   positions/    types, state, service, repo
-  panel/        types, flatten, tracking, service, stats
-  fetch/        types, repo, service, pipeline, runner, country_runner
+  panel/        types, flatten, flatten_rules, flatten_jobs, flatten_orphans, tracking, service, stats
+  fetch/        types, repo, service, pipeline, runner, country_runner, state, client, ports, scheduler
   scrape/       relevance, filter, merge, listing, company, board, boards/
   web/          server, routes, deps, query, validators
-  db/           migrate.py, tracking, users, fetch_runs
+  db/           __init__.py (bootstrap), migrate.py
   core/         auth, db helpers, ATS constants, paths
 ```
 
 Add files only when the domain gains a clear responsibility — not ahead of need.
+
+## Secrets and documentation
+
+This repository is **public**. Committed files must not contain live infrastructure credentials.
+
+| Keep gitignored | OK in committed docs |
+|-----------------|----------------------|
+| `.env`, `aws-postgres.env`, `*.pem` | `<ELASTIC_IP>`, `PASSWORD`, `change-me` |
+| Real `DATABASE_URL` / `REDIS_URL` | Example URLs with placeholders (see `.env.example`) |
+| SSH keys, API keys, admin passwords | Public domain `kuchup.com`, `127.0.0.1`, `localhost` |
+
+Agents and contributors: before writing postmortems, ops notes, or examples, **do not copy** hosts or passwords from local config. Point readers to gitignored `aws-postgres.env` instead.
+
+Full rule: [`engineering-standards`](../../.claude/skills/engineering-standards/SKILL.md) §7.
 
 ## Run locally
 

@@ -1,0 +1,11 @@
+what are the dead codes here in this project?
+using codebase-memory-mcp
+
+---
+
+sure
+
+---
+
+_company_fetch_attempts_v1
+?

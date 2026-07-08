@@ -1,0 +1,55 @@
+do you think that if we change the structure of code to something like Hexagonal can help to make this better or its too much?
+you can see the skills to have better insight on it.
+
+---
+
+do you think that if we change the structure of code to something like Hexagonal can help to make this better or its too much?
+you can see the skills to have better insight on it.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+do you trust on your changes that can be deployed on server/
+
+---
+
+run them and check for correctness
+
+---
+
+run them and check for correctness
+
+---
+
+deploy now
+
+---
+
+deploy now
+
+---
+
+run germany fetch cycle which is better parameter to check for correctness
+
+---
+
+run germany fetch cycle which is better parameter to check for correctness
+
+---
+
+you got in stuck solve this problem
+
+---
+
+you got in stuck solve this problem

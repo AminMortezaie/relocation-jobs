@@ -1,0 +1,13 @@
+restart the panel now
+
+---
+
+restart the panel now
+
+---
+
+wrong logic.
+
+realwork has a new position today but it's not showing in fetched toady positions also the number of fetched today in panel is 66 which is completely wrong.
+
+there must be a conflict on date problem

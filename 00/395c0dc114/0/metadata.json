@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "00395c0dc114",
+  "session_id": "d1be427a-0819-49e2-9ada-2e96f3881022",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T23:52:48.232773Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [
+    "relocation_jobs/admin/service.py",
+    "tests/web/test_catalog_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "8b70de475a70",
+  "checkpoint_transcript_start": 23,
+  "transcript_lines_at_start": 23,
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T23:52:48.230275Z",
+    "agent_lines": 77,
+    "agent_removed": 50,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 77,
+    "total_lines_changed": 127,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

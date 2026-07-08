@@ -3,7 +3,7 @@
   "checkpoint_id": "3bc39f151c37",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 24,
+  "checkpoints_count": 28,
   "files_touched": [
     ".dockerignore",
     ".gitignore",
@@ -115,6 +115,12 @@
       "transcript": "/3b/c39f151c37/3/full.jsonl",
       "content_hash": "/3b/c39f151c37/3/content_hash.txt",
       "prompt": "/3b/c39f151c37/3/prompt.txt"
+    },
+    {
+      "metadata": "/3b/c39f151c37/4/metadata.json",
+      "transcript": "/3b/c39f151c37/4/full.jsonl",
+      "content_hash": "/3b/c39f151c37/4/content_hash.txt",
+      "prompt": "/3b/c39f151c37/4/prompt.txt"
     }
   ]
 }

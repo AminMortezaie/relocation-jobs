@@ -1,0 +1,29 @@
+fetching companies should be put on logic of application and each 6 hours we should get the newest data from companies.
+
+also on EC2.
+
+what do you think of this?
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+@/Users/amin/.cursor/projects/Users-amin-dev-p-projects-armenia-resume/terminals/90.txt:1019-1027
+
+---
+
+@/Users/amin/.cursor/projects/Users-amin-dev-p-projects-armenia-resume/terminals/90.txt:1019-1027
+
+---
+
+@/Users/amin/.cursor/projects/Users-amin-dev-p-projects-armenia-resume/terminals/90.txt:1026-1028

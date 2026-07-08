@@ -1,0 +1,76 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "3bc39f151c37",
+  "session_id": "9bc6d5eb-cdb2-49c6-9cd0-2ea6ef81da33",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T01:47:42.156652Z",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "save_step_count": 4,
+  "files_touched": [
+    ".dockerignore",
+    "Dockerfile.ec2-worker",
+    "docs/operations/ec2-panel.md",
+    "relocation_jobs/db/users.py",
+    "relocation_jobs/fetch/runner.py",
+    "relocation_jobs/fetch/scheduler.py",
+    "scripts/ec2_app_deploy.sh",
+    "scripts/fetch_scheduler_worker.py",
+    "tests/fetch/test_scheduler.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "0820bbbdbeea",
+  "session_metrics": {
+    "duration_ms": 5405611,
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T01:47:42.153135Z",
+    "agent_lines": 485,
+    "agent_removed": 562,
+    "human_added": 4047,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 4533,
+    "total_lines_changed": 8656,
+    "agent_percentage": 12.0956561922366,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 9,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "deploy/ec2/Caddyfile": 9
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 9,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 417,
+      "agent_lines_removed": 7
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 1,
+      "agent_lines_added": 418,
+      "agent_lines_removed": 7,
+      "user_removed_per_file": {
+        "Dockerfile.ec2-worker": 1
+      }
+    }
+  ]
+}

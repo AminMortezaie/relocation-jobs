@@ -241,3 +241,44 @@ def test_master_resume_and_profile_persist_in_db(db):
     assert profile.full_name == "Ada"
     assert profile.email == "ada@example.com"
     assert profile.pipeline == ["Focus on backend roles.", "Use concise bullet points."]
+
+
+def test_wrap_project_fragment_for_pdf():
+    wrapped = service.wrap_project_fragment_for_pdf(r"\subsection*{Demo}")
+    assert r"\documentclass" in wrapped
+    assert r"\subsection*{Demo}" in wrapped
+    assert wrapped.rstrip().endswith(r"\end{document}")
+
+    full = r"\documentclass{article}\begin{document}Hi\end{document}"
+    assert service.wrap_project_fragment_for_pdf(full) == full
+
+
+def test_project_master_round_trip(db):
+    saved = mcp_repo.save_project_master(
+        1,
+        "Relocation Jobs!",
+        r"\subsection*{Relocation Jobs}" "\nVisa job board at kuchup.com.",
+        label="Relocation Jobs (kuchup.com)",
+    )
+    assert saved["slug"] == "relocation-jobs"
+    assert saved["label"] == "Relocation Jobs (kuchup.com)"
+
+    items = service.list_project_masters(user_id=1)
+    assert {item.slug for item in items} == {"relocation-jobs"}
+    assert items[0].label == "Relocation Jobs (kuchup.com)"
+
+    detail = service.get_project_master_detail("relocation-jobs", user_id=1)
+    assert "kuchup.com" in detail["content"]
+    assert detail["slug"] == "relocation-jobs"
+
+    body = mcp_repo.read_project_master(1, "relocation-jobs")
+    assert "Visa job board" in body
+    assert r"\subsection*" in body
+
+
+def test_project_master_invalid_slug(db):
+    try:
+        mcp_repo.save_project_master(1, "", "content")
+        assert False, "expected ValueError"
+    except ValueError as exc:
+        assert "required" in str(exc)

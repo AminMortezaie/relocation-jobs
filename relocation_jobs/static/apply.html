@@ -39,7 +39,7 @@
         </a>
       </div>
       <h2>Sign in</h2>
-      <p class="hint">Your application profile and master resumes are stored per user in the database.</p>
+      <p class="hint">Your application profile, master resumes, and project masters are stored per user in the database.</p>
       <div class="login-error" id="applyLoginError"></div>
       <form id="applyLoginForm">
         <label for="applyLoginUsername">Username</label>
@@ -68,7 +68,7 @@
             </span>
           </a>
           <h1 class="page-heading">Application data</h1>
-          <p class="admin-subtitle">Profile and master resumes for Claude Desktop MCP</p>
+          <p class="admin-subtitle">Profile, master resumes, and project masters for Claude Desktop MCP</p>
         </div>
         <div class="admin-header-actions">
           <a href="/" class="header-secondary-btn admin-nav-link">Job panel</a>
@@ -82,6 +82,7 @@
       <nav class="apply-tabs" aria-label="Application data sections">
         <button type="button" class="apply-tab apply-tab--active" data-tab="profile" id="applyTabProfile">Profile</button>
         <button type="button" class="apply-tab" data-tab="masters" id="applyTabMasters">Master resumes</button>
+        <button type="button" class="apply-tab" data-tab="projects" id="applyTabProjects">Projects</button>
       </nav>
 
       <section class="admin-panel apply-panel" id="applyProfilePanel">
@@ -173,11 +174,60 @@
           </div>
         </div>
       </section>
+
+      <section class="admin-panel apply-panel hidden" id="applyProjectsPanel">
+        <h2 class="admin-panel-title">Project masters</h2>
+        <p class="hint apply-hint">LaTeX fragment for MCP reframe (evidence bank). Same macros as your master CV when you insert a Projects block — not pasted wholesale without your approval.</p>
+
+        <div class="apply-masters-layout">
+          <aside class="apply-master-list-wrap">
+            <div class="apply-master-list-header">
+              <span class="apply-master-list-title">Projects</span>
+              <button type="button" class="link-btn apply-new-master-btn" id="applyNewProjectBtn">+ New</button>
+            </div>
+            <ul class="apply-master-list" id="applyProjectList"></ul>
+          </aside>
+
+          <div class="apply-master-editor">
+            <div class="apply-master-meta">
+              <label for="applyProjectSlug">Slug</label>
+              <input type="text" id="applyProjectSlug" class="apply-master-slug-input" placeholder="relocation-jobs" spellcheck="false" />
+              <label for="applyProjectLabel">Label</label>
+              <input type="text" id="applyProjectLabel" placeholder="Relocation Jobs (kuchup.com)" />
+            </div>
+
+            <div class="apply-master-actions">
+              <button type="button" class="header-secondary-btn" id="applyProjectRenderBtn">Re-render PDF</button>
+              <a class="header-secondary-btn" id="applyProjectOpenPdf" href="#" target="_blank" rel="noopener noreferrer" hidden>Open PDF</a>
+              <a class="header-primary-btn" id="applyProjectDownloadPdf" href="#" download="project.pdf" hidden>Download PDF</a>
+            </div>
+
+            <div class="apply-master-preview-grid">
+              <div class="apply-master-tex-panel">
+                <label for="applyProjectContent" class="apply-master-preview-label">LaTeX content</label>
+                <textarea id="applyProjectContent" class="apply-tex-editor" spellcheck="false" placeholder="\subsection*{Project name}\hfill \textit{Personal project}&#10;\begin{itemize}&#10;  \item …&#10;\end{itemize}"></textarea>
+              </div>
+              <div class="apply-master-pdf-panel">
+                <h3 class="apply-master-preview-label">PDF preview</h3>
+                <div class="apply-master-pdf-frame-wrap">
+                  <iframe id="applyProjectPdfFrame" class="apply-master-pdf-frame" title="Project master PDF preview" hidden></iframe>
+                  <p id="applyProjectPdfMissing" class="apply-master-pdf-missing" hidden>No PDF yet — click Re-render PDF.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="apply-form-actions">
+              <span class="apply-updated-at" id="applyProjectUpdated"></span>
+              <button type="button" class="header-primary-btn" id="applyProjectSaveBtn">Save project</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
   <div class="toast" id="applyToast"></div>
 
-  <script type="module" src="/static/js/apply.js?v=6"></script>
+  <script type="module" src="/static/js/apply.js?v=9"></script>
 </body>
 </html>

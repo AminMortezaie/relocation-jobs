@@ -161,11 +161,113 @@ Hello world
     assert pdf[1] == "resume_java.pdf"
 
 
+def test_mcp_project_master_round_trip(v2_auth_client):
+    tex = r"""\subsection*{Relocation Jobs}
+Built kuchup.com --- scrape, catalog, MCP CV pipeline.
+"""
+    saved = v2_auth_client.put(
+        "/api/mcp/project-masters/relocation-jobs",
+        json={"content": tex, "label": "Relocation Jobs (kuchup.com)"},
+    )
+    assert saved.status_code == 200
+    body = saved.get_json()
+    assert body["ok"] is True
+    assert body["slug"] == "relocation-jobs"
+    assert body["label"] == "Relocation Jobs (kuchup.com)"
+
+    listing = v2_auth_client.get("/api/mcp/project-masters")
+    assert listing.status_code == 200
+    items = listing.get_json()["items"]
+    assert len(items) == 1
+    assert items[0]["slug"] == "relocation-jobs"
+    assert items[0]["has_pdf"] is False
+    assert items[0]["pdf_filename"] == "project_relocation_jobs.pdf"
+
+    detail = v2_auth_client.get("/api/mcp/project-masters/relocation-jobs")
+    assert detail.status_code == 200
+    detail_body = detail.get_json()
+    assert "kuchup.com" in detail_body["content"]
+    assert detail_body["label"] == "Relocation Jobs (kuchup.com)"
+    assert detail_body["has_pdf"] is False
+    assert detail_body["pdf_filename"] == "project_relocation_jobs.pdf"
+
+
+def test_mcp_project_master_pdf_round_trip(v2_auth_client):
+    tex = r"""\subsection*{Relocation Jobs}
+Built kuchup.com.
+"""
+    saved = v2_auth_client.put(
+        "/api/mcp/project-masters/relocation-jobs",
+        json={"content": tex, "label": "Relocation Jobs"},
+    )
+    assert saved.status_code == 200
+    slug = saved.get_json()["slug"]
+    mcp_repo.save_project_pdf(1, slug, FAKE_PDF)
+
+    listing = v2_auth_client.get("/api/mcp/project-masters")
+    item = next(i for i in listing.get_json()["items"] if i["slug"] == slug)
+    assert item["has_pdf"] is True
+
+    detail = v2_auth_client.get(f"/api/mcp/project-masters/{slug}")
+    assert detail.get_json()["has_pdf"] is True
+
+    pdf = v2_auth_client.get(f"/api/mcp/project-masters/{slug}/pdf")
+    assert pdf.status_code == 200
+    assert pdf.mimetype == "application/pdf"
+    assert pdf.data == FAKE_PDF
+
+
+def test_mcp_project_master_render_api(v2_auth_client, monkeypatch):
+    from relocation_jobs.mcp.render import CompileResult
+
+    tex = r"""\subsection*{Relocation Jobs}
+Built kuchup.com.
+"""
+    saved = v2_auth_client.put(
+        "/api/mcp/project-masters/relocation-jobs",
+        json={"content": tex, "label": "Relocation Jobs"},
+    )
+    assert saved.status_code == 200
+    slug = saved.get_json()["slug"]
+
+    def fake_render(tex_path):
+        written = tex_path.read_text(encoding="utf-8")
+        assert r"\documentclass" in written
+        assert r"\subsection*{Relocation Jobs}" in written
+        pdf_path = tex_path.with_suffix(".pdf")
+        pdf_path.write_bytes(FAKE_PDF)
+        return CompileResult(ok=True, log="ok", pdf_path=str(pdf_path))
+
+    monkeypatch.setattr("relocation_jobs.mcp.service.render.render_tex_to_pdf", fake_render)
+
+    rendered = v2_auth_client.post(f"/api/mcp/project-masters/{slug}/render")
+    assert rendered.status_code == 200
+    body = rendered.get_json()
+    assert body["ok"] is True
+    assert body["pdf_stored"] is True
+
+    pdf = service.read_project_pdf_download(slug, user_id=1)
+    assert pdf[0] == FAKE_PDF
+    assert pdf[1] == "project_relocation_jobs.pdf"
+
+
+def test_mcp_project_master_invalid_slug(v2_auth_client):
+    resp = v2_auth_client.put(
+        "/api/mcp/project-masters/!!!",
+        json={"content": "x", "label": "Bad"},
+    )
+    assert resp.status_code == 400
+
+
 def test_mcp_routes_require_auth(v2_client):
     assert v2_client.get("/api/mcp/profile").status_code == 401
     assert v2_client.get("/api/mcp/master-resumes").status_code == 401
     assert v2_client.get("/api/mcp/master-resumes/go/pdf").status_code == 401
     assert v2_client.post("/api/mcp/master-resumes/go/render").status_code == 401
+    assert v2_client.get("/api/mcp/project-masters").status_code == 401
+    assert v2_client.get("/api/mcp/project-masters/x").status_code == 401
+    assert v2_client.get("/api/mcp/project-masters/x/pdf").status_code == 401
+    assert v2_client.post("/api/mcp/project-masters/x/render").status_code == 401
 
 
 def test_mcp_profile_isolated_per_user(v2_auth_client, auth_client):

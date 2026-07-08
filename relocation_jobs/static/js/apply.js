@@ -1,4 +1,4 @@
-/** Application data — profile + master resumes for MCP (per logged-in user). */
+/** Application data — profile + master resumes + project masters for MCP (per logged-in user). */
 
 import { beginScreenLoad, endScreenLoad, setScreenLoadProgress } from "./screen-loader.js";
 import { $, escapeHtml, finishLoadingProgress, setLoadingProgress } from "./utils.js";
@@ -7,6 +7,10 @@ let masterItems = [];
 let selectedSlug = "";
 let selectedHasPdf = false;
 let selectedPdfFilename = "resume.pdf";
+let projectItems = [];
+let selectedProjectSlug = "";
+let selectedProjectHasPdf = false;
+let selectedProjectPdfFilename = "project.pdf";
 const MAX_PIPELINE_PROMPTS = 5;
 
 function showLogin() {
@@ -59,6 +63,7 @@ function setTab(tab) {
   }
   $("applyProfilePanel")?.classList.toggle("hidden", tab !== "profile");
   $("applyMastersPanel")?.classList.toggle("hidden", tab !== "masters");
+  $("applyProjectsPanel")?.classList.toggle("hidden", tab !== "projects");
 }
 
 function fillProfileForm(profile) {
@@ -343,15 +348,21 @@ async function loadData() {
   showError("");
   setLoadingProgress(15);
   try {
-    const [profileData, mastersData] = await Promise.all([
+    const [profileData, mastersData, projectsData] = await Promise.all([
       api("/api/mcp/profile"),
       api("/api/mcp/master-resumes"),
+      api("/api/mcp/project-masters"),
     ]);
     fillProfileForm(profileData.profile || {});
     masterItems = mastersData.items || [];
+    projectItems = projectsData.items || [];
     renderMasterList();
+    renderProjectList();
     if (masterItems.length && !selectedSlug) {
       await loadMasterDetail(masterItems[0].slug);
+    }
+    if (projectItems.length && !selectedProjectSlug) {
+      await loadProjectDetail(projectItems[0].slug);
     }
   } finally {
     finishLoadingProgress();
@@ -397,6 +408,213 @@ function startNewMaster() {
   $("applyMasterSlug").focus();
 }
 
+function projectPdfUrl(slug, { download = false } = {}) {
+  const params = new URLSearchParams();
+  if (download) params.set("download", "1");
+  else params.set("ts", String(Date.now()));
+  const query = params.toString();
+  return `/api/mcp/project-masters/${encodeURIComponent(slug)}/pdf${query ? `?${query}` : ""}`;
+}
+
+function updateProjectPdfPreview({ slug, hasPdf, pdfFilename }) {
+  selectedProjectHasPdf = Boolean(hasPdf);
+  selectedProjectPdfFilename = pdfFilename || "project.pdf";
+
+  const download = $("applyProjectDownloadPdf");
+  const openPdf = $("applyProjectOpenPdf");
+  if (download) {
+    download.href = slug ? projectPdfUrl(slug, { download: true }) : "#";
+    download.download = selectedProjectPdfFilename;
+    download.hidden = !selectedProjectHasPdf;
+  }
+  if (openPdf) {
+    openPdf.href = slug && selectedProjectHasPdf ? projectPdfUrl(slug) : "#";
+    openPdf.hidden = !selectedProjectHasPdf;
+  }
+
+  const pdfFrame = $("applyProjectPdfFrame");
+  const pdfMissing = $("applyProjectPdfMissing");
+  const renderBtn = $("applyProjectRenderBtn");
+
+  if (renderBtn) renderBtn.disabled = !slug;
+
+  if (selectedProjectHasPdf && slug && pdfFrame) {
+    pdfFrame.hidden = false;
+    pdfFrame.src = projectPdfUrl(slug);
+    if (pdfMissing) pdfMissing.hidden = true;
+  } else {
+    if (pdfFrame) {
+      pdfFrame.removeAttribute("src");
+      pdfFrame.hidden = true;
+    }
+    if (pdfMissing) pdfMissing.hidden = false;
+  }
+}
+
+function renderProjectList() {
+  const list = $("applyProjectList");
+  if (!list) return;
+
+  if (!projectItems.length) {
+    list.innerHTML = `<li class="apply-master-empty">No project masters yet — create one.</li>`;
+    return;
+  }
+
+  list.innerHTML = projectItems.map((item) => {
+    const label = (item.label || item.slug).trim();
+    const active = item.slug === selectedProjectSlug ? " apply-master-item--active" : "";
+    const pdfBadge = item.has_pdf
+      ? '<span class="apply-master-item-badge apply-master-item-badge--pdf">PDF</span>'
+      : "";
+    return `<li><button type="button" class="apply-master-item${active}" data-slug="${escapeHtml(item.slug)}"><span class="apply-master-item-label">${escapeHtml(label)}${pdfBadge}</span><span class="apply-master-item-slug">${escapeHtml(item.slug)}</span></button></li>`;
+  }).join("");
+}
+
+function clearProjectEditor() {
+  selectedProjectSlug = "";
+  selectedProjectHasPdf = false;
+  selectedProjectPdfFilename = "project.pdf";
+  $("applyProjectSlug").value = "";
+  $("applyProjectLabel").value = "";
+  $("applyProjectContent").value = "";
+  $("applyProjectUpdated").textContent = "";
+  updateProjectPdfPreview({ slug: "", hasPdf: false });
+  const pdfMissing = $("applyProjectPdfMissing");
+  if (pdfMissing) pdfMissing.hidden = false;
+  renderProjectList();
+}
+
+async function loadProjectDetail(slug) {
+  selectedProjectSlug = slug;
+  renderProjectList();
+  setLoadingProgress(20);
+  try {
+    const detail = await api(`/api/mcp/project-masters/${encodeURIComponent(slug)}`);
+    $("applyProjectSlug").value = detail.slug || slug;
+    $("applyProjectLabel").value = detail.label || "";
+    $("applyProjectContent").value = detail.content || "";
+    const updatedParts = [];
+    if (detail.updated_at) updatedParts.push(`Updated ${detail.updated_at}`);
+    if (detail.pdf_updated_at) updatedParts.push(`PDF ${detail.pdf_updated_at}`);
+    $("applyProjectUpdated").textContent = updatedParts.join(" · ");
+    updateProjectPdfPreview({
+      slug: detail.slug || slug,
+      hasPdf: detail.has_pdf,
+      pdfFilename: detail.pdf_filename,
+    });
+  } finally {
+    finishLoadingProgress();
+  }
+}
+
+async function persistProject() {
+  const slug = $("applyProjectSlug").value.trim();
+  const content = $("applyProjectContent").value;
+  if (!slug) {
+    throw new Error("Slug is required (e.g. relocation-jobs)");
+  }
+  if (!content.trim()) {
+    throw new Error("Project content cannot be empty");
+  }
+
+  const saved = await api(`/api/mcp/project-masters/${encodeURIComponent(slug)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      content,
+      label: $("applyProjectLabel").value.trim(),
+    }),
+  });
+  selectedProjectSlug = saved.slug || slug;
+  const projectsData = await api("/api/mcp/project-masters");
+  projectItems = projectsData.items || [];
+  renderProjectList();
+  $("applyProjectUpdated").textContent = saved.updated_at
+    ? `Updated ${saved.updated_at}`
+    : "";
+  return saved;
+}
+
+async function refreshProjectDetail(slug = selectedProjectSlug) {
+  if (!slug) return null;
+  const detail = await api(`/api/mcp/project-masters/${encodeURIComponent(slug)}`);
+  const updatedParts = [];
+  if (detail.updated_at) updatedParts.push(`Updated ${detail.updated_at}`);
+  if (detail.pdf_updated_at) updatedParts.push(`PDF ${detail.pdf_updated_at}`);
+  $("applyProjectUpdated").textContent = updatedParts.join(" · ");
+  updateProjectPdfPreview({
+    slug: detail.slug || slug,
+    hasPdf: detail.has_pdf,
+    pdfFilename: detail.pdf_filename,
+  });
+  return detail;
+}
+
+async function rerenderProjectPdf() {
+  const slug = $("applyProjectSlug").value.trim() || selectedProjectSlug;
+  if (!slug) {
+    showError("Select or save a project master before rendering PDF");
+    return;
+  }
+
+  const btn = $("applyProjectRenderBtn");
+  const saveBtn = $("applyProjectSaveBtn");
+  btn.disabled = true;
+  if (saveBtn) saveBtn.disabled = true;
+  showError("");
+  beginScreenLoad("Rendering PDF…");
+  setScreenLoadProgress(15);
+  const tick = window.setInterval(() => setScreenLoadProgress(88), 800);
+  try {
+    setScreenLoadProgress(20);
+    await persistProject();
+    setScreenLoadProgress(35);
+    const result = await api(
+      `/api/mcp/project-masters/${encodeURIComponent(selectedProjectSlug)}/render`,
+      { method: "POST" },
+    );
+    setScreenLoadProgress(92);
+    if (!result.ok) {
+      throw new Error(result.error || result.log || "Render failed");
+    }
+    showToast("PDF re-rendered");
+    updateProjectPdfPreview({
+      slug: selectedProjectSlug,
+      hasPdf: Boolean(result.pdf_stored),
+      pdfFilename: result.pdf_filename,
+    });
+    setScreenLoadProgress(96);
+    await refreshProjectDetail(selectedProjectSlug);
+  } catch (err) {
+    showError(err.message || "Failed to re-render PDF");
+  } finally {
+    window.clearInterval(tick);
+    endScreenLoad();
+    btn.disabled = false;
+    if (saveBtn) saveBtn.disabled = false;
+  }
+}
+
+async function saveProject() {
+  showError("");
+  const btn = $("applyProjectSaveBtn");
+  btn.disabled = true;
+  try {
+    await persistProject();
+    await refreshProjectDetail(selectedProjectSlug);
+    showToast(`Saved ${selectedProjectSlug}`);
+  } catch (err) {
+    showError(err.message || "Failed to save project master");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function startNewProject() {
+  clearProjectEditor();
+  $("applyProjectSlug").focus();
+}
+
 async function refreshAuth() {
   const res = await fetch("/api/auth/status", { credentials: "same-origin" });
   const data = await res.json();
@@ -436,7 +654,9 @@ async function submitLogin(event) {
 async function logout() {
   await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
   clearMasterEditor();
+  clearProjectEditor();
   masterItems = [];
+  projectItems = [];
   showLogin();
 }
 
@@ -462,6 +682,14 @@ function bindEvents() {
     const btn = e.target.closest(".apply-master-item");
     if (!btn) return;
     loadMasterDetail(btn.dataset.slug);
+  });
+  $("applyProjectSaveBtn")?.addEventListener("click", saveProject);
+  $("applyProjectRenderBtn")?.addEventListener("click", rerenderProjectPdf);
+  $("applyNewProjectBtn")?.addEventListener("click", startNewProject);
+  $("applyProjectList")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".apply-master-item");
+    if (!btn) return;
+    loadProjectDetail(btn.dataset.slug);
   });
 
   for (const tabBtn of document.querySelectorAll(".apply-tab")) {

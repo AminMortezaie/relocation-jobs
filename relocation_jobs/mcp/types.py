@@ -31,6 +31,14 @@ class MasterResumeSummary(BaseSchema):
     pdf_filename: str = ""
 
 
+class ProjectMasterSummary(BaseSchema):
+    slug: str
+    label: str = ""
+    updated_at: str = ""
+    has_pdf: bool = False
+    pdf_filename: str = ""
+
+
 class ApplicationProfile(BaseSchema):
     full_name: str = ""
     email: str = ""

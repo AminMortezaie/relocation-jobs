@@ -4,7 +4,11 @@ import json
 import re
 
 from relocation_jobs.core.db import _utc_now, db_read, db_transaction
-from relocation_jobs.mcp.types import ApplicationProfile, MasterResumeSummary
+from relocation_jobs.mcp.types import (
+    ApplicationProfile,
+    MasterResumeSummary,
+    ProjectMasterSummary,
+)
 
 _SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
@@ -17,14 +21,22 @@ def normalize_country_key(country: str) -> str:
     return (country or "").strip().lower()
 
 
-def normalize_master_resume_slug(slug: str) -> str:
+def normalize_mcp_slug(slug: str, *, kind: str = "slug") -> str:
     raw = (slug or "").strip().lower()
     if not raw:
-        raise ValueError("master resume slug is required")
+        raise ValueError(f"{kind} is required")
     cleaned = re.sub(r"[^a-z0-9]+", "-", raw).strip("-")
     if not cleaned or not _SLUG_RE.match(cleaned):
-        raise ValueError(f"invalid master resume slug: {slug!r}")
+        raise ValueError(f"invalid {kind}: {slug!r}")
     return cleaned
+
+
+def normalize_master_resume_slug(slug: str) -> str:
+    return normalize_mcp_slug(slug, kind="master resume slug")
+
+
+def normalize_project_master_slug(slug: str) -> str:
+    return normalize_mcp_slug(slug, kind="project master slug")
 
 
 def company_slug(name: str) -> str:
@@ -170,6 +182,121 @@ def save_master_resume(
                 pdf_updated_at = CASE
                     WHEN mcp_master_resumes.content IS DISTINCT FROM EXCLUDED.content THEN NULL
                     ELSE mcp_master_resumes.pdf_updated_at
+                END
+            """,
+            (user_id, key, (label or "").strip(), content, now),
+        )
+    return {"user_id": user_id, "slug": key, "label": (label or "").strip(), "updated_at": now}
+
+
+def list_project_masters(user_id: int) -> list[ProjectMasterSummary]:
+    with db_read() as conn:
+        rows = conn.execute(
+            """
+            SELECT slug, label, updated_at, pdf_bytes
+            FROM mcp_project_masters
+            WHERE user_id = %s
+            ORDER BY slug
+            """,
+            (user_id,),
+        ).fetchall()
+    return [
+        ProjectMasterSummary(
+            slug=row["slug"],
+            label=(row.get("label") or "").strip(),
+            updated_at=(row.get("updated_at") or "").strip(),
+            has_pdf=bool(row.get("pdf_bytes")),
+        )
+        for row in rows
+    ]
+
+
+def get_project_master_row(user_id: int, slug: str) -> dict | None:
+    key = normalize_project_master_slug(slug)
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT slug, label, content, updated_at, pdf_bytes, pdf_updated_at
+            FROM mcp_project_masters
+            WHERE user_id = %s AND slug = %s
+            """,
+            (user_id, key),
+        ).fetchone()
+    return _row(row) if row else None
+
+
+def read_project_master(user_id: int, slug: str) -> str:
+    key = normalize_project_master_slug(slug)
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT content
+            FROM mcp_project_masters
+            WHERE user_id = %s AND slug = %s
+            """,
+            (user_id, key),
+        ).fetchone()
+    if row is None or not (row.get("content") or "").strip():
+        raise LookupError(f"Project master not found: {key}")
+    return row["content"]
+
+
+def read_project_pdf_bytes(user_id: int, slug: str) -> bytes:
+    row = get_project_master_row(user_id, slug)
+    key = normalize_project_master_slug(slug)
+    if row is None or not row.get("pdf_bytes"):
+        raise LookupError(f"No PDF for project master {key}")
+    data = row["pdf_bytes"]
+    if isinstance(data, memoryview):
+        return bytes(data)
+    return data
+
+
+def save_project_pdf(user_id: int, slug: str, pdf_bytes: bytes) -> dict:
+    key = normalize_project_master_slug(slug)
+    now = _utc_now()
+    with db_transaction() as conn:
+        conn.execute(
+            """
+            UPDATE mcp_project_masters
+            SET pdf_bytes = %s, pdf_updated_at = %s, updated_at = %s
+            WHERE user_id = %s AND slug = %s
+            """,
+            (pdf_bytes, now, now, user_id, key),
+        )
+    return {
+        "user_id": user_id,
+        "slug": key,
+        "pdf_bytes": len(pdf_bytes),
+        "pdf_updated_at": now,
+    }
+
+
+def save_project_master(
+    user_id: int,
+    slug: str,
+    content: str,
+    *,
+    label: str = "",
+) -> dict:
+    key = normalize_project_master_slug(slug)
+    now = _utc_now()
+    with db_transaction() as conn:
+        conn.execute(
+            """
+            INSERT INTO mcp_project_masters (user_id, slug, label, content, updated_at)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (user_id, slug) DO UPDATE SET
+                label = EXCLUDED.label,
+                content = EXCLUDED.content,
+                updated_at = EXCLUDED.updated_at,
+                pdf_bytes = CASE
+                    WHEN mcp_project_masters.content IS DISTINCT FROM EXCLUDED.content THEN NULL
+                    ELSE mcp_project_masters.pdf_bytes
+                END,
+                pdf_updated_at = CASE
+                    WHEN mcp_project_masters.content IS DISTINCT FROM EXCLUDED.content THEN NULL
+                    ELSE mcp_project_masters.pdf_updated_at
                 END
             """,
             (user_id, key, (label or "").strip(), content, now),

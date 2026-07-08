@@ -1,12 +1,12 @@
 # MCP application assistant (v0)
 
-**Last updated:** 2026-07-07
+**Last updated:** 2026-07-08
 
 Plan and reference for the `relocation_jobs/mcp/` domain: a local MCP server for **Claude Desktop** that prepares tailored resume PDFs for jobs on the panel. v0 does **not** submit applications automatically and does **not** use the Claude API — Claude Desktop (subscription) does the resume reframing in chat; this app supplies data, validation, PDF rendering, and board state updates.
 
 **Private data is stored in Postgres per user — nothing sensitive is committed to git.**
 
-Use the panel **Application data** page at `/apply` (also linked from the account menu) to edit your profile, **pipeline prompts**, and master resumes in the browser. Claude Desktop MCP tools read the same data for the configured MCP user (`MCP_USERNAME` / `MCP_USER_ID` env).
+Use the panel **Application data** page at `/apply` (also linked from the account menu) to edit your profile, **pipeline prompts**, **master resumes**, and **project masters** in the browser. Claude Desktop MCP tools read the same data for the configured MCP user (`MCP_USERNAME` / `MCP_USER_ID` env).
 
 Related: [architecture.md](architecture.md), [business-rules.md](business-rules.md), [contributing.md](../contributing.md).
 
@@ -20,6 +20,7 @@ Related: [architecture.md](architecture.md), [business-rules.md](business-rules.
 |----------|----------------------|
 | MCP tools for job context, queue, multi-master resumes | Headless Claude API orchestration |
 | Master `.tex` + tailored `.tex` per job in DB | Browser auto-submit (Playwright) |
+| Project masters (LaTeX evidence bank for reframe) | Auto-insert full project essays into tailored CV |
 | Deterministic validation before PDF render | ATS-specific form fillers |
 | Local LaTeX → PDF (`tectonic` / `pdflatex`) | Batch unattended apply |
 | `mark_applied` via existing `positions` service | Keyword scoring / auto-fetch JD in chat |
@@ -49,7 +50,7 @@ relocation_jobs/mcp/
 
 ## Database schema
 
-Migrations: `mcp_tables_v1`, `mcp_master_resumes_v2`.
+Migrations: `mcp_tables_v1`, `mcp_master_resumes_v2`, `mcp_project_masters_v1`.
 
 ### `mcp_master_resumes`
 
@@ -58,6 +59,16 @@ Migrations: `mcp_tables_v1`, `mcp_master_resumes_v2`.
 | `user_id` + `slug` | PK — e.g. `go`, `java`, `fullstack` |
 | `label` | Display name |
 | `content` | Master `.tex` |
+
+### `mcp_project_masters`
+
+| Column | Purpose |
+|--------|---------|
+| `user_id` + `slug` | PK — e.g. `relocation-jobs` |
+| `label` | Display name |
+| `content` | LaTeX fragment (reframe evidence bank; insert-ready for a Projects block) |
+
+Project masters are **not** employment history and are **not** validated as employers/years. Agents load them during reframe for JD-aligned facts; dumping the full fragment into tailored `.tex` requires explicit user approval. The `/apply` Projects tab can **Re-render PDF** (fragments are wrapped in a minimal `\documentclass` for preview).
 
 ### `mcp_user_documents`
 
@@ -84,7 +95,9 @@ Migration: `mcp_cover_letter_v1`.
 | `list_application_queue` | Pinned + looking-to-apply jobs (discovery only — not required to save) |
 | `list_master_resumes` | All master variants |
 | `get_master_resume` / `save_master_resume` | Read/write master tex by slug |
-| `get_mcp_status` | Debug: MCP user + profile/resume presence + `pipeline_prompt_count` |
+| `list_project_masters` | All project master variants (LaTeX evidence) |
+| `get_project_master` / `save_project_master` | Read/write project LaTeX by slug |
+| `get_mcp_status` | Debug: MCP user + profile/resume/project presence + `pipeline_prompt_count` |
 | `get_application_profile` / `save_application_profile` | Profile fields; `pipeline` array on profile |
 | `get_reframe_pipeline` | Ordered pipeline prompts only (alias of profile.pipeline) |
 | `save_tailored_tex` | Requires `master_resume_slug`; overwrites prior tailored tex; queue membership not required |
@@ -106,7 +119,7 @@ MCP writes artifacts to Postgres; the panel reads them via HTTP (same user sessi
 
 | Panel surface | Purpose |
 |---------------|---------|
-| `/apply` | Profile, pipeline prompts, master resumes (setup) |
+| `/apply` | Profile, pipeline prompts, master resumes, project masters (setup) |
 | `/company/<country>/<company-slug>` | Per-company workspace: positions, CV / cover letter tex, PDF preview — see [company-workspace.md](company-workspace.md) |
 | Job board (phase 3) | CV/PDF and cover-letter badges; company name → workspace |
 
@@ -146,8 +159,9 @@ flowchart TD
 #### 0. One-time setup (`/apply`)
 
 1. Save **master resume(s)** (e.g. `go`, `java`, `fullstack`).
-2. Save **application profile** (name, email, …).
-3. Add **five pipeline prompts** (one phase each) from [`.claude/skills/mcp-resume-reframe/pipeline-prompts.md`](../../.claude/skills/mcp-resume-reframe/pipeline-prompts.md). Each slot ends with a **go ahead?** checkpoint — do not use a single consolidated auto-run prompt.
+2. Save **project master(s)** (LaTeX fragments, e.g. `relocation-jobs`) — evidence bank for reframe, not CV employment rows.
+3. Save **application profile** (name, email, …).
+4. Add **five pipeline prompts** (one phase each) from [`.claude/skills/mcp-resume-reframe/pipeline-prompts.md`](../../.claude/skills/mcp-resume-reframe/pipeline-prompts.md). Each slot ends with a **go ahead?** checkpoint — do not use a single consolidated auto-run prompt.
 
 #### 1. Pick a position
 
@@ -209,10 +223,10 @@ Quick sanity check: `get_mcp_status()` → `pipeline_prompt_count` (count only, 
 
 For each string in `pipeline[0]`, `pipeline[1]`, … **in order**:
 
-1. Run **only that phase** for this job (use `get_job_context.description_text` as the JD + masters as needed).
+1. Run **only that phase** for this job (use `get_job_context.description_text` as the JD + masters / project masters as needed).
 2. Output **markdown** (not LaTeX) until the final phase.
 3. End with **go ahead?** and **wait** for the user before the next phase.
-4. **Mirror additions (phase 3):** add **1–2 new bullets** to one real role for ATS/JD similarity — **all master bullets kept**. User approves new bullets in phase 2–3. Never remove or shorten master content without explicit user approval.
+4. **Mirror additions (phase 3):** add **1–2 new bullets** to one real role for ATS/JD similarity — prefer facts from a matching **project master**; **all master bullets kept**. User approves new bullets in phase 2–3. Never remove or shorten master content without explicit user approval. Do not dump the full project narrative into the CV.
 5. **Final acceptance** on the full markdown draft (master + additions) before any `.tex` work.
 
 There is no `run_pipeline` MCP tool. Use `get_reframe_pipeline` or `get_application_profile().pipeline`.

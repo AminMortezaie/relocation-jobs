@@ -63,12 +63,37 @@ def save_master_resume(slug: str, content: str, label: str = "") -> str:
 
 
 @mcp.tool()
+def list_project_masters() -> str:
+    """List project masters for the MCP user (slug, label, updated_at).
+
+    Project masters are LaTeX fragments used as a reframe evidence bank —
+    not employment history and not pasted wholesale into tailored CVs without approval.
+    """
+    items = service.list_project_masters()
+    return _json([item.model_dump() for item in items])
+
+
+@mcp.tool()
+def get_project_master(slug: str) -> str:
+    """Read one project master LaTeX body by slug (e.g. relocation-jobs)."""
+    uid = service.resolve_user_id()
+    return mcp_repo.read_project_master(uid, slug)
+
+
+@mcp.tool()
+def save_project_master(slug: str, content: str, label: str = "") -> str:
+    """Create or update a project master LaTeX fragment for the MCP user."""
+    return _json(service.save_project_master(slug, content, label=label))
+
+
+@mcp.tool()
 def get_mcp_status() -> str:
-    """Return MCP user identity and whether profile / master resumes exist (debug user mismatch)."""
+    """Return MCP user identity and whether profile / master resumes / project masters exist (debug user mismatch)."""
     uid = service.resolve_user_id()
     user = get_user_by_id(uid) or {}
     profile = service.get_application_profile(user_id=uid)
     masters = service.list_master_resumes(user_id=uid)
+    projects = service.list_project_masters(user_id=uid)
     has_profile = any(
         getattr(profile, field, "")
         for field in (
@@ -89,6 +114,8 @@ def get_mcp_status() -> str:
         "pipeline_prompt_count": len(profile.pipeline),
         "master_resume_count": len(masters),
         "master_resume_slugs": [item.slug for item in masters],
+        "project_master_count": len(projects),
+        "project_master_slugs": [item.slug for item in projects],
     })
 
 

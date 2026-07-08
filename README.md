@@ -1,87 +1,92 @@
 # Relocation Jobs
 
-A job-search tool for backend and software engineering roles at tech companies that offer visa or relocation sponsorship. Company lists are sourced from [relocate.me](https://relocate.me); each employer's ATS (Applicant Tracking System) is auto-detected and jobs are scraped into a shared catalog. A Flask web panel lets you track applications per user and prepare tailored resume PDFs per position.
+Visa- and relocation-focused job search for backend and software roles in Europe.
 
-**Production:** [https://kuchup.com](https://kuchup.com) (EC2 + Cloudflare)  
-**Supported countries:** Germany, Netherlands, UK, Portugal, plus custom countries (e.g. Armenia, Ireland) via the panel — stored in Postgres (and Redis when configured).
+Company lists come from [relocate.me](https://relocate.me). Each employer’s ATS is auto-detected; openings are scraped into a **shared Postgres catalog**. A multi-user Flask panel tracks applications. A **Claude Desktop MCP** pipeline prepares tailored LaTeX/PDF resumes and cover letters per position — with **project masters** as an evidence bank for reframing.
 
-> **Contributors:** [`docs/contributing.md`](docs/contributing.md) · [`docs/`](docs/README.md)
+**Production:** [https://kuchup.com](https://kuchup.com) (AWS EC2 + Cloudflare)  
+**Countries:** Germany, Netherlands, UK, Portugal, plus custom countries (e.g. Armenia, Ireland) via the panel.
+
+> **Contributors / docs:** [`docs/contributing.md`](docs/contributing.md) · [`docs/README.md`](docs/README.md) · [`AGENTS.md`](AGENTS.md)
+
+---
 
 ## Features
 
-- **ATS auto-detection** — Greenhouse, Lever, Ashby, Personio, Workable, Recruitee, SmartRecruiters, TeamTailor, and a generic Playwright fallback
-- **Relevance filtering** — include/exclude keyword rules for backend and software roles
-- **Web panel** — paginated company board (25 per page), filters and search, mark applied / not-for-me, trigger scrapes, add companies
-- **Per-user tracking** — applied state and rejections stored in Postgres, merged with the catalog at read time
-- **Application assistant** — per-position tailored LaTeX + PDF (Claude Desktop MCP), profile and master resumes on `/apply`, company workspace at `/company/<country>/<slug>` with live PDF preview
-- **Concurrent scraping** — asyncio + httpx for ATS API calls (default 16 workers); Playwright in a thread pool for detection
+| Area | What you get |
+|------|----------------|
+| **Company discovery** | Careers URL discovery from relocate.me → Postgres (`build_companies`) |
+| **ATS ingestion** | 25 ATS type choices (Greenhouse, Lever, Ashby, Personio, Workable, Workday, …) + Playwright fallback; cached `ats_type` / `ats_url` |
+| **Concurrent scrape** | asyncio + httpx (up to **16** workers); relevance include/exclude keywords |
+| **Shared catalog + per-user overlay** | Tracking (applied / reject / not-for-me / pin / looking-to-apply) merged at read time |
+| **Web panel** | Paginated board (`GET /api/board`, default **25**/page), filters, fetch, add company |
+| **Scheduled fetch (prod)** | EC2 Playwright worker every **6 hours** |
+| **Application assistant** | Claude Desktop MCP: masters, project masters, gated JD-mirror reframe, validate, PDF (`tectonic`) |
+| **Company workspace** | `/company/<country>/<slug>` — positions, CV / cover letter, live PDF preview, board CV/PDF badges |
+
+---
 
 ## Quick start
 
 ```bash
-# Install
 pip install -r requirements-dev.txt
 python3 -m playwright install chromium
 
-# Configure (see Environment below)
 cp .env.example .env
-# Edit .env — set DATABASE_URL at minimum
+# Set DATABASE_URL at minimum (local Postgres is fastest for dev)
 
-# Run the panel
 PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py
 # → http://127.0.0.1:5051
 ```
 
-On first startup the app creates the Postgres schema and bootstraps an admin user from `PANEL_ADMIN_USER` / `PANEL_ADMIN_PASSWORD`. If no password is set, a random one is printed to the terminal.
+On first startup the app creates the Postgres schema and bootstraps an admin from `PANEL_ADMIN_USER` / `PANEL_ADMIN_PASSWORD`. If no password is set, a random one is printed to the terminal.
+
+After editing React UI: `cd frontend && npm run build` → `relocation_jobs/static/dist/board.js`. Hard refresh (`Cmd+Shift+R`) after JS/CSS changes.
+
+---
 
 ## Environment
 
-Copy `.env.example` to `.env` before running locally.
+Copy `.env.example` → `.env`. Real hosts/passwords stay in gitignored `.env` / `aws-postgres.env` — this repo is **public**; docs use placeholders only.
 
 | Variable | Purpose |
 |----------|---------|
-| `DATABASE_URL` | **Required.** Postgres URL — AWS EC2 (see `.env.example`) or local instance |
-| `REDIS_URL` | Optional. Country label cache on EC2 (`scripts/ec2_redis.sh`); Postgres fallback when unset |
+| `DATABASE_URL` | **Required.** Postgres (local or AWS EC2) |
+| `REDIS_URL` | Optional country-label cache (`scripts/ec2_redis.sh`); Postgres fallback when unset |
 | `PANEL_SECRET_KEY` | Flask session signing |
 | `PANEL_ADMIN_USER` / `PANEL_ADMIN_PASSWORD` | Bootstrap admin on first run |
-| `PANEL_SCRAPE_ENABLED` | Set to `0` on Render free tier (512 MB RAM); `1` locally for fetch |
-| `PANEL_DATA_DIR` | Local data dir for `custom_cities.json` (default: `data/`) |
-| `PANEL_ALLOW_REGISTER` | Allow self-service registration after first user |
+| `PANEL_SCRAPE_ENABLED` | `1` locally for fetch; `0` on slim production panel image |
+| `PANEL_DATA_DIR` | Local data dir for `custom_cities.json` (default `data/`) |
+| `PANEL_ALLOW_REGISTER` | Self-service registration after first user |
 | `MCP_USERNAME` / `MCP_USER_ID` | Panel user for Claude Desktop MCP (default `admin`) |
-| `MCP_LATEX_CMD` | LaTeX compiler for PDF render (default `tectonic`) |
+| `MCP_LATEX_CMD` | LaTeX compiler for PDF (default `tectonic`) |
 
-Application assistant docs: [mcp-application.md](docs/reference/mcp-application.md) · [company-workspace.md](docs/reference/company-workspace.md).
+MCP docs: [mcp-application.md](docs/reference/mcp-application.md) · [company-workspace.md](docs/reference/company-workspace.md).  
+AWS Postgres: `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes — [ops index](docs/README.md).
 
-AWS Postgres ops: `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes. See [docs index § Operations](docs/README.md#5-operations).
-
-For local dev, a local Postgres instance is faster than remote AWS (~150 ms/query). See comments in `.env.example`.
+---
 
 ## Usage
 
 ### Web panel
 
 ```bash
-PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py
-# → http://127.0.0.1:5051
+PANEL_SCRAPE_ENABLED=1 python3 scripts/panel_server.py   # → :5051
 ```
 
-Sign in with the admin credentials. Select a single country, then use **Fetch** (admin) to scrape. The main board loads one page at a time via `GET /api/board` (default 25 companies per page, filter-aware). Toolbar order: **pagination → search → sort/filters**. Per-company fetch, skip-filled, and visa-only are in the toolbar and company cards.
+Sign in → select a **single country** → **Fetch** (admin) to scrape. Board: `GET /api/board` (pagination → search → sort/filters). Aggregate stats: admin page / `GET /api/admin/panel-stats` (board only returns lightweight `user_stats`).
 
-Your aggregate stats (applied counts, fetch summary) live on the **admin** page (`GET /api/admin/panel-stats`), not on the main board — the board response only includes lightweight `user_stats` for the header chip.
+Re-scrapes **merge by URL** — fetch dates and tracking are preserved. Jobs gone from an ATS stay as catalog orphans and reappear if you still have tracking.
 
-After changing React UI (`frontend/`), run `cd frontend && npm run build` (outputs `relocation_jobs/static/dist/board.js`). Hard refresh after JS/CSS changes (`Cmd+Shift+R`).
+| Path | Purpose |
+|------|---------|
+| `/` | Job board |
+| `/apply` | Profile, pipeline prompts, **master resumes**, **project masters** (LaTeX + optional PDF) |
+| `/company/<country>/<slug>` | Positions, tailored CV / cover letter, PDF preview, re-render |
 
-Tracking (applied, not-for-me, company-level applied) is stored per user in Postgres. Re-scrapes merge jobs by URL — existing `fetched` dates and tracking state are preserved; jobs removed from an ATS stay in the catalog as orphans and reappear if you have tracking for them.
-
-**Application data** (`/apply`) — edit profile, pipeline prompts, and master resume `.tex` variants (per logged-in user).
-
-**Company workspace** (`/company/<country>/<company-slug>`) — open from a company name on the board to see all positions, tailored LaTeX, PDF preview, and re-render. CV/PDF badges appear on the board when MCP has prepared artifacts for a role.
-
-**Claude Desktop MCP** — `python3 scripts/mcp_server.py` exposes tools to tailor resumes per job, validate, render PDF, mark applied, and **add companies** (same flow as the panel Add company dialog). See [docs/reference/mcp-application.md](docs/reference/mcp-application.md).
+**Claude Desktop MCP:** `python3 scripts/mcp_server.py` — job context, application queue, masters, project masters, tailored tex/PDF, cover letters, `mark_applied`, add company/position. See [mcp-application.md](docs/reference/mcp-application.md).
 
 ### Build company lists
-
-Discovers careers URLs from relocate.me and company homepages, then writes to the Postgres catalog.
 
 ```bash
 python3 scripts/build_companies.py netherlands
@@ -89,20 +94,20 @@ python3 scripts/build_companies.py uk "Monzo"          # single company
 python3 scripts/build_companies.py netherlands --sort-only
 ```
 
-Sort order: city (A–Z) → company size (smallest first) → name (A–Z).
+Sort: city (A–Z) → company size (smallest first) → name (A–Z).
 
 ### Scrape jobs
 
 ```bash
 python3 scripts/scrape_jobs.py --country uk
-python3 scripts/scrape_jobs.py --country uk "Monzo"              # single company
+python3 scripts/scrape_jobs.py --country uk "Monzo"
 python3 scripts/scrape_jobs.py --country netherlands --skip-filled
-python3 scripts/scrape_jobs.py --country germany --workers 16   # async (default 16)
-python3 scripts/scrape_jobs.py --country uk --serial            # one company at a time
-python3 scripts/scrape_jobs.py --all                            # all supported countries
+python3 scripts/scrape_jobs.py --country germany --workers 16   # default 16
+python3 scripts/scrape_jobs.py --country uk --serial
+python3 scripts/scrape_jobs.py --all
 ```
 
-On the first run per company, ATS type and API URL are detected and cached in Postgres. Later runs call the ATS REST API directly.
+First run per company: detect + cache ATS. Later runs hit the ATS API directly.
 
 ### Reset password
 
@@ -110,138 +115,106 @@ On the first run per company, ATS type and API URL are detected and cached in Po
 python3 scripts/reset_password.py <username>
 ```
 
+---
+
 ## Architecture
 
-### Data flow
-
 ```
-relocate.me (country page)
-    ↓
-build_companies.py       ← careers URL discovery → Postgres catalog
-    ↓
-v2 fetch / scrape_jobs   ← ATS detection + job fetch → Postgres catalog
-    ↓
-web/server.py         ← Flask API (catalog + per-user tracking)
+relocate.me
+    → build_companies          → Postgres catalog
+    → scrape / v2 fetch        → Postgres catalog
+    → web/ (Flask)             → board API (catalog + per-user merge)
+    → mcp/                     → tailored tex / PDF / project masters
+    → /company/…               → workspace + mark_applied
 ```
 
 ### Data stores
 
 | Store | Contents |
 |-------|----------|
-| **Postgres** (`DATABASE_URL`) | Catalog, users, tracking, fetch runs, custom countries — AWS EC2 in production |
-| **Redis** (`REDIS_URL`) | Country label cache (optional; EC2 colocated with panel) |
+| **Postgres** (`DATABASE_URL`) | Catalog, users, tracking, fetch runs, MCP artifacts (masters, projects, applications) |
+| **Redis** (`REDIS_URL`) | Optional country-label cache |
 | `companies/*.json` | Git archive only — not read at runtime |
 | `data/custom_cities.json` | User-added cities (`PANEL_DATA_DIR`) |
 
-### Package layout
+### Package layout (`relocation_jobs/`)
 
 ```
-relocation_jobs/
-├── catalog/      # Postgres catalog repo + writes
-├── positions/    # Job tracking (apply, reject, not-for-me)
-├── panel/        # flatten_companies, paginated board, stats, filters
-├── mcp/          # Application assistant: tailored tex, PDF render, MCP tools
-├── fetch/        # In-process country + company fetch
-├── scrape/       # ATS boards, merge, enrich
-├── web/          # Flask server + routes
-├── companies/    # Company CRUD orchestration
-├── users/        # Per-user repo, history
-├── admin/        # Dashboard aggregates
-├── core/         # db helpers, auth, ATS constants, paths
-├── db/           # User tracking, fetch runs, migrations
-├── schemas/      # Pydantic contracts
-├── static/       # UI (JS, CSS; `dist/board.js` from `frontend/`)
-└── build_companies.py  # Careers URL discovery CLI
+catalog/      Postgres company + job reads/writes
+positions/    Apply, reject, not-for-me, pin, looking-to-apply
+panel/        Board flatten, pagination, filters, stats
+fetch/        In-process asyncio country + company fetch
+scrape/       ATS boards, merge, enrich, relevance
+mcp/          Claude Desktop MCP — masters, projects, tex → PDF
+web/          Flask server + routes
+companies/    Company CRUD
+users/        Users, applied history
+admin/        Dashboard aggregates
+core/         db, auth, ATS constants, detection
+db/           Migrations bootstrap
+static/       UI (+ dist/board.js from frontend/)
 ```
 
-Rules: [`docs/reference/rules.md`](docs/reference/rules.md).
+**Layer rule:** SQL only in `*/repo.py`. Details: [architecture.md](docs/reference/architecture.md) · [rules.md](docs/reference/rules.md).
 
-### Panel board API
+### Board API
 
-`GET /api/board` returns one page of companies plus metadata. Query params: `page`, `page_size` (max 100, default 25), `country`, `q` (company name search), and the same filter flags as the toolbar (`visa_only`, `hide_applied`, `fetch_problem_only`, etc.). Response includes `companies`, `meta` (`page`, `total_companies`, `total_pages`, `has_more`, …), and lightweight `user_stats`. Pagination is **visible-offset**: the server scans the scoped country catalog, applies flatten + panel filters, skips to the page offset, then fills up to `page_size` rows — so filters affect which companies appear on each page.
+`GET /api/board` — `page`, `page_size` (default 25, max 100), `country`, `q`, filter flags. **Visible-offset** pagination after flatten + filters. “Newest first” is **client-side on the current page**; server returns catalog order. Full flow: [board.md](docs/reference/board.md).
 
-**Sort (“Newest first”)** is applied **client-side on the current page only**; the server returns catalog DB order (`country`, `name`). Full flow: [`docs/reference/board.md`](docs/reference/board.md).
-
-### ATS detection (first run per company)
+### ATS detection (first run)
 
 ```
 careers_url
-  → 1. KNOWN_ATS override (core/ats_constants.py)?
-  → 2. detect_ats_static() — HTTP + HTML regex
-  → 3. detect_ats_via_playwright() — headless Chromium, XHR interception
-  → 4. generic fallback — Playwright DOM parse for job links
+  → 1. KNOWN_ATS override
+  → 2. detect_ats_static()
+  → 3. detect_ats_via_playwright()   # XHR intercept
+  → 4. generic Playwright DOM fallback
 ```
-
-Detected `ats_type` and `ats_url` are written to Postgres. Subsequent scrapes use the cached API endpoint.
-
-### Supported ATS platforms
-
-| ATS | Scraping |
-|-----|----------|
-| Greenhouse (US/EU) | REST API `boards-api[.eu].greenhouse.io/v1/boards/{slug}/jobs` |
-| Lever (US/EU) | REST API `api.lever.co` / `jobs.eu.lever.co` |
-| Ashby | REST API `api.ashbyhq.com/posting-api/job-board/{slug}` |
-| Personio | XML feed `{base}/xml` |
-| Workable | REST API `apply.workable.com/api/v2/accounts/{slug}/jobs` |
-| Recruitee | REST API `{slug}.recruitee.com/api/offers/` |
-| SmartRecruiters | REST API `api.smartrecruiters.com/v1/companies/{id}/postings` |
-| TeamTailor | REST API with intercepted API key |
-| Generic | Playwright DOM parse |
 
 ### Job filtering
 
-Jobs match when the title contains an **include** keyword and no **exclude** keyword (case-insensitive). Rules live in `relocation_jobs/core/ats_constants.py` (`INCLUDE_KEYWORDS`, `EXCLUDE_KEYWORDS`). Implementation: `relocation_jobs/scrape/relevance.py`.
+Titles must match an **include** keyword and no **exclude** keyword (`INCLUDE_KEYWORDS` / `EXCLUDE_KEYWORDS` in `core/ats_constants.py`; `scrape/relevance.py`).
+
+---
 
 ## Testing
 
 ```bash
-pytest tests -o addopts=                 # full suite (~166 tests)
-pytest tests/mcp tests/web/test_mcp_company_workspace.py -o addopts=   # application assistant
-pytest tests/test_route_manifest.py -o addopts=   # fast route check
-pytest --cov --cov-report=term-missing   # coverage (90% gate on business modules)
+pytest tests -o addopts=                 # v2 suite (~299 collected)
+pytest tests/mcp -o addopts=             # MCP / application assistant
+pytest tests/test_route_manifest.py -o addopts=
+pytest --cov --cov-report=term-missing   # 90% gate on business modules
 ```
 
-Tests use an in-memory Postgres mock — no live ATS or Postgres in CI. Business rules: [`docs/reference/business-rules.md`](docs/reference/business-rules.md).
+In-memory Postgres mock only — no live ATS or production DB. Contracts: [business-rules.md](docs/reference/business-rules.md).
 
-## Deployment
+---
 
-Production runs on **one AWS EC2 instance** (Postgres + Redis + panel + Caddy). Full ops guide: [`docs/operations/ec2-panel.md`](docs/operations/ec2-panel.md).
+## Deployment (kuchup.com)
 
-### Production stack (EC2)
+One AWS EC2 host: Postgres + Redis + panel + fetch worker + Caddy. Guide: [ec2-panel.md](docs/operations/ec2-panel.md).
 
-| Layer | Role |
-|-------|------|
-| **Postgres** (`pg`) | Catalog, users, tracking, custom countries |
-| **Redis** (`relocation-redis`) | Country registry cache when `REDIS_URL` is set |
-| **Panel** (`relocation-panel`) | Gunicorn on port 10000 (`Dockerfile.ec2`, scrape disabled) |
-| **Caddy** (`relocation-caddy`) | TLS + reverse proxy for `kuchup.com` / `www` |
-| **Cloudflare** | DNS, optional proxy (orange cloud) to hide origin IP |
-
-**Why EC2 instead of Render alone:** the panel and database live on the same host, so board API latency dropped from minutes (Render → remote Postgres) to seconds. Scraping still runs **locally** on your laptop (`PANEL_SCRAPE_ENABLED=1`).
-
-### Deploy / update panel
-
-Requires `aws-postgres.env`, SSH key at `~/Downloads/relocation.pem`:
+| Service | Role |
+|---------|------|
+| Postgres (`pg`) | Source of truth |
+| Redis | Country-label cache when configured |
+| Panel (`relocation-panel`) | Gunicorn; slim image; `PANEL_SCRAPE_ENABLED=0` |
+| Fetch worker (`relocation-fetch-worker`) | Playwright; country scrape every **6h** (concurrency **4**) |
+| Caddy | TLS + reverse proxy for kuchup.com / www (raw IP → 404) |
+| Cloudflare | DNS; optional orange-cloud + origin lock-down |
 
 ```bash
-./scripts/ec2_app_deploy.sh deploy   # build frontend, rsync, docker build, restart panel + Caddy
-./scripts/ec2_app_deploy.sh sync     # frontend build + rsync only (static files via volume mount)
-./scripts/ec2_app_deploy.sh status   # containers + health check
+./scripts/ec2_app_deploy.sh deploy      # frontend build, rsync, images, restart
+./scripts/ec2_app_deploy.sh sync        # UI / static only
+./scripts/ec2_app_deploy.sh status
+./scripts/ec2_app_deploy.sh worker-logs
 ```
 
-`sync` runs `cd frontend && npm run build` so `relocation_jobs/static/dist/board.js` is included (the React board bundle). Static files are mounted into the panel container — no image rebuild needed for UI-only changes.
+Requires gitignored `aws-postgres.env` and deploy SSH key. After laptop IP changes: `./scripts/aws_postgres_migrate.sh sync-sg`.
 
-**Domain (Cloudflare):** A records `@` and `www` → Elastic IP from `aws-postgres.env`. Caddy auto-issues Let's Encrypt certs. Direct IP access returns 404; use `https://kuchup.com` only. To hide the origin IP: orange-cloud proxy + restrict security group ports 80/443 to [Cloudflare IPs](https://www.cloudflare.com/ips-v4) — see [lock-down steps](docs/operations/ec2-panel.md#lock-down-origin-domain-only-hide-ip).
+**Why colocated EC2:** board latency dropped far below Render → remote Postgres. Local scrape (`PANEL_SCRAPE_ENABLED=1`) and the EC2 worker both write the same catalog.
 
-**Redis on EC2:** `./scripts/ec2_redis.sh` — set `REDIS_URL` in local `.env` and in deploy env.
-
-**Postgres access:** `./scripts/aws_postgres_migrate.sh sync-sg` after your public IP changes.
-
-### Render (legacy)
-
-`render.yaml` targets Render's **free** web tier with scraping disabled. Optional fallback until full EC2 cutover; same `DATABASE_URL` / `REDIS_URL` as EC2.
-
-**Workflow:** scrape locally → `./scripts/ec2_app_deploy.sh deploy` (or push + Render redeploy if still using Render).
+`render.yaml` remains an optional legacy free-tier path (scrape off).
 
 ### Local Docker smoke test
 
@@ -254,34 +227,34 @@ docker run --rm -p 8080:10000 \
   relocation-jobs
 ```
 
-## Development
-
-All contributor docs: **[`docs/README.md`](docs/README.md)**
+---
 
 ## Troubleshooting
 
-**`dig` / `curl` cannot resolve domain locally**
+**Domain doesn’t resolve locally** — try `dig @1.1.1.1 kuchup.com A`, flush DNS, or use `1.1.1.1` / `8.8.8.8`. Use `curl -I https://kuchup.com`, not `ping https://…`.
 
-Public DNS may already work (`dig @1.1.1.1 kuchup.com A`) while your home router DNS is stale. Flush macOS cache (`sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`) or set DNS to `1.1.1.1` / `8.8.8.8`. Do not use `ping https://domain` — use `ping kuchup.com` or `curl -I https://kuchup.com`.
+**Board empty on EC2 but API works** — rebuild React: `cd frontend && npm run build` then `./scripts/ec2_app_deploy.sh sync`.
 
-**Board empty on EC2 but API works**
+**Company returns 0 jobs** — clear cached ATS / re-scrape; check Network tab on careers page; add `KNOWN_ATS` in `core/ats_constants.py`.
 
-Rebuild and sync the React bundle: `cd frontend && npm run build` then `./scripts/ec2_app_deploy.sh sync`. The deploy script builds frontend automatically; static files are served from a volume mount.
+**Playwright detection hangs** — ~25s timeout; pages behind login/cookie walls often need `KNOWN_ATS`.
 
-**Company returns 0 jobs but has openings**
+**ATS 401/403** — try Greenhouse/Lever US vs EU variants; Recruitee needs the real slug.
 
-1. Clear cached ATS in the catalog (or delete `ats_type` / `ats_url` for that company) and re-scrape.
-2. Inspect the careers page in DevTools (Network tab) for the ATS API call.
-3. Add a manual override to `KNOWN_ATS` in `relocation_jobs/core/ats_constants.py`.
+**Wrong careers URL** — copy the live careers CTA URL; update in panel or re-run `build_companies.py` for that employer.
 
-**Playwright detection hangs**
+**Board feels hung (~minutes)** — often N+1 / remote Postgres; see [board-load postmortem](docs/reference/board-load-performance-incident.md). Prefer local Postgres for day-to-day UI work.
 
-Timeout is ~25 s plus a short settle wait. Pages behind login or heavy cookie banners may need a `KNOWN_ATS` entry.
+---
 
-**ATS returns 401 / 403**
+## Development docs
 
-Try US vs EU Greenhouse/Lever variants. Recruitee sometimes proxies through `careers-analytics.recruitee.com` — the real slug is required.
-
-**Wrong careers URL from auto-discovery**
-
-Open the company site in a browser, follow the careers CTA, copy the URL, and update the company in the panel or re-run `build_companies.py` for that employer.
+| Topic | Doc |
+|-------|-----|
+| First 15 minutes | [contributing.md](docs/contributing.md) |
+| Architecture | [architecture.md](docs/reference/architecture.md) |
+| Coding rules | [rules.md](docs/reference/rules.md) |
+| Job buckets | [business-rules.md](docs/reference/business-rules.md) |
+| MCP / apply / project masters | [mcp-application.md](docs/reference/mcp-application.md) |
+| Agent commands | [CLAUDE.md](CLAUDE.md) |
+| Full doc index | [docs/README.md](docs/README.md) |

@@ -1,0 +1,2 @@
+the buttons to choose between sections on application data not working.
+for example if you choose master resume on above of page nothing happens its a front problem.

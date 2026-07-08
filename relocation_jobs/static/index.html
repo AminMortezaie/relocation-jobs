@@ -6,7 +6,7 @@
   <title>Relocation Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=39" />
+  <link rel="stylesheet" href="/static/styles.css?v=56" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
@@ -24,8 +24,22 @@
   </div>
   <div class="layout">
     <div id="loginPanel" class="login-panel" hidden>
+      <div class="login-brand">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="11" r="8"/><path d="M4 11h16"/><path d="M12 3a8 8 0 0 1 0 16"/><path d="M12 3a8 8 0 0 0 0 16"/>
+              <rect x="8.5" y="15.5" width="7" height="5" rx="1" fill="currentColor" stroke="none"/><path d="M10 15.5V14a2 2 0 0 1 4 0v1.5"/>
+            </svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">Relocation Jobs</span>
+            <span class="brand-tagline">Visa-friendly roles abroad</span>
+          </span>
+        </div>
+      </div>
       <h2 id="loginTitle">Sign in</h2>
-      <p class="hint" id="loginHint">Your applied / not-for-me tracking is stored per user in the database.</p>
+      <p class="hint" id="loginHint">Track applications and relocation-friendly roles per country.</p>
       <div class="login-error" id="loginError"></div>
       <form id="loginForm">
         <label for="loginUsername">Username</label>
@@ -42,17 +56,17 @@
     <div id="mainContent" class="main-content hidden">
     <header class="app-header">
       <div class="app-header-brand">
-        <h1 class="app-title">Relocation Jobs</h1>
-        <div class="user-menu">
-          <button type="button" class="user-avatar-btn" id="userMenuBtn" aria-expanded="false" aria-controls="userMenuPopover" aria-label="Account menu">
-            <span id="userAvatar">?</span>
-          </button>
-          <div class="user-dropdown" id="userMenuPopover" hidden>
-            <p class="user-dropdown-name" id="userName">Account</p>
-            <a href="/apply" class="user-dropdown-admin">Application data</a>
-            <a href="/admin" class="user-dropdown-admin" id="adminLink" hidden>Admin panel</a>
-            <button type="button" class="user-dropdown-signout" id="logoutBtn">Sign out</button>
-          </div>
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="11" r="8"/><path d="M4 11h16"/><path d="M12 3a8 8 0 0 1 0 16"/><path d="M12 3a8 8 0 0 0 0 16"/>
+              <rect x="8.5" y="15.5" width="7" height="5" rx="1" fill="currentColor" stroke="none"/><path d="M10 15.5V14a2 2 0 0 1 4 0v1.5"/>
+            </svg>
+          </span>
+          <span class="brand-text">
+            <span class="brand-name">Relocation Jobs</span>
+            <span class="brand-tagline">Visa-friendly roles abroad</span>
+          </span>
         </div>
       </div>
 
@@ -105,6 +119,17 @@
             </svg>
             <span class="header-btn-text">Add company</span>
           </button>
+          <div class="user-menu">
+            <button type="button" class="user-avatar-btn" id="userMenuBtn" aria-expanded="false" aria-controls="userMenuPopover" aria-label="Account menu">
+              <span id="userAvatar">?</span>
+            </button>
+            <div class="user-dropdown" id="userMenuPopover" hidden>
+              <p class="user-dropdown-name" id="userName">Account</p>
+              <a href="/apply" class="user-dropdown-admin">Application data</a>
+              <a href="/admin" class="user-dropdown-admin" id="adminLink" hidden>Admin panel</a>
+              <button type="button" class="user-dropdown-signout" id="logoutBtn">Sign out</button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -585,7 +610,7 @@
     </form>
   </div>
 
-  <script type="module" crossorigin src="/static/dist/board.js?v=2"></script>
-  <script type="module" src="/static/js/main.js?v=102"></script>
+  <script type="module" crossorigin src="/static/dist/board.js?v=4"></script>
+  <script type="module" src="/static/js/main.js?v=104"></script>
 </body>
 </html>

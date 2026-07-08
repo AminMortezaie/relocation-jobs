@@ -185,7 +185,7 @@ function CompanyCard({ company, ui }) {
           </div>
           {company.careers_url ? (
             <div className="careers-row">
-              <a className="job-title" href={company.careers_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.8rem", fontWeight: 500 }}>
+              <a className="job-title job-title--secondary" href={company.careers_url} target="_blank" rel="noopener noreferrer">
                 Careers page
               </a>
               <button
@@ -313,7 +313,9 @@ function CompanyCard({ company, ui }) {
             />
           ))
         ) : !isCollapsed ? (
-          <div className="position-card"><span className="job-meta">{emptyMessage(company, ui)}</span></div>
+          <div className="position-card position-card-empty">
+            <p className="empty-hint text-sm text-muted">{emptyMessage(company, ui)}</p>
+          </div>
         ) : null}
         {!isCollapsed && showingRejected && rejectedCount > 0 ? (
           <>

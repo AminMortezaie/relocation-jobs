@@ -18,6 +18,7 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Work on board sort, pagination, newest | [reference/board.md](reference/board.md) |
 | Board performance / read-model design (proposal) | [reference/board-read-model-proposal.md](reference/board-read-model-proposal.md) |
 | Fetch pipeline queue / Kafka placement (proposal) | [reference/kafka-fetch-pipeline-proposal.md](reference/kafka-fetch-pipeline-proposal.md) |
+| Full SPA UI modernization (proposal) | [reference/full-spa-ui-modernization-proposal.md](reference/full-spa-ui-modernization-proposal.md) |
 | Catalog vs per-user tracking (design) | [reference/catalog-pattern.md](reference/catalog-pattern.md) |
 | Panel / admin statistics | [reference/stats.md](reference/stats.md) |
 | Test failures / catalog seed in tests | [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md) |
@@ -42,6 +43,7 @@ docs/
     board.md                  pagination, “newest first” sort, timestamps
     board-read-model-proposal.md  board performance: projection table, cursors (proposal)
     kafka-fetch-pipeline-proposal.md  fetch/scrape work queue, Kafka placement (proposal)
+    full-spa-ui-modernization-proposal.md  React SPA, design system, dark/light, mobile (proposal)
     stats.md                  admin/user stats definitions
     business-rules.md         job buckets, orphans, apply/reject/not-for-me
     rules.md                  v2 coding standards (SQL in repo.py)

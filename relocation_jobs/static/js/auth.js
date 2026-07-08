@@ -50,7 +50,7 @@ export function setLoginMode(mode) {
   $("toggleRegister").textContent = register ? "Back to sign in" : "Create account";
   $("loginHint").textContent = register
     ? "Password must be at least 8 characters."
-    : "Your applied / not-for-me tracking is stored per user in the database.";
+    : "Track applications and relocation-friendly roles per country.";
 }
 
 export async function refreshAuth() {

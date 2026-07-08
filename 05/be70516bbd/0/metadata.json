@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "05be70516bbd",
+  "session_id": "9a8f40c5-b864-415b-8753-d67154b278cf",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T02:37:50.110481Z",
+  "branch": "main",
+  "checkpoints_count": 12,
+  "save_step_count": 1,
+  "files_touched": [
+    "docs/README.md",
+    "docs/reference/full-spa-ui-modernization-proposal.md",
+    "frontend/src/App.jsx",
+    "frontend/src/CompanyCard.jsx",
+    "relocation_jobs/static/admin.html",
+    "relocation_jobs/static/apply.html",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/auth.js",
+    "relocation_jobs/static/styles.css"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "2f236998f96a",
+  "session_metrics": {
+    "turn_count": 12
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T02:37:50.107195Z",
+    "agent_lines": 922,
+    "agent_removed": 100,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 922,
+    "total_lines_changed": 1022,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}

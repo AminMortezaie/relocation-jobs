@@ -1,0 +1,21 @@
+we have lots of changes we didnt push on git.
+review them by skills and docs principles and then tell me which file should be changed and why.
+
+---
+
+we have lots of changes we didnt push on git.
+review them by skills and docs principles and then tell me which file should be changed and why.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+do you think that can we push this changes with a good trust on it?
+
+---
+
+do you think that can we push this changes with a good trust on it?

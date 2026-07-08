@@ -1,0 +1,19 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "a175bdbe6c95",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "relocation_jobs/admin/service.py",
+    "tests/core/test_ats_detection.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/a1/75bdbe6c95/0/metadata.json",
+      "transcript": "/a1/75bdbe6c95/0/full.jsonl",
+      "content_hash": "/a1/75bdbe6c95/0/content_hash.txt",
+      "prompt": "/a1/75bdbe6c95/0/prompt.txt"
+    }
+  ]
+}

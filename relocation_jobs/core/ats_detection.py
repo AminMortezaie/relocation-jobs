@@ -474,6 +474,26 @@ def _detect_hibob_from_url(careers_url: str) -> tuple[str | None, str | None]:
     return "hibob", f"https://{slug}.careers.hibob.com/jobs"
 
 
+def _recruitee_board_has_real_jobs(slug: str) -> bool:
+    """Check that the Recruitee board has at least 3 non-sample/non-test offers with reasonable titles."""
+    try:
+        response = requests.get(
+            f"https://{slug}.recruitee.com/api/offers/",
+            headers=HEADERS,
+            timeout=8,
+        )
+        if response.status_code != 200:
+            return False
+        offers = (response.json().get("offers") or [])
+        real = [
+            o for o in offers
+            if not re.search(r"\b(sample|test|demo|example)\b", (o.get("title") or ""), re.I)
+        ]
+        return len(real) >= 3
+    except Exception:
+        return False
+
+
 def _detect_recruitee_from_careers_host(careers_url: str) -> tuple[str | None, str | None]:
     """careers.{slug}.com / careers.{slug}.io often maps to {slug}.recruitee.com."""
     parsed = urlparse(careers_url)
@@ -490,6 +510,8 @@ def _detect_recruitee_from_careers_host(careers_url: str) -> tuple[str | None, s
         return None, None
     board_url = f"https://{slug}.recruitee.com/"
     if not _recruitee_board_exists(slug):
+        return None, None
+    if not _recruitee_board_has_real_jobs(slug):
         return None, None
     return "recruitee", board_url
 

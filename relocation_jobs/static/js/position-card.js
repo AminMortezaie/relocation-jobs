@@ -72,9 +72,29 @@ function cvBadges(job) {
   return html;
 }
 
-function cityBadge(job) {
-  const label = (job.job_city || job.location || "").trim();
-  return label ? `<span class="badge job-city">${escapeHtml(label)}</span>` : "";
+const CITY_PREVIEW_LIMIT = 3;
+
+/** Split a job location string into de-duped city entries. Locations are
+ *  separated by ";" (e.g. "Belgrade, Serbia; Berlin, Germany"); a lone
+ *  "City, Country" stays a single entry (we do not split on its comma). */
+function splitJobCities(text) {
+  const trimmed = (text || "").trim();
+  if (!trimmed) return [];
+  let parts;
+  if (trimmed.includes(";")) parts = trimmed.split(";");
+  else if (trimmed.includes(" · ")) parts = trimmed.split(" · ");
+  else return [trimmed];
+  const seen = new Set();
+  const out = [];
+  for (const part of parts) {
+    const label = part.trim();
+    if (!label) continue;
+    const key = label.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(label);
+  }
+  return out;
 }
 
 class PositionCard extends HTMLElement {
@@ -84,13 +104,17 @@ class PositionCard extends HTMLElement {
     super();
     this._job = null;
     this._variant = "open";
+    this._citiesExpanded = false;
   }
 
   get job() { return this._job; }
   set job(val) {
     const prev = this._job;
     this._job = val;
-    if (this.isConnected && val !== prev) this.render();
+    if (this.isConnected && val !== prev) {
+      this._citiesExpanded = false;
+      this.render();
+    }
   }
 
   get variant() { return this._variant; }
@@ -315,6 +339,8 @@ class PositionCard extends HTMLElement {
   // --- Render ---
 
   render() {
+    // Rebuilding innerHTML drops any open popover, so clear the raised stacking.
+    this._setRaised(false);
     if (!this._job) { this.innerHTML = ""; return; }
     const v = this._variant;
     if (v === "rejected") this.innerHTML = this._htmlRejected();
@@ -328,7 +354,22 @@ class PositionCard extends HTMLElement {
   }
 
   _titleRow(job) {
-    return `<div class="position-title-row"><a class="job-title" href="${escapeHtml(job.url || "")}" target="_blank" rel="noopener noreferrer">${escapeHtml(job.title || "")}</a>${cityBadge(job)}</div>`;
+    return `<div class="position-title-row"><a class="job-title" href="${escapeHtml(job.url || "")}" target="_blank" rel="noopener noreferrer">${escapeHtml(job.title || "")}</a>${this._cityBadge(job)}</div>`;
+  }
+
+  /** Location badge showing at most CITY_PREVIEW_LIMIT cities, with an
+   *  expand/collapse control (mirrors the company card's behaviour). */
+  _cityBadge(job) {
+    const cities = splitJobCities(job.job_city || job.location || "");
+    if (!cities.length) return "";
+    const overflow = cities.length > CITY_PREVIEW_LIMIT;
+    const shown = this._citiesExpanded || !overflow ? cities : cities.slice(0, CITY_PREVIEW_LIMIT);
+    const badge = `<span class="badge job-city">${escapeHtml(shown.join(" · "))}</span>`;
+    if (!overflow) return badge;
+    const btn = this._citiesExpanded
+      ? `<button type="button" class="expand-cities-btn" title="Show fewer locations">Show less</button>`
+      : `<button type="button" class="expand-cities-btn" title="Show all locations">+${cities.length - CITY_PREVIEW_LIMIT} more</button>`;
+    return badge + btn;
   }
 
   _htmlOpen() {
@@ -506,6 +547,8 @@ class PositionCard extends HTMLElement {
     const t = e.target.closest("button, a");
     if (!t) return;
 
+    if (t.closest(".expand-cities-btn")) { e.stopPropagation(); this._citiesExpanded = !this._citiesExpanded; this.render(); return; }
+
     if (t.closest(".job-title")) { e.stopPropagation(); void this._markSeen(); return; }
 
     if (t.closest(".pin-job-btn")) { e.stopPropagation(); void this._togglePin(); return; }
@@ -588,6 +631,7 @@ class PositionCard extends HTMLElement {
   _closeAtsPopover() {
     this.querySelectorAll(".ats-score-popover").forEach(p => p.hidden = true);
     this.querySelectorAll(".ats-score-trigger").forEach(t => t.setAttribute("aria-expanded", "false"));
+    this._setRaised(false);
   }
 
   _updateAtsPreview(wrap, score, opts) {
@@ -639,6 +683,7 @@ class PositionCard extends HTMLElement {
   _closeHideReasonPopover() {
     this.querySelectorAll(".hide-reason-popover").forEach(p => p.hidden = true);
     this.querySelectorAll(".hide-reason-trigger").forEach(t => t.setAttribute("aria-expanded", "false"));
+    this._setRaised(false);
   }
 
   _toggleReferralPopover() {
@@ -660,6 +705,7 @@ class PositionCard extends HTMLElement {
     const trig = this.querySelector(".referral-btn");
     if (pop) pop.hidden = true;
     if (trig) trig.setAttribute("aria-expanded", "false");
+    this._setRaised(false);
   }
 
   _closeAllPopovers(except) {
@@ -686,6 +732,26 @@ class PositionCard extends HTMLElement {
     popover.style.top = `${Math.round(top)}px`;
     popover.style.left = `${Math.round(left)}px`;
     popover.classList.add("is-floating");
+    this._setRaised(true);
+  }
+
+  /** Lift this card and its company above siblings while a popover is open.
+   *  Dimmed cards (.position-seen use opacity < 1) create a stacking context
+   *  that traps the popover's z-index behind later siblings. We target the
+   *  inner .position-card (which carries the opacity SC) so the SC itself
+   *  gets positioned above siblings.  We also raise the .company-card so
+   *  the popover doesn't fall behind the *next* company card. */
+  _setRaised(on) {
+    const inner = this.querySelector(".position-card");
+    if (inner) {
+      inner.style.position = on ? "relative" : "";
+      inner.style.zIndex = on ? "10000" : "";
+    }
+    // company-card already has position:relative from CSS
+    const cc = this.closest(".company-card");
+    if (cc) {
+      cc.style.zIndex = on ? "10000" : "";
+    }
   }
 }
 

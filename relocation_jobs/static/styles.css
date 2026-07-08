@@ -1365,7 +1365,6 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
 }
@@ -1380,6 +1379,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   background: var(--brand-gradient);
   opacity: 0.85;
   pointer-events: none;
+  border-radius: var(--radius) 0 0 var(--radius);
 }
 
 .company-card:hover {

@@ -345,7 +345,7 @@ def get_job_context(
         cover_letter_pdf_filename=_application_cover_letter_pdf_filename(uid, company_name),
         description_text=str(description["description_text"]),
         has_description=bool(description["has_description"]),
-        needs_fetch=bool(description["needs_fetch"]),
+        needs_fetch=bool(description["needs_fetch"]) and not _non_fetchable_posting_url(catalog_url),
         description_html=str(description.get("description_html") or ""),
         posted_at=job_fetched_ts(job),
     )
@@ -517,15 +517,16 @@ def get_position_description(idempotency_key: str) -> PositionDescription:
     if job is None:
         raise LookupError(f"Position not found: {key}")
     description = _job_description_fields(job)
+    job_url = (job.get("url") or "").strip()
     return PositionDescription(
         idempotency_key=key,
         country=(job.get("country") or "").strip(),
         company=(job.get("company_name") or "").strip(),
-        url=(job.get("url") or "").strip(),
+        url=job_url,
         title=(job.get("title") or "").strip(),
         description_text=str(description["description_text"]),
         has_description=bool(description["has_description"]),
-        needs_fetch=bool(description["needs_fetch"]),
+        needs_fetch=bool(description["needs_fetch"]) and not _non_fetchable_posting_url(job_url),
         description_html=str(description.get("description_html") or ""),
     )
 
@@ -540,6 +541,11 @@ def fetch_and_store_position_description(idempotency_key: str) -> PositionDescri
     url = (job.get("url") or "").strip()
     if not url:
         raise ValueError("Position has no job URL")
+    if _non_fetchable_posting_url(url):
+        raise ValueError(
+            "Cannot fetch job description from LinkedIn, Indeed, or Glassdoor. "
+            "Paste the job description manually."
+        )
     country_key = (job.get("country") or "").strip().lower()
     company_name = (job.get("company_name") or "").strip()
     company_row = get_company(country_key, company_name) or {}

@@ -5,6 +5,7 @@ from relocation_jobs.core import ats_detection as mod
 
 def test_recruitee_careers_host_requires_live_board(monkeypatch):
     monkeypatch.setattr(mod, "_recruitee_board_exists", lambda slug: slug == "realco")
+    monkeypatch.setattr(mod, "_recruitee_board_has_real_jobs", lambda slug: slug == "realco")
     assert mod._detect_recruitee_from_careers_host("https://careers.criteo.com/") == (None, None)
     assert mod._detect_recruitee_from_careers_host("https://careers.realco.com/") == (
         "recruitee",

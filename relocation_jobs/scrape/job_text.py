@@ -218,6 +218,28 @@ _JOB_DETAIL_FETCHERS = {
 }
 
 
+_JD_SIGNAL_PATTERNS = re.compile(
+    r"(?i)(?:"
+    r"responsibilit|requirement|qualification|what you.ll |about the role|"
+    r"the ideal candidate|about you\b|key skills|job description|"
+    r"we are looking for|your profile|what we expect|"
+    r"day to day|main tasks|key accountabilities|"
+    r"education and experience|minimum requirement|preferred qualification"
+    r")"
+)
+
+
+def _looks_like_job_description(text: str) -> bool:
+    if not text:
+        return False
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    long_lines = sum(1 for l in lines if len(l) > 60)
+    if _JD_SIGNAL_PATTERNS.search(text):
+        return long_lines >= 2
+    bullet_count = text.count("• ")
+    return long_lines >= 5 and bullet_count >= 2
+
+
 def fetch_job_detail(url: str, ats_type: str | None = None) -> JobFetchResult:
     fetcher = _JOB_DETAIL_FETCHERS.get(ats_type or "")
     if fetcher:
@@ -236,7 +258,7 @@ def fetch_job_detail(url: str, ats_type: str | None = None) -> JobFetchResult:
         response = requests.get(url, headers=HEADERS, timeout=15)
         if response.ok:
             text = html_to_readable(response.text)
-            if len(text) > 200:
+            if len(text) > 300 and _looks_like_job_description(text):
                 return JobFetchResult(text, "")
     except Exception:
         pass

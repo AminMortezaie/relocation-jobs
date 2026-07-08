@@ -105,6 +105,19 @@ def register(app):
             app.logger.exception("admin panel-stats failed")
             return jsonify({"error": str(exc)}), 500
 
+    @app.get("/api/admin/recent-jobs")
+    @admin_required
+    def api_admin_recent_jobs():
+        try:
+            limit = int(request.args.get("limit", "30"))
+        except ValueError:
+            limit = 30
+        try:
+            return jsonify({"jobs": admin_service.get_recently_fetched_jobs(limit=limit)})
+        except Exception as exc:
+            app.logger.exception("admin recent-jobs failed")
+            return jsonify({"error": str(exc)}), 500
+
     @app.get("/api/admin/config")
     @admin_required
     def api_admin_config():

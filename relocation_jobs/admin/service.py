@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 
 from relocation_jobs.core.ats_constants import (
     DEFAULT_CONCURRENCY,
@@ -23,6 +24,7 @@ from relocation_jobs.fetch.scheduler import (
 )
 from relocation_jobs.panel.service import flatten_companies_for_stats
 from relocation_jobs.panel.stats import compute_stats
+from relocation_jobs.core.db import db_read
 
 
 def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
@@ -97,6 +99,24 @@ def get_admin_overview(*, fetch_state: dict | None = None) -> dict:
         "catalog": catalog["totals"],
         "fetch": fetch_state or {"running": False},
     }
+
+
+def get_recently_fetched_jobs(*, limit: int = 30) -> list[dict]:
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    with db_read() as conn:
+        rows = conn.execute(
+            """
+            SELECT j.title, j.url, j.fetched, j.visa_sponsorship,
+                   c.name AS company_name, c.country
+            FROM matching_jobs j
+            JOIN companies c ON c.id = j.company_id
+            WHERE j.fetched >= %s
+            ORDER BY j.fetched DESC
+            LIMIT %s
+            """,
+            (today, max(1, min(limit, 200))),
+        ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def get_admin_dashboard(

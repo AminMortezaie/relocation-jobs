@@ -21,12 +21,14 @@ function showAdminSkeletons() {
   const panelStats = $("adminPanelStats");
   const catalog = $("adminCatalog");
   const users = $("adminUsers");
+  const newJobs = $("adminNewJobs");
   const runs = $("adminFetchRuns");
   const config = $("adminConfig");
   if (worker) worker.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(3)}</div>`;
   if (panelStats) panelStats.innerHTML = `<div class="skeleton-admin-stats">${skeletonStatCards(4)}</div>`;
   if (catalog) catalog.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(5)}</div>`;
   if (users) users.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(3)}</div>`;
+  if (newJobs) newJobs.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(4)}</div>`;
   if (runs) runs.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(4)}</div>`;
   if (config) config.innerHTML = `<div class="skeleton-admin-table">${skeletonRows(3)}</div>`;
 }
@@ -294,6 +296,57 @@ function renderFetchRuns(data) {
   `;
 }
 
+function renderNewJobs(data) {
+  const jobs = data.jobs || [];
+  if (!jobs.length) {
+    $("adminNewJobs").innerHTML = `
+      <section class="admin-panel">
+        <h2 class="admin-panel-title">Today's new positions</h2>
+        <p class="hint">No positions fetched today.</p>
+      </section>
+    `;
+    return;
+  }
+  const rows = jobs
+    .map((job) => {
+      const title = escapeHtml(job.title || "Untitled");
+      const company = escapeHtml(job.company_name || "?");
+      const country = escapeHtml(job.country || "?");
+      const fetched = formatTs(job.fetched);
+      const visa = job.visa_sponsorship
+        ? '<span class="badge visa">Visa</span>'
+        : "";
+      return `
+        <tr>
+          ${adminCell(title, "Title")}
+          ${adminCell(company, "Company")}
+          ${adminCell(country, "Country")}
+          ${adminCell(fetched, "Fetched")}
+          ${adminCell(visa, "Visa")}
+        </tr>
+      `;
+    })
+    .join("");
+
+  $("adminNewJobs").innerHTML = `
+    <section class="admin-panel">
+      <h2 class="admin-panel-title">Today's new positions</h2>
+      <p class="hint">${jobs.length} position${jobs.length === 1 ? "" : "s"} fetched today.</p>
+      <details class="admin-details" open>
+        <summary>New positions (${jobs.length})</summary>
+        <div class="admin-table-wrap" style="margin-top:0.55rem">
+          <table class="admin-table admin-table--responsive">
+            <thead>
+              <tr><th>Title</th><th>Company</th><th>Country</th><th>Fetched</th><th>Visa</th></tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  `;
+}
+
 function renderConfig(data) {
   const redisLabel = data.countries_store === "redis" && data.redis_ping
     ? "redis (connected)"
@@ -322,6 +375,7 @@ async function loadDashboard() {
   setLoadingProgress(80);
   renderCatalog(data.catalog);
   renderUsers(data.users);
+  renderNewJobs(await apiGet("/api/admin/recent-jobs?limit=30"));
   renderFetchRuns(data.runs);
   renderConfig(data.config);
   await initAdminWorker(data.worker);

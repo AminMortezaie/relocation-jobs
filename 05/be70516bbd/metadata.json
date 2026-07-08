@@ -3,7 +3,7 @@
   "checkpoint_id": "05be70516bbd",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 14,
+  "checkpoints_count": 22,
   "files_touched": [
     "docs/README.md",
     "docs/reference/full-spa-ui-modernization-proposal.md",
@@ -29,6 +29,12 @@
       "transcript": "/05/be70516bbd/1/full.jsonl",
       "content_hash": "/05/be70516bbd/1/content_hash.txt",
       "prompt": "/05/be70516bbd/1/prompt.txt"
+    },
+    {
+      "metadata": "/05/be70516bbd/2/metadata.json",
+      "transcript": "/05/be70516bbd/2/full.jsonl",
+      "content_hash": "/05/be70516bbd/2/content_hash.txt",
+      "prompt": "/05/be70516bbd/2/prompt.txt"
     }
   ]
 }

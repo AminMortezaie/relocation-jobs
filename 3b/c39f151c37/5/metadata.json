@@ -1,34 +1,22 @@
 {
   "cli_version": "0.7.7",
   "checkpoint_id": "3bc39f151c37",
+  "session_id": "cfae738a-2c57-4ff7-8c56-ffb87a7f2a87",
   "strategy": "manual-commit",
+  "created_at": "2026-07-08T01:47:42.306686Z",
   "branch": "main",
-  "checkpoints_count": 33,
+  "checkpoints_count": 5,
+  "save_step_count": 5,
   "files_touched": [
     ".dockerignore",
-    ".gitignore",
-    "AGENTS.md",
-    "Dockerfile.ec2-worker",
-    "docker-entrypoint.sh",
-    "docs/README.md",
-    "docs/backlog.md",
-    "docs/contributing.md",
     "docs/operations/ec2-panel.md",
-    "docs/reference/board-load-performance-incident.md",
-    "docs/reference/catalog-pattern.md",
-    "docs/reference/catalog-seed-test-failure.md",
-    "docs/reference/kafka-fetch-pipeline-proposal.md",
-    "docs/reference/rules.md",
     "docs/reference/stats.md",
     "relocation_jobs/admin/service.py",
     "relocation_jobs/build_companies.py",
-    "relocation_jobs/catalog/cache.py",
     "relocation_jobs/catalog/repo.py",
     "relocation_jobs/catalog/stats.py",
     "relocation_jobs/catalog/writes.py",
     "relocation_jobs/companies/service.py",
-    "relocation_jobs/core/auth.py",
-    "relocation_jobs/core/location_tags.py",
     "relocation_jobs/core/migrations.py",
     "relocation_jobs/db/__init__.py",
     "relocation_jobs/db/companies.py",
@@ -36,16 +24,11 @@
     "relocation_jobs/db/fetch_runs.py",
     "relocation_jobs/db/tracking.py",
     "relocation_jobs/db/users.py",
-    "relocation_jobs/fetch/client.py",
     "relocation_jobs/fetch/country_runner.py",
     "relocation_jobs/fetch/pipeline.py",
-    "relocation_jobs/fetch/ports.py",
     "relocation_jobs/fetch/repo.py",
     "relocation_jobs/fetch/runner.py",
-    "relocation_jobs/fetch/scheduler.py",
-    "relocation_jobs/fetch/service.py",
     "relocation_jobs/fetch/state.py",
-    "relocation_jobs/mcp/repo.py",
     "relocation_jobs/mcp/server.py",
     "relocation_jobs/mcp/service.py",
     "relocation_jobs/panel/flatten.py",
@@ -58,9 +41,6 @@
     "relocation_jobs/positions/repo.py",
     "relocation_jobs/positions/state.py",
     "relocation_jobs/positions/tracking_resolve.py",
-    "relocation_jobs/reset_password.py",
-    "relocation_jobs/scrape/ats_resolve.py",
-    "relocation_jobs/scrape/board.py",
     "relocation_jobs/scrape/company.py",
     "relocation_jobs/static/admin.html",
     "relocation_jobs/static/js/admin-scrape.js",
@@ -74,59 +54,98 @@
     "relocation_jobs/web/routes/fetch.py",
     "relocation_jobs/web/server.py",
     "scripts/ec2_app_deploy.sh",
-    "scripts/fetch_scheduler_worker.py",
     "tests/catalog/test_repo.py",
     "tests/conftest.py",
     "tests/core/test_custom_countries.py",
     "tests/fetch/test_runner_country_results.py",
-    "tests/fetch/test_scheduler.py",
-    "tests/fetch/test_service.py",
     "tests/helpers/seed.py",
-    "tests/panel/test_hide_empty.py",
     "tests/panel/test_jobs.py",
-    "tests/panel/test_preview_board.py",
     "tests/positions/test_state.py",
     "tests/positions/test_workflows.py",
     "tests/web/test_admin_e2e.py",
     "tests/web/test_catalog_api.py",
     "tests/web/test_fetch_api.py"
   ],
-  "sessions": [
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "506cac07dcb1",
+  "session_metrics": {
+    "duration_ms": 4147591,
+    "turn_count": 5,
+    "context_tokens": 184922,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T01:47:42.301122Z",
+    "agent_lines": 3255,
+    "agent_removed": 4036,
+    "human_added": 818,
+    "human_modified": 15,
+    "human_removed": 0,
+    "total_committed": 4088,
+    "total_lines_changed": 8202,
+    "agent_percentage": 88.89295293830773,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
     {
-      "metadata": "/3b/c39f151c37/0/metadata.json",
-      "transcript": "/3b/c39f151c37/0/full.jsonl",
-      "content_hash": "/3b/c39f151c37/0/content_hash.txt",
-      "prompt": "/3b/c39f151c37/0/prompt.txt"
+      "checkpoint_number": 1,
+      "user_lines_added": 440,
+      "user_lines_removed": 10,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".dockerignore": 1,
+        "Dockerfile.ec2-worker": 26,
+        "deploy/ec2/Caddyfile": 9,
+        "docs/operations/ec2-panel.md": 17,
+        "relocation_jobs/db/users.py": 8,
+        "relocation_jobs/fetch/runner.py": 9,
+        "relocation_jobs/fetch/scheduler.py": 160,
+        "scripts/ec2_app_deploy.sh": 55,
+        "scripts/fetch_scheduler_worker.py": 45,
+        "tests/fetch/test_scheduler.py": 110
+      },
+      "user_removed_per_file": {
+        "docs/operations/ec2-panel.md": 5,
+        "scripts/ec2_app_deploy.sh": 5
+      }
     },
     {
-      "metadata": "/3b/c39f151c37/1/metadata.json",
-      "transcript": "/3b/c39f151c37/1/full.jsonl",
-      "content_hash": "/3b/c39f151c37/1/content_hash.txt",
-      "prompt": "/3b/c39f151c37/1/prompt.txt"
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1009,
+      "agent_lines_removed": 57
     },
     {
-      "metadata": "/3b/c39f151c37/2/metadata.json",
-      "transcript": "/3b/c39f151c37/2/full.jsonl",
-      "content_hash": "/3b/c39f151c37/2/content_hash.txt",
-      "prompt": "/3b/c39f151c37/2/prompt.txt"
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1009,
+      "agent_lines_removed": 57
     },
     {
-      "metadata": "/3b/c39f151c37/3/metadata.json",
-      "transcript": "/3b/c39f151c37/3/full.jsonl",
-      "content_hash": "/3b/c39f151c37/3/content_hash.txt",
-      "prompt": "/3b/c39f151c37/3/prompt.txt"
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1707,
+      "agent_lines_removed": 61
     },
     {
-      "metadata": "/3b/c39f151c37/4/metadata.json",
-      "transcript": "/3b/c39f151c37/4/full.jsonl",
-      "content_hash": "/3b/c39f151c37/4/content_hash.txt",
-      "prompt": "/3b/c39f151c37/4/prompt.txt"
-    },
-    {
-      "metadata": "/3b/c39f151c37/5/metadata.json",
-      "transcript": "/3b/c39f151c37/5/full.jsonl",
-      "content_hash": "/3b/c39f151c37/5/content_hash.txt",
-      "prompt": "/3b/c39f151c37/5/prompt.txt"
+      "checkpoint_number": 5,
+      "user_lines_added": 5,
+      "user_lines_removed": 5,
+      "agent_lines_added": 3556,
+      "agent_lines_removed": 3910,
+      "user_added_per_file": {
+        "relocation_jobs/fetch/scheduler.py": 1,
+        "tests/fetch/test_scheduler.py": 4
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/fetch/scheduler.py": 1,
+        "tests/fetch/test_scheduler.py": 4
+      }
     }
   ]
 }

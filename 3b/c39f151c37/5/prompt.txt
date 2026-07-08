@@ -1,0 +1,37 @@
+the data in admin panel is mostly wrong, investigate all of the data based on the skills you have and find out problems and fix them
+
+---
+
+deploy
+
+---
+
+deploy
+
+---
+
+i just concerned about the data you put in admin i think some of them are incorrect investigate them and remove redundant data from it cause some of them are not needed.
+
+---
+
+i just concerned about the data you put in admin i think some of them are incorrect investigate them and remove redundant data from it cause some of them are not needed.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+check by end to end tests to ensure that is working based on the skills u have
+
+---
+
+check by end to end tests to ensure that is working based on the skills u have

@@ -14,13 +14,15 @@ let selectedProjectPdfFilename = "project.pdf";
 const MAX_PIPELINE_PROMPTS = 5;
 
 function showLogin() {
-  $("applyContent")?.classList.add("hidden");
+  const content = $("applyContent");
+  if (content) content.hidden = true;
   $("applyLoginPanel").hidden = false;
 }
 
 function showApp() {
   $("applyLoginPanel").hidden = true;
-  $("applyContent")?.classList.remove("hidden");
+  const content = $("applyContent");
+  if (content) content.hidden = false;
 }
 
 function showError(message) {
@@ -61,9 +63,12 @@ function setTab(tab) {
   for (const btn of document.querySelectorAll(".apply-tab")) {
     btn.classList.toggle("apply-tab--active", btn.dataset.tab === tab);
   }
-  $("applyProfilePanel")?.classList.toggle("hidden", tab !== "profile");
-  $("applyMastersPanel")?.classList.toggle("hidden", tab !== "masters");
-  $("applyProjectsPanel")?.classList.toggle("hidden", tab !== "projects");
+  const profile = $("applyProfilePanel");
+  const masters = $("applyMastersPanel");
+  const projects = $("applyProjectsPanel");
+  if (profile) profile.hidden = tab !== "profile";
+  if (masters) masters.hidden = tab !== "masters";
+  if (projects) projects.hidden = tab !== "projects";
 }
 
 function fillProfileForm(profile) {

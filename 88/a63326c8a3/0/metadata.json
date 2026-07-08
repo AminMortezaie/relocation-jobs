@@ -1,0 +1,89 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "88a63326c8a3",
+  "session_id": "20c9aa1c-c901-4323-bf29-dfdd2b4a85ee",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T13:26:56.488398Z",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "save_step_count": 4,
+  "files_touched": [
+    "docs/reference/company-workspace.md",
+    "docs/reference/mcp-application.md",
+    "frontend/src/CompanyCard.jsx",
+    "frontend/src/CvApplicationBadges.jsx",
+    "relocation_jobs/catalog/cache.py",
+    "relocation_jobs/catalog/util.py",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/fetch/log.py",
+    "relocation_jobs/mcp/names.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/mcp/types.py",
+    "relocation_jobs/panel/tracking.py",
+    "relocation_jobs/scrape/http_trace.py",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/js/company.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/mcp.py",
+    "tests/mcp/test_mcp_service.py",
+    "tests/mcp/test_names.py",
+    "tests/web/test_mcp_company_workspace.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "da2c35027a5a",
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T13:26:56.484429Z",
+    "agent_lines": 591,
+    "agent_removed": 54,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 144,
+    "total_committed": 591,
+    "total_lines_changed": 789,
+    "agent_percentage": 81.74904942965779,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 144,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_removed_per_file": {
+        "relocation_jobs/catalog/cache.py": 7,
+        "relocation_jobs/catalog/util.py": 8,
+        "relocation_jobs/fetch/log.py": 4,
+        "relocation_jobs/scrape/http_trace.py": 125
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 735,
+      "agent_lines_removed": 198
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 735,
+      "agent_lines_removed": 198
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 735,
+      "agent_lines_removed": 198
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+add a simple field like we have place for resume and saving .tex file just for cover letter.
+
+every functions are like resume and can generate pdf like resume.
+
+read the skills and plan for it.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+how to tell claude to save cover letter on
+
+---
+
+update the zip file mcp skill to add claude to find it
+
+---
+
+update the zip file mcp skill to add claude to find it
+
+---
+
+restart the server

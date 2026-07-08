@@ -56,7 +56,7 @@ from relocation_jobs.mcp.types import (
 )
 from relocation_jobs.core.location_tags import job_fails_office_location_gate
 from relocation_jobs.panel.tracking import job_dict, resolve_track
-from relocation_jobs.positions.service import set_job_applied
+from relocation_jobs.positions.service import set_job_applied, set_job_ats_score as _set_job_ats_score
 from relocation_jobs.positions.state import effective_wrong_location, position_view_from_row
 from relocation_jobs.positions.types import PositionBucket
 from relocation_jobs.shared.timestamps import job_fetched_ts, normalize_posted_at
@@ -1507,6 +1507,20 @@ def update_position(
         job=stored,
         updated_fields=updated_fields,
     )
+
+
+def set_ats_score(
+    country: str,
+    company: str,
+    url: str,
+    ats_score: int | None,
+    *,
+    user_id: int | None = None,
+) -> dict:
+    uid = user_id if user_id is not None else resolve_user_id()
+    if ats_score is not None and not 0 <= ats_score <= 100:
+        raise ValueError("ats_score must be between 0 and 100")
+    return _set_job_ats_score(country, company, url, ats_score, user_id=uid)
 
 
 def mark_job_applied(

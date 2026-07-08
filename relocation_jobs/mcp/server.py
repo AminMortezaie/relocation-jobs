@@ -241,6 +241,12 @@ def render_cover_letter_pdf(country: str, company: str, url: str) -> str:
 
 
 @mcp.tool()
+def set_ats_score(country: str, company: str, url: str, ats_score: int | None = None) -> str:
+    """Set or clear the ATS score for a job (0-100). Use None to clear."""
+    return _json(service.set_ats_score(country, company, url, ats_score))
+
+
+@mcp.tool()
 def mark_applied(country: str, company: str, url: str, applied: bool = True) -> str:
     """Mark the job applied (or unapplied) in the panel tracking DB."""
     return _json(service.mark_job_applied(country, company, url, applied=applied))

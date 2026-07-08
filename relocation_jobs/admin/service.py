@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import os
-from datetime import datetime, timezone
+from datetime import datetime
+
+from relocation_jobs.users.applied import _timezone, local_day_utc_bounds
 
 from relocation_jobs.core.ats_constants import (
     DEFAULT_CONCURRENCY,
@@ -101,8 +103,15 @@ def get_admin_overview(*, fetch_state: dict | None = None) -> dict:
     }
 
 
-def get_recently_fetched_jobs(*, limit: int = 30) -> list[dict]:
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+def get_recently_fetched_jobs(
+    *,
+    limit: int = 30,
+    timezone_name: str | None = None,
+) -> list[dict]:
+    start_utc, end_utc = local_day_utc_bounds(timezone_name)
+    tz = _timezone(timezone_name)
+    start_date = datetime.fromisoformat(start_utc).astimezone(tz).date().isoformat()
+    end_date = datetime.fromisoformat(end_utc).astimezone(tz).date().isoformat()
     with db_read() as conn:
         rows = conn.execute(
             """
@@ -110,11 +119,11 @@ def get_recently_fetched_jobs(*, limit: int = 30) -> list[dict]:
                    c.name AS company_name, c.country
             FROM matching_jobs j
             JOIN companies c ON c.id = j.company_id
-            WHERE j.fetched >= %s
+            WHERE j.fetched >= %s AND j.fetched < %s
             ORDER BY j.fetched DESC
             LIMIT %s
             """,
-            (today, max(1, min(limit, 200))),
+            (start_date, end_date, max(1, min(limit, 200))),
         ).fetchall()
     return [dict(r) for r in rows]
 

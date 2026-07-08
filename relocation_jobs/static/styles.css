@@ -5819,6 +5819,7 @@ body.scroll-locked {
   flex-direction: column;
   gap: 0.65rem;
   min-width: 0;
+  flex: 1;
 }
 
 .apply-master-actions {
@@ -5832,6 +5833,7 @@ body.scroll-locked {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.85rem;
   min-height: 420px;
+  flex: 1;
 }
 
 .apply-master-preview-label {
@@ -5854,7 +5856,7 @@ body.scroll-locked {
 .apply-master-pdf-frame-wrap {
   position: relative;
   flex: 1;
-  min-height: 420px;
+  min-height: 520px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--surface2);
@@ -5863,8 +5865,7 @@ body.scroll-locked {
 
 .apply-master-pdf-frame {
   width: 100%;
-  height: 100%;
-  min-height: 420px;
+  height: 520px;
   border: 0;
   background: #fff;
 }
@@ -5910,7 +5911,7 @@ body.scroll-locked {
 
 .apply-tex-editor {
   flex: 1;
-  min-height: 420px;
+  min-height: 520px;
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.8rem;
   line-height: 1.45;

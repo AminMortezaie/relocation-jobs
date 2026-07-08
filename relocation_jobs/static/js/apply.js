@@ -69,6 +69,23 @@ function setTab(tab) {
   if (profile) profile.hidden = tab !== "profile";
   if (masters) masters.hidden = tab !== "masters";
   if (projects) projects.hidden = tab !== "projects";
+
+  // PDF iframes load while their panel is hidden (profile is the default tab).
+  // Re-set src after show so the browser PDF viewer gets the real viewport size.
+  if (tab === "masters" && selectedSlug) {
+    updateMasterPdfPreview({
+      slug: selectedSlug,
+      hasPdf: selectedHasPdf,
+      pdfFilename: selectedPdfFilename,
+    });
+  }
+  if (tab === "projects" && selectedProjectSlug) {
+    updateProjectPdfPreview({
+      slug: selectedProjectSlug,
+      hasPdf: selectedProjectHasPdf,
+      pdfFilename: selectedProjectPdfFilename,
+    });
+  }
 }
 
 function fillProfileForm(profile) {

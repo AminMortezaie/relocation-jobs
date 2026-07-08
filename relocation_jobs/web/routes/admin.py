@@ -113,7 +113,13 @@ def register(app):
         except ValueError:
             limit = 30
         try:
-            return jsonify({"jobs": admin_service.get_recently_fetched_jobs(limit=limit)})
+            timezone_name = (request.args.get("timezone") or "").strip() or None
+            return jsonify({
+                "jobs": admin_service.get_recently_fetched_jobs(
+                    limit=limit,
+                    timezone_name=timezone_name,
+                ),
+            })
         except Exception as exc:
             app.logger.exception("admin recent-jobs failed")
             return jsonify({"error": str(exc)}), 500

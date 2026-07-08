@@ -352,7 +352,11 @@ async function loadDashboard() {
   setLoadingProgress(80);
   renderCatalog(data.catalog);
   renderUsers(data.users);
-  renderNewJobs(await apiGet("/api/admin/recent-jobs?limit=30"));
+  renderNewJobs(
+    await apiGet(
+      `/api/admin/recent-jobs?limit=30&timezone=${encodeURIComponent(tz)}`,
+    ),
+  );
   renderFetchRuns(data.runs);
   renderConfig(data.config);
   await initAdminWorker(data.worker);

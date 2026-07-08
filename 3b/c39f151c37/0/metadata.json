@@ -1,0 +1,257 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "3bc39f151c37",
+  "session_id": "2d055cc1-589e-4f4b-9300-9a1e73bced23",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T01:47:41.697496Z",
+  "branch": "main",
+  "checkpoints_count": 12,
+  "save_step_count": 12,
+  "files_touched": [
+    ".dockerignore",
+    ".gitignore",
+    "AGENTS.md",
+    "Dockerfile.ec2-worker",
+    "docker-entrypoint.sh",
+    "docs/README.md",
+    "docs/backlog.md",
+    "docs/contributing.md",
+    "docs/operations/ec2-panel.md",
+    "docs/reference/board-load-performance-incident.md",
+    "docs/reference/catalog-pattern.md",
+    "docs/reference/catalog-seed-test-failure.md",
+    "docs/reference/rules.md",
+    "docs/reference/stats.md",
+    "relocation_jobs/admin/service.py",
+    "relocation_jobs/build_companies.py",
+    "relocation_jobs/catalog/cache.py",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/catalog/stats.py",
+    "relocation_jobs/catalog/writes.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/auth.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/db/__init__.py",
+    "relocation_jobs/db/companies.py",
+    "relocation_jobs/db/events.py",
+    "relocation_jobs/db/fetch_runs.py",
+    "relocation_jobs/db/tracking.py",
+    "relocation_jobs/db/users.py",
+    "relocation_jobs/fetch/client.py",
+    "relocation_jobs/fetch/country_runner.py",
+    "relocation_jobs/fetch/pipeline.py",
+    "relocation_jobs/fetch/ports.py",
+    "relocation_jobs/fetch/repo.py",
+    "relocation_jobs/fetch/runner.py",
+    "relocation_jobs/fetch/scheduler.py",
+    "relocation_jobs/fetch/service.py",
+    "relocation_jobs/fetch/state.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/panel/flatten.py",
+    "relocation_jobs/panel/flatten_jobs.py",
+    "relocation_jobs/panel/flatten_orphans.py",
+    "relocation_jobs/panel/flatten_rules.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/panel/stats.py",
+    "relocation_jobs/panel/tracking.py",
+    "relocation_jobs/positions/repo.py",
+    "relocation_jobs/positions/state.py",
+    "relocation_jobs/positions/tracking_resolve.py",
+    "relocation_jobs/reset_password.py",
+    "relocation_jobs/scrape/ats_resolve.py",
+    "relocation_jobs/scrape/board.py",
+    "relocation_jobs/scrape/company.py",
+    "relocation_jobs/static/admin.html",
+    "relocation_jobs/static/js/admin-scrape.js",
+    "relocation_jobs/static/js/admin-worker.js",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/board-filter.js",
+    "relocation_jobs/static/js/stats-dashboard.js",
+    "relocation_jobs/users/repo.py",
+    "relocation_jobs/web/routes/admin.py",
+    "relocation_jobs/web/routes/companies.py",
+    "relocation_jobs/web/routes/fetch.py",
+    "relocation_jobs/web/server.py",
+    "scripts/ec2_app_deploy.sh",
+    "scripts/fetch_scheduler_worker.py",
+    "tests/catalog/test_repo.py",
+    "tests/conftest.py",
+    "tests/core/test_custom_countries.py",
+    "tests/fetch/test_runner_country_results.py",
+    "tests/fetch/test_scheduler.py",
+    "tests/fetch/test_service.py",
+    "tests/helpers/seed.py",
+    "tests/panel/test_hide_empty.py",
+    "tests/panel/test_jobs.py",
+    "tests/panel/test_preview_board.py",
+    "tests/positions/test_state.py",
+    "tests/positions/test_workflows.py",
+    "tests/web/test_admin_e2e.py",
+    "tests/web/test_catalog_api.py",
+    "tests/web/test_fetch_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "fed6e22cab6f",
+  "session_metrics": {
+    "turn_count": 12,
+    "context_tokens": 185185,
+    "context_window_size": 200000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T01:47:41.690648Z",
+    "agent_lines": 3331,
+    "agent_removed": 3992,
+    "human_added": 516,
+    "human_modified": 128,
+    "human_removed": 0,
+    "total_committed": 3975,
+    "total_lines_changed": 7971,
+    "agent_percentage": 91.87053067369213,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 440,
+      "user_lines_removed": 10,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".dockerignore": 1,
+        "Dockerfile.ec2-worker": 26,
+        "deploy/ec2/Caddyfile": 9,
+        "docs/operations/ec2-panel.md": 17,
+        "relocation_jobs/db/users.py": 8,
+        "relocation_jobs/fetch/runner.py": 9,
+        "relocation_jobs/fetch/scheduler.py": 160,
+        "scripts/ec2_app_deploy.sh": 55,
+        "scripts/fetch_scheduler_worker.py": 45,
+        "tests/fetch/test_scheduler.py": 110
+      },
+      "user_removed_per_file": {
+        "docs/operations/ec2-panel.md": 5,
+        "scripts/ec2_app_deploy.sh": 5
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 440,
+      "agent_lines_removed": 10
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 3689,
+      "agent_lines_removed": 3911
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 3680,
+      "agent_lines_removed": 3911
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 3680,
+      "agent_lines_removed": 3911
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 313,
+      "user_lines_removed": 56,
+      "agent_lines_added": 3680,
+      "agent_lines_removed": 3911,
+      "user_added_per_file": {
+        "relocation_jobs/admin/service.py": 2,
+        "relocation_jobs/catalog/repo.py": 31,
+        "relocation_jobs/panel/flatten.py": 58,
+        "relocation_jobs/panel/service.py": 35,
+        "relocation_jobs/static/js/admin.js": 19,
+        "tests/catalog/test_repo.py": 77,
+        "tests/panel/test_preview_board.py": 88,
+        "tests/web/test_admin_e2e.py": 3
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/admin/service.py": 7,
+        "relocation_jobs/catalog/repo.py": 15,
+        "relocation_jobs/panel/service.py": 27,
+        "relocation_jobs/static/js/admin.js": 3,
+        "tests/web/test_admin_e2e.py": 4
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 3978,
+      "agent_lines_removed": 3937
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 3978,
+      "agent_lines_removed": 3937
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 4222,
+      "agent_lines_removed": 3938
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 21,
+      "user_lines_removed": 44,
+      "agent_lines_added": 4463,
+      "agent_lines_removed": 4043,
+      "user_added_per_file": {
+        "relocation_jobs/admin/service.py": 15,
+        "relocation_jobs/static/admin.html": 1,
+        "relocation_jobs/web/routes/admin.py": 5
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/admin/service.py": 25,
+        "relocation_jobs/static/admin.html": 3,
+        "relocation_jobs/web/routes/admin.py": 16
+      }
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 18,
+      "user_lines_removed": 18,
+      "agent_lines_added": 4473,
+      "agent_lines_removed": 4077,
+      "user_added_per_file": {
+        "relocation_jobs/fetch/pipeline.py": 4,
+        "relocation_jobs/fetch/ports.py": 1,
+        "relocation_jobs/fetch/service.py": 2,
+        "relocation_jobs/scrape/company.py": 11
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/fetch/pipeline.py": 4,
+        "relocation_jobs/fetch/ports.py": 1,
+        "relocation_jobs/fetch/service.py": 2,
+        "relocation_jobs/scrape/company.py": 11
+      }
+    }
+  ]
+}

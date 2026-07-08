@@ -1,0 +1,59 @@
+plan to fix this brutal problem
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+i think your assumation was wrong cause its loading too long and more than before find the real problem here
+
+---
+
+i think your assumation was wrong cause its loading too long and more than before find the real problem here
+
+---
+
+write down a complete article about what happened and created this brutal problem in application.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+add a principle to not point to actual ip address of server cause we're pushing on public git repo.
+add this to skills and everyfiles has the real ip should be ignored on git and on documents we should not expose credintioanl data like this.
+
+---
+
+add a principle to not point to actual ip address of server cause we're pushing on public git repo.
+add this to skills and everyfiles has the real ip should be ignored on git and on documents we should not expose credintioanl data like this.
+
+---
+
+can we deploy it on server now?
+
+---
+
+i just asked you a question not doing anything
+
+---
+
+i just asked you a question not doing anything

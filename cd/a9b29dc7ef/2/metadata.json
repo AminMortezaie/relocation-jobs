@@ -1,0 +1,131 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "cda9b29dc7ef",
+  "session_id": "d9d7affb-0ff7-4282-9244-8e81eb262941",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T02:37:46.803796Z",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "save_step_count": 8,
+  "files_touched": [
+    "relocation_jobs/catalog/locations.py",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/static/js/board.js",
+    "relocation_jobs/static/js/data.js",
+    "relocation_jobs/static/js/dialogs.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/static/js/utils.js",
+    "tests/catalog/test_locations.py",
+    "tests/web/test_catalog_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "cc63ad74aec4",
+  "session_metrics": {
+    "duration_ms": 729351,
+    "turn_count": 8
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T02:37:46.800288Z",
+    "agent_lines": 198,
+    "agent_removed": 34,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 198,
+    "total_lines_changed": 232,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 916,
+      "user_lines_removed": 91,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "docs/README.md": 2,
+        "docs/reference/full-spa-ui-modernization-proposal.md": 352,
+        "frontend/src/App.jsx": 15,
+        "frontend/src/CompanyCard.jsx": 4,
+        "relocation_jobs/static/admin.html": 27,
+        "relocation_jobs/static/apply.html": 27,
+        "relocation_jobs/static/company.html": 27,
+        "relocation_jobs/static/dist/board.js": 1,
+        "relocation_jobs/static/index.html": 40,
+        "relocation_jobs/static/js/auth.js": 1,
+        "relocation_jobs/static/styles.css": 420
+      },
+      "user_removed_per_file": {
+        "frontend/src/App.jsx": 2,
+        "frontend/src/CompanyCard.jsx": 2,
+        "relocation_jobs/static/admin.html": 2,
+        "relocation_jobs/static/apply.html": 2,
+        "relocation_jobs/static/company.html": 2,
+        "relocation_jobs/static/dist/board.js": 1,
+        "relocation_jobs/static/index.html": 15,
+        "relocation_jobs/static/js/auth.js": 1,
+        "relocation_jobs/static/styles.css": 64
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 916,
+      "agent_lines_removed": 91
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1103,
+      "agent_lines_removed": 118
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1103,
+      "agent_lines_removed": 118
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1101,
+      "agent_lines_removed": 118
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1107,
+      "agent_lines_removed": 127
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1101,
+      "agent_lines_removed": 133
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1120,
+      "agent_lines_removed": 134
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1120,
+      "agent_lines_removed": 134
+    }
+  ]
+}

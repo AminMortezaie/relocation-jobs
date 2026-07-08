@@ -3,14 +3,18 @@
   "checkpoint_id": "cda9b29dc7ef",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 14,
+  "checkpoints_count": 22,
   "files_touched": [
     "relocation_jobs/catalog/locations.py",
     "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/static/js/board.js",
     "relocation_jobs/static/js/data.js",
     "relocation_jobs/static/js/dialogs.js",
+    "relocation_jobs/static/js/events.js",
     "relocation_jobs/static/js/scrape.js",
     "relocation_jobs/static/js/state.js",
+    "relocation_jobs/static/js/utils.js",
+    "tests/catalog/test_locations.py",
     "tests/web/test_catalog_api.py"
   ],
   "sessions": [
@@ -25,6 +29,12 @@
       "transcript": "/cd/a9b29dc7ef/1/full.jsonl",
       "content_hash": "/cd/a9b29dc7ef/1/content_hash.txt",
       "prompt": "/cd/a9b29dc7ef/1/prompt.txt"
+    },
+    {
+      "metadata": "/cd/a9b29dc7ef/2/metadata.json",
+      "transcript": "/cd/a9b29dc7ef/2/full.jsonl",
+      "content_hash": "/cd/a9b29dc7ef/2/content_hash.txt",
+      "prompt": "/cd/a9b29dc7ef/2/prompt.txt"
     }
   ]
 }

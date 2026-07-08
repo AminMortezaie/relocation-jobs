@@ -8,6 +8,8 @@ import { loadBoard, showJobsLoading } from "./board.js";
 export { setLoadingProgress, finishLoadingProgress, showJobsLoading };
 
 let locationsLoaded = false;
+let pickerLocationsCache = null;
+let pickerLocationsPromise = null;
 
 function savedLocationKey() {
   return localStorage.getItem("panel_location")
@@ -38,11 +40,16 @@ export async function loadCountries() {
   }
 }
 
+export function getCachedAtsTypes() {
+  return state.atsTypes || [];
+}
+
 export async function loadAtsTypes() {
   const sel = $("ats");
   if (!sel) return;
 
   const types = await fetchAtsTypes();
+  state.atsTypes = types;
   sel.innerHTML = [
     `<option value="all">All ATS</option>`,
     `<option value="generic">Generic / unknown</option>`,
@@ -87,6 +94,25 @@ export async function loadCities({ deferred = false } = {}) {
 export async function ensureLocationsLoaded() {
   if (locationsLoaded) return;
   await loadCities();
+}
+
+export function invalidatePickerLocationsCache() {
+  pickerLocationsCache = null;
+}
+
+export async function loadPickerLocations() {
+  if (pickerLocationsCache) return pickerLocationsCache;
+  if (!pickerLocationsPromise) {
+    pickerLocationsPromise = fetchLocations("all", { picker: true })
+      .then((locations) => {
+        pickerLocationsCache = locations;
+        return locations;
+      })
+      .finally(() => {
+        pickerLocationsPromise = null;
+      });
+  }
+  return pickerLocationsPromise;
 }
 
 export async function loadJobs(options = {}) {

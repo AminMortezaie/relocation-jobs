@@ -816,19 +816,24 @@ function bindJobsListEvents() {
 }
 
 function bindToolbarEvents() {
-  $("country").addEventListener("change", async () => {
+  $("country").addEventListener("change", () => {
     updateFetchHeaderUI();
-    await loadCities();
-    await loadJobs({ force: true, overlayLabel: "Updating board…" });
+    const locSel = $("location");
+    if (locSel) {
+      locSel.value = "all";
+      localStorage.setItem("panel_location", "all");
+    }
+    void loadCities();
+    void loadBoard({ force: true, noOverlay: true, preserveContent: true });
   });
   $("ats")?.addEventListener("change", () => {
-    void loadJobs({ force: true, overlayLabel: "Updating board…" });
+    void loadBoard({ force: true, noOverlay: true, preserveContent: true });
   });
   $("location")?.addEventListener("focus", () => {
     void ensureLocationsLoaded();
   });
   $("location")?.addEventListener("change", () => {
-    void loadJobs({ force: true, overlayLabel: "Updating board…" });
+    void loadBoard({ force: true, noOverlay: true, preserveContent: true });
   });
   $("search").addEventListener("input", debounce(() => {
     void loadBoard({ force: true, noOverlay: true, preserveContent: true });

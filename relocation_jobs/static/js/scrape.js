@@ -302,6 +302,22 @@ export function ensureFetchPolling() {
 }
 
 export async function openFetchProgress() {
+  const cached = state.lastFetchStatus;
+  const clientActive = fetchClientActive();
+
+  if (cached?.running || clientActive) {
+    if (cached?.running) {
+      syncFetchJobSummary(cached);
+      markFetchActiveFromStatus(cached);
+      showFetchPanelForStatus(cached, { reopen: true });
+      applyFetchStatus(cached, { replaceLog: true });
+      ensureFetchPolling();
+    }
+  } else if (cached?.company && cached?.review_jobs) {
+    openFetchPanel();
+    applyFetchStatus(cached, { replaceLog: true });
+  }
+
   let st;
   try {
     st = await getFetchStatus();
@@ -309,6 +325,8 @@ export async function openFetchProgress() {
   } catch {
     if (state.lastFetchStatus?.running) {
       st = state.lastFetchStatus;
+    } else if (cached?.running || clientActive) {
+      return;
     } else {
       toast("Could not load fetch status");
       return;
@@ -531,12 +549,11 @@ export async function startCountryFetch() {
 }
 
 export async function fetchOneCompany(country, company) {
-  const st = await syncFetchStateFromServer();
-  if (st?.running) {
+  if (state.lastFetchStatus?.running) {
     toast("A fetch is already running.");
     return;
   }
-  if (state.fetchBusy || state.countryFetchActive) {
+  if (state.fetchBusy || state.countryFetchActive || state.serverFetchRunning) {
     clearFetchActivity();
   }
 
@@ -549,6 +566,14 @@ export async function fetchOneCompany(country, company) {
     country,
     company,
   });
+
+  const st = await syncFetchStateFromServer();
+  if (st?.running) {
+    toast("A fetch is already running.");
+    setFetchBusy(false);
+    hideFetchPanelOnFailure();
+    return;
+  }
 
   try {
     const data = await fetchCompanyRequest(country, company);

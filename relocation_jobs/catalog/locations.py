@@ -5,10 +5,30 @@ from relocation_jobs.core.location_tags import (
     normalize_location,
     normalize_locations,
     picker_cities_for_country,
-    sync_company_location_fields,
 )
 from relocation_jobs.core.paths import supported_countries
-from relocation_jobs.catalog.repo import load_country_catalog
+from relocation_jobs.catalog.repo import load_company_location_sources
+from relocation_jobs.catalog.serialize import parse_cities_json, parse_locations_json
+
+
+def _add_locations_from_company_rows(rows: list[dict], add) -> None:
+    for row in rows:
+        catalog_country = row.get("country") or ""
+        parsed = parse_locations_json(
+            row.get("locations_json"),
+            catalog_country=catalog_country,
+        )
+        if parsed:
+            for loc in parsed:
+                add(loc.country, loc.city)
+            continue
+        for loc in normalize_locations(
+            None,
+            catalog_country=catalog_country,
+            legacy_cities=parse_cities_json(row.get("cities_json")),
+            legacy_city=row.get("city") or "",
+        ):
+            add(loc["country"], loc["city"])
 
 
 def list_company_locations(
@@ -42,19 +62,9 @@ def list_company_locations(
         if filter_country
         else sorted(supported_countries())
     )
-    for key in country_keys:
-        data = load_country_catalog(key)
-        if not data:
-            continue
-        for company in data.get("companies") or []:
-            sync_company_location_fields(company, catalog_country=key)
-            locations = normalize_locations(
-                company.get("locations"),
-                catalog_country=key,
-                legacy_cities=company.get("cities") if isinstance(company.get("cities"), list) else None,
-                legacy_city=company.get("city", ""),
-            )
-            for loc in locations:
-                add(loc["country"], loc["city"])
+    _add_locations_from_company_rows(
+        load_company_location_sources(country_keys),
+        add,
+    )
 
     return sorted(keyed.values(), key=lambda loc: (loc["country_label"], loc["city"].casefold()))

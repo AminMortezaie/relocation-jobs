@@ -145,6 +145,16 @@ export function setLoadingProgress(pct) {
   fill.style.width = `${Math.max(current, pct)}%`;
 }
 
+export function beginTopLoadingProgress(pct = 8) {
+  if (isScreenLoadActive()) return;
+  const fill = document.getElementById("loadingBarFill");
+  const bar = document.getElementById("loadingBar");
+  if (!fill || !bar) return;
+  bar.classList.remove("done");
+  fill.style.opacity = "1";
+  fill.style.width = `${pct}%`;
+}
+
 export function finishLoadingProgress() {
   if (isScreenLoadActive()) {
     endScreenLoad();

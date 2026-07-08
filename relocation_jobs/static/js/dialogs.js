@@ -2,8 +2,8 @@
 
 import { state } from "./state.js";
 import { $, escapeAttr, escapeHtml, toast } from "./utils.js";
-import { addCompany, updateCareersUrl, updateCompanyCity, updateCompanyName, fetchLocations, fetchAtsTypes, addCustomLocation, addCustomCountry } from "./api.js";
-import { loadJobs, loadCities } from "./data.js";
+import { addCompany, updateCareersUrl, updateCompanyCity, updateCompanyName, fetchAtsTypes, addCustomLocation, addCustomCountry } from "./api.js";
+import { loadJobs, loadCities, getCachedAtsTypes, loadPickerLocations, invalidatePickerLocationsCache } from "./data.js";
 import { migrateCompanyKeyInState } from "./storage.js";
 
 function getAddCompanyCountryOptions() {
@@ -33,11 +33,10 @@ export function populateAddCompanyCountryPicker({ force = false } = {}) {
   container.dataset.ready = "1";
 }
 
-export async function populateAddCompanyAtsPicker() {
+function renderAddCompanyAtsOptions(types) {
   const container = $("addCompanyAtsOptions");
   if (!container) return;
 
-  const types = await fetchAtsTypes();
   container.innerHTML = [
     `<button
       type="button"
@@ -62,6 +61,19 @@ export async function populateAddCompanyAtsPicker() {
         >${escapeHtml(item.label || item.id)}</button>`
       ),
   ].join("");
+  setAddCompanyAts(getAddCompanyAts());
+}
+
+export async function populateAddCompanyAtsPicker() {
+  const container = $("addCompanyAtsOptions");
+  if (!container) return;
+
+  let types = getCachedAtsTypes();
+  if (!types.length) {
+    types = await fetchAtsTypes();
+    if (types.length) state.atsTypes = types;
+  }
+  renderAddCompanyAtsOptions(types);
 }
 
 function setAddCompanyAts(value) {
@@ -145,7 +157,11 @@ function toggleAddCompanyAccordion(itemId) {
   if (!item || item.hidden) return;
   const trigger = item.querySelector(".add-company-accordion-trigger");
   const expanded = trigger?.getAttribute("aria-expanded") === "true";
-  setAddCompanyAccordionExpanded(itemId, !expanded);
+  const willExpand = !expanded;
+  setAddCompanyAccordionExpanded(itemId, willExpand);
+  if (willExpand && itemId === "addCompanyLocationsAccordion") {
+    void loadAddCompanyLocationsWhenNeeded();
+  }
 }
 
 function collapseAllAddCompanyAccordions() {
@@ -415,13 +431,28 @@ function renderAddCompanyLocationOptions() {
 
 async function ensureAddCompanyPickerLocations() {
   if (!addCompanyPickerLocations.length) {
-    addCompanyPickerLocations = await fetchLocations("all", { picker: true });
+    addCompanyPickerLocations = await loadPickerLocations();
   }
 }
 
-export async function openAddCompanyDialog() {
+async function loadAddCompanyLocationsWhenNeeded() {
+  const container = $("addCompanyLocationOptions");
+  if (!container) return;
+  if (addCompanyPickerLocations.length) {
+    renderAddCompanyLocationOptions();
+    return;
+  }
+  container.innerHTML = `<p class="text-muted">Loading cities…</p>`;
+  try {
+    await ensureAddCompanyPickerLocations();
+    renderAddCompanyLocationOptions();
+  } catch {
+    container.innerHTML = `<p class="text-muted">Could not load cities</p>`;
+  }
+}
+
+export function openAddCompanyDialog() {
   populateAddCompanyCountryPicker();
-  await Promise.all([populateAddCompanyAtsPicker(), ensureAddCompanyPickerLocations()]);
   $("addCompanyName").value = "";
   $("addCompanyUrl").value = "";
   if ($("addCompanyLocationSearch")) $("addCompanyLocationSearch").value = "";
@@ -438,6 +469,7 @@ export async function openAddCompanyDialog() {
   $("addCompanyDialog").classList.add("open");
   $("addCompanyDialog").setAttribute("aria-hidden", "false");
   $("addCompanyName").focus();
+  void populateAddCompanyAtsPicker();
 }
 
 export function closeAddCompanyDialog() {
@@ -603,6 +635,8 @@ async function addCustomCompanyLocation(country, city, countryLabel = "") {
     return false;
   }
   ensurePickerLocation(entry);
+  invalidatePickerLocationsCache();
+  addCompanyPickerLocations = [];
   selected.push(entry);
   setAddCompanyLocations(selected);
   renderAddCompanyLocationOptions();
@@ -949,7 +983,7 @@ async function populateEditCityOptions(selectedLocations) {
   const container = $("editCityOptions");
   if (!container) return;
 
-  const options = await fetchLocations("all", { picker: true });
+  const options = await loadPickerLocations();
   const selected = normalizeLocationList(selectedLocations);
   const optionKeys = new Set(options.map((loc) => locationSelectionKey(loc)));
 

@@ -374,6 +374,22 @@ def count_fetch_problems(country_keys: list[str]) -> int:
     return int(_row(row).get("total") or 0)
 
 
+def load_company_location_sources(country_keys: list[str]) -> list[dict]:
+    if not country_keys:
+        return []
+    country_sql, country_params = _country_in_clause(country_keys)
+    with db_read() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT c.country, c.city, c.cities_json, c.locations_json
+            FROM companies c
+            WHERE {country_sql}
+            """,
+            tuple(country_params),
+        ).fetchall()
+    return [_row(row) for row in rows]
+
+
 def load_catalog_companies_page(
     country_keys: list[str],
     *,

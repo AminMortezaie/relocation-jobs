@@ -1,7 +1,7 @@
 /** Board load path: paginated catalog from server, local UI filters only. */
 
 import { state } from "./state.js";
-import { $ } from "./utils.js";
+import { $, beginTopLoadingProgress, finishLoadingProgress, setLoadingProgress } from "./utils.js";
 import { fetchBoard, fetchBoardUserStats } from "./api.js";
 import { releaseCompanyOrder } from "./render.js";
 import { syncBoardView } from "./board-view.js";
@@ -111,8 +111,11 @@ export async function loadBoard(options = {}) {
 
   const preserveContent = options.preserveContent === true;
   const useOverlay = options.noOverlay !== true;
+  const useTopBar = !useOverlay;
   if (useOverlay) {
     beginScreenLoad(overlayLabel(options, page, requestChanged));
+  } else if (useTopBar) {
+    beginTopLoadingProgress(12);
   }
 
   releaseCompanyOrder();
@@ -124,8 +127,10 @@ export async function loadBoard(options = {}) {
 
   try {
     if (useOverlay) setScreenLoadProgress(20);
+    else if (useTopBar) setLoadingProgress(28);
     await loadBoardCatalog({ ...options, page, requestChanged });
     if (useOverlay) setScreenLoadProgress(72);
+    else if (useTopBar) setLoadingProgress(82);
 
     const totalPages = boardTotalPages();
     if (state.boardPage > totalPages) {
@@ -134,13 +139,16 @@ export async function loadBoard(options = {}) {
 
     if (options.refreshUserStats) {
       if (useOverlay) setScreenLoadProgress(86);
+      else if (useTopBar) setLoadingProgress(90);
       await loadBoardUserStats();
     }
 
     if (useOverlay) setScreenLoadProgress(94);
+    else if (useTopBar) setLoadingProgress(96);
     applyBoardView();
   } finally {
     if (useOverlay) endScreenLoad();
+    else if (useTopBar) finishLoadingProgress();
   }
 }
 

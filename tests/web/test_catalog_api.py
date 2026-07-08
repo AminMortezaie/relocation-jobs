@@ -156,6 +156,18 @@ def test_countries_list_includes_custom_country(v2_auth_client, tmp_data_dir):
     assert "spain" in ids
 
 
+def test_locations_picker_returns_structured_list(v2_auth_client, seeded_catalog_v2):
+    del seeded_catalog_v2
+    resp = v2_auth_client.get("/api/locations?country=all&picker=1")
+    assert resp.status_code == 200
+    locations = resp.get_json()["locations"]
+    assert isinstance(locations, list)
+    for loc in locations:
+        assert "country" in loc
+        assert "city" in loc
+        assert "key" in loc
+
+
 def test_add_custom_city_requires_supported_country(v2_auth_client, tmp_data_dir):
     resp = v2_auth_client.post("/api/locations", json={"country": "spain", "city": "Madrid"})
     assert resp.status_code == 400

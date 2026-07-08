@@ -14,6 +14,7 @@ export const state = {
   showNotForMeCompanies: new Set(),
   showRejectedCompanies: new Set(),
   scrapeConfig: { default_concurrency: 16, max_concurrency: 16 },
+  atsTypes: [],
   authState: { authenticated: false, allow_register: false },
   loginMode: "login",
   editCareersContext: null,

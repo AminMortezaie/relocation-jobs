@@ -70,6 +70,48 @@ def get_worker_status(*, fetch_state: dict | None, scrape_enabled: bool) -> dict
     }
 
 
+def _fetched_today_bounds(
+    timezone_name: str | None,
+) -> tuple[str, str, str, str]:
+    start_utc, end_utc = local_day_utc_bounds(timezone_name)
+    tz = _timezone(timezone_name)
+    start_date = datetime.fromisoformat(start_utc).astimezone(tz).date().isoformat()
+    end_date = datetime.fromisoformat(end_utc).astimezone(tz).date().isoformat()
+    return start_utc, end_utc, start_date, end_date
+
+
+_FETCHED_TODAY_SQL = """
+    (
+      (j.fetched ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T'
+       AND j.fetched >= %s AND j.fetched < %s)
+      OR
+      (j.fetched ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+       AND j.fetched >= %s AND j.fetched < %s)
+    )
+"""
+
+
+def count_matching_jobs_fetched_today(
+    *,
+    timezone_name: str | None = None,
+    country_key: str | None = None,
+) -> int:
+    start_utc, end_utc, start_date, end_date = _fetched_today_bounds(timezone_name)
+    sql = f"""
+        SELECT COUNT(*) AS n
+        FROM matching_jobs j
+        JOIN companies c ON c.id = j.company_id
+        WHERE {_FETCHED_TODAY_SQL.strip()}
+    """
+    params: list = [start_utc, end_utc, start_date, end_date]
+    if country_key and country_key != "all":
+        sql += " AND c.country = %s"
+        params.append(country_key)
+    with db_read() as conn:
+        row = conn.execute(sql, tuple(params)).fetchone()
+    return int((row or {}).get("n") or 0)
+
+
 def compute_admin_panel_stats(
     *,
     user_id: int,
@@ -84,7 +126,7 @@ def compute_admin_panel_stats(
         ats_type=ats_type,
         user_id=user_id,
     )
-    return compute_stats(
+    stats = compute_stats(
         companies,
         file_meta,
         fetch_problem_count=fetch_problem_count,
@@ -92,6 +134,11 @@ def compute_admin_panel_stats(
         country_key=country_key,
         timezone_name=timezone_name,
     )
+    stats["latest_fetch_new_jobs"] = count_matching_jobs_fetched_today(
+        timezone_name=timezone_name,
+        country_key=country_key,
+    )
+    return stats
 
 
 def get_admin_overview(*, fetch_state: dict | None = None) -> dict:
@@ -108,22 +155,25 @@ def get_recently_fetched_jobs(
     limit: int = 30,
     timezone_name: str | None = None,
 ) -> list[dict]:
-    start_utc, end_utc = local_day_utc_bounds(timezone_name)
-    tz = _timezone(timezone_name)
-    start_date = datetime.fromisoformat(start_utc).astimezone(tz).date().isoformat()
-    end_date = datetime.fromisoformat(end_utc).astimezone(tz).date().isoformat()
+    start_utc, end_utc, start_date, end_date = _fetched_today_bounds(timezone_name)
     with db_read() as conn:
         rows = conn.execute(
-            """
+            f"""
             SELECT j.title, j.url, j.fetched, j.visa_sponsorship,
                    c.name AS company_name, c.country
             FROM matching_jobs j
             JOIN companies c ON c.id = j.company_id
-            WHERE j.fetched >= %s AND j.fetched < %s
+            WHERE {_FETCHED_TODAY_SQL.strip()}
             ORDER BY j.fetched DESC
             LIMIT %s
             """,
-            (start_date, end_date, max(1, min(limit, 200))),
+            (
+                start_utc,
+                end_utc,
+                start_date,
+                end_date,
+                max(1, min(limit, 200)),
+            ),
         ).fetchall()
     return [dict(r) for r in rows]
 

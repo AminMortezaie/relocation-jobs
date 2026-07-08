@@ -97,53 +97,30 @@ def test_admin_panel_stats_open_roles_exclude_applied_and_not_for_me(
     assert stats["positions_not_for_me"] == 1
 
 
-def test_admin_panel_stats_new_jobs_today_from_fetch_runs(v2_auth_client, seeded_catalog_v2):
+def test_admin_panel_stats_new_jobs_today_counts_matching_jobs(
+    v2_auth_client, seeded_catalog_v2,
+):
     from datetime import datetime, timezone
 
-    from relocation_jobs.users.repo import get_user_by_username
-    from relocation_jobs.fetch import repo as fetch_repo
+    from relocation_jobs.core.job_identity import job_idempotency_key, stamp_job_identity
+    from tests.helpers.seed import replace_matching_jobs
 
-    user_id = get_user_by_username("admin")["id"]
-    now = datetime.now(timezone.utc).replace(microsecond=0)
-    started = now.isoformat()
-    finished = now.isoformat()
-    run_id = int(fetch_repo.create_fetch_run(
-        user_id=user_id,
-        country="uk",
-        company_name=None,
-        file_name="uk.json",
-        concurrency=1,
-        started_at=started,
-    )["id"])
-    fetch_repo.finalize_fetch_run(
-        run_id,
-        finished_at=finished,
-        exit_code=0,
-        new_jobs=4,
-        companies_done=1,
-        companies_total=1,
-        result_line="Done",
-    )
-    run_id = int(fetch_repo.create_fetch_run(
-        user_id=user_id,
-        country="uk",
-        company_name="Acme Backend Ltd",
-        file_name="uk.json",
-        concurrency=1,
-        started_at=started,
-    )["id"])
-    fetch_repo.finalize_fetch_run(
-        run_id,
-        finished_at=finished,
-        exit_code=0,
-        new_jobs=2,
-        companies_done=1,
-        companies_total=1,
-        result_line="Done",
-    )
+    now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    jobs = []
+    for idx in range(4):
+        job = {
+            "title": f"New Role {idx}",
+            "url": f"https://boards.greenhouse.io/acmebackend/jobs/{900000 + idx}?gh_jid={900000 + idx}",
+            "fetched": now,
+            "last_seen": now,
+        }
+        stamp_job_identity(job)
+        job.setdefault("idempotency_key", job_idempotency_key(job["url"]))
+        jobs.append(job)
+    replace_matching_jobs("uk", "Acme Backend Ltd", jobs)
 
     stats = v2_auth_client.get("/api/admin/panel-stats?country=uk&timezone=UTC").get_json()
-    assert stats["latest_fetch_new_jobs"] == 6
+    assert stats["latest_fetch_new_jobs"] == 4
 
 
 def test_countries_list_includes_custom_country(v2_auth_client, tmp_data_dir):

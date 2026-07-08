@@ -27,6 +27,14 @@ def test_detect_teamtailor_embedded_on_custom_careers_host():
 
 def test_detect_ats_static_finds_workday_for_criteo(monkeypatch):
     monkeypatch.setattr(mod, "_recruitee_board_exists", lambda slug: False)
+
+    class _Resp:
+        text = (
+            '<a href="https://criteo.wd3.myworkdayjobs.com/en-US/CriteoCareers">Jobs</a>'
+        )
+        url = "https://careers.criteo.com/"
+
+    monkeypatch.setattr(mod.requests, "get", lambda *args, **kwargs: _Resp())
     ats_type, ats_url = mod.detect_ats_static("https://careers.criteo.com/")
     assert ats_type == "workday"
     assert ats_url and "criteo.wd3.myworkdayjobs.com" in ats_url

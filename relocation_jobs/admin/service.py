@@ -82,11 +82,9 @@ def _fetched_today_bounds(
 
 _FETCHED_TODAY_SQL = """
     (
-      (j.fetched ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T'
-       AND j.fetched >= %s AND j.fetched < %s)
+      (LENGTH(j.fetched) > 10 AND j.fetched >= %s AND j.fetched < %s)
       OR
-      (j.fetched ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
-       AND j.fetched >= %s AND j.fetched < %s)
+      (LENGTH(j.fetched) = 10 AND j.fetched >= %s AND j.fetched < %s)
     )
 """
 

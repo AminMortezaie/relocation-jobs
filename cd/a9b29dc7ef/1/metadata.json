@@ -1,0 +1,89 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "cda9b29dc7ef",
+  "session_id": "c9a567e1-ef94-462e-9660-f48e73680212",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-08T02:37:46.716544Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/catalog/locations.py",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/static/js/data.js",
+    "relocation_jobs/static/js/dialogs.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "tests/web/test_catalog_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "45a45ce6975e",
+  "session_metrics": {
+    "duration_ms": 554227,
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-08T02:37:46.714497Z",
+    "agent_lines": 0,
+    "agent_removed": 1,
+    "human_added": 2,
+    "human_modified": 27,
+    "human_removed": 0,
+    "total_committed": 2,
+    "total_lines_changed": 36,
+    "agent_percentage": 2.7777777777777777,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1103,
+      "user_lines_removed": 118,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "docs/README.md": 2,
+        "docs/reference/full-spa-ui-modernization-proposal.md": 352,
+        "frontend/src/App.jsx": 15,
+        "frontend/src/CompanyCard.jsx": 4,
+        "relocation_jobs/catalog/locations.py": 42,
+        "relocation_jobs/catalog/repo.py": 16,
+        "relocation_jobs/static/admin.html": 27,
+        "relocation_jobs/static/apply.html": 27,
+        "relocation_jobs/static/company.html": 27,
+        "relocation_jobs/static/dist/board.js": 1,
+        "relocation_jobs/static/index.html": 40,
+        "relocation_jobs/static/js/auth.js": 1,
+        "relocation_jobs/static/js/data.js": 26,
+        "relocation_jobs/static/js/dialogs.js": 45,
+        "relocation_jobs/static/js/scrape.js": 28,
+        "relocation_jobs/static/js/state.js": 1,
+        "relocation_jobs/static/styles.css": 420,
+        "tests/catalog/test_locations.py": 17,
+        "tests/web/test_catalog_api.py": 12
+      },
+      "user_removed_per_file": {
+        "frontend/src/App.jsx": 2,
+        "frontend/src/CompanyCard.jsx": 2,
+        "relocation_jobs/catalog/locations.py": 15,
+        "relocation_jobs/static/admin.html": 2,
+        "relocation_jobs/static/apply.html": 2,
+        "relocation_jobs/static/company.html": 2,
+        "relocation_jobs/static/dist/board.js": 1,
+        "relocation_jobs/static/index.html": 15,
+        "relocation_jobs/static/js/auth.js": 1,
+        "relocation_jobs/static/js/dialogs.js": 9,
+        "relocation_jobs/static/js/scrape.js": 3,
+        "relocation_jobs/static/styles.css": 64
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1101,
+      "agent_lines_removed": 118
+    }
+  ]
+}

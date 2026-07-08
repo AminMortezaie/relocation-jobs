@@ -1,0 +1,6 @@
+if you wanted to add kafka to this project what was the best place to put it.
+whats the feature needs this in whole application?
+
+---
+
+just propose a plan in our plans(we have similar proposal previously) and tell me why you claiming this.

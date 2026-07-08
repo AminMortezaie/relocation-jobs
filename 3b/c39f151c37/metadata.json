@@ -3,7 +3,7 @@
   "checkpoint_id": "3bc39f151c37",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 19,
+  "checkpoints_count": 21,
   "files_touched": [
     ".dockerignore",
     ".gitignore",
@@ -17,6 +17,7 @@
     "docs/reference/board-load-performance-incident.md",
     "docs/reference/catalog-pattern.md",
     "docs/reference/catalog-seed-test-failure.md",
+    "docs/reference/kafka-fetch-pipeline-proposal.md",
     "docs/reference/rules.md",
     "docs/reference/stats.md",
     "relocation_jobs/admin/service.py",
@@ -102,6 +103,12 @@
       "transcript": "/3b/c39f151c37/1/full.jsonl",
       "content_hash": "/3b/c39f151c37/1/content_hash.txt",
       "prompt": "/3b/c39f151c37/1/prompt.txt"
+    },
+    {
+      "metadata": "/3b/c39f151c37/2/metadata.json",
+      "transcript": "/3b/c39f151c37/2/full.jsonl",
+      "content_hash": "/3b/c39f151c37/2/content_hash.txt",
+      "prompt": "/3b/c39f151c37/2/prompt.txt"
     }
   ]
 }

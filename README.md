@@ -229,24 +229,6 @@ docker run --rm -p 8080:10000 \
 
 ---
 
-## Troubleshooting
-
-**Domain doesn’t resolve locally** — try `dig @1.1.1.1 kuchup.com A`, flush DNS, or use `1.1.1.1` / `8.8.8.8`. Use `curl -I https://kuchup.com`, not `ping https://…`.
-
-**Board empty on EC2 but API works** — rebuild React: `cd frontend && npm run build` then `./scripts/ec2_app_deploy.sh sync`.
-
-**Company returns 0 jobs** — clear cached ATS / re-scrape; check Network tab on careers page; add `KNOWN_ATS` in `core/ats_constants.py`.
-
-**Playwright detection hangs** — ~25s timeout; pages behind login/cookie walls often need `KNOWN_ATS`.
-
-**ATS 401/403** — try Greenhouse/Lever US vs EU variants; Recruitee needs the real slug.
-
-**Wrong careers URL** — copy the live careers CTA URL; update in panel or re-run `build_companies.py` for that employer.
-
-**Board feels hung (~minutes)** — often N+1 / remote Postgres; see [board-load postmortem](docs/reference/board-load-performance-incident.md). Prefer local Postgres for day-to-day UI work.
-
----
-
 ## Development docs
 
 | Topic | Doc |

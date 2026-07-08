@@ -36,5 +36,17 @@
       "content_hash": "/05/be70516bbd/2/content_hash.txt",
       "prompt": "/05/be70516bbd/2/prompt.txt"
     }
-  ]
+  ],
+  "combined_attribution": {
+    "calculated_at": "2026-07-08T02:37:50.275333Z",
+    "agent_lines": 922,
+    "agent_removed": 100,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 922,
+    "total_lines_changed": 1022,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
 }

@@ -1,0 +1,1 @@
+update skills to use always the codebase-memory-mcp before starting a task if needed to change on code to use less memory.

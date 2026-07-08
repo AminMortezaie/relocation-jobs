@@ -1,0 +1,18 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "032062966e50",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "AGENTS.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/03/2062966e50/0/metadata.json",
+      "transcript": "/03/2062966e50/0/full.jsonl",
+      "content_hash": "/03/2062966e50/0/content_hash.txt",
+      "prompt": "/03/2062966e50/0/prompt.txt"
+    }
+  ]
+}

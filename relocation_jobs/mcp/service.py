@@ -55,12 +55,12 @@ from relocation_jobs.mcp.types import (
     ValidationResult,
 )
 from relocation_jobs.core.location_tags import job_fails_office_location_gate
-from relocation_jobs.panel.tracking import resolve_track
+from relocation_jobs.panel.tracking import job_dict, resolve_track
 from relocation_jobs.positions.service import set_job_applied
 from relocation_jobs.positions.state import effective_wrong_location, position_view_from_row
 from relocation_jobs.positions.types import PositionBucket
 from relocation_jobs.shared.timestamps import job_fetched_ts, normalize_posted_at
-from relocation_jobs.users.repo import load_job_tracking
+from relocation_jobs.users.repo import load_job_status_history, load_job_tracking
 
 
 _MIN_JD_CHARS = 80
@@ -419,6 +419,7 @@ def list_company_applications(
         raise LookupError(f"Company not found: {company}")
 
     tracking = load_job_tracking(uid, country=country_key)
+    status_history = load_job_status_history(uid, country=country_key)
     app_rows = repo.list_applications_for_company(uid, country_key, company_name)
     profile = get_application_profile(user_id=uid)
     app_by_key = {
@@ -448,6 +449,18 @@ def list_company_applications(
         )
         row = track
         app = app_by_key.get(idem_key, {})
+        # Full tracking state, derived exactly as the job board does, so the
+        # company page's <position-card> shows identical state badges/dates.
+        state = job_dict(
+            job,
+            company_name=company_name,
+            company=company_row,
+            country_key=country_key,
+            country_label="",
+            job_tracking=tracking,
+            status_history=status_history,
+            mcp_applications=None,
+        )
         positions.append(CompanyPositionApplication(
             title=(job.get("title") or "").strip(),
             url=catalog_url,
@@ -458,6 +471,19 @@ def list_company_applications(
             looking_to_apply=bool(row.get("looking_to_apply")),
             pinned=bool(row.get("pinned")),
             ats_score=row.get("ats_score"),
+            applied_date=state["applied_date"],
+            applied_at=state["applied_at"],
+            applied_history=state["applied_history"],
+            applied_events=state["applied_events"],
+            rejected_date=state["rejected_date"],
+            rejected_history=state["rejected_history"],
+            looking_to_apply_date=state["looking_to_apply_date"],
+            seen=state["seen"],
+            seen_date=state["seen_date"],
+            waiting_referral=state["waiting_referral"],
+            waiting_referral_date=state["waiting_referral_date"],
+            referral_linkedin_url=state["referral_linkedin_url"],
+            pinned_at=state["pinned_at"],
             has_tailored_tex=bool((app.get("tailored_tex") or "").strip()),
             has_pdf=bool(app.get("pdf_bytes")),
             master_resume_slug=(app.get("master_resume_slug") or "").strip(),

@@ -446,26 +446,17 @@ function positionCardVariant(position) {
 }
 
 function normalizePositionForCard(position) {
+  // The tracking state (applied/looking/seen/rejected dates + history, referral,
+  // pin) now comes through from the backend on `position`, so spread it as-is
+  // for parity with the job board. Only override fields the company applications
+  // endpoint doesn't supply or that are workspace-specific.
   return {
     ...position,
     country: routeCountry || "",
     company: companyName || "",
     visa_sponsorship: false,
-    waiting_referral: false,
-    waiting_referral_date: "",
-    referral_linkedin_url: "",
-    seen: false,
-    seen_date: "",
     fetched: position.tailored_tex_updated_at || position.pdf_updated_at || position.cover_letter_tex_updated_at || position.cover_letter_pdf_updated_at || "",
     last_seen: "",
-    applied_date: position.applied ? (position.tailored_tex_updated_at || position.pdf_updated_at || "") : "",
-    applied_at: "",
-    applied_history: [],
-    applied_events: [],
-    rejected_date: position.rejected ? (position.tailored_tex_updated_at || position.pdf_updated_at || "") : "",
-    rejected_history: [],
-    looking_to_apply_date: "",
-    pinned_at: "",
     job_city: position.location || "",
     not_for_me: false,
     not_for_me_date: "",

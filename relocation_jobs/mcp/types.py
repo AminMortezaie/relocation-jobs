@@ -123,6 +123,20 @@ class CompanyPositionApplication(BaseSchema):
     looking_to_apply: bool = False
     pinned: bool = False
     ats_score: int | None = None
+    # Full tracking state (parity with the job board's card).
+    applied_date: str = ""
+    applied_at: str = ""
+    applied_history: list[str] = Field(default_factory=list)
+    applied_events: list[dict] = Field(default_factory=list)
+    rejected_date: str = ""
+    rejected_history: list[str] = Field(default_factory=list)
+    looking_to_apply_date: str = ""
+    seen: bool = False
+    seen_date: str = ""
+    waiting_referral: bool = False
+    waiting_referral_date: str = ""
+    referral_linkedin_url: str = ""
+    pinned_at: str = ""
     has_tailored_tex: bool = False
     has_pdf: bool = False
     master_resume_slug: str = ""

@@ -6090,6 +6090,16 @@ body.scroll-locked {
   border-color: rgba(37, 99, 235, 0.35);
 }
 
+.company-position-badge--cl-pdf {
+  color: #0f766e;
+  border-color: rgba(15, 118, 110, 0.35);
+}
+
+.company-position-badge--cl-tex {
+  color: #0369a1;
+  border-color: rgba(3, 105, 161, 0.35);
+}
+
 .company-position-badge--queue {
   color: #d97706;
   border-color: rgba(217, 119, 6, 0.35);
@@ -6098,6 +6108,29 @@ body.scroll-locked {
 .company-position-badge--pin {
   color: #7c3aed;
   border-color: rgba(124, 58, 237, 0.35);
+}
+
+.company-artifact-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.company-artifact-tab {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.company-artifact-tab--active {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 .company-position-empty {

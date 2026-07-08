@@ -29,7 +29,11 @@ from relocation_jobs.core.db import _normalize_url
 from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
 from relocation_jobs.users.repo import get_user_by_username
 from relocation_jobs.mcp import repo, render, validate
-from relocation_jobs.mcp.names import application_pdf_filename, master_pdf_filename
+from relocation_jobs.mcp.names import (
+    application_cover_letter_pdf_filename,
+    application_pdf_filename,
+    master_pdf_filename,
+)
 from relocation_jobs.mcp.types import (
     AddCompanyResult,
     AddPositionResult,
@@ -214,6 +218,8 @@ def _application_state(user_id: int, idempotency_key: str) -> dict:
     return {
         "has_tex": bool((row.get("tailored_tex") or "").strip()),
         "has_pdf": bool(row.get("pdf_bytes")),
+        "has_cover_letter_tex": bool((row.get("cover_letter_tex") or "").strip()),
+        "has_cover_letter_pdf": bool(row.get("cover_letter_pdf_bytes")),
         "master_slug": (row.get("master_resume_slug") or "").strip(),
     }
 
@@ -221,6 +227,11 @@ def _application_state(user_id: int, idempotency_key: str) -> dict:
 def _application_pdf_filename(user_id: int, company: str) -> str:
     profile = get_application_profile(user_id=user_id)
     return application_pdf_filename(profile.full_name, company)
+
+
+def _application_cover_letter_pdf_filename(user_id: int, company: str) -> str:
+    profile = get_application_profile(user_id=user_id)
+    return application_cover_letter_pdf_filename(profile.full_name, company)
 
 
 def _master_pdf_filename(user_id: int, slug: str) -> str:
@@ -301,6 +312,9 @@ def get_job_context(
         has_tailored_tex=app_state["has_tex"],
         has_pdf=app_state["has_pdf"],
         pdf_filename=_application_pdf_filename(uid, company_name),
+        has_cover_letter_tex=app_state["has_cover_letter_tex"],
+        has_cover_letter_pdf=app_state["has_cover_letter_pdf"],
+        cover_letter_pdf_filename=_application_cover_letter_pdf_filename(uid, company_name),
         description_text=str(description["description_text"]),
         has_description=bool(description["has_description"]),
         needs_fetch=bool(description["needs_fetch"]),
@@ -422,6 +436,13 @@ def list_company_applications(
             tailored_tex_updated_at=(app.get("tailored_tex_updated_at") or "").strip(),
             pdf_updated_at=(app.get("pdf_updated_at") or "").strip(),
             pdf_filename=application_pdf_filename(profile.full_name, company_name),
+            has_cover_letter_tex=bool((app.get("cover_letter_tex") or "").strip()),
+            has_cover_letter_pdf=bool(app.get("cover_letter_pdf_bytes")),
+            cover_letter_tex_updated_at=(app.get("cover_letter_tex_updated_at") or "").strip(),
+            cover_letter_pdf_updated_at=(app.get("cover_letter_pdf_updated_at") or "").strip(),
+            cover_letter_pdf_filename=application_cover_letter_pdf_filename(
+                profile.full_name, company_name,
+            ),
             has_description=bool(_job_description_fields(job)["has_description"]),
         ))
 
@@ -585,6 +606,92 @@ def render_application_pdf(
     if row is None:
         return RenderResult(ok=False, log=f"Application not found: {idempotency_key}")
     return render_tailored_pdf(
+        row["country"],
+        row["company_name"],
+        row["job_url"],
+        user_id=uid,
+    )
+
+
+def read_application_cover_letter_tex(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> ApplicationTexDetail:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        raise LookupError(f"Application not found: {idempotency_key}")
+    content = repo.read_cover_letter_tex(uid, idempotency_key)
+    ctx = get_job_context(
+        row["country"],
+        row["company_name"],
+        row["job_url"],
+        user_id=uid,
+    )
+    return ApplicationTexDetail(
+        idempotency_key=idempotency_key,
+        country=ctx.country,
+        company=ctx.company,
+        url=ctx.url,
+        title=ctx.title,
+        content=content,
+        master_resume_slug="",
+        updated_at=(row.get("cover_letter_tex_updated_at") or "").strip(),
+    )
+
+
+def save_application_cover_letter_tex(
+    idempotency_key: str,
+    content: str,
+    *,
+    user_id: int | None = None,
+) -> dict:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        raise LookupError(f"Application not found: {idempotency_key}")
+    if not content.strip():
+        raise ValueError("LaTeX content cannot be empty")
+    saved = repo.save_cover_letter_tex(
+        uid,
+        idempotency_key,
+        content,
+        country=row["country"],
+        company=row["company_name"],
+        url=row["job_url"],
+    )
+    return {
+        "ok": True,
+        "idempotency_key": idempotency_key,
+        "updated_at": saved["updated_at"],
+    }
+
+
+def read_application_cover_letter_pdf_download(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> tuple[bytes, str]:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        raise LookupError(f"Application not found: {idempotency_key}")
+    pdf_bytes = repo.read_cover_letter_pdf_bytes(uid, idempotency_key)
+    filename = _application_cover_letter_pdf_filename(uid, row["company_name"])
+    return pdf_bytes, filename
+
+
+def render_application_cover_letter_pdf(
+    idempotency_key: str,
+    *,
+    user_id: int | None = None,
+) -> RenderResult:
+    uid = user_id if user_id is not None else resolve_user_id()
+    row = repo.get_application(uid, idempotency_key)
+    if row is None:
+        return RenderResult(ok=False, log=f"Application not found: {idempotency_key}")
+    return render_cover_letter_pdf(
         row["country"],
         row["company_name"],
         row["job_url"],
@@ -810,6 +917,92 @@ def render_tailored_pdf(
             url=ctx.url,
             event="pdf_rendered",
             extra={"pdf_bytes": stored["pdf_bytes"], "master_resume_slug": slug},
+        )
+        return RenderResult(
+            ok=True,
+            log=compiled.log,
+            pdf_stored=True,
+            pdf_bytes=stored["pdf_bytes"],
+            pdf_filename=pdf_filename,
+        )
+
+
+def save_cover_letter_tex_for_job(
+    country: str,
+    company: str,
+    url: str,
+    content: str,
+    *,
+    user_id: int | None = None,
+) -> dict:
+    uid = user_id if user_id is not None else resolve_user_id()
+    ctx = get_job_context(country, company, url, user_id=uid)
+    if not content.strip():
+        raise ValueError("LaTeX content cannot be empty")
+    overwritten = ctx.has_cover_letter_tex
+    saved = repo.save_cover_letter_tex(
+        uid,
+        ctx.idempotency_key,
+        content,
+        country=ctx.country,
+        company=ctx.company,
+        url=ctx.url,
+    )
+    meta = repo.touch_application_meta(
+        uid,
+        ctx.idempotency_key,
+        country=ctx.country,
+        company=ctx.company,
+        url=ctx.url,
+        event="cover_letter_tex_saved",
+        extra={"overwritten": overwritten},
+    )
+    return {
+        "idempotency_key": ctx.idempotency_key,
+        "updated_at": saved["updated_at"],
+        "overwritten": overwritten,
+        "meta": meta,
+    }
+
+
+def render_cover_letter_pdf(
+    country: str,
+    company: str,
+    url: str,
+    *,
+    user_id: int | None = None,
+) -> RenderResult:
+    uid = user_id if user_id is not None else resolve_user_id()
+    ctx = get_job_context(country, company, url, user_id=uid)
+
+    try:
+        tex = repo.read_cover_letter_tex(uid, ctx.idempotency_key)
+    except LookupError as exc:
+        return RenderResult(ok=False, log=str(exc))
+
+    if not tex.strip():
+        return RenderResult(ok=False, log="Cover letter LaTeX content cannot be empty")
+
+    pdf_filename = _application_cover_letter_pdf_filename(uid, company)
+    basename = pdf_filename.removesuffix(".pdf")
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tex_path = Path(tmp) / f"{basename}.tex"
+        tex_path.write_text(tex, encoding="utf-8")
+        compiled = render.render_tex_to_pdf(tex_path)
+        if not compiled.ok:
+            return RenderResult(ok=False, log=compiled.log)
+
+        pdf_bytes = Path(compiled.pdf_path).read_bytes()
+        stored = repo.save_cover_letter_pdf(uid, ctx.idempotency_key, pdf_bytes)
+        repo.touch_application_meta(
+            uid,
+            ctx.idempotency_key,
+            country=country,
+            company=company,
+            url=ctx.url,
+            event="cover_letter_pdf_rendered",
+            extra={"pdf_bytes": stored["pdf_bytes"]},
         )
         return RenderResult(
             ok=True,

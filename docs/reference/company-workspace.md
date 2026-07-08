@@ -33,9 +33,12 @@ Out of scope for early phases: browser auto-submit, headless Claude API, full Ov
 | `/company/<country>/<company-slug>` | Company workspace page (static shell + JS) |
 | `/api/mcp/companies/<country>/<company>/applications` | All catalog positions merged with MCP + tracking state |
 | `/api/mcp/applications/<idempotency_key>` | Single position application detail |
-| `/api/mcp/applications/<idempotency_key>/tex` | Tailored LaTeX source |
-| `/api/mcp/applications/<idempotency_key>/pdf` | Stored PDF (`application/pdf`) |
-| `/api/mcp/applications/<idempotency_key>/render` | Re-compile tex → update PDF in DB |
+| `/api/mcp/applications/<idempotency_key>/tex` | Tailored resume LaTeX source |
+| `/api/mcp/applications/<idempotency_key>/pdf` | Stored resume PDF (`application/pdf`) |
+| `/api/mcp/applications/<idempotency_key>/render` | Re-compile resume tex → update PDF in DB |
+| `/api/mcp/applications/<idempotency_key>/cover-letter/tex` | Cover letter LaTeX source |
+| `/api/mcp/applications/<idempotency_key>/cover-letter/pdf` | Stored cover letter PDF |
+| `/api/mcp/applications/<idempotency_key>/cover-letter/render` | Re-compile cover letter tex → update PDF |
 
 **Company slug:** lowercase, non-alphanumeric runs become `-` (same rules as master resume slugs). Resolved to catalog `companies.name` within the country. Example: `Acme Backend Ltd` → `acme-backend-ltd` → `/company/uk/acme-backend-ltd`.
 
@@ -50,8 +53,8 @@ Canonical DB keys remain `(country, company_name, idempotency_key)` — the slug
 │  Acme Corp · UK                    [Job panel] [Sign out]   │
 ├─────────────────────────────────────────────────────────────┤
 │  Positions (left)              │  Selected position (right) │
-│  ○ Senior Go Engineer     PDF  │  Title · location          │
-│  ○ Staff Backend          CV   │  [Open job posting]        │
+│  ○ Senior Go Engineer PDF CL   │  Title · location          │
+│  ○ Staff Backend          CV   │  [CV | Cover letter] tabs  │
 │  ● Platform Engineer      PDF  │  ┌──────────┬────────────┐ │
 │                                │  │ LaTeX    │ PDF preview │ │
 │                                │  └──────────┴────────────┘ │
@@ -59,7 +62,7 @@ Canonical DB keys remain `(country, company_name, idempotency_key)` — the slug
 └─────────────────────────────────────────────────────────────┘
 ```
 
-PDF preview uses the **stored** `pdf_bytes` from Postgres. **Re-render** calls the same server compile path as MCP `render_pdf` (`tectonic` / `MCP_LATEX_CMD`). This is not client-side LaTeX.
+Switch **CV** vs **Cover letter** to edit/preview the matching artifact. PDF preview uses stored `pdf_bytes` or `cover_letter_pdf_bytes` from Postgres. **Re-render** calls the same server compile path as MCP (`tectonic` / `MCP_LATEX_CMD`). Cover letters skip master-structure validation.
 
 ---
 

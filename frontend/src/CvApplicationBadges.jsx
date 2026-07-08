@@ -1,7 +1,9 @@
 import { companyWorkspacePath } from "./companyWorkspace";
 
 function CvApplicationBadges({ job, company }) {
-  if (!job?.has_tailored_tex && !job?.has_pdf) return null;
+  const hasCv = Boolean(job?.has_tailored_tex || job?.has_pdf);
+  const hasCl = Boolean(job?.has_cover_letter_tex || job?.has_cover_letter_pdf);
+  if (!hasCv && !hasCl) return null;
   const href = companyWorkspacePath(job.country || company?.country, job.company || company?.name);
   return (
     <>
@@ -12,6 +14,15 @@ function CvApplicationBadges({ job, company }) {
       ) : job.has_tailored_tex ? (
         <a className="badge cv-tex" href={href} title="Open tailored LaTeX source">
           CV ready
+        </a>
+      ) : null}
+      {job.has_cover_letter_pdf ? (
+        <a className="badge cv-pdf" href={href} title="Open cover letter PDF preview">
+          CL PDF
+        </a>
+      ) : job.has_cover_letter_tex ? (
+        <a className="badge cv-tex" href={href} title="Open cover letter LaTeX source">
+          CL ready
         </a>
       ) : null}
       {job.master_resume_slug ? (

@@ -192,6 +192,28 @@ def render_pdf(country: str, company: str, url: str, master_resume_slug: str = "
 
 
 @mcp.tool()
+def save_cover_letter_tex(
+    country: str,
+    company: str,
+    url: str,
+    content: str,
+) -> str:
+    """Save cover letter LaTeX for this job.
+
+    Overwrites any existing cover letter tex. Job must exist in the catalog
+    (call get_job_context first and use the url/country/company it returns).
+    Prefer rendering PDF on the panel rather than render_cover_letter_pdf in chat.
+    """
+    return _json(service.save_cover_letter_tex_for_job(country, company, url, content))
+
+
+@mcp.tool()
+def render_cover_letter_pdf(country: str, company: str, url: str) -> str:
+    """Compile saved cover letter tex to PDF and store the PDF bytes in Postgres."""
+    return _json(service.render_cover_letter_pdf(country, company, url))
+
+
+@mcp.tool()
 def mark_applied(country: str, company: str, url: str, applied: bool = True) -> str:
     """Mark the job applied (or unapplied) in the panel tracking DB."""
     return _json(service.mark_job_applied(country, company, url, applied=applied))

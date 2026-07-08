@@ -224,7 +224,9 @@ def list_applications_for_company(
         rows = conn.execute(
             """
             SELECT idempotency_key, tailored_tex, pdf_bytes, master_resume_slug,
-                   tailored_tex_updated_at, pdf_updated_at, job_url
+                   tailored_tex_updated_at, pdf_updated_at, job_url,
+                   cover_letter_tex, cover_letter_pdf_bytes,
+                   cover_letter_tex_updated_at, cover_letter_pdf_updated_at
             FROM mcp_applications
             WHERE user_id = %s AND LOWER(TRIM(country)) = %s AND company_name = %s
             """,
@@ -242,7 +244,11 @@ def load_application_summaries(
         SELECT idempotency_key,
                (tailored_tex IS NOT NULL AND TRIM(tailored_tex) <> '') AS has_tailored_tex,
                (pdf_bytes IS NOT NULL AND LENGTH(pdf_bytes) > 0) AS has_pdf,
-               master_resume_slug
+               master_resume_slug,
+               (cover_letter_tex IS NOT NULL AND TRIM(cover_letter_tex) <> '')
+                   AS has_cover_letter_tex,
+               (cover_letter_pdf_bytes IS NOT NULL AND LENGTH(cover_letter_pdf_bytes) > 0)
+                   AS has_cover_letter_pdf
         FROM mcp_applications
         WHERE user_id = %s
     """
@@ -261,6 +267,8 @@ def load_application_summaries(
             "has_tailored_tex": bool(row.get("has_tailored_tex")),
             "has_pdf": bool(row.get("has_pdf")),
             "master_resume_slug": (row.get("master_resume_slug") or "").strip(),
+            "has_cover_letter_tex": bool(row.get("has_cover_letter_tex")),
+            "has_cover_letter_pdf": bool(row.get("has_cover_letter_pdf")),
         }
     return summaries
 
@@ -270,6 +278,16 @@ def read_pdf_bytes(user_id: int, idempotency_key: str) -> bytes:
     if row is None or not row.get("pdf_bytes"):
         raise LookupError(f"No PDF for application {idempotency_key}")
     data = row["pdf_bytes"]
+    if isinstance(data, memoryview):
+        return bytes(data)
+    return data
+
+
+def read_cover_letter_pdf_bytes(user_id: int, idempotency_key: str) -> bytes:
+    row = get_application(user_id, idempotency_key)
+    if row is None or not row.get("cover_letter_pdf_bytes"):
+        raise LookupError(f"No cover letter PDF for application {idempotency_key}")
+    data = row["cover_letter_pdf_bytes"]
     if isinstance(data, memoryview):
         return bytes(data)
     return data
@@ -356,6 +374,48 @@ def read_tailored_tex(user_id: int, idempotency_key: str) -> str:
     return row["tailored_tex"]
 
 
+def save_cover_letter_tex(
+    user_id: int,
+    idempotency_key: str,
+    content: str,
+    *,
+    country: str,
+    company: str,
+    url: str,
+) -> dict:
+    now = _utc_now()
+    upsert_application_shell(
+        user_id,
+        idempotency_key,
+        country=country,
+        company=company,
+        url=url,
+    )
+    with db_transaction() as conn:
+        conn.execute(
+            """
+            UPDATE mcp_applications
+            SET cover_letter_tex = %s,
+                cover_letter_tex_updated_at = %s,
+                updated_at = %s
+            WHERE user_id = %s AND idempotency_key = %s
+            """,
+            (content, now, now, user_id, idempotency_key),
+        )
+    return {
+        "user_id": user_id,
+        "idempotency_key": idempotency_key,
+        "updated_at": now,
+    }
+
+
+def read_cover_letter_tex(user_id: int, idempotency_key: str) -> str:
+    row = get_application(user_id, idempotency_key)
+    if row is None or not (row.get("cover_letter_tex") or "").strip():
+        raise LookupError(f"No cover letter for application {idempotency_key}")
+    return row["cover_letter_tex"]
+
+
 def save_pdf(user_id: int, idempotency_key: str, pdf_bytes: bytes) -> dict:
     now = _utc_now()
     with db_transaction() as conn:
@@ -371,6 +431,27 @@ def save_pdf(user_id: int, idempotency_key: str, pdf_bytes: bytes) -> dict:
         "user_id": user_id,
         "idempotency_key": idempotency_key,
         "pdf_bytes": len(pdf_bytes),
+    }
+
+
+def save_cover_letter_pdf(user_id: int, idempotency_key: str, pdf_bytes: bytes) -> dict:
+    now = _utc_now()
+    with db_transaction() as conn:
+        conn.execute(
+            """
+            UPDATE mcp_applications
+            SET cover_letter_pdf_bytes = %s,
+                cover_letter_pdf_updated_at = %s,
+                updated_at = %s
+            WHERE user_id = %s AND idempotency_key = %s
+            """,
+            (pdf_bytes, now, now, user_id, idempotency_key),
+        )
+    return {
+        "user_id": user_id,
+        "idempotency_key": idempotency_key,
+        "pdf_bytes": len(pdf_bytes),
+        "updated_at": now,
     }
 
 

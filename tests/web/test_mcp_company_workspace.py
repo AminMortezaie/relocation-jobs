@@ -35,6 +35,30 @@ def test_list_company_applications_merges_catalog_and_mcp(
     assert match.has_pdf is True
     assert match.master_resume_slug == "go"
     assert match.pdf_filename == "test_user_acme_backend_ltd.pdf"
+    assert match.has_cover_letter_tex is False
+    assert match.has_cover_letter_pdf is False
+
+
+def test_list_company_applications_includes_cover_letter_flags(
+    seeded_catalog_v2, mcp_documents,
+):
+    saved = service.save_cover_letter_tex_for_job(
+        COUNTRY,
+        COMPANY,
+        JOB_URL,
+        r"\documentclass{article}\begin{document}Cover\end{document}",
+        user_id=1,
+    )
+    idem_key = saved["idempotency_key"]
+    mcp_repo.save_cover_letter_pdf(1, idem_key, FAKE_PDF)
+
+    payload = service.list_company_applications(COUNTRY, COMPANY, user_id=1)
+    match = next(p for p in payload.positions if p.idempotency_key == idem_key)
+    assert match.has_cover_letter_tex is True
+    assert match.has_cover_letter_pdf is True
+    assert match.cover_letter_pdf_filename == "test_user_acme_backend_ltd_cover_letter.pdf"
+    assert match.has_tailored_tex is False
+    assert match.has_pdf is False
 
 
 def test_list_company_applications_excludes_not_for_me(
@@ -316,3 +340,62 @@ def test_board_jobs_include_mcp_flags(v2_auth_client, seeded_catalog_v2, mcp_doc
     assert job["has_tailored_tex"] is True
     assert job["has_pdf"] is True
     assert job["master_resume_slug"] == "go"
+
+
+def test_cover_letter_http_roundtrip(v2_auth_client, seeded_catalog_v2, mcp_documents):
+    cover = r"\documentclass{article}\begin{document}Dear hiring manager\end{document}"
+    saved = service.save_cover_letter_tex_for_job(
+        COUNTRY,
+        COMPANY,
+        JOB_URL,
+        cover,
+        user_id=1,
+    )
+    idem_key = saved["idempotency_key"]
+    mcp_repo.save_cover_letter_pdf(1, idem_key, FAKE_PDF)
+
+    listed = v2_auth_client.get(
+        f"/api/mcp/companies/{COUNTRY}/{COMPANY}/applications",
+    )
+    assert listed.status_code == 200
+    match = next(p for p in listed.get_json()["positions"] if p["idempotency_key"] == idem_key)
+    assert match["has_cover_letter_tex"] is True
+    assert match["has_cover_letter_pdf"] is True
+
+    tex = v2_auth_client.get(f"/api/mcp/applications/{idem_key}/cover-letter/tex")
+    assert tex.status_code == 200
+    assert "Dear hiring manager" in tex.get_json()["content"]
+
+    updated = cover.replace("Dear hiring manager", "Dear team")
+    put = v2_auth_client.put(
+        f"/api/mcp/applications/{idem_key}/cover-letter/tex",
+        json={"content": updated},
+    )
+    assert put.status_code == 200
+    assert put.get_json()["ok"] is True
+
+    tex_after = v2_auth_client.get(f"/api/mcp/applications/{idem_key}/cover-letter/tex")
+    assert "Dear team" in tex_after.get_json()["content"]
+
+    pdf = v2_auth_client.get(f"/api/mcp/applications/{idem_key}/cover-letter/pdf")
+    assert pdf.status_code == 200
+    assert pdf.mimetype == "application/pdf"
+    assert pdf.data == FAKE_PDF
+    disposition = pdf.headers.get("Content-Disposition") or ""
+    assert "test_user_acme_backend_ltd_cover_letter.pdf" in disposition
+
+    board = v2_auth_client.get("/api/board?country=uk").get_json()
+    acme = next(c for c in board["companies"] if c["name"] == COMPANY)
+    job = next(j for j in acme["jobs"] if j["url"] == JOB_URL)
+    assert job["has_cover_letter_tex"] is True
+    assert job["has_cover_letter_pdf"] is True
+
+
+def test_cover_letter_routes_require_auth(v2_client):
+    assert v2_client.get("/api/mcp/applications/some-key/cover-letter/tex").status_code == 401
+    assert v2_client.put(
+        "/api/mcp/applications/some-key/cover-letter/tex",
+        json={"content": "x"},
+    ).status_code == 401
+    assert v2_client.get("/api/mcp/applications/some-key/cover-letter/pdf").status_code == 401
+    assert v2_client.post("/api/mcp/applications/some-key/cover-letter/render").status_code == 401

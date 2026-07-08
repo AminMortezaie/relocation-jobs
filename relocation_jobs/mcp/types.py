@@ -72,6 +72,9 @@ class JobContext(BaseSchema):
     has_tailored_tex: bool = False
     has_pdf: bool = False
     pdf_filename: str = ""
+    has_cover_letter_tex: bool = False
+    has_cover_letter_pdf: bool = False
+    cover_letter_pdf_filename: str = ""
     description_text: str = ""
     description_html: str = ""
     has_description: bool = False
@@ -118,6 +121,11 @@ class CompanyPositionApplication(BaseSchema):
     tailored_tex_updated_at: str = ""
     pdf_updated_at: str = ""
     pdf_filename: str = ""
+    has_cover_letter_tex: bool = False
+    has_cover_letter_pdf: bool = False
+    cover_letter_tex_updated_at: str = ""
+    cover_letter_pdf_updated_at: str = ""
+    cover_letter_pdf_filename: str = ""
     has_description: bool = False
 
 

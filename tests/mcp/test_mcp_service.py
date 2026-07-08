@@ -45,6 +45,8 @@ def test_get_job_context(seeded_catalog_v2, mcp_documents):
     assert ctx.idempotency_key
     assert ctx.has_tailored_tex is False
     assert ctx.has_pdf is False
+    assert ctx.has_cover_letter_tex is False
+    assert ctx.has_cover_letter_pdf is False
     assert ctx.master_resume_slug == ""
 
 
@@ -118,6 +120,39 @@ def test_save_tailored_tex_overwrites_without_queue_membership(
 
     tex = mcp_repo.read_tailored_tex(1, ctx.idempotency_key)
     assert "Staff Go Engineer" in tex
+
+
+def test_save_cover_letter_tex_overwrites(seeded_catalog_v2, mcp_documents):
+    first = service.save_cover_letter_tex_for_job(
+        "uk",
+        "Acme Backend Ltd",
+        JOB_URL,
+        r"\documentclass{article}\begin{document}Hello\end{document}",
+        user_id=1,
+    )
+    assert first["overwritten"] is False
+
+    second = service.save_cover_letter_tex_for_job(
+        "uk",
+        "Acme Backend Ltd",
+        JOB_URL,
+        r"\documentclass{article}\begin{document}Updated letter\end{document}",
+        user_id=1,
+    )
+    assert second["overwritten"] is True
+
+    ctx = service.get_job_context(
+        "uk",
+        "Acme Backend Ltd",
+        JOB_URL,
+        user_id=1,
+    )
+    assert ctx.has_cover_letter_tex is True
+    assert ctx.has_cover_letter_pdf is False
+    assert ctx.cover_letter_pdf_filename.endswith("_cover_letter.pdf")
+
+    tex = mcp_repo.read_cover_letter_tex(1, ctx.idempotency_key)
+    assert "Updated letter" in tex
 
 
 def test_validate_uses_correct_master_variant(seeded_catalog_v2, mcp_documents):

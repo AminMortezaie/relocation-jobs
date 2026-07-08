@@ -15,14 +15,6 @@ def row_dict(row) -> dict:
     return row if isinstance(row, dict) else dict(row)
 
 
-def visa_to_db(value) -> int | None:
-    if value is True:
-        return 1
-    if value is False:
-        return 0
-    return None
-
-
 def visa_from_db(value) -> bool | None:
     if value is None:
         return None

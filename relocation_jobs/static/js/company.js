@@ -1,4 +1,4 @@
-/** Company workspace — per-position tailored CV + PDF preview. */
+/** Company workspace — per-position tailored CV / cover letter + PDF preview. */
 
 import { companyWorkspacePath } from "./company-workspace.js";
 import { beginScreenLoad, endScreenLoad, setScreenLoadProgress } from "./screen-loader.js";
@@ -11,6 +11,70 @@ let positions = [];
 let selectedKey = "";
 let savedTexContent = "";
 let texEditing = false;
+let artifactMode = "cv";
+
+function isCoverLetter() {
+  return artifactMode === "cover-letter";
+}
+
+function artifactApiBase(idempotencyKey) {
+  const root = `/api/mcp/applications/${encodeURIComponent(idempotencyKey)}`;
+  return isCoverLetter() ? `${root}/cover-letter` : root;
+}
+
+function artifactHasTex(position) {
+  return isCoverLetter()
+    ? Boolean(position.has_cover_letter_tex)
+    : Boolean(position.has_tailored_tex);
+}
+
+function artifactHasPdf(position) {
+  return isCoverLetter()
+    ? Boolean(position.has_cover_letter_pdf)
+    : Boolean(position.has_pdf);
+}
+
+function artifactPdfFilename(position) {
+  if (isCoverLetter()) {
+    return position.cover_letter_pdf_filename || "cover_letter.pdf";
+  }
+  return position.pdf_filename || "resume.pdf";
+}
+
+function emptyTexMessage() {
+  return isCoverLetter()
+    ? "No cover letter LaTeX for this position yet."
+    : "No tailored LaTeX for this position yet.";
+}
+
+function emptyPdfMessage() {
+  return isCoverLetter()
+    ? "No cover letter PDF yet — save cover letter tex via MCP, then re-render."
+    : "No PDF yet — save tailored tex via MCP, then re-render.";
+}
+
+function syncArtifactTabs() {
+  const cv = $("companyArtifactCv");
+  const cover = $("companyArtifactCover");
+  if (cv) {
+    cv.classList.toggle("company-artifact-tab--active", !isCoverLetter());
+    cv.setAttribute("aria-selected", isCoverLetter() ? "false" : "true");
+  }
+  if (cover) {
+    cover.classList.toggle("company-artifact-tab--active", isCoverLetter());
+    cover.setAttribute("aria-selected", isCoverLetter() ? "true" : "false");
+  }
+  const texLabel = $("companyTexLabel");
+  const pdfLabel = $("companyPdfLabel");
+  if (texLabel) {
+    texLabel.textContent = isCoverLetter() ? "Cover letter LaTeX" : "CV LaTeX source";
+  }
+  if (pdfLabel) {
+    pdfLabel.textContent = isCoverLetter() ? "Cover letter PDF" : "CV PDF preview";
+  }
+  const pdfMissing = $("companyPdfMissing");
+  if (pdfMissing) pdfMissing.textContent = emptyPdfMessage();
+}
 
 function parseRoute() {
   const parts = window.location.pathname.split("/").filter(Boolean);
@@ -71,6 +135,11 @@ function positionBadges(position) {
   const badges = [];
   if (position.has_pdf) badges.push('<span class="company-position-badge company-position-badge--pdf">PDF</span>');
   else if (position.has_tailored_tex) badges.push('<span class="company-position-badge company-position-badge--tex">CV</span>');
+  if (position.has_cover_letter_pdf) {
+    badges.push('<span class="company-position-badge company-position-badge--cl-pdf">CL PDF</span>');
+  } else if (position.has_cover_letter_tex) {
+    badges.push('<span class="company-position-badge company-position-badge--cl-tex">CL</span>');
+  }
   if (position.looking_to_apply) badges.push('<span class="company-position-badge company-position-badge--queue">Queue</span>');
   if (position.pinned) badges.push('<span class="company-position-badge company-position-badge--pin">Pinned</span>');
   return badges.join("");
@@ -88,10 +157,14 @@ function renderPositionList() {
   }
 
   const withCv = positions.filter((p) => p.has_tailored_tex || p.has_pdf).length;
+  const withCl = positions.filter((p) => p.has_cover_letter_tex || p.has_cover_letter_pdf).length;
   if (hint) {
-    hint.textContent = withCv
-      ? `${withCv} of ${positions.length} roles have a tailored CV.`
-      : "No tailored CVs yet — use Claude Desktop MCP after marking roles looking to apply.";
+    const parts = [];
+    if (withCv) parts.push(`${withCv} tailored CV`);
+    if (withCl) parts.push(`${withCl} cover letter`);
+    hint.textContent = parts.length
+      ? `${parts.join(" · ")} across ${positions.length} roles.`
+      : "No tailored CVs or cover letters yet — use Claude Desktop MCP after marking roles looking to apply.";
   }
 
   list.innerHTML = positions.map((position) => {
@@ -280,6 +353,8 @@ function clearDetail() {
   selectedKey = "";
   savedTexContent = "";
   texEditing = false;
+  artifactMode = "cv";
+  syncArtifactTabs();
   const body = $("companyDetailBody");
   const empty = $("companyDetailEmpty");
   if (body) body.hidden = true;
@@ -305,7 +380,7 @@ function setTexViewMode({ editing = false, content = savedTexContent } = {}) {
   const hasTex = Boolean(content.trim());
 
   if (view) {
-    view.textContent = content || "No tailored LaTeX for this position yet.";
+    view.textContent = content || emptyTexMessage();
     view.hidden = editing;
   }
   if (editor) {
@@ -336,7 +411,7 @@ async function persistTex() {
     throw new Error("LaTeX content cannot be empty");
   }
   const saved = await api(
-    `/api/mcp/applications/${encodeURIComponent(selectedKey)}/tex`,
+    `${artifactApiBase(selectedKey)}/tex`,
     {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -366,6 +441,8 @@ async function saveTex() {
 
 async function loadPositionDetail(idempotencyKey, position, { quiet = false } = {}) {
   selectedKey = idempotencyKey;
+  texEditing = false;
+  syncArtifactTabs();
   resetJobDescription();
   renderPositionList();
   const empty = $("companyDetailEmpty");
@@ -388,6 +465,7 @@ async function loadPositionDetail(idempotencyKey, position, { quiet = false } = 
   const applyHint = $("companyApplyHint");
   const applyHintText = $("companyApplyHintText");
   const applyUrl = $("companyApplyUrl");
+  const hasPdf = artifactHasPdf(position);
   if (applyLink) {
     applyLink.href = position.url || "#";
     applyLink.hidden = !hasUrl;
@@ -395,7 +473,7 @@ async function loadPositionDetail(idempotencyKey, position, { quiet = false } = 
   if (applyHint && applyHintText && applyUrl) {
     applyHint.hidden = !hasUrl;
     if (hasUrl) {
-      applyHintText.textContent = position.has_pdf
+      applyHintText.textContent = hasPdf
         ? "After downloading your PDF, apply at the original posting: "
         : "Apply at the original posting: ";
       applyUrl.href = position.url;
@@ -405,25 +483,27 @@ async function loadPositionDetail(idempotencyKey, position, { quiet = false } = 
 
   const download = $("companyDownloadPdf");
   const openPdf = $("companyOpenPdf");
-  const pdfUrl = `/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/pdf?ts=${Date.now()}`;
+  const base = artifactApiBase(idempotencyKey);
+  const pdfUrl = `${base}/pdf?ts=${Date.now()}`;
   if (download) {
-    download.href = `/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/pdf?download=1`;
-    download.download = position.pdf_filename || "resume.pdf";
-    download.hidden = !position.has_pdf;
+    download.href = `${base}/pdf?download=1`;
+    download.download = artifactPdfFilename(position);
+    download.hidden = !hasPdf;
   }
   if (openPdf) {
-    openPdf.href = position.has_pdf ? pdfUrl : "#";
-    openPdf.hidden = !position.has_pdf;
+    openPdf.href = hasPdf ? pdfUrl : "#";
+    openPdf.hidden = !hasPdf;
   }
 
   const texView = $("companyTexView");
   const pdfFrame = $("companyPdfFrame");
   const pdfMissing = $("companyPdfMissing");
+  if (pdfMissing) pdfMissing.textContent = emptyPdfMessage();
 
-  if (position.has_tailored_tex) {
+  if (artifactHasTex(position)) {
     if (!quiet) setLoadingProgress(35);
     try {
-      const tex = await api(`/api/mcp/applications/${encodeURIComponent(idempotencyKey)}/tex`);
+      const tex = await api(`${base}/tex`);
       setTexViewMode({ editing: false, content: tex.content || "" });
     } catch (err) {
       setTexViewMode({ editing: false, content: "" });
@@ -437,7 +517,7 @@ async function loadPositionDetail(idempotencyKey, position, { quiet = false } = 
     if (!quiet) finishLoadingProgress();
   }
 
-  if (position.has_pdf && pdfFrame) {
+  if (hasPdf && pdfFrame) {
     pdfFrame.hidden = false;
     pdfFrame.src = pdfUrl;
     if (pdfMissing) pdfMissing.hidden = true;
@@ -447,6 +527,23 @@ async function loadPositionDetail(idempotencyKey, position, { quiet = false } = 
       pdfFrame.hidden = true;
     }
     if (pdfMissing) pdfMissing.hidden = false;
+  }
+}
+
+async function switchArtifactMode(mode) {
+  if (mode !== "cv" && mode !== "cover-letter") return;
+  if (mode === artifactMode) return;
+  if (texEditing) {
+    const proceed = window.confirm("Discard unsaved LaTeX edits and switch document?");
+    if (!proceed) return;
+    texEditing = false;
+  }
+  artifactMode = mode;
+  syncArtifactTabs();
+  const position = positions.find((p) => p.idempotency_key === selectedKey);
+  if (position) {
+    showError("");
+    await loadPositionDetail(selectedKey, position, { quiet: true });
   }
 }
 
@@ -468,7 +565,7 @@ async function loadWorkspace() {
     positions = data.positions || [];
     document.title = `${companyName} — Relocation Jobs`;
     $("companyTitle").textContent = companyName;
-    $("companySubtitle").textContent = "Tailored resumes and PDF preview";
+    $("companySubtitle").textContent = "Tailored resumes, cover letters, and PDF preview";
     $("companyCountryLabel").textContent = (data.country || routeCountry).toUpperCase();
 
     if (routeSlug !== data.company_slug) {
@@ -479,9 +576,14 @@ async function loadWorkspace() {
     renderPositionList();
     const preferred = positions.find((p) => p.has_pdf)
       || positions.find((p) => p.has_tailored_tex)
+      || positions.find((p) => p.has_cover_letter_pdf)
+      || positions.find((p) => p.has_cover_letter_tex)
       || positions.find((p) => p.looking_to_apply || p.pinned)
       || positions[0];
     if (preferred?.idempotency_key) {
+      artifactMode = preferred.has_pdf || preferred.has_tailored_tex
+        ? "cv"
+        : (preferred.has_cover_letter_pdf || preferred.has_cover_letter_tex ? "cover-letter" : "cv");
       await loadPositionDetail(preferred.idempotency_key, preferred);
     } else {
       clearDetail();
@@ -525,7 +627,7 @@ async function rerenderPdf() {
     }
     setScreenLoadProgress(25);
     const result = await api(
-      `/api/mcp/applications/${encodeURIComponent(selectedKey)}/render`,
+      `${artifactApiBase(selectedKey)}/render`,
       { method: "POST" },
     );
     setScreenLoadProgress(92);
@@ -598,6 +700,8 @@ function bindEvents() {
   $("companyTexEditBtn")?.addEventListener("click", startTexEdit);
   $("companyTexSaveBtn")?.addEventListener("click", saveTex);
   $("companyTexCancelBtn")?.addEventListener("click", cancelTexEdit);
+  $("companyArtifactCv")?.addEventListener("click", () => switchArtifactMode("cv"));
+  $("companyArtifactCover")?.addEventListener("click", () => switchArtifactMode("cover-letter"));
   $("companyPositionList")?.addEventListener("click", (event) => {
     const btn = event.target.closest(".company-position-item");
     if (!btn) return;

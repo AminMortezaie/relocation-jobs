@@ -60,10 +60,6 @@ def get_fetch_log_context() -> dict:
     return dict(_fetch_log_context.get())
 
 
-def clear_fetch_log_context() -> None:
-    _fetch_log_context.set({})
-
-
 def _context_line(**fields) -> str:
     parts: list[str] = []
     if fields.get("run_id") is not None:

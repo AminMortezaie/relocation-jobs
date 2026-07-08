@@ -33,3 +33,8 @@ def application_pdf_filename(full_name: str, company_name: str) -> str:
 
     company = _filename_part(company_name) or "company"
     return f"{'_'.join([*name_bits, company])}.pdf"
+
+
+def application_cover_letter_pdf_filename(full_name: str, company_name: str) -> str:
+    base = application_pdf_filename(full_name, company_name)
+    return f"{base.removesuffix('.pdf')}_cover_letter.pdf"

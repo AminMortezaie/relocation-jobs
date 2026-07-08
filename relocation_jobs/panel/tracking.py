@@ -17,12 +17,16 @@ def mcp_fields_for_key(idempotency_key: str, mcp_applications: dict | None) -> d
             "has_tailored_tex": False,
             "has_pdf": False,
             "master_resume_slug": "",
+            "has_cover_letter_tex": False,
+            "has_cover_letter_pdf": False,
         }
     app = mcp_applications.get((idempotency_key or "").strip(), {})
     return {
         "has_tailored_tex": bool(app.get("has_tailored_tex")),
         "has_pdf": bool(app.get("has_pdf")),
         "master_resume_slug": (app.get("master_resume_slug") or "").strip(),
+        "has_cover_letter_tex": bool(app.get("has_cover_letter_tex")),
+        "has_cover_letter_pdf": bool(app.get("has_cover_letter_pdf")),
     }
 
 

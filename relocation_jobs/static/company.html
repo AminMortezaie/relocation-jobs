@@ -92,8 +92,8 @@
 
         <section class="company-detail-panel admin-panel" id="companyDetailPanel">
           <div id="companyDetailEmpty" class="company-detail-empty">
-            <p>Select a position with a tailored resume to preview LaTeX and PDF.</p>
-            <p class="hint">Use Claude Desktop MCP to generate tailored CVs, or mark roles as <em>looking to apply</em> on the job panel.</p>
+            <p>Select a position with a tailored resume or cover letter to preview LaTeX and PDF.</p>
+            <p class="hint">Use Claude Desktop MCP to generate tailored CVs / cover letters, or mark roles as <em>looking to apply</em> on the job panel.</p>
           </div>
 
           <div id="companyDetailBody" class="company-detail-body" hidden>
@@ -137,10 +137,15 @@
               </div>
             </div>
 
+            <div class="company-artifact-tabs" role="tablist" aria-label="Document type">
+              <button type="button" class="company-artifact-tab company-artifact-tab--active" role="tab" data-artifact="cv" id="companyArtifactCv" aria-selected="true">CV</button>
+              <button type="button" class="company-artifact-tab" role="tab" data-artifact="cover-letter" id="companyArtifactCover" aria-selected="false">Cover letter</button>
+            </div>
+
             <div class="company-preview-grid">
               <div class="company-tex-panel">
                 <div class="company-tex-header">
-                  <h3 class="company-preview-label">LaTeX source</h3>
+                  <h3 class="company-preview-label" id="companyTexLabel">LaTeX source</h3>
                   <div class="company-tex-actions">
                     <button type="button" class="header-secondary-btn" id="companyTexEditBtn" hidden>Edit</button>
                     <button type="button" class="header-secondary-btn" id="companyTexSaveBtn" hidden>Save</button>
@@ -151,10 +156,10 @@
                 <textarea class="company-tex-editor" id="companyTexEditor" hidden spellcheck="false"></textarea>
               </div>
               <div class="company-pdf-panel">
-                <h3 class="company-preview-label">PDF preview</h3>
+                <h3 class="company-preview-label" id="companyPdfLabel">PDF preview</h3>
                 <div class="company-pdf-frame-wrap">
-                  <iframe id="companyPdfFrame" class="company-pdf-frame" title="Resume PDF preview"></iframe>
-                  <p id="companyPdfMissing" class="company-pdf-missing" hidden>No PDF yet — save tailored tex via MCP, then re-render.</p>
+                  <iframe id="companyPdfFrame" class="company-pdf-frame" title="PDF preview"></iframe>
+                  <p id="companyPdfMissing" class="company-pdf-missing" hidden>No PDF yet — save tex via MCP, then re-render.</p>
                 </div>
               </div>
             </div>
@@ -166,6 +171,6 @@
 
   <div class="toast" id="companyToast"></div>
 
-  <script type="module" src="/static/js/company.js?v=13"></script>
+  <script type="module" src="/static/js/company.js?v=14"></script>
 </body>
 </html>

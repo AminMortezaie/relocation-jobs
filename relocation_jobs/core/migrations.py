@@ -109,6 +109,7 @@ def _migrate_schema(conn) -> None:
     run_migration_once(conn, "mcp_master_resumes_v2", _migrate_mcp_master_resumes_v2)
     run_migration_once(conn, "mcp_master_resumes_pdf_v1", _migrate_mcp_master_resumes_pdf_v1)
     run_migration_once(conn, "mcp_applications_country_lower_v1", _migrate_mcp_applications_country_lower)
+    run_migration_once(conn, "mcp_cover_letter_v1", _migrate_mcp_cover_letter_v1)
     run_migration_once(conn, "location_gate_override_v1", _apply_location_gate_override_column)
 
 
@@ -225,6 +226,21 @@ def _migrate_mcp_applications_country_lower(conn) -> None:
         UPDATE mcp_applications
         SET country = LOWER(TRIM(country))
         WHERE country <> LOWER(TRIM(country))
+        """
+    )
+
+
+def _migrate_mcp_cover_letter_v1(conn) -> None:
+    conn.execute(
+        """
+        ALTER TABLE mcp_applications
+        ADD COLUMN IF NOT EXISTS cover_letter_tex TEXT;
+        ALTER TABLE mcp_applications
+        ADD COLUMN IF NOT EXISTS cover_letter_pdf_bytes BYTEA;
+        ALTER TABLE mcp_applications
+        ADD COLUMN IF NOT EXISTS cover_letter_tex_updated_at TEXT;
+        ALTER TABLE mcp_applications
+        ADD COLUMN IF NOT EXISTS cover_letter_pdf_updated_at TEXT;
         """
     )
 

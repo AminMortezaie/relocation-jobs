@@ -214,3 +214,63 @@ def register(app):
         if not result.ok:
             return jsonify({"ok": False, "error": result.log, **result.model_dump()}), 400
         return jsonify({"ok": True, **result.model_dump()})
+
+    @app.get("/api/mcp/applications/<path:idempotency_key>/cover-letter/tex")
+    @login_required
+    def api_mcp_application_cover_letter_tex(idempotency_key: str):
+        try:
+            detail = mcp_service.read_application_cover_letter_tex(
+                idempotency_key, user_id=g.user_id,
+            )
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        return jsonify(detail.model_dump())
+
+    @app.put("/api/mcp/applications/<path:idempotency_key>/cover-letter/tex")
+    @login_required
+    def api_mcp_application_cover_letter_tex_put(idempotency_key: str):
+        body = request.get_json(silent=True) or {}
+        content = body.get("content")
+        if content is None:
+            return jsonify({"error": "content is required"}), 400
+        try:
+            saved = mcp_service.save_application_cover_letter_tex(
+                idempotency_key,
+                str(content),
+                user_id=g.user_id,
+            )
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        return jsonify(saved)
+
+    @app.get("/api/mcp/applications/<path:idempotency_key>/cover-letter/pdf")
+    @login_required
+    def api_mcp_application_cover_letter_pdf(idempotency_key: str):
+        try:
+            pdf_bytes, filename = mcp_service.read_application_cover_letter_pdf_download(
+                idempotency_key,
+                user_id=g.user_id,
+            )
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        quoted = quote(filename)
+        download = request.args.get("download", "").strip().lower() in ("1", "true", "yes")
+        disposition = "attachment" if download else "inline"
+        headers = {
+            "Content-Disposition": (
+                f'{disposition}; filename="{filename}"; filename*=UTF-8\'\'{quoted}'
+            ),
+        }
+        return Response(pdf_bytes, mimetype="application/pdf", headers=headers)
+
+    @app.post("/api/mcp/applications/<path:idempotency_key>/cover-letter/render")
+    @login_required
+    def api_mcp_application_cover_letter_render(idempotency_key: str):
+        result = mcp_service.render_application_cover_letter_pdf(
+            idempotency_key, user_id=g.user_id,
+        )
+        if not result.ok:
+            return jsonify({"ok": False, "error": result.log, **result.model_dump()}), 400
+        return jsonify({"ok": True, **result.model_dump()})

@@ -68,7 +68,11 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 | Column | Purpose |
 |--------|---------|
 | `master_resume_slug` | Variant used for this application |
-| `tailored_tex`, `pdf_bytes`, `meta_json` | Application artifacts |
+| `tailored_tex`, `pdf_bytes`, `meta_json` | Resume application artifacts |
+| `cover_letter_tex`, `cover_letter_pdf_bytes` | Cover letter artifacts (parallel to resume) |
+| `cover_letter_tex_updated_at`, `cover_letter_pdf_updated_at` | Cover letter timestamps |
+
+Migration: `mcp_cover_letter_v1`.
 
 ---
 
@@ -76,7 +80,7 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 
 | Tool | Purpose |
 |------|---------|
-| `get_job_context` | Job + tracking + `description_text` (JD), `has_description` / `needs_fetch`, `master_resume_slug`, `has_tailored_tex` / `has_pdf`, `can_save_tailored_tex` |
+| `get_job_context` | Job + tracking + `description_text` (JD), `has_description` / `needs_fetch`, `master_resume_slug`, `has_tailored_tex` / `has_pdf`, `has_cover_letter_tex` / `has_cover_letter_pdf`, `can_save_tailored_tex` |
 | `list_application_queue` | Pinned + looking-to-apply jobs (discovery only — not required to save) |
 | `list_master_resumes` | All master variants |
 | `get_master_resume` / `save_master_resume` | Read/write master tex by slug |
@@ -86,6 +90,8 @@ Profile (`profile_json`), including optional `pipeline` — up to 5 ordered prom
 | `save_tailored_tex` | Requires `master_resume_slug`; overwrites prior tailored tex; queue membership not required |
 | `validate_tex` | Structure + fact checks vs master |
 | `render_pdf` | Compile → store PDF bytes |
+| `save_cover_letter_tex` | Freeform cover letter LaTeX; overwrites prior; no master slug; queue membership not required |
+| `render_cover_letter_pdf` | Compile cover letter → store PDF bytes (prefer panel Re-render) |
 | `mark_applied` | Panel tracking |
 | `list_supported_countries` | Country keys for `add_company` (germany, netherlands, uk, portugal) |
 | `list_ats_types` | ATS ids for `add_company` (`auto` detects from careers URL) |
@@ -101,12 +107,12 @@ MCP writes artifacts to Postgres; the panel reads them via HTTP (same user sessi
 | Panel surface | Purpose |
 |---------------|---------|
 | `/apply` | Profile, pipeline prompts, master resumes (setup) |
-| `/company/<country>/<company-slug>` | Per-company workspace: positions, tailored tex, PDF preview — see [company-workspace.md](company-workspace.md) |
-| Job board (phase 3) | CV/PDF badges; company name → workspace |
+| `/company/<country>/<company-slug>` | Per-company workspace: positions, CV / cover letter tex, PDF preview — see [company-workspace.md](company-workspace.md) |
+| Job board (phase 3) | CV/PDF and cover-letter badges; company name → workspace |
 
-Web API (login required): `GET /api/mcp/companies/<country>/<company>/applications`, `GET/POST /api/mcp/applications/<idempotency_key>/…` — documented in [company-workspace.md](company-workspace.md).
+Web API (login required): `GET /api/mcp/companies/<country>/<company>/applications`, `GET/POST /api/mcp/applications/<idempotency_key>/…` (resume), `…/cover-letter/…` — documented in [company-workspace.md](company-workspace.md).
 
-Claude Desktop owns reframing (`save_tailored_tex` after user approval); the panel **renders PDF** (Re-render PDF) to save tokens in chat.
+Claude Desktop owns reframing (`save_tailored_tex` after user approval); optional `save_cover_letter_tex` afterward. The panel **renders PDF** (Re-render PDF, CV or Cover letter tab) to save tokens in chat.
 
 ### End-to-end flow (position → pipeline → reframe)
 

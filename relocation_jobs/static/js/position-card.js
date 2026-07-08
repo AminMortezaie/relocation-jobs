@@ -105,6 +105,7 @@ class PositionCard extends HTMLElement {
     this._job = null;
     this._variant = "open";
     this._citiesExpanded = false;
+    this._closeOnScrollHandler = null;
   }
 
   get job() { return this._job; }
@@ -733,6 +734,22 @@ class PositionCard extends HTMLElement {
     popover.style.left = `${Math.round(left)}px`;
     popover.classList.add("is-floating");
     this._setRaised(true);
+    this._addCloseOnScroll();
+  }
+
+  /** Close popovers on first scroll so the position:fixed popover doesn't
+   *  float disconnected from its trigger. */
+  _addCloseOnScroll() {
+    this._removeCloseOnScroll();
+    this._closeOnScrollHandler = () => { this._closeAllPopovers(); };
+    window.addEventListener("scroll", this._closeOnScrollHandler, { once: true, passive: true });
+  }
+
+  _removeCloseOnScroll() {
+    if (this._closeOnScrollHandler) {
+      window.removeEventListener("scroll", this._closeOnScrollHandler);
+      this._closeOnScrollHandler = null;
+    }
   }
 
   /** Lift this card and its company above siblings while a popover is open.
@@ -752,6 +769,7 @@ class PositionCard extends HTMLElement {
     if (cc) {
       cc.style.zIndex = on ? "10000" : "";
     }
+    if (!on) this._removeCloseOnScroll();
   }
 }
 

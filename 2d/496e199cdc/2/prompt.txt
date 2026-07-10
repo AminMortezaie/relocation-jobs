@@ -1,0 +1,7 @@
+read the skills and docs and tell me why on server the job scheduler did not run about more than 12 hours.
+find the problem on aws logs
+
+---
+
+use timeout is crucial for this project.
+restart it and then plan for writing down a good practice to handle this problem to not occur again.

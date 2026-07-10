@@ -3,8 +3,11 @@
   "checkpoint_id": "2d496e199cdc",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 8,
+  "checkpoints_count": 10,
   "files_touched": [
+    "docs/README.md",
+    "docs/operations/ec2-panel.md",
+    "docs/reference/fetch-scheduler-timeout-practices.md",
     "frontend/src/CvApplicationBadges.jsx",
     "relocation_jobs/mcp/repo.py",
     "relocation_jobs/mcp/server.py",
@@ -36,6 +39,12 @@
       "transcript": "/2d/496e199cdc/1/full.jsonl",
       "content_hash": "/2d/496e199cdc/1/content_hash.txt",
       "prompt": "/2d/496e199cdc/1/prompt.txt"
+    },
+    {
+      "metadata": "/2d/496e199cdc/2/metadata.json",
+      "transcript": "/2d/496e199cdc/2/full.jsonl",
+      "content_hash": "/2d/496e199cdc/2/content_hash.txt",
+      "prompt": "/2d/496e199cdc/2/prompt.txt"
     }
   ]
 }

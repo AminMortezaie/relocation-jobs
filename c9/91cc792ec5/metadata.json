@@ -1,0 +1,29 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "c991cc792ec5",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".env.example",
+    "docs/reference/fetch-scheduler-timeout-practices.md",
+    "relocation_jobs/fetch/country_runner.py",
+    "relocation_jobs/fetch/repo.py",
+    "relocation_jobs/fetch/runner.py",
+    "relocation_jobs/fetch/scheduler.py",
+    "relocation_jobs/fetch/state.py",
+    "relocation_jobs/scrape/playwright_board.py",
+    "relocation_jobs/web/server.py",
+    "scripts/ec2_app_deploy.sh",
+    "tests/fetch/test_runner_country_results.py",
+    "tests/fetch/test_scheduler.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/c9/91cc792ec5/0/metadata.json",
+      "transcript": "/c9/91cc792ec5/0/full.jsonl",
+      "content_hash": "/c9/91cc792ec5/0/content_hash.txt",
+      "prompt": "/c9/91cc792ec5/0/prompt.txt"
+    }
+  ]
+}

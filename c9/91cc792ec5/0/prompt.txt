@@ -1,0 +1,3 @@
+read the skills.
+
+you need to add a feature to remove the whole countries if needed.

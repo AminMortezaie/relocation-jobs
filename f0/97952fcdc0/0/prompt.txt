@@ -442,3 +442,7 @@ no no no.
 i meant in homepage dont show companies without position it cannot help.
 
 revert the changes you applied on previous action and do for the homepage
+
+---
+
+ok deploy on server

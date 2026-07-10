@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "404a4d3734a0",
+  "session_id": "3610b184-caf8-45cb-858b-96c0471cce1a",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-10T17:35:33.590628Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "tests/fetch/test_log.py",
+    "tests/web/test_fetch_api.py",
+    "tests/web/test_public_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "c8f5a8db8bfe",
+  "checkpoint_transcript_start": 80,
+  "transcript_lines_at_start": 80,
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-10T17:35:33.58751Z",
+    "agent_lines": 60,
+    "agent_removed": 42,
+    "human_added": 36,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 96,
+    "total_lines_changed": 170,
+    "agent_percentage": 60,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

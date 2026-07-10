@@ -107,6 +107,10 @@ cmd_sync() {
     log "Building frontend (board.js)..."
     (cd "$ROOT/frontend" && npm run build --silent)
   fi
+  if [[ -d "$ROOT/homepage" ]]; then
+    log "Building homepage (static export)..."
+    "$ROOT/scripts/build_homepage.sh"
+  fi
   log "Syncing to ${EC2_SSH_USER}@${ELASTIC_IP}:${REMOTE_DIR}"
   ssh_cmd "mkdir -p ${REMOTE_DIR}"
   rsync_cmd

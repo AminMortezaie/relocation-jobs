@@ -19,6 +19,7 @@ except ImportError:
 
 ROOT = PROJECT_ROOT
 STATIC = STATIC_DIR
+HOMEPAGE_STATIC = STATIC / "homepage"
 
 
 def _public_site_url() -> str:
@@ -85,9 +86,29 @@ def company_workspace_page(country, company_slug):
 
 @app.route("/")
 def public_home_page():
-    resp = send_from_directory(STATIC, "public.html")
+    if (HOMEPAGE_STATIC / "index.html").is_file():
+        resp = send_from_directory(HOMEPAGE_STATIC, "index.html")
+    else:
+        resp = send_from_directory(STATIC, "public.html")
     resp.headers["Cache-Control"] = "no-store"
     return resp
+
+
+@app.route("/_next/<path:asset_path>")
+def homepage_next_assets(asset_path):
+    resp = send_from_directory(HOMEPAGE_STATIC / "_next", asset_path)
+    if resp.status_code == 200:
+        resp.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    return resp
+
+
+@app.route("/icon.svg")
+def homepage_icon():
+    if (HOMEPAGE_STATIC / "icon.svg").is_file():
+        resp = send_from_directory(HOMEPAGE_STATIC, "icon.svg")
+        resp.headers["Cache-Control"] = "public, max-age=86400"
+        return resp
+    return Response(status=404)
 
 
 @app.route("/panel")

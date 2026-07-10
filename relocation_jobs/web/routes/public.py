@@ -4,6 +4,7 @@ from relocation_jobs.catalog.repo import get_catalog_overview, load_catalog_comp
 from relocation_jobs.core.location_tags import country_label
 
 PREVIEW_LIMIT = 8
+PREVIEW_SEARCH_LIMIT = 24
 PREVIEW_JOB_LIMIT = 2
 
 
@@ -51,16 +52,54 @@ def _public_overview_payload() -> dict:
     }
 
 
-def _public_preview_payload(limit: int = PREVIEW_LIMIT) -> dict:
+def _public_preview_payload(
+    *,
+    limit: int = PREVIEW_LIMIT,
+    country: str | None = None,
+    search: str | None = None,
+) -> dict:
     overview = get_catalog_overview()
-    countries = [row.get("country") for row in overview.get("countries") or [] if row.get("country")]
-    company_rows = load_catalog_companies_page(countries, offset=0, limit=limit) if countries else []
+    countries = [
+        row.get("country")
+        for row in overview.get("countries") or []
+        if row.get("country")
+    ]
+    country_key = (country or "").strip().lower()
+    if country_key and country_key != "all":
+        countries = [key for key in countries if key == country_key]
+    query = (search or "").strip() or None
+    fetch_limit = limit if not query and not country_key else max(limit, PREVIEW_SEARCH_LIMIT)
+    company_rows = (
+        load_catalog_companies_page(
+            countries,
+            offset=0,
+            limit=fetch_limit,
+            search=query,
+        )
+        if countries
+        else []
+    )
     companies = [_preview_company(company) for _, company in company_rows]
+    if query:
+        needle = query.lower()
+        companies = [
+            company
+            for company in companies
+            if needle in (company.get("name") or "").lower()
+            or needle in (company.get("country_label") or "").lower()
+            or any(
+                needle in (job.get("title") or "").lower()
+                for job in company.get("preview_jobs") or []
+            )
+        ]
+    companies = companies[:limit]
     return {
         "companies": companies,
         "meta": {
             "limit": limit,
             "returned": len(companies),
+            "country": country_key or "all",
+            "q": query or "",
         },
     }
 
@@ -72,4 +111,13 @@ def register(app):
 
     @app.get("/api/public/preview")
     def api_public_preview():
-        return _public_preview_payload()
+        from flask import request
+
+        country = request.args.get("country", "").strip().lower() or None
+        search = request.args.get("q", "").strip() or None
+        try:
+            limit = int(request.args.get("limit", PREVIEW_LIMIT))
+        except ValueError:
+            limit = PREVIEW_LIMIT
+        limit = max(1, min(limit, PREVIEW_SEARCH_LIMIT))
+        return _public_preview_payload(limit=limit, country=country, search=search)

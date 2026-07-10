@@ -1,0 +1,24 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "e9851989a85f",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/9Z4rv0L8O5P6kRRHA83d3/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/9Z4rv0L8O5P6kRRHA83d3/_ssgManifest.js",
+    "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_ssgManifest.js",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt"
+  ],
+  "sessions": [
+    {
+      "metadata": "/e9/851989a85f/0/metadata.json",
+      "transcript": "/e9/851989a85f/0/full.jsonl",
+      "content_hash": "/e9/851989a85f/0/content_hash.txt",
+      "prompt": "/e9/851989a85f/0/prompt.txt"
+    }
+  ]
+}

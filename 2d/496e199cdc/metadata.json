@@ -3,7 +3,7 @@
   "checkpoint_id": "2d496e199cdc",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 19,
+  "checkpoints_count": 23,
   "files_touched": [
     "docs/README.md",
     "docs/operations/ec2-panel.md",
@@ -56,6 +56,12 @@
       "transcript": "/2d/496e199cdc/3/full.jsonl",
       "content_hash": "/2d/496e199cdc/3/content_hash.txt",
       "prompt": "/2d/496e199cdc/3/prompt.txt"
+    },
+    {
+      "metadata": "/2d/496e199cdc/4/metadata.json",
+      "transcript": "/2d/496e199cdc/4/full.jsonl",
+      "content_hash": "/2d/496e199cdc/4/content_hash.txt",
+      "prompt": "/2d/496e199cdc/4/prompt.txt"
     }
   ]
 }

@@ -4,6 +4,7 @@ import json
 import re
 
 from relocation_jobs.core.db import _utc_now, db_read, db_transaction
+from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.mcp.types import (
     ApplicationProfile,
     MasterResumeSummary,
@@ -59,6 +60,41 @@ def resolve_company_name_by_slug(country_key: str, slug: str) -> str | None:
         if company_slug(name) == target:
             return name
     return None
+
+
+def workspace_path_for_application(
+    *,
+    country: str,
+    company_name: str,
+    idempotency_key: str = "",
+) -> str:
+    country_key = normalize_country_key(country)
+    name = (company_name or "").strip()
+    slug = company_slug(name)
+    if not slug:
+        return ""
+    if country_key in supported_countries():
+        return f"/company/{country_key}/{slug}"
+    key = (idempotency_key or "").strip()
+    if not key:
+        return ""
+    with db_read() as conn:
+        row = conn.execute(
+            """
+            SELECT c.country
+            FROM matching_jobs j
+            JOIN companies c ON c.id = j.company_id
+            WHERE j.idempotency_key = %s
+              AND LOWER(TRIM(c.name)) = LOWER(TRIM(%s))
+              AND c.country = ANY(%s)
+            ORDER BY c.country
+            LIMIT 1
+            """,
+            (key, name, list(sorted(supported_countries()))),
+        ).fetchone()
+    if row is None:
+        return ""
+    return f"/company/{row['country']}/{slug}"
 
 
 def get_user_documents(user_id: int) -> dict | None:
@@ -368,7 +404,7 @@ def load_application_summaries(
     country: str | None = None,
 ) -> dict[str, dict]:
     sql = """
-        SELECT idempotency_key,
+        SELECT idempotency_key, country, company_name,
                (tailored_tex IS NOT NULL AND TRIM(tailored_tex) <> '') AS has_tailored_tex,
                (pdf_bytes IS NOT NULL AND LENGTH(pdf_bytes) > 0) AS has_pdf,
                master_resume_slug,
@@ -396,6 +432,11 @@ def load_application_summaries(
             "master_resume_slug": (row.get("master_resume_slug") or "").strip(),
             "has_cover_letter_tex": bool(row.get("has_cover_letter_tex")),
             "has_cover_letter_pdf": bool(row.get("has_cover_letter_pdf")),
+            "workspace_path": workspace_path_for_application(
+                country=(row.get("country") or "").strip(),
+                company_name=(row.get("company_name") or "").strip(),
+                idempotency_key=key,
+            ),
         }
     return summaries
 

@@ -150,3 +150,72 @@ def test_board_panel_filters_still_on_legacy_jobs_route(v2_auth_client, seeded_c
     board = v2_auth_client.get("/api/board?country=uk").get_json()
     acme = next(c for c in board["companies"] if c["name"] == "Acme Backend Ltd")
     assert len(acme["jobs"]) == 2
+
+
+def test_board_cv_badge_uses_supported_workspace_path_for_unsupported_application_country(
+    v2_auth_client, seeded_catalog_v2, mcp_documents,
+):
+    from relocation_jobs.catalog.repo import sync_company_board_to_catalog
+    from relocation_jobs.core.job_identity import job_idempotency_key
+    from relocation_jobs.mcp import repo as mcp_repo
+
+    del seeded_catalog_v2, mcp_documents
+    germany_url = "https://www.workato.com/careers?gh_jid=8284791002#open-roles"
+    singapore_url = "https://workato.com/careers?gh_jid=8284791002"
+    idem_key = job_idempotency_key(singapore_url)
+
+    sync_company_board_to_catalog(
+        "germany",
+        {
+            "name": "Workato",
+            "city": "Berlin",
+            "size": "201-500",
+            "careers_url": "https://www.workato.com/careers",
+            "ats_type": "greenhouse",
+            "ats_url": "https://boards.greenhouse.io/workato",
+            "matching_jobs": [
+                {
+                    "title": "Senior Software Engineer (Go)",
+                    "url": germany_url,
+                    "idempotency_key": idem_key,
+                    "location": "Singapore",
+                    "fetched": "2026-07-09T12:05:09+00:00",
+                    "last_seen": "2026-07-09T12:05:09+00:00",
+                }
+            ],
+        },
+    )
+    sync_company_board_to_catalog(
+        "singapore",
+        {
+            "name": "Workato",
+            "city": "Singapore",
+            "size": "201-500",
+            "careers_url": "https://workato.com/careers",
+            "ats_type": "greenhouse",
+            "ats_url": "https://boards.greenhouse.io/workato",
+            "matching_jobs": [
+                {
+                    "title": "Senior Software Engineer (Go)",
+                    "url": singapore_url,
+                    "idempotency_key": idem_key,
+                    "location": "Singapore",
+                    "fetched": "2026-07-09",
+                    "last_seen": "2026-07-09",
+                }
+            ],
+        },
+    )
+    mcp_repo.save_tailored_tex(
+        1,
+        idem_key,
+        r"\documentclass{article}\begin{document}Go\end{document}",
+        master_resume_slug="go",
+        country="singapore",
+        company="Workato",
+        url=singapore_url,
+    )
+
+    summaries = mcp_repo.load_application_summaries(1)
+    assert summaries[idem_key]["has_tailored_tex"] is True
+    assert summaries[idem_key]["workspace_path"] == "/company/germany/workato"

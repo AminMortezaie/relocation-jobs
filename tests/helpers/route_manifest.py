@@ -2,9 +2,13 @@ from __future__ import annotations
 
 PANEL_PAGE_ROUTES: dict[str, frozenset[str]] = {
     "/": frozenset({"GET"}),
+    "/app": frozenset({"GET"}),
+    "/preview": frozenset({"GET"}),
     "/admin": frozenset({"GET"}),
     "/apply": frozenset({"GET"}),
     "/company/<country>/<path:company_slug>": frozenset({"GET"}),
+    "/robots.txt": frozenset({"GET"}),
+    "/sitemap.xml": frozenset({"GET"}),
 }
 
 PANEL_API_ROUTES: dict[str, frozenset[str]] = {
@@ -29,6 +33,8 @@ PANEL_API_ROUTES: dict[str, frozenset[str]] = {
     "/api/jobs/pin": frozenset({"PATCH", "POST"}),
     "/api/board": frozenset({"GET"}),
     "/api/board/stats": frozenset({"GET"}),
+    "/api/public/overview": frozenset({"GET"}),
+    "/api/public/preview": frozenset({"GET"}),
     "/api/companies/<country>/<path:company_name>": frozenset({"GET"}),
     "/api/companies/applied": frozenset({"PATCH", "POST"}),
     "/api/companies/awaiting-response": frozenset({"PATCH", "POST"}),

@@ -356,13 +356,41 @@ def list_application_queue(
     user_id: int | None = None,
     country: str | None = None,
 ) -> list[ApplicationQueueItem]:
+    return _list_tracked_application_items(
+        user_id=user_id,
+        country=country,
+        include_row=lambda row: bool(row.get("pinned")) or bool(row.get("looking_to_apply")),
+        sort_key=lambda item: (not item.pinned, not item.looking_to_apply, item.company.lower()),
+    )
+
+
+def list_looking_to_apply_jobs(
+    *,
+    user_id: int | None = None,
+    country: str | None = None,
+) -> list[ApplicationQueueItem]:
+    return _list_tracked_application_items(
+        user_id=user_id,
+        country=country,
+        include_row=lambda row: bool(row.get("looking_to_apply")),
+        sort_key=lambda item: (item.company.lower(), item.title.lower(), item.url),
+    )
+
+
+def _list_tracked_application_items(
+    *,
+    user_id: int | None = None,
+    country: str | None = None,
+    include_row,
+    sort_key,
+) -> list[ApplicationQueueItem]:
     uid = user_id if user_id is not None else resolve_user_id()
     scope = (country or "").strip().lower() or None
     tracking = load_job_tracking(uid, country=scope)
     items: list[ApplicationQueueItem] = []
 
     for (country_key, company_name, job_url), row in tracking.items():
-        if not row.get("pinned") and not row.get("looking_to_apply"):
+        if not include_row(row):
             continue
         job = get_job_by_url(
             job_url,
@@ -384,7 +412,7 @@ def list_application_queue(
             ats_score=row.get("ats_score"),
         ))
 
-    items.sort(key=lambda item: (not item.pinned, not item.looking_to_apply, item.company.lower()))
+    items.sort(key=sort_key)
     return items
 
 

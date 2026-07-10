@@ -4,7 +4,7 @@ function CvApplicationBadges({ job, company }) {
   const hasCv = Boolean(job?.has_tailored_tex || job?.has_pdf);
   const hasCl = Boolean(job?.has_cover_letter_tex || job?.has_cover_letter_pdf);
   if (!hasCv && !hasCl) return null;
-  const href = companyWorkspacePath(job.country || company?.country, job.company || company?.name);
+  const href = job?.workspace_path || companyWorkspacePath(job.country || company?.country, job.company || company?.name);
   return (
     <>
       {job.has_pdf ? (

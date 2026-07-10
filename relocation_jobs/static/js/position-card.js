@@ -54,7 +54,7 @@ function cvBadges(job) {
   const hasCv = Boolean(job.has_tailored_tex || job.has_pdf);
   const hasCl = Boolean(job.has_cover_letter_tex || job.has_cover_letter_pdf);
   if (!hasCv && !hasCl && !job.master_resume_slug) return "";
-  const href = companyWorkspacePath(country, companyName);
+  const href = String(job.workspace_path || "").trim() || companyWorkspacePath(country, companyName);
   let html = "";
   if (job.has_pdf) {
     html += `<a class="badge cv-pdf" href="${href}" title="Open tailored CV and PDF preview">PDF ready</a>`;

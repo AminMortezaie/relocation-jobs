@@ -25,6 +25,7 @@ _GH_JID_RE = re.compile(r"(?:^|[?&])gh_jid=(\d+)", re.I)
 _CUSTOM_JOB_ID_RE = re.compile(r"/(?:job|jobs|positions)/(\d+)(?:[/?#]|$)", re.I)
 _BRANDED_GREENHOUSE_CAREERS = {
     "getyourguide.careers": "getyourguide",
+    "workato.com/careers": "workato",
 }
 
 
@@ -59,6 +60,9 @@ def greenhouse_job_ids_from_url(url: str, *, board_slug: str = "") -> tuple[str,
     lowered = text.lower()
     for host, board in _BRANDED_GREENHOUSE_CAREERS.items():
         if host in lowered:
+            gh_jid = _GH_JID_RE.search(text)
+            if gh_jid:
+                return board, gh_jid.group(1)
             branded = re.search(r"/jobs/(\d+)", text)
             if branded:
                 return board, branded.group(1)

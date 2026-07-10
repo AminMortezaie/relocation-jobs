@@ -199,6 +199,28 @@ def register(app):
             return jsonify({"error": str(exc)}), 404
         return jsonify(detail.model_dump())
 
+    @app.put("/api/mcp/positions/<path:idempotency_key>/description")
+    @login_required
+    def api_mcp_position_description_put(idempotency_key: str):
+        body = request.get_json(silent=True) or {}
+        description_text = body.get("description_text")
+        if description_text is None:
+            return jsonify({"error": "description_text is required"}), 400
+        try:
+            detail = mcp_service.get_position_description(idempotency_key)
+            mcp_service.update_position(
+                detail.country,
+                detail.company,
+                detail.url,
+                description_text=str(description_text),
+            )
+            updated = mcp_service.get_position_description(idempotency_key)
+        except LookupError as exc:
+            return jsonify({"error": str(exc)}), 404
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        return jsonify(updated.model_dump())
+
     @app.post("/api/mcp/positions/<path:idempotency_key>/fetch-description")
     @login_required
     def api_mcp_position_fetch_description(idempotency_key: str):

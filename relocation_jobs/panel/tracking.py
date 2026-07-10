@@ -19,6 +19,7 @@ def mcp_fields_for_key(idempotency_key: str, mcp_applications: dict | None) -> d
             "master_resume_slug": "",
             "has_cover_letter_tex": False,
             "has_cover_letter_pdf": False,
+            "workspace_path": "",
         }
     app = mcp_applications.get((idempotency_key or "").strip(), {})
     return {
@@ -27,6 +28,7 @@ def mcp_fields_for_key(idempotency_key: str, mcp_applications: dict | None) -> d
         "master_resume_slug": (app.get("master_resume_slug") or "").strip(),
         "has_cover_letter_tex": bool(app.get("has_cover_letter_tex")),
         "has_cover_letter_pdf": bool(app.get("has_cover_letter_pdf")),
+        "workspace_path": (app.get("workspace_path") or "").strip(),
     }
 
 

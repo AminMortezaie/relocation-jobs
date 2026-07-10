@@ -127,11 +127,19 @@
             <div id="companyPositionCardContainer" class="company-position-card-container"></div>
 
             <div class="company-jd-panel" id="companyJdPanel" hidden>
-              <h3 class="company-preview-label">Job description</h3>
+              <div class="company-jd-header">
+                <h3 class="company-preview-label">Job description</h3>
+                <div class="company-jd-actions">
+                  <button type="button" class="header-secondary-btn" id="companyJdEditBtn" hidden>Edit</button>
+                  <button type="button" class="header-secondary-btn" id="companyJdSaveBtn" hidden>Save</button>
+                  <button type="button" class="link-btn" id="companyJdCancelBtn" hidden>Cancel</button>
+                </div>
+              </div>
               <div class="company-jd-view" id="companyJdView" hidden></div>
+              <textarea class="company-jd-editor" id="companyJdEditor" hidden spellcheck="false"></textarea>
               <div class="company-jd-empty" id="companyJdEmpty" hidden>
                 <p class="company-jd-missing hint" id="companyJdMissing">
-                  No job description stored for this role yet. Fetch it from the posting URL.
+                  No job description stored for this role yet. Fetch it from the posting URL or paste it here.
                 </p>
                 <button type="button" class="header-secondary-btn" id="companyJdFetchBtn">
                   Fetch job description

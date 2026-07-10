@@ -23,6 +23,7 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Panel / admin statistics | [reference/stats.md](reference/stats.md) |
 | Test failures / catalog seed in tests | [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md) |
 | Board hung / slow load (2026-07 postmortem) | [reference/board-load-performance-incident.md](reference/board-load-performance-incident.md) |
+| Fetch scheduler hung / timeouts (2026-07) | [reference/fetch-scheduler-timeout-practices.md](reference/fetch-scheduler-timeout-practices.md) |
 | Secrets / no real IPs in public docs | [reference/rules.md](reference/rules.md#secrets-and-documentation) · `.env` / `aws-postgres.env` gitignored |
 | MCP apply assistant (Claude Desktop, v0) | [reference/mcp-application.md](reference/mcp-application.md) |
 | Company workspace (CV/PDF on panel) | [reference/company-workspace.md](reference/company-workspace.md) |

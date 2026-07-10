@@ -43,6 +43,8 @@ Manual scrape from your laptop still works (`PANEL_SCRAPE_ENABLED=1`); the worke
 
 On `t4g.micro`, if the worker OOMs during fetch, lower concurrency to `2` or upsize the instance.
 
+**Scheduler stuck?** If `worker-logs` shows no new lines for 2+ hours while the container is Up, a Playwright scrape may have hung. Restart: `docker restart relocation-fetch-worker`. See [fetch-scheduler-timeout-practices.md](../reference/fetch-scheduler-timeout-practices.md) for layered timeout rules and the implementation plan.
+
 ---
 
 ## Cloudflare DNS

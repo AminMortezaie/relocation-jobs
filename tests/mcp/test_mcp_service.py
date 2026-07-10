@@ -207,6 +207,29 @@ def test_list_application_queue_includes_looking_to_apply(
     assert any(item.url == job["url"] for item in items)
 
 
+def test_list_looking_to_apply_jobs_excludes_pinned_only(
+    v2_auth_client, seeded_catalog_v2, mcp_documents,
+):
+    board = v2_auth_client.get("/api/board?country=uk").get_json()
+    co = board["companies"][0]
+    first = co["jobs"][0]
+    second = co["jobs"][1]
+    v2_auth_client.post(
+        "/api/jobs/looking-to-apply",
+        json={"country": "uk", "company": co["name"], "url": first["url"], "looking_to_apply": True},
+    )
+    v2_auth_client.post(
+        "/api/jobs/pin",
+        json={"country": "uk", "company": co["name"], "url": second["url"], "pinned": True},
+    )
+
+    items = service.list_looking_to_apply_jobs(user_id=1, country="uk")
+    urls = {item.url for item in items}
+    assert first["url"] in urls
+    assert second["url"] not in urls
+    assert all(item.looking_to_apply for item in items)
+
+
 def test_mark_job_applied(seeded_catalog_v2, mcp_documents):
     result = service.mark_job_applied(
         "uk",

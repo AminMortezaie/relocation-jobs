@@ -188,14 +188,17 @@ function renderPositionList() {
 let jdVisible = false;
 let jdLoaded = false;
 let jdCache = { key: "", hasDescription: false, text: "", html: "", needsFetch: false };
+let jdEditing = false;
 
 function setJobDescriptionContent({ hasDescription = false, text = "", html = "" } = {}) {
   const view = $("companyJdView");
   const empty = $("companyJdEmpty");
   const fetchBtn = $("companyJdFetchBtn");
+  const editor = $("companyJdEditor");
   if (!view || !empty) return;
   const content = (text || "").trim();
   const markup = (html || "").trim();
+  if (editor) editor.hidden = true;
   if (hasDescription && (markup || content)) {
     if (markup) {
       view.innerHTML = markup;
@@ -216,6 +219,44 @@ function setJobDescriptionContent({ hasDescription = false, text = "", html = ""
   }
 }
 
+function setJobDescriptionEditMode({ content = jdCache.text || "" } = {}) {
+  jdEditing = true;
+  const view = $("companyJdView");
+  const empty = $("companyJdEmpty");
+  const editor = $("companyJdEditor");
+  const editBtn = $("companyJdEditBtn");
+  const saveBtn = $("companyJdSaveBtn");
+  const cancelBtn = $("companyJdCancelBtn");
+  const fetchBtn = $("companyJdFetchBtn");
+  if (view) view.hidden = true;
+  if (empty) empty.hidden = true;
+  if (editor) {
+    editor.hidden = false;
+    editor.value = content;
+    editor.focus();
+  }
+  if (editBtn) editBtn.hidden = true;
+  if (saveBtn) saveBtn.hidden = false;
+  if (cancelBtn) cancelBtn.hidden = false;
+  if (fetchBtn) fetchBtn.hidden = true;
+}
+
+function setJobDescriptionViewMode() {
+  jdEditing = false;
+  const editBtn = $("companyJdEditBtn");
+  const saveBtn = $("companyJdSaveBtn");
+  const cancelBtn = $("companyJdCancelBtn");
+  const fetchBtn = $("companyJdFetchBtn");
+  if (editBtn) {
+    editBtn.hidden = false;
+    editBtn.textContent = jdCache.hasDescription ? "Edit" : "Paste description";
+  }
+  if (saveBtn) saveBtn.hidden = true;
+  if (cancelBtn) cancelBtn.hidden = true;
+  if (fetchBtn) fetchBtn.hidden = false;
+  setJobDescriptionContent(jdCache);
+}
+
 function applyJobDescriptionPayload(jd) {
   const text = (jd.description_text || "").trim();
   const html = (jd.description_html || "").trim();
@@ -228,7 +269,7 @@ function applyJobDescriptionPayload(jd) {
     needsFetch: !hasDescription,
   };
   jdLoaded = true;
-  setJobDescriptionContent(jdCache);
+  setJobDescriptionViewMode();
   const position = positions.find((p) => p.idempotency_key === selectedKey);
   if (position) {
     position.has_description = jdCache.hasDescription;
@@ -257,11 +298,29 @@ function updateJdToggleButton(position) {
 function resetJobDescription() {
   jdVisible = false;
   jdLoaded = false;
+  jdEditing = false;
   jdCache = { key: "", hasDescription: false, text: "", html: "", needsFetch: false };
   const panel = $("companyJdPanel");
   const btn = $("companyJdToggleBtn");
+  const editBtn = $("companyJdEditBtn");
+  const saveBtn = $("companyJdSaveBtn");
+  const cancelBtn = $("companyJdCancelBtn");
+  const fetchBtn = $("companyJdFetchBtn");
+  const editor = $("companyJdEditor");
   if (panel) panel.hidden = true;
   setJobDescriptionContent();
+  if (editBtn) editBtn.hidden = true;
+  if (saveBtn) saveBtn.hidden = true;
+  if (cancelBtn) cancelBtn.hidden = true;
+  if (fetchBtn) {
+    fetchBtn.hidden = false;
+    fetchBtn.disabled = false;
+    fetchBtn.textContent = "Fetch job description";
+  }
+  if (editor) {
+    editor.hidden = true;
+    editor.value = "";
+  }
   if (btn) {
     btn.hidden = true;
     btn.disabled = false;
@@ -288,7 +347,11 @@ async function toggleJobDescription() {
   if (jdLoaded && jdCache.key === selectedKey) {
     jdVisible = true;
     panel.hidden = false;
-    setJobDescriptionContent(jdCache);
+    if (jdEditing) {
+      setJobDescriptionEditMode();
+    } else {
+      setJobDescriptionViewMode();
+    }
     updateJdToggleButton(position);
     return;
   }
@@ -305,7 +368,9 @@ async function toggleJobDescription() {
     if (err.message?.includes("(500)")) {
       jdVisible = true;
       panel.hidden = false;
-      setJobDescriptionContent();
+      jdCache = { key: selectedKey, hasDescription: false, text: "", html: "", needsFetch: true };
+      jdLoaded = true;
+      setJobDescriptionViewMode();
       $("companyJdMissing").textContent = (
         "Job description is not available yet. Use Fetch job description below."
       );
@@ -346,6 +411,55 @@ async function fetchJobDescription() {
   } finally {
     fetchBtn.disabled = false;
     fetchBtn.textContent = "Fetch job description";
+  }
+}
+
+function startJobDescriptionEdit() {
+  setJobDescriptionEditMode();
+}
+
+function cancelJobDescriptionEdit() {
+  setJobDescriptionViewMode();
+}
+
+async function persistJobDescription() {
+  if (!selectedKey) {
+    throw new Error("Select a position first");
+  }
+  const descriptionText = $("companyJdEditor")?.value ?? "";
+  if (!descriptionText.trim()) {
+    throw new Error("Job description cannot be empty");
+  }
+  return api(
+    `/api/mcp/positions/${encodeURIComponent(selectedKey)}/description`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description_text: descriptionText }),
+    },
+  );
+}
+
+async function saveJobDescription() {
+  const editBtn = $("companyJdEditBtn");
+  const saveBtn = $("companyJdSaveBtn");
+  const fetchBtn = $("companyJdFetchBtn");
+  if (!saveBtn) return;
+  saveBtn.disabled = true;
+  if (editBtn) editBtn.disabled = true;
+  if (fetchBtn) fetchBtn.disabled = true;
+  showError("");
+  try {
+    const jd = await persistJobDescription();
+    jdVisible = true;
+    applyJobDescriptionPayload(jd);
+    showToast("Job description saved");
+  } catch (err) {
+    showError(err.message || "Failed to save job description");
+  } finally {
+    saveBtn.disabled = false;
+    if (editBtn) editBtn.disabled = false;
+    if (fetchBtn) fetchBtn.disabled = false;
   }
 }
 
@@ -735,6 +849,9 @@ function bindEvents() {
   $("companyLogoutBtn")?.addEventListener("click", logout);
   $("companyJdToggleBtn")?.addEventListener("click", toggleJobDescription);
   $("companyJdFetchBtn")?.addEventListener("click", fetchJobDescription);
+  $("companyJdEditBtn")?.addEventListener("click", startJobDescriptionEdit);
+  $("companyJdSaveBtn")?.addEventListener("click", saveJobDescription);
+  $("companyJdCancelBtn")?.addEventListener("click", cancelJobDescriptionEdit);
   $("companyRenderBtn")?.addEventListener("click", rerenderPdf);
   $("companyTexEditBtn")?.addEventListener("click", startTexEdit);
   $("companyTexSaveBtn")?.addEventListener("click", saveTex);

@@ -38,6 +38,11 @@ def test_greenhouse_job_ids_from_url_gh_jid_with_board_slug():
     )
 
 
+def test_greenhouse_job_ids_from_branded_workato_gh_jid():
+    url = "https://www.workato.com/careers?gh_jid=8499680002#open-roles"
+    assert greenhouse_job_ids_from_url(url) == ("workato", "8499680002")
+
+
 def test_fetch_greenhouse_job_text_getyourguide(monkeypatch):
     payload = json.loads(_FIXTURE.read_text())
 

@@ -43,6 +43,14 @@ def list_application_queue(country: str = "") -> str:
 
 
 @mcp.tool()
+def list_looking_to_apply_jobs(country: str = "") -> str:
+    """List only jobs in looking-to-apply state for the configured MCP user."""
+    scope = country.strip() or None
+    items = service.list_looking_to_apply_jobs(country=scope)
+    return _json([item.model_dump() for item in items])
+
+
+@mcp.tool()
 def list_master_resumes() -> str:
     """List master resume variants for the MCP user (slug, label, updated_at)."""
     items = service.list_master_resumes()

@@ -190,6 +190,48 @@ def test_position_description_api(v2_auth_client, seeded_catalog_v2, mcp_documen
     assert match.has_description is True
 
 
+def test_position_description_put_overwrites_text(
+    v2_auth_client, seeded_catalog_v2, mcp_documents,
+):
+    from relocation_jobs.catalog.repo import get_company, sync_company_board_to_catalog
+
+    company = get_company("uk", COMPANY)
+    assert company is not None
+    jobs = list(company["matching_jobs"])
+    jobs[0]["description_text"] = "Old job description that should be replaced from the workspace editor."
+    company["matching_jobs"] = jobs
+    sync_company_board_to_catalog(COUNTRY, company)
+
+    saved = service.save_tailored_tex_for_job(
+        COUNTRY,
+        COMPANY,
+        JOB_URL,
+        GO_MASTER_TEX,
+        master_resume_slug="go",
+        user_id=1,
+    )
+    idem_key = saved["idempotency_key"]
+
+    updated = v2_auth_client.put(
+        f"/api/mcp/positions/{idem_key}/description",
+        json={
+            "description_text": (
+                "Corrected Worketo job description with enough detail to replace the wrong saved text "
+                "from the company workspace editor."
+            ),
+        },
+    )
+    assert updated.status_code == 200
+    body = updated.get_json()
+    assert body["has_description"] is True
+    assert "Corrected Worketo" in body["description_text"]
+    assert "Old job description" not in body["description_text"]
+
+    refreshed = service.get_position_description(idem_key)
+    assert "Corrected Worketo" in refreshed.description_text
+    assert "Old job description" not in refreshed.description_text
+
+
 def test_position_description_needs_fetch_when_empty(
     v2_auth_client, seeded_catalog_v2, mcp_documents,
 ):
@@ -318,6 +360,7 @@ def test_list_company_applications_finds_tex_when_country_mixed_case(
 def test_company_applications_routes_require_auth(v2_client):
     assert v2_client.get("/api/mcp/companies/uk/acme/applications").status_code == 401
     assert v2_client.get("/api/mcp/positions/some-key/description").status_code == 401
+    assert v2_client.put("/api/mcp/positions/some-key/description", json={}).status_code == 401
     assert v2_client.post("/api/mcp/positions/some-key/fetch-description").status_code == 401
     assert v2_client.get("/api/mcp/applications/some-key/tex").status_code == 401
     assert v2_client.put("/api/mcp/applications/some-key/tex", json={"content": "x"}).status_code == 401

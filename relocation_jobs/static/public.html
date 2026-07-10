@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Relocation Jobs | Visa-friendly software roles abroad</title>
+  <meta
+    name="description"
+    content="Discover visa-friendly software jobs across Germany, the Netherlands, the UK, and Portugal. Preview curated relocation-focused roles and sign in to track applications."
+  />
+  <link rel="canonical" href="https://kuchup.com/preview" />
+  <meta property="og:title" content="Relocation Jobs" />
+  <meta
+    property="og:description"
+    content="Preview relocation-focused software roles and country coverage before signing in."
+  />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://kuchup.com/preview" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/public.css?v=1" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Relocation Jobs",
+      "url": "https://kuchup.com/preview",
+      "description": "Visa-friendly software jobs abroad with curated previews and private tracking tools."
+    }
+  </script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a href="/preview" class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">RJ</span>
+        <span>
+          <strong>Relocation Jobs</strong>
+          <span class="brand-copy">Curated relocation-focused software search</span>
+        </span>
+      </a>
+      <nav class="site-nav">
+        <a href="#catalog">Catalog</a>
+        <a href="#countries">Countries</a>
+        <a href="#how">How it works</a>
+        <a class="button button-ghost" href="/">Sign in</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Curated relocation-friendly roles</p>
+          <h1>A cleaner way to browse software jobs that actually fit relocation goals.</h1>
+          <p class="hero-text">
+            Explore a public preview of countries, companies, and recent openings. Use the private workspace to track applications, filter deeper, and manage company-level work.
+          </p>
+          <form class="hero-search" id="previewSearchForm">
+            <label class="hero-search-label" for="previewSearchInput">Search the public preview</label>
+            <div class="hero-search-row">
+              <svg class="hero-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path>
+              </svg>
+              <input id="previewSearchInput" type="search" placeholder="Company, country, or role title" autocomplete="off" />
+              <button class="button" type="submit">Browse preview</button>
+            </div>
+          </form>
+          <div class="hero-actions">
+            <a class="button" href="#catalog">View catalog preview</a>
+            <a class="button button-ghost" href="/">Open private workspace</a>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <p class="panel-title">Private workspace includes</p>
+          <ul class="feature-list">
+            <li>Per-user tracking for applied, rejected, and not-for-me roles</li>
+            <li>Country, ATS, location, and visibility controls</li>
+            <li>Company workspace for application documents and activity</li>
+            <li>Admin and fetch tooling kept out of the public experience</li>
+          </ul>
+          <div class="hero-panel-note">
+            <span class="panel-note-label">Product shape</span>
+            <p>The public side is for discovery. The signed-in side is for doing the work.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="stats-strip" aria-labelledby="statsHeading">
+        <div class="section-head">
+          <h2 id="statsHeading">Current catalog snapshot</h2>
+          <p>Real data from the active relocation catalog, presented as a public preview.</p>
+        </div>
+        <div class="stats-grid" id="statsGrid">
+          <article class="stat-card"><span class="stat-label">Companies</span><strong id="statCompanies">-</strong><span class="stat-note">Curated company set</span></article>
+          <article class="stat-card"><span class="stat-label">Open roles</span><strong id="statJobs">-</strong><span class="stat-note">Visible in current snapshot</span></article>
+          <article class="stat-card"><span class="stat-label">Visa-friendly roles</span><strong id="statVisaJobs">-</strong><span class="stat-note">Roles with relocation signal</span></article>
+          <article class="stat-card"><span class="stat-label">Countries</span><strong id="statCountries">-</strong><span class="stat-note">Supported catalog coverage</span></article>
+        </div>
+      </section>
+
+      <section class="country-section" id="countries" aria-labelledby="countryHeading">
+        <div class="section-head section-head-inline">
+          <div>
+            <h2 id="countryHeading">Country coverage</h2>
+            <p>Browse the main country buckets and freshness of recent activity.</p>
+          </div>
+          <div class="section-chip-row">
+            <span class="surface-chip">Directory-style browsing</span>
+            <span class="surface-chip">Public preview only</span>
+          </div>
+        </div>
+        <div class="country-grid" id="countryGrid"></div>
+      </section>
+
+      <section class="preview-section" id="catalog" aria-labelledby="previewHeading">
+        <div class="section-head section-head-inline">
+          <div>
+            <h2 id="previewHeading">Preview companies and roles</h2>
+            <p>Search-first public preview inspired by directory and listing products, not a generic marketing page.</p>
+          </div>
+          <div class="section-chip-row">
+            <span class="surface-chip">Search</span>
+            <span class="surface-chip">Cards</span>
+            <span class="surface-chip">Status chips</span>
+          </div>
+        </div>
+        <div class="preview-toolbar">
+          <p class="preview-toolbar-copy">A small public subset to show the shape of the catalog before sign-in.</p>
+          <div class="preview-chip-row">
+            <span class="preview-chip">Company cards</span>
+            <span class="preview-chip">Role snippets</span>
+            <span class="preview-chip">Country labels</span>
+          </div>
+        </div>
+        <div class="preview-grid" id="previewGrid"></div>
+      </section>
+
+      <section class="how-section" id="how" aria-labelledby="howHeading">
+        <div class="section-head">
+          <h2 id="howHeading">How the product is structured</h2>
+          <p>One system, two densities: public browsing for discovery and private workspace for action.</p>
+        </div>
+        <div class="steps-grid">
+          <article class="step-card">
+            <span class="step-number">1</span>
+            <h3>Browse the public preview</h3>
+            <p>See country coverage, company examples, and role snapshots without exposing private workflow state.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">2</span>
+            <h3>Sign in for the workspace</h3>
+            <p>Open the denser board and company workflow when you want tracking, filtering, and application operations.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">3</span>
+            <h3>Keep the product practical</h3>
+            <p>Everything is designed to feel curated, trustworthy, and useful instead of flashy or marketplace-heavy.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="/static/js/public-home.js?v=1"></script>
+</body>
+</html>

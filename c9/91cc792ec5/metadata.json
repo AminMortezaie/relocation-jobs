@@ -3,7 +3,7 @@
   "checkpoint_id": "c991cc792ec5",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
+  "checkpoints_count": 9,
   "files_touched": [
     ".env.example",
     "docs/reference/fetch-scheduler-timeout-practices.md",
@@ -12,11 +12,17 @@
     "relocation_jobs/fetch/runner.py",
     "relocation_jobs/fetch/scheduler.py",
     "relocation_jobs/fetch/state.py",
+    "relocation_jobs/fetch/timeouts.py",
     "relocation_jobs/scrape/playwright_board.py",
     "relocation_jobs/web/server.py",
     "scripts/ec2_app_deploy.sh",
+    "tests/fetch/test_country_runner_timeout.py",
+    "tests/fetch/test_fetch_state_reap.py",
+    "tests/fetch/test_fetch_state_stale.py",
     "tests/fetch/test_runner_country_results.py",
-    "tests/fetch/test_scheduler.py"
+    "tests/fetch/test_scheduler.py",
+    "tests/fetch/test_timeouts.py",
+    "tests/scrape/test_playwright_board_timeout.py"
   ],
   "sessions": [
     {
@@ -24,6 +30,12 @@
       "transcript": "/c9/91cc792ec5/0/full.jsonl",
       "content_hash": "/c9/91cc792ec5/0/content_hash.txt",
       "prompt": "/c9/91cc792ec5/0/prompt.txt"
+    },
+    {
+      "metadata": "/c9/91cc792ec5/1/metadata.json",
+      "transcript": "/c9/91cc792ec5/1/full.jsonl",
+      "content_hash": "/c9/91cc792ec5/1/content_hash.txt",
+      "prompt": "/c9/91cc792ec5/1/prompt.txt"
     }
   ]
 }

@@ -1,0 +1,70 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "404a4d3734a0",
+  "session_id": "5903bae0-6443-412e-b97e-d5ccec623369",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-10T17:35:38.688804Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "frontend/src/companyWorkspace.js",
+    "relocation_jobs/static/admin.html",
+    "relocation_jobs/static/apply.html",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/dist/board.js",
+    "relocation_jobs/static/js/company-workspace.js",
+    "relocation_jobs/static/js/position-card.js",
+    "relocation_jobs/static/js/public-home.js",
+    "relocation_jobs/static/public.html",
+    "relocation_jobs/web/server.py",
+    "tests/fetch/test_log.py",
+    "tests/helpers/route_manifest.py",
+    "tests/web/test_fetch_api.py",
+    "tests/web/test_public_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "b58d18002aa2",
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-10T17:35:38.685473Z",
+    "agent_lines": 29,
+    "agent_removed": 43,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 32,
+    "total_committed": 29,
+    "total_lines_changed": 104,
+    "agent_percentage": 69.23076923076923,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 48,
+      "user_lines_removed": 32,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12,
+        "tests/fetch/test_log.py": 36
+      },
+      "user_removed_per_file": {
+        "tests/fetch/test_log.py": 32
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 97,
+      "agent_lines_removed": 75,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

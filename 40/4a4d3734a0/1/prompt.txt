@@ -1,0 +1,13 @@
+we have a preview version which is different from our panel.
+
+i want to make this preview on webiste "/" and tranfer the job panel to "/panel" route.
+
+---
+
+we have a preview version which is different from our panel.
+
+i want to make this preview on webiste "/" and tranfer the job panel to "/panel" route.
+
+---
+
+restart the panel

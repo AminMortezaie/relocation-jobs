@@ -3,13 +3,17 @@
   "checkpoint_id": "2d496e199cdc",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 5,
+  "checkpoints_count": 8,
   "files_touched": [
+    "frontend/src/CvApplicationBadges.jsx",
+    "relocation_jobs/mcp/repo.py",
     "relocation_jobs/mcp/server.py",
     "relocation_jobs/mcp/service.py",
+    "relocation_jobs/panel/tracking.py",
     "relocation_jobs/scrape/boards/greenhouse.py",
     "relocation_jobs/static/company.html",
     "relocation_jobs/static/js/company.js",
+    "relocation_jobs/static/js/position-card.js",
     "relocation_jobs/static/styles.css",
     "relocation_jobs/web/routes/__init__.py",
     "relocation_jobs/web/routes/mcp.py",
@@ -17,6 +21,7 @@
     "tests/helpers/route_manifest.py",
     "tests/mcp/test_mcp_service.py",
     "tests/scrape/test_greenhouse_job_text.py",
+    "tests/web/test_board_api.py",
     "tests/web/test_mcp_company_workspace.py"
   ],
   "sessions": [
@@ -25,6 +30,12 @@
       "transcript": "/2d/496e199cdc/0/full.jsonl",
       "content_hash": "/2d/496e199cdc/0/content_hash.txt",
       "prompt": "/2d/496e199cdc/0/prompt.txt"
+    },
+    {
+      "metadata": "/2d/496e199cdc/1/metadata.json",
+      "transcript": "/2d/496e199cdc/1/full.jsonl",
+      "content_hash": "/2d/496e199cdc/1/content_hash.txt",
+      "prompt": "/2d/496e199cdc/1/prompt.txt"
     }
   ]
 }

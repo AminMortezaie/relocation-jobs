@@ -1,0 +1,114 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "2d496e199cdc",
+  "session_id": "3ad13cc8-cee9-46f0-9e23-45eac8293f99",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-10T15:53:41.454053Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 3,
+  "files_touched": [
+    "frontend/src/CvApplicationBadges.jsx",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/mcp/server.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/panel/tracking.py",
+    "relocation_jobs/scrape/boards/greenhouse.py",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/js/company.js",
+    "relocation_jobs/static/js/position-card.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/__init__.py",
+    "relocation_jobs/web/routes/mcp.py",
+    "relocation_jobs/web/server.py",
+    "tests/helpers/route_manifest.py",
+    "tests/mcp/test_mcp_service.py",
+    "tests/scrape/test_greenhouse_job_text.py",
+    "tests/web/test_board_api.py",
+    "tests/web/test_mcp_company_workspace.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "e97c9bf4fd8d",
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-10T15:53:41.452073Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 146,
+    "human_modified": 43,
+    "human_removed": 0,
+    "total_committed": 146,
+    "total_lines_changed": 189,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1488,
+      "user_lines_removed": 43,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "frontend/src/CvApplicationBadges.jsx": 1,
+        "relocation_jobs/mcp/repo.py": 42,
+        "relocation_jobs/mcp/server.py": 8,
+        "relocation_jobs/mcp/service.py": 30,
+        "relocation_jobs/panel/tracking.py": 2,
+        "relocation_jobs/scrape/boards/greenhouse.py": 4,
+        "relocation_jobs/static/company.html": 10,
+        "relocation_jobs/static/js/company.js": 120,
+        "relocation_jobs/static/js/position-card.js": 1,
+        "relocation_jobs/static/js/public-home.js": 152,
+        "relocation_jobs/static/public.css": 529,
+        "relocation_jobs/static/public.html": 165,
+        "relocation_jobs/static/styles.css": 59,
+        "relocation_jobs/web/routes/__init__.py": 2,
+        "relocation_jobs/web/routes/mcp.py": 22,
+        "relocation_jobs/web/routes/public.py": 75,
+        "relocation_jobs/web/server.py": 46,
+        "scripts/.claude/settings.local.json": 12,
+        "tests/helpers/route_manifest.py": 6,
+        "tests/mcp/test_mcp_service.py": 23,
+        "tests/scrape/test_greenhouse_job_text.py": 5,
+        "tests/web/test_board_api.py": 69,
+        "tests/web/test_mcp_company_workspace.py": 43,
+        "tests/web/test_public_api.py": 62
+      },
+      "user_removed_per_file": {
+        "frontend/src/CvApplicationBadges.jsx": 1,
+        "relocation_jobs/mcp/repo.py": 1,
+        "relocation_jobs/mcp/service.py": 2,
+        "relocation_jobs/static/company.html": 2,
+        "relocation_jobs/static/js/company.js": 3,
+        "relocation_jobs/static/js/position-card.js": 1,
+        "relocation_jobs/static/styles.css": 30,
+        "relocation_jobs/web/routes/__init__.py": 2,
+        "relocation_jobs/web/server.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1476,
+      "agent_lines_removed": 43,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1476,
+      "agent_lines_removed": 43,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import threading
 from datetime import datetime, timezone
 
@@ -117,7 +118,7 @@ def memory_status() -> dict:
 def sync_live_to_db() -> None:
     with _fetch_lock:
         run_id = _fetch_state.get("run_id")
-        if not run_id:
+        if not run_id or not _fetch_state.get("running"):
             return
         snapshot = {
             "progress": dict(_fetch_state.get("progress") or {}),
@@ -148,6 +149,9 @@ def persist_fetch_run(run_id: int | None = None) -> None:
         rid = run_id or _fetch_state.get("run_id")
         if not rid:
             return
+    if not fetch_repo.fetch_run_is_running(int(rid)):
+        return
+    with _fetch_lock:
         payload = {
             "finished_at": _fetch_state.get("finished_at") or utc_now(),
             "exit_code": _fetch_state.get("exit_code"),
@@ -167,6 +171,10 @@ def persist_fetch_run(run_id: int | None = None) -> None:
     with _fetch_lock:
         _fetch_state["last_fetch_run"] = row
         _fetch_state["run_id"] = None
+
+
+def _fetch_process_may_reap_orphans() -> bool:
+    return os.environ.get("PANEL_SCRAPE_ENABLED", "0").lower() in ("1", "true", "yes")
 
 
 def reap_zombie_fetch() -> None:
@@ -189,7 +197,7 @@ def reap_zombie_fetch() -> None:
         persist_fetch_run()
     with _fetch_lock:
         local_running = bool(_fetch_state.get("running"))
-    if not local_running:
+    if not local_running and _fetch_process_may_reap_orphans():
         fetch_repo.reap_orphan_running_fetch_runs()
 
 
@@ -229,6 +237,19 @@ def wait_for_fetch_thread(timeout: float | None = None) -> bool:
         return True
     thread.join(timeout=timeout)
     return not thread.is_alive()
+
+
+def abandon_fetch_after_timeout(*, result_line: str) -> None:
+    request_fetch_cancel()
+    with _fetch_lock:
+        if _fetch_state.get("run_id"):
+            _fetch_state["running"] = False
+            _fetch_state["exit_code"] = 1
+            _fetch_state["finished_at"] = utc_now()
+            _fetch_state["result_line"] = result_line
+            _fetch_state["log"].append(result_line)
+    persist_fetch_run()
+    set_fetch_thread(None)
 
 
 def request_fetch_cancel() -> tuple[bool, str | None]:
@@ -303,6 +324,8 @@ def set_fetch_thread(thread: threading.Thread | None) -> None:
 
 def update_progress(progress: dict) -> None:
     with _fetch_lock:
+        if not _fetch_state.get("running"):
+            return
         prev = dict(_fetch_state.get("progress") or {})
         company_results = prev.get("company_results") or progress.get("company_results") or []
         merged = dict(progress)
@@ -316,6 +339,8 @@ def record_company_result(company_name: str, new_count: int, jobs: list[dict]) -
     if new_count <= 0:
         return
     with _fetch_lock:
+        if not _fetch_state.get("running"):
+            return
         _fetch_state["new_jobs_total"] = int(_fetch_state.get("new_jobs_total") or 0) + int(new_count)
         progress = dict(_fetch_state.get("progress") or {})
         results = list(progress.get("company_results") or [])
@@ -331,6 +356,8 @@ def record_company_result(company_name: str, new_count: int, jobs: list[dict]) -
 
 def append_log_line(line: str) -> None:
     with _fetch_lock:
+        if not _fetch_state.get("running"):
+            return
         _fetch_state["log"].append(line)
 
 
@@ -343,6 +370,69 @@ def set_review_jobs(payload: dict) -> None:
 def mutate_state(mutator) -> None:
     with _fetch_lock:
         mutator(_fetch_state)
+
+
+def mutate_state_for_run(run_id: int, mutator) -> None:
+    with _fetch_lock:
+        if not _fetch_state.get("running"):
+            return
+        active = _fetch_state.get("run_id")
+        if active is None or int(active) != int(run_id):
+            return
+        mutator(_fetch_state)
+
+
+def update_progress_for_run(run_id: int, progress: dict) -> None:
+    with _fetch_lock:
+        if not _fetch_state.get("running"):
+            return
+        active = _fetch_state.get("run_id")
+        if active is None or int(active) != int(run_id):
+            return
+        prev = dict(_fetch_state.get("progress") or {})
+        company_results = prev.get("company_results") or progress.get("company_results") or []
+        merged = dict(progress)
+        if company_results:
+            merged["company_results"] = list(company_results)
+        _fetch_state["progress"] = merged
+    sync_live_to_db()
+
+
+def append_log_line_for_run(run_id: int, line: str) -> None:
+    with _fetch_lock:
+        if not _fetch_state.get("running"):
+            return
+        active = _fetch_state.get("run_id")
+        if active is None or int(active) != int(run_id):
+            return
+        _fetch_state["log"].append(line)
+
+
+def record_company_result_for_run(
+    run_id: int,
+    company_name: str,
+    new_count: int,
+    jobs: list[dict],
+) -> None:
+    if new_count <= 0:
+        return
+    with _fetch_lock:
+        if not _fetch_state.get("running"):
+            return
+        active = _fetch_state.get("run_id")
+        if active is None or int(active) != int(run_id):
+            return
+        _fetch_state["new_jobs_total"] = int(_fetch_state.get("new_jobs_total") or 0) + int(new_count)
+        progress = dict(_fetch_state.get("progress") or {})
+        results = list(progress.get("company_results") or [])
+        results.append({
+            "company": company_name,
+            "new_count": int(new_count),
+            "jobs": list(jobs or []),
+        })
+        progress["company_results"] = results
+        _fetch_state["progress"] = progress
+    sync_live_to_db()
 
 
 def fetch_lock():

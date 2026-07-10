@@ -9,7 +9,6 @@ from relocation_jobs.core.db import get_connection
 from relocation_jobs.core.paths import PROJECT_ROOT, STATIC_DIR
 from relocation_jobs.db import init_db
 from relocation_jobs.db.migrate import apply_v2_migrations
-from relocation_jobs.fetch import repo as fetch_repo
 from relocation_jobs.fetch.log import configure_fetch_logging
 from relocation_jobs.web.routes import register_routes
 
@@ -40,7 +39,6 @@ def bootstrap_app() -> None:
     init_db()
     configure_fetch_logging()
     apply_v2_migrations(get_connection())
-    fetch_repo.reap_orphan_running_fetch_runs()
     init_auth(app)
     _bootstrapped = True
 

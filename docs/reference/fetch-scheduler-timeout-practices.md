@@ -1,7 +1,7 @@
 # Fetch scheduler: timeout and hang resilience
 
 **Last updated:** 2026-07-10  
-**Status:** practices defined; code changes not yet implemented  
+**Status:** implemented (2026-07-10)  
 **Trigger:** EC2 worker blocked 15+ hours on a hung Playwright scrape (endios, Germany run 341)
 
 Related: [operations/ec2-panel.md](../operations/ec2-panel.md), [kafka-fetch-pipeline-proposal.md](kafka-fetch-pipeline-proposal.md), [board-load-performance-incident.md](board-load-performance-incident.md)
@@ -179,9 +179,11 @@ Every cycle logs `Error: No catalog for country: uk`. Fix catalog seed or remove
 
 ## Acceptance criteria (done when)
 
-- [ ] Hung Playwright scrape times out within 90s; company skipped with log line
-- [ ] Hung company times out within 5 min; country fetch completes remaining companies
-- [ ] Scheduler `wait_for_fetch_thread` returns within country timeout; next country / sleep runs
-- [ ] Panel status API does not reap worker-owned running fetches
-- [ ] Tests cover scheduler timeout path
-- [ ] [ec2-panel.md](../operations/ec2-panel.md) links here for on-call
+- [x] Hung Playwright scrape times out within 90s; company skipped with log line
+- [x] Hung company times out within 5 min; country fetch completes remaining companies
+- [x] Scheduler `wait_for_fetch_thread` returns within country timeout; next country / sleep runs
+- [x] Panel status API does not reap worker-owned running fetches
+- [x] Tests cover scheduler timeout path
+- [x] [ec2-panel.md](../operations/ec2-panel.md) links here for on-call
+
+**Known limitation:** a timed-out Playwright thread may still hold `_playwright_sem` until the orphan thread exits; country-level timeout is the backstop for the scheduler loop.

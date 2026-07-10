@@ -288,6 +288,14 @@ def latest_finished_country_run() -> dict | None:
     return data
 
 
+def fetch_run_is_running(run_id: int) -> bool:
+    row = get_connection().execute(
+        "SELECT status FROM fetch_runs WHERE id = %s",
+        (int(run_id),),
+    ).fetchone()
+    return bool(row and row.get("status") == "running")
+
+
 def get_running_fetch_run() -> dict | None:
     row = get_connection().execute(
         """
@@ -470,7 +478,7 @@ def finalize_fetch_run(
                 log_json = COALESCE(%s, log_json),
                 review_jobs_json = COALESCE(%s, review_jobs_json),
                 cancel_requested = 0
-            WHERE id = %s
+            WHERE id = %s AND status = 'running'
             RETURNING *
             """,
             tuple(params),
@@ -511,7 +519,7 @@ def reap_orphan_running_fetch_runs(*, finished_at: str | None = None) -> int:
             SET status = 'failed',
                 finished_at = %s,
                 exit_code = 1,
-                result_line = COALESCE(result_line, 'Fetch interrupted (server restarted)')
+                result_line = COALESCE(result_line, 'Fetch interrupted (orphan reap)')
             WHERE status = 'running'
             """,
             (finished_at,),

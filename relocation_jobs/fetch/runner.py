@@ -31,6 +31,17 @@ def _country_fetch_worker(
     cancelled = False
     new_jobs_total = 0
     companies_done = 0
+
+    def on_progress(progress: dict) -> None:
+        fetch_state.update_progress_for_run(run_id, progress)
+
+    def on_company_result(company_name: str, new_count: int, jobs: list[dict]) -> None:
+        fetch_state.record_company_result_for_run(run_id, company_name, new_count, jobs)
+
+    def append_log(line: str) -> None:
+        fetch_state.append_log_line_for_run(run_id, line)
+        log_event(line)
+
     try:
         async def _run():
             nonlocal new_jobs_total, companies_done, cancelled
@@ -42,15 +53,15 @@ def _country_fetch_worker(
                     skip_filled=skip_filled,
                     ats_type=ats_type,
                     concurrency=concurrency,
-                    on_progress=fetch_state.update_progress,
-                    on_log=_append_log,
-                    on_company_result=fetch_state.record_company_result,
+                    on_progress=on_progress,
+                    on_log=append_log,
+                    on_company_result=on_company_result,
                 )
 
         new_jobs_total, companies_done, cancelled = asyncio.run(_run())
         exit_code = 130 if cancelled else 0
     except Exception as exc:
-        _append_log(f"Error: {exc}")
+        append_log(f"Error: {exc}")
         exit_code = 1
     finally:
         finish_line = None
@@ -79,7 +90,7 @@ def _country_fetch_worker(
             st["running"] = False
             st["finished_at"] = fetch_state.utc_now()
 
-        fetch_state.mutate_state(_finish)
+        fetch_state.mutate_state_for_run(run_id, _finish)
         fetch_state.sync_live_to_db()
         fetch_state.persist_fetch_run(run_id)
 
@@ -96,7 +107,7 @@ def _company_fetch_worker(
     result_message = ""
     set_cancel_checker(lambda: fetch_repo.fetch_run_cancel_requested(run_id))
     try:
-        fetch_state.mutate_state(lambda st: st.update({
+        fetch_state.mutate_state_for_run(run_id, lambda st: st.update({
             "progress": {
                 "current": 0,
                 "total": 1,
@@ -165,7 +176,7 @@ def _company_fetch_worker(
             st["running"] = False
             st["finished_at"] = fetch_state.utc_now()
 
-        fetch_state.mutate_state(_finish)
+        fetch_state.mutate_state_for_run(run_id, _finish)
         fetch_state.sync_live_to_db()
         fetch_state.persist_fetch_run(run_id)
 

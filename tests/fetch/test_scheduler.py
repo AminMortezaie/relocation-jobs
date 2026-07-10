@@ -87,6 +87,40 @@ def test_run_fetch_cycle_starts_configured_countries(db, monkeypatch):
     ]
 
 
+def test_run_fetch_cycle_abandons_on_country_timeout(db, monkeypatch):
+    from relocation_jobs.users.repo import resolve_scheduler_user_id
+
+    del db
+    monkeypatch.setenv("FETCH_SCHEDULE_ENABLED", "1")
+    monkeypatch.setenv("FETCH_SCHEDULE_COUNTRIES", "uk")
+
+    abandoned: list[dict] = []
+
+    def fake_abandon(*, result_line: str) -> None:
+        abandoned.append({"result_line": result_line})
+
+    monkeypatch.setattr(
+        "relocation_jobs.fetch.scheduler.start_country_fetch",
+        lambda **kwargs: 42,
+    )
+    monkeypatch.setattr(
+        "relocation_jobs.fetch.state.wait_for_fetch_thread",
+        lambda timeout=None: False,
+    )
+    monkeypatch.setattr(
+        "relocation_jobs.fetch.state.abandon_fetch_after_timeout",
+        fake_abandon,
+    )
+
+    user_id = resolve_scheduler_user_id()
+    result = run_fetch_cycle(user_id=user_id)
+
+    assert result["skipped"] is False
+    assert result["started"] == ["uk"]
+    assert len(abandoned) == 1
+    assert "timed out" in abandoned[0]["result_line"]
+
+
 def test_run_fetch_cycle_disabled(monkeypatch):
     monkeypatch.setenv("FETCH_SCHEDULE_ENABLED", "0")
     result = run_fetch_cycle(user_id=1)

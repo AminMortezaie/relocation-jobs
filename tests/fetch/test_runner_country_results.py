@@ -42,6 +42,7 @@ def test_on_country_progress_preserves_company_results():
     fetch_state.reset_for_tests()
     with fetch_state.fetch_lock():
         fetch_state.mutate_state(lambda st: st.update({
+            "running": True,
             "progress": {
                 "current": 1,
                 "total": 3,

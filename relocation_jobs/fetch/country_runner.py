@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import time
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 
 import httpx
 
@@ -18,6 +18,7 @@ from relocation_jobs.fetch import repo as fetch_repo
 from relocation_jobs.fetch.log import log_event
 from relocation_jobs.fetch.pipeline import fetch_and_persist_company
 from relocation_jobs.fetch.client import make_fetch_client
+from relocation_jobs.fetch.timeouts import company_timeout_seconds
 from relocation_jobs.scrape.merge import now_iso
 
 
@@ -82,10 +83,13 @@ def _fetch_one_thread(
 
         async def _inner():
             async with make_fetch_client(concurrency=http_concurrency) as client:
-                return await fetch_and_persist_company(
-                    client, country_key, name, fetch_run_id=run_id,
-                    enrich_concurrency=enrich_concurrency,
-                    on_company_result=on_company_result,
+                return await asyncio.wait_for(
+                    fetch_and_persist_company(
+                        client, country_key, name, fetch_run_id=run_id,
+                        enrich_concurrency=enrich_concurrency,
+                        on_company_result=on_company_result,
+                    ),
+                    timeout=company_timeout_seconds(),
                 )
 
         try:
@@ -93,6 +97,9 @@ def _fetch_one_thread(
             return name, new_count, False, msg
         except FetchCancelled:
             return name, 0, True, None
+        except TimeoutError:
+            limit = company_timeout_seconds()
+            return name, 0, False, f"[{index}/{total}] {name} — Error: timed out after {limit}s"
         except Exception as exc:
             return name, 0, False, f"[{index}/{total}] {name} — Error: {exc}"
     finally:
@@ -155,10 +162,13 @@ async def run_country_fetch(
                     done = index
                     continue
                 try:
-                    msg, new_count = await fetch_and_persist_company(
-                        client, country_key, name, fetch_run_id=run_id,
-                        enrich_concurrency=enrich_concurrency,
-                        on_company_result=on_company_result,
+                    msg, new_count = await asyncio.wait_for(
+                        fetch_and_persist_company(
+                            client, country_key, name, fetch_run_id=run_id,
+                            enrich_concurrency=enrich_concurrency,
+                            on_company_result=on_company_result,
+                        ),
+                        timeout=company_timeout_seconds(),
                     )
                     new_jobs_total += new_count
                     if on_log:
@@ -166,6 +176,10 @@ async def run_country_fetch(
                 except FetchCancelled:
                     cancelled = True
                     break
+                except TimeoutError:
+                    limit = company_timeout_seconds()
+                    if on_log:
+                        on_log(f"[{index}/{total}] {name} — Error: timed out after {limit}s")
                 except Exception as exc:
                     if on_log:
                         on_log(f"[{index}/{total}] {name} — Error: {exc}")
@@ -178,10 +192,13 @@ async def run_country_fetch(
         cancelled = False
         done = 0
         futures_map: dict = {}
+        future_started_at: dict = {}
+        company_timeout = company_timeout_seconds()
         pool = ThreadPoolExecutor(max_workers=workers)
         try:
             company_iter = iter(enumerate(companies, start=1))
             in_flight = 0
+            pending: set = set()
 
             def _fill_pool():
                 nonlocal in_flight
@@ -202,34 +219,65 @@ async def run_country_fetch(
                         on_company_result=on_company_result,
                     )
                     futures_map[f] = (name, index)
-                    f.add_done_callback(lambda _: None)
+                    future_started_at[f] = time.monotonic()
+                    pending.add(f)
                     in_flight += 1
 
             _fill_pool()
 
-            while futures_map:
-                completed = next(as_completed(futures_map), None)
-                if completed is None:
+            while pending:
+                if fetch_repo.fetch_run_cancel_requested(run_id):
+                    cancelled = True
                     break
-                fname, fidx = futures_map.pop(completed)
-                in_flight -= 1
-                try:
-                    _, new_count, was_cancelled, msg = completed.result()
-                    new_jobs_total += new_count
-                    if was_cancelled:
-                        cancelled = True
-                    if msg and on_log:
-                        on_log(msg)
-                except Exception as exc:
+
+                finished, still_pending = wait(
+                    pending,
+                    timeout=1.0,
+                    return_when=FIRST_COMPLETED,
+                )
+                now = time.monotonic()
+                timed_out = [
+                    f for f in still_pending
+                    if now - future_started_at.get(f, now) >= company_timeout
+                ]
+
+                for f in timed_out:
+                    pending.discard(f)
+                    fname, fidx = futures_map.pop(f)
+                    future_started_at.pop(f, None)
+                    in_flight -= 1
                     if on_log:
-                        on_log(f"[{fidx}/{total}] {fname} — Error: {exc}")
-                done += 1
-                report(done, fname, "done")
+                        on_log(
+                            f"[{fidx}/{total}] {fname} — Error: timed out after {company_timeout}s"
+                        )
+                    done += 1
+                    report(done, fname, "done")
+
+                for f in finished:
+                    pending.discard(f)
+                    fname, fidx = futures_map.pop(f)
+                    future_started_at.pop(f, None)
+                    in_flight -= 1
+                    try:
+                        _, new_count, was_cancelled, msg = f.result()
+                        new_jobs_total += new_count
+                        if was_cancelled:
+                            cancelled = True
+                        if msg and on_log:
+                            on_log(msg)
+                    except Exception as exc:
+                        if on_log:
+                            on_log(f"[{fidx}/{total}] {fname} — Error: {exc}")
+                    done += 1
+                    report(done, fname, "done")
+
                 if cancelled:
-                    for f in futures_map:
+                    for f in list(pending):
                         f.cancel()
                     break
-                _fill_pool()
+
+                if timed_out or finished:
+                    _fill_pool()
         finally:
             clear_cancel_checker()
             pool.shutdown(wait=False, cancel_futures=True)

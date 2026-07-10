@@ -13,6 +13,7 @@ from relocation_jobs.fetch import repo as fetch_repo
 from relocation_jobs.fetch.log import configure_fetch_logging, log_event
 from relocation_jobs.fetch import state as fetch_state
 from relocation_jobs.fetch.runner import start_country_fetch
+from relocation_jobs.fetch.timeouts import country_timeout_seconds
 
 LOGGER = logging.getLogger("relocation_jobs.fetch.scheduler")
 
@@ -119,12 +120,23 @@ def run_fetch_cycle(*, user_id: int | None = None) -> dict:
             user_id=resolved_user_id,
             concurrency=concurrency,
         )
-        fetch_state.wait_for_fetch_thread()
-        log_event(
-            "Scheduled country fetch finished",
-            run_id=run_id,
-            country=country,
-        )
+        joined = fetch_state.wait_for_fetch_thread(timeout=country_timeout_seconds())
+        if not joined:
+            log_event(
+                "Scheduled country fetch timed out",
+                run_id=run_id,
+                country=country,
+                level=logging.ERROR,
+            )
+            fetch_state.abandon_fetch_after_timeout(
+                result_line=f"Country fetch timed out after {country_timeout_seconds()}s",
+            )
+        else:
+            log_event(
+                "Scheduled country fetch finished",
+                run_id=run_id,
+                country=country,
+            )
 
     result = {
         "skipped": False,

@@ -657,3 +657,13 @@ def touch_application_meta(
             (json.dumps(base), now, user_id, idempotency_key),
         )
     return base
+
+
+def delete_mcp_applications_for_country(country_key: str) -> int:
+    key = (country_key or "").strip().lower()
+    with db_transaction() as conn:
+        rows = conn.execute(
+            "DELETE FROM mcp_applications WHERE country = %s RETURNING id",
+            (key,),
+        ).fetchall()
+    return len(rows)

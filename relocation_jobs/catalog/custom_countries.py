@@ -112,6 +112,20 @@ def upsert_custom_country(country_key: str, label: str) -> None:
         )
 
 
+def remove_custom_country(country_key: str) -> bool:
+    key = (country_key or "").strip().lower()
+    if not key:
+        return False
+    if countries_use_redis():
+        return bool(get_redis().hdel(COUNTRIES_REDIS_KEY, key))
+    with db_transaction() as conn:
+        cur = conn.execute(
+            "DELETE FROM custom_countries WHERE country = %s RETURNING country",
+            (key,),
+        )
+        return cur.fetchone() is not None
+
+
 def list_catalog_country_keys() -> frozenset[str]:
     with db_read() as conn:
         rows = conn.execute(

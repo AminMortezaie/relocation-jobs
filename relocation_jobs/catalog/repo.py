@@ -10,7 +10,7 @@ from relocation_jobs.core.job_identity import (
     normalize_job_url,
     stamp_job_identity,
 )
-from relocation_jobs.core.location_tags import country_label, sync_company_location_fields
+from relocation_jobs.core.location_tags import all_country_labels, country_label, sync_company_location_fields
 
 from relocation_jobs.catalog.cache import invalidate_country_cache
 from relocation_jobs.catalog.serialize import (
@@ -1135,6 +1135,30 @@ def delete_company(country_key: str, company_name: str) -> bool:
     return deleted
 
 
+def delete_country_catalog(country_key: str) -> dict:
+    key = (country_key or "").strip().lower()
+    with db_transaction() as conn:
+        company_row = conn.execute(
+            "SELECT COUNT(*) AS n FROM companies WHERE country = %s",
+            (key,),
+        ).fetchone()
+        job_row = conn.execute(
+            """
+            SELECT COUNT(*) AS n
+            FROM matching_jobs j
+            JOIN companies c ON c.id = j.company_id
+            WHERE c.country = %s
+            """,
+            (key,),
+        ).fetchone()
+        companies = int((company_row or {}).get("n") or 0)
+        jobs = int((job_row or {}).get("n") or 0)
+        conn.execute("DELETE FROM companies WHERE country = %s", (key,))
+        conn.execute("DELETE FROM country_meta WHERE country = %s", (key,))
+    invalidate_country_cache(key)
+    return {"companies": companies, "jobs": jobs}
+
+
 def insert_jobs(country_key: str, company_name: str, jobs: list[dict]) -> int:
     if not jobs:
         return 0
@@ -1428,9 +1452,39 @@ def _overview_country_meta(
     return sorted(meta_by_country.values(), key=lambda row: row["country"])
 
 
+def _registered_country_row(country_key: str, label: str) -> dict:
+    return {
+        "country": country_key,
+        "label": label,
+        "companies": 0,
+        "jobs": 0,
+        "visa_jobs": 0,
+        "fetch_problems": 0,
+        "fetch_ok": 0,
+        "missing_locations": 0,
+    }
+
+
+def _merge_registered_country_rows(countries: list[dict]) -> list[dict]:
+    by_key = {row["country"]: dict(row) for row in countries}
+    for key, label in all_country_labels().items():
+        if key not in by_key:
+            by_key[key] = _registered_country_row(key, label)
+        elif not by_key[key].get("label"):
+            by_key[key]["label"] = label
+    return sorted(by_key.values(), key=lambda row: row["country"])
+
+
 def get_catalog_overview() -> dict:
     if not catalog_has_data():
-        return _empty_catalog_overview()
+        countries = _merge_registered_country_rows([])
+        return {
+            "has_data": bool(countries),
+            "countries": countries,
+            "totals": _empty_catalog_overview()["totals"],
+            "fetch_problem_companies": [],
+            "country_meta": _overview_country_meta([], {}, countries),
+        }
 
     stats = load_catalog_stats()
     jobs_by_country = _overview_jobs_by_country(stats["job_rows"])
@@ -1439,6 +1493,7 @@ def get_catalog_overview() -> dict:
         jobs_by_country,
         stats["empty_companies"],
     )
+    countries = _merge_registered_country_rows(countries)
     fetch_problem_companies = [
         {
             "country": row.get("country"),

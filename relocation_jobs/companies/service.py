@@ -18,6 +18,7 @@ from relocation_jobs.core.slug import slug_from_name
 from relocation_jobs.catalog.repo import get_company
 from relocation_jobs.catalog.repo import (
     delete_company,
+    delete_country_catalog,
     insert_jobs,
     rename_company_in_catalog,
     update_company_fields,
@@ -34,6 +35,7 @@ from relocation_jobs.core.job_identity import (
 from relocation_jobs.core.location_tags import (
     country_label,
     ensure_country_key,
+    remove_custom_country,
     _strip_country_suffix,
     normalize_location,
     sync_company_location_fields,
@@ -683,6 +685,42 @@ def remove_company(country_key: str, company_name: str) -> dict:
         "country_label": country_label(country_key),
         "company": canonical_name,
         "removed_jobs": removed_jobs,
+    }
+
+
+def remove_country(country_key: str) -> dict:
+    country_key = (country_key or "").strip().lower()
+    if not country_key or country_key == "all":
+        raise ValueError("country is required (not 'all')")
+    if country_key not in supported_countries():
+        raise ValueError(f"Unknown country: {country_key}")
+
+    from relocation_jobs.fetch import state as fetch_state
+
+    status = fetch_state.memory_status()
+    if status.get("running") and (status.get("country") or "").strip().lower() == country_key:
+        raise ValueError(f"Fetch is running for {country_key}")
+
+    label = country_label(country_key)
+    catalog_removed = delete_country_catalog(country_key)
+    tracking_removed = positions_repo.clear_country_tracking(country_key)
+    from relocation_jobs.fetch import repo as fetch_repo
+    from relocation_jobs.mcp import repo as mcp_repo
+
+    fetch_runs_removed = fetch_repo.delete_fetch_runs_for_country(country_key)
+    mcp_removed = mcp_repo.delete_mcp_applications_for_country(country_key)
+    remove_custom_country(country_key)
+
+    return {
+        "country": country_key,
+        "country_label": label,
+        "removed_companies": catalog_removed["companies"],
+        "removed_jobs": catalog_removed["jobs"],
+        "removed_job_tracking": tracking_removed["job_tracking"],
+        "removed_company_tracking": tracking_removed["company_tracking"],
+        "removed_job_status_events": tracking_removed["job_status_events"],
+        "removed_fetch_runs": fetch_runs_removed,
+        "removed_mcp_applications": mcp_removed,
     }
 
 

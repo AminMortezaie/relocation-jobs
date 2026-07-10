@@ -136,6 +136,24 @@ def add_custom_country(label: str) -> dict:
     return {"id": country_key, "label": country_label_text}
 
 
+def remove_custom_country(country_key: str) -> bool:
+    key = normalize_country_key(country_key)
+    if not key:
+        raise ValueError("Country is required")
+
+    from relocation_jobs.catalog.custom_countries import remove_custom_country as remove_country_label
+
+    with _custom_countries_lock:
+        removed_label = remove_country_label(key)
+        cities = load_custom_cities(use_cache=False)
+        if key in cities:
+            del cities[key]
+            save_custom_cities(cities)
+        _invalidate_custom_countries_cache()
+
+    return removed_label
+
+
 def ensure_country_key(country_key: str) -> str:
     key = normalize_country_key(country_key)
     if not key:

@@ -16,6 +16,7 @@ add_company = companies.add_company
 add_manual_jobs = companies.add_manual_jobs
 list_ats_types = companies.list_ats_types
 remove_company = companies.remove_company
+remove_country = companies.remove_country
 rename_company = companies.rename_company
 resolve_company_name = companies.resolve_company_name
 set_company_applied = companies.set_company_applied

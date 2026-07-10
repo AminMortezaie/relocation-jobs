@@ -4,7 +4,7 @@ import os
 
 from flask import g, jsonify, request
 
-from relocation_jobs.core.auth import login_required
+from relocation_jobs.core.auth import admin_required, login_required
 from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILABLE, MAX_CONCURRENCY
 from relocation_jobs.core.location_tags import add_custom_city, add_custom_country, all_country_labels
 from relocation_jobs.core.paths import supported_countries
@@ -55,6 +55,26 @@ def register(app):
             return jsonify({"ok": True, "country": country})
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
+
+    @app.delete("/api/countries/<country>")
+    @app.post("/api/countries/remove")
+    @admin_required
+    def api_countries_remove(country: str | None = None):
+        if country is None:
+            body = request.get_json(silent=True) or {}
+            country = (body.get("country") or "").strip().lower()
+        else:
+            country = country.strip().lower()
+        if not country or country == "all":
+            return jsonify({"error": "country is required (not 'all')"}), 400
+        try:
+            result = deps.remove_country(country)
+            return jsonify({"ok": True, **result})
+        except ValueError as exc:
+            message = str(exc)
+            if message.startswith("Fetch is running"):
+                return jsonify({"error": message}), 409
+            return jsonify({"error": message}), 400
 
     @app.get("/api/ats-types")
     @login_required

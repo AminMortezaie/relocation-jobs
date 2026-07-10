@@ -1,5 +1,6 @@
 /** Admin dashboard — catalog ops, users, fetch history, system config. */
 
+import { removeCountry } from "./api.js";
 import { initAdminWorker } from "./admin-worker.js";
 import { buildAdminStatsHtml } from "./stats-dashboard.js";
 import { $, escapeHtml, escapeAttr, setLoadingProgress, finishLoadingProgress, formatActivityBadge } from "./utils.js";
@@ -118,12 +119,51 @@ function lastFetchByCountry(countryMeta) {
   return map;
 }
 
+let countryRemoveInFlight = false;
+
+async function handleRemoveCountry(countryKey, countryLabel) {
+  if (countryRemoveInFlight) return;
+  const label = countryLabel || countryKey;
+  const message =
+    `Remove ${label} entirely?\n\n` +
+    "This deletes all companies, jobs, tracking, fetch history, and MCP applications for every user.";
+  if (!window.confirm(message)) return;
+
+  countryRemoveInFlight = true;
+  const buttons = document.querySelectorAll(".admin-remove-country-btn");
+  buttons.forEach((btn) => { btn.disabled = true; });
+
+  try {
+    const result = await removeCountry(countryKey);
+    if (!result) return;
+    await loadDashboard();
+  } catch (err) {
+    $("adminError").hidden = false;
+    $("adminError").textContent = err.message || "Failed to remove country";
+  } finally {
+    countryRemoveInFlight = false;
+    buttons.forEach((btn) => { btn.disabled = false; });
+  }
+}
+
+function bindCatalogActions() {
+  const mount = $("adminCatalog");
+  if (!mount || mount.dataset.removeBound === "1") return;
+  mount.dataset.removeBound = "1";
+  mount.addEventListener("click", (event) => {
+    const btn = event.target.closest(".admin-remove-country-btn");
+    if (!btn) return;
+    void handleRemoveCountry(btn.dataset.country, btn.dataset.countryLabel);
+  });
+}
+
 function renderCatalog(data) {
-  if (!data.has_data) {
+  const countries = data.countries || [];
+  if (!countries.length) {
     $("adminCatalog").innerHTML = `
       <section class="admin-panel">
         <h2 class="admin-panel-title">Catalog</h2>
-        <p class="hint">No catalog data in the database yet.</p>
+        <p class="hint">No countries registered yet.</p>
       </section>
     `;
     $("adminFetchProblems").innerHTML = "";
@@ -132,7 +172,7 @@ function renderCatalog(data) {
 
   const lastFetch = lastFetchByCountry(data.country_meta);
 
-  const countryRows = (data.countries || [])
+  const countryRows = countries
     .map(
       (row) => `
       <tr>
@@ -142,6 +182,10 @@ function renderCatalog(data) {
         ${adminCell(row.visa_jobs, "Visa")}
         ${adminCell(escapeHtml(formatTs(lastFetch[row.country] || "")), "Last fetch")}
         ${adminCell(row.missing_locations, "No locations")}
+        ${adminCell(
+          `<button type="button" class="btn btn-ghost btn-sm admin-remove-country-btn" data-country="${escapeAttr(row.country)}" data-country-label="${escapeAttr(row.label)}">Remove</button>`,
+          "Actions",
+        )}
       </tr>
     `
     )
@@ -150,19 +194,20 @@ function renderCatalog(data) {
   $("adminCatalog").innerHTML = `
     <section class="admin-panel">
       <h2 class="admin-panel-title">Catalog by country</h2>
-      <p class="hint">Raw Postgres counts — not filtered by your tracking state.</p>
+      <p class="hint">Registered countries and raw Postgres counts — not filtered by your tracking state.</p>
       <div class="admin-table-wrap">
         <table class="admin-table admin-table--responsive">
           <thead>
             <tr>
-              <th>Country</th><th>Companies</th><th>Stored roles</th><th>Visa</th><th>Last fetch</th><th>No locations</th>
+              <th>Country</th><th>Companies</th><th>Stored roles</th><th>Visa</th><th>Last fetch</th><th>No locations</th><th>Actions</th>
             </tr>
           </thead>
-          <tbody>${countryRows || '<tr><td colspan="6">No data</td></tr>'}</tbody>
+          <tbody>${countryRows || '<tr><td colspan="7">No data</td></tr>'}</tbody>
         </table>
       </div>
     </section>
   `;
+  bindCatalogActions();
 
   const problems = data.fetch_problem_companies || [];
   $("adminFetchProblems").innerHTML = problems.length

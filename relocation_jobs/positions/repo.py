@@ -722,3 +722,25 @@ def clear_company_tracking(country: str, company_name: str) -> None:
             "DELETE FROM company_tracking WHERE country = %s AND company_name = %s",
             (country, company_name),
         )
+
+
+def clear_country_tracking(country_key: str) -> dict:
+    key = (country_key or "").strip().lower()
+    with db_transaction() as conn:
+        job_rows = conn.execute(
+            "DELETE FROM job_tracking WHERE country = %s RETURNING user_id",
+            (key,),
+        ).fetchall()
+        company_rows = conn.execute(
+            "DELETE FROM company_tracking WHERE country = %s RETURNING user_id",
+            (key,),
+        ).fetchall()
+        event_rows = conn.execute(
+            "DELETE FROM job_status_events WHERE country = %s RETURNING user_id",
+            (key,),
+        ).fetchall()
+    return {
+        "job_tracking": len(job_rows),
+        "company_tracking": len(company_rows),
+        "job_status_events": len(event_rows),
+    }

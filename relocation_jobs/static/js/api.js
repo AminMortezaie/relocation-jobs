@@ -664,6 +664,18 @@ export async function addCustomCountry(label) {
   return data.country || null;
 }
 
+export async function removeCountry(country) {
+  const res = await apiFetch(`/api/countries/${encodeURIComponent(country)}`, {
+    method: "DELETE",
+  });
+  const data = await parseJsonResponse(res);
+  if (!res.ok) {
+    toast(data.error || "Could not remove country");
+    return null;
+  }
+  return data;
+}
+
 export async function fetchCities(country = "all") {
   const data = await fetchLocations(country);
   return data.map((loc) => loc.city);

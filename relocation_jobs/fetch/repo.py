@@ -531,3 +531,12 @@ def clear_running_fetch_runs_for_tests() -> None:
     with db_transaction() as conn:
         conn.execute("DELETE FROM fetch_runs WHERE status = 'running'")
 
+
+def delete_fetch_runs_for_country(country_key: str) -> int:
+    key = (country_key or "").strip().lower()
+    with db_transaction() as conn:
+        rows = conn.execute(
+            "DELETE FROM fetch_runs WHERE country = %s RETURNING id",
+            (key,),
+        ).fetchall()
+    return len(rows)

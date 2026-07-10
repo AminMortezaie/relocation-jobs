@@ -1,0 +1,15 @@
+<timestamp>Friday, Jul 10, 2026, 9:13 PM (UTC+4)</timestamp>
+
+Remove whole country (admin)
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+restart the panel
+
+---
+
+i have singapore country in my list but i dont have it on panel to remove

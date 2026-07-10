@@ -1,0 +1,74 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "f6284f1a9712",
+  "session_id": "3610b184-caf8-45cb-858b-96c0471cce1a",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-10T17:23:10.279147Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 3,
+  "files_touched": [
+    "relocation_jobs/catalog/custom_countries.py",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/fetch/repo.py",
+    "relocation_jobs/mcp/repo.py",
+    "relocation_jobs/positions/repo.py",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/web/deps.py",
+    "relocation_jobs/web/routes/catalog.py",
+    "tests/catalog/test_remove_country.py",
+    "tests/helpers/route_manifest.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "b701342bbe04",
+  "checkpoint_transcript_start": 27,
+  "transcript_lines_at_start": 27,
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-10T17:23:10.275705Z",
+    "agent_lines": 374,
+    "agent_removed": 9,
+    "human_added": 11,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 385,
+    "total_lines_changed": 394,
+    "agent_percentage": 97.20812182741116,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 336,
+      "agent_lines_removed": 3,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 336,
+      "agent_lines_removed": 3,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

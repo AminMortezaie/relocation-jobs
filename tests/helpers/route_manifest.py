@@ -2,6 +2,7 @@ from __future__ import annotations
 
 PANEL_PAGE_ROUTES: dict[str, frozenset[str]] = {
     "/": frozenset({"GET"}),
+    "/panel": frozenset({"GET"}),
     "/app": frozenset({"GET"}),
     "/preview": frozenset({"GET"}),
     "/admin": frozenset({"GET"}),

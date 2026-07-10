@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 
-def test_root_page_keeps_private_app_shell(v2_client, seeded_catalog_v2):
+def test_panel_page_keeps_private_app_shell(v2_client, seeded_catalog_v2):
     del seeded_catalog_v2
-    resp = v2_client.get("/")
+    resp = v2_client.get("/panel")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert 'id="loginPanel"' in body
@@ -12,13 +12,27 @@ def test_root_page_keeps_private_app_shell(v2_client, seeded_catalog_v2):
 
 def test_public_preview_page_is_available_without_auth(v2_client, seeded_catalog_v2):
     del seeded_catalog_v2
-    resp = v2_client.get("/preview")
+    resp = v2_client.get("/")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert "Relocation Jobs | Visa-friendly software roles abroad" in body
-    assert "/api/public/overview" in body
-    assert 'href="/preview"' in body
+    assert "/static/js/public-home.js" in body
     assert 'href="/"' in body
+    assert 'href="/panel"' in body
+
+
+def test_legacy_preview_path_redirects_to_root(v2_client, seeded_catalog_v2):
+    del seeded_catalog_v2
+    resp = v2_client.get("/preview", follow_redirects=False)
+    assert resp.status_code == 301
+    assert resp.headers["Location"].endswith("/")
+
+
+def test_legacy_app_path_redirects_to_panel(v2_client, seeded_catalog_v2):
+    del seeded_catalog_v2
+    resp = v2_client.get("/app", follow_redirects=False)
+    assert resp.status_code == 301
+    assert resp.headers["Location"].endswith("/panel")
 
 
 def test_public_overview_returns_catalog_snapshot(v2_client, seeded_catalog_v2):
@@ -59,4 +73,4 @@ def test_public_seo_endpoints_are_available(v2_client):
 
     sitemap = v2_client.get("/sitemap.xml")
     assert sitemap.status_code == 200
-    assert "<loc>https://kuchup.com/preview</loc>" in sitemap.get_data(as_text=True)
+    assert "<loc>https://kuchup.com/</loc>" in sitemap.get_data(as_text=True)

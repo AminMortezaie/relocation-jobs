@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from flask import Flask, Response, request, send_from_directory
+from flask import Flask, Response, redirect, request, send_from_directory
 
 from relocation_jobs.core.auth import init_auth
 from relocation_jobs.core.db import get_connection
@@ -73,9 +73,7 @@ def apply_page():
 
 @app.route("/app")
 def app_page():
-    resp = send_from_directory(STATIC, "index.html")
-    resp.headers["Cache-Control"] = "no-store"
-    return resp
+    return redirect("/panel", code=301)
 
 
 @app.route("/company/<country>/<path:company_slug>")
@@ -86,7 +84,14 @@ def company_workspace_page(country, company_slug):
 
 
 @app.route("/")
-def index():
+def public_home_page():
+    resp = send_from_directory(STATIC, "public.html")
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
+
+
+@app.route("/panel")
+def panel_page():
     resp = send_from_directory(STATIC, "index.html")
     resp.headers["Cache-Control"] = "no-store"
     return resp
@@ -94,9 +99,7 @@ def index():
 
 @app.route("/preview")
 def preview_page():
-    resp = send_from_directory(STATIC, "public.html")
-    resp.headers["Cache-Control"] = "no-store"
-    return resp
+    return redirect("/", code=301)
 
 
 @app.route("/robots.txt")
@@ -118,7 +121,7 @@ def sitemap_xml():
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
         "  <url>",
-        f"    <loc>{public_site_url}/preview</loc>",
+        f"    <loc>{public_site_url}/</loc>",
         "  </url>",
         "</urlset>",
         "",

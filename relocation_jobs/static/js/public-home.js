@@ -100,7 +100,7 @@ function renderPreview(companies) {
       </p>
       ${list}
       <div class="preview-footer">
-        <a class="preview-link" href="/">Open private workspace</a>
+        <a class="preview-link" href="/panel">Open private workspace</a>
       </div>
     `;
     grid.appendChild(card);

@@ -148,6 +148,7 @@ def test_company_fetch_worker_integration(seeded_catalog_v2, db, monkeypatch):
     from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.catalog.repo import get_company
     from relocation_jobs.fetch import repo as fetch_repo
+    from relocation_jobs.fetch import state as fetch_state
     from relocation_jobs.fetch.runner import _company_fetch_worker
 
     del db
@@ -175,14 +176,13 @@ def test_company_fetch_worker_integration(seeded_catalog_v2, db, monkeypatch):
                 },
             ),
         )
-        run_id = int(fetch_repo.create_fetch_run(
+        run_id = fetch_state.reset_for_run(
             user_id=user_id,
             country="uk",
-            company_name="Acme Backend Ltd",
+            company="Acme Backend Ltd",
             file_name="uk.json",
             concurrency=1,
-            started_at="2025-06-01T10:00:00+00:00",
-        )["id"])
+        )
         _company_fetch_worker("uk", "Acme Backend Ltd", run_id=run_id)
 
     company = get_company("uk", "Acme Backend Ltd")

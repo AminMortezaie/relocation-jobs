@@ -3,7 +3,7 @@
   "checkpoint_id": "2d496e199cdc",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 10,
+  "checkpoints_count": 19,
   "files_touched": [
     "docs/README.md",
     "docs/operations/ec2-panel.md",
@@ -17,15 +17,20 @@
     "relocation_jobs/static/company.html",
     "relocation_jobs/static/js/company.js",
     "relocation_jobs/static/js/position-card.js",
+    "relocation_jobs/static/js/public-home.js",
+    "relocation_jobs/static/public.css",
+    "relocation_jobs/static/public.html",
     "relocation_jobs/static/styles.css",
     "relocation_jobs/web/routes/__init__.py",
     "relocation_jobs/web/routes/mcp.py",
+    "relocation_jobs/web/routes/public.py",
     "relocation_jobs/web/server.py",
     "tests/helpers/route_manifest.py",
     "tests/mcp/test_mcp_service.py",
     "tests/scrape/test_greenhouse_job_text.py",
     "tests/web/test_board_api.py",
-    "tests/web/test_mcp_company_workspace.py"
+    "tests/web/test_mcp_company_workspace.py",
+    "tests/web/test_public_api.py"
   ],
   "sessions": [
     {
@@ -45,6 +50,12 @@
       "transcript": "/2d/496e199cdc/2/full.jsonl",
       "content_hash": "/2d/496e199cdc/2/content_hash.txt",
       "prompt": "/2d/496e199cdc/2/prompt.txt"
+    },
+    {
+      "metadata": "/2d/496e199cdc/3/metadata.json",
+      "transcript": "/2d/496e199cdc/3/full.jsonl",
+      "content_hash": "/2d/496e199cdc/3/content_hash.txt",
+      "prompt": "/2d/496e199cdc/3/prompt.txt"
     }
   ]
 }

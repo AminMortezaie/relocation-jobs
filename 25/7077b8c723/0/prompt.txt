@@ -1,0 +1,456 @@
+## Design direction
+
+**Subject:** This isn't a travel/relocation consumer brand — it's a personal ATS-scraping and application-tracking engineering system, self-hosted on EC2 with 299 tests. The audience is technical (recruiters, engineers evaluating it, or Amin himself). The homepage should read like **infrastructure**, not a wanderlust travel app — that's the aesthetic risk: avoid every visa-stamp/globe/boarding-pass cliché.
+
+**Signature element:** A live **split-flap departures board** — like an airport arrivals board — but instead of flights, each row is a company: `BERLIN · WOLT · GO · SCRAPED 6H AGO`. It ticks and flips on load. This is literally true to the product (companies flow through a scraped catalog into tracked rows) and gives one unmistakable, mechanical moment instead of a generic hero gradient.
+
+**Token system:**
+- **Color:** `#0B0E11` (near-black graphite bg), `#E8E6E1` (warm off-white text), `#FF8A00` (split-flap amber, used sparingly — status/accent only), `#1B2430` (panel/card surface), `#4FD1C5` (cool teal — used only for "live/scraping" indicators), hairline `#2A3038`
+- **Type:** Display/mono — `IBM Plex Mono` (split-flap board, section labels, metrics) paired with `Inter` for body copy. No serif, no cream, no terracotta.
+- **Layout:** Dense, panel-based, hairline dividers — evokes a monitoring dashboard, not a landing page. Sections are "modules" not "features."
+- **Motion:** One orchestrated load sequence (the board flips into place), then restraint — hover states only, no scroll-triggered confetti.
+
+Here's the full Cursor prompt:
+
+---
+
+```
+Build a homepage for kuchup.com (Relocation Jobs) — a self-hosted job-discovery and 
+application-tracking system for EU relocation/visa-sponsored software roles. This is 
+an infrastructure product, not a travel brand. Audience: engineers and recruiters. 
+Avoid any visa-stamp, boarding-pass, globe, or "wanderlust" visual clichés. Avoid warm 
+cream/terracotta palettes, near-black+neon-green palettes, and broadsheet/newspaper 
+layouts — these are overused AI-generated defaults.
+
+DESIGN TOKENS
+- Background: #0B0E11 (near-black graphite)
+- Text: #E8E6E1 (warm off-white)
+- Surface/panel: #1B2430
+- Hairline divider: #2A3038
+- Primary accent (amber, sparing use — status, CTAs, the flap board): #FF8A00
+- Secondary accent (teal, "live" indicators only): #4FD1C5
+- Display/mono face: IBM Plex Mono (headings, labels, metrics, the flap board itself)
+- Body face: Inter (paragraphs, descriptions)
+- No border-radius above 4px anywhere. No drop shadows — use hairline borders instead.
+
+SIGNATURE ELEMENT: SPLIT-FLAP DEPARTURES BOARD
+Build the hero as a live split-flap/departure-board component (mechanical flip 
+animation per character, like an airport arrivals board), showing rows like:
+  BERLIN    · FENERGO       · JAVA  · SCRAPED 3H AGO
+  AMSTERDAM · POLARSTEPS    · PYTHON· APPLIED
+  HAMBURG   · SCAYLE        · GO    · CV READY
+On page load, rows flip into place staggered by ~80ms each, cycling a few times 
+before settling. This is the one big orchestrated motion moment — everything else 
+on the page should be still by comparison.
+
+PAGE STRUCTURE
+1. Header: wordmark "kuchup" in mono caps, small teal dot + "LIVE" pulse indicator, 
+   nav (Board / Docs / GitHub), minimal.
+2. Hero: one-line thesis headline (e.g. "One catalog. 25 ATS integrations. Every 
+   relocation-friendly role in Europe.") + the split-flap board as the visual, not 
+   an illustration.
+3. "How it flows" module — NOT numbered 01/02/03 icons-in-a-row (too generic) — 
+   instead render it as a real pipeline diagram: relocate.me → ATS detection → 
+   Postgres catalog → tracking panel → MCP tailoring → applied. Use a horizontal 
+   flow with hairline connecting lines and small mono labels, like a system 
+   architecture diagram, since this genuinely is a pipeline.
+4. Stats strip: real documented metrics only — 25 ATS types supported, 299 tests / 
+   90% coverage gate, board load 89s→1.7s (postmortem framing: "we measured it and 
+   fixed it," not a marketing stat), scrape concurrency 16, 6h scheduled refresh. 
+   Present as a dense metrics row in mono type, not big rounded stat cards.
+5. "Under the hood" panel: tech stack listed plainly (Flask, Postgres, Playwright, 
+   React 19, MCP/Claude Desktop) as a quiet reference table, not logos-as-badges.
+6. Footer: minimal, plain text links, no newsletter box.
+
+COPY VOICE
+Write in plain, specific, engineering register — no "revolutionize your job search" 
+marketing language. Describe what it does, not how impressive it is. Example good 
+line: "Every re-scrape merges by job URL and preserves your tracking history." 
+Example bad line: "Never miss an opportunity again!"
+
+TECHNICAL
+- Next.js + Tailwind, single-file component acceptable for the board.
+- Fully responsive; board component degrades to a static stacked list under 480px 
+  (no flip animation on mobile — respect reduced-motion and small viewports).
+- Visible keyboard focus states throughout.
+- Respect prefers-reduced-motion: disable the flip animation, show board settled.
+
+Build this as production-ready code I can drop into my Next.js app, componentized 
+(Hero, FlapBoard, PipelineDiagram, StatsStrip, StackTable, Footer).
+```
+
+---
+
+restart the server to see what you have changed
+
+---
+
+restart the server to see what you have changed
+
+---
+
+wire into flask to run up completely on localhost:5051
+
+---
+
+change design system to this.
+
+Build a homepage for kuchup.com (Relocation Jobs) that matches the EXISTING app's 
+design system exactly — this is the marketing/landing entry point to a product 
+users will immediately open into the dashboard shown below, so it must feel like 
+the same product, not a different visual identity.
+
+MATCH THIS EXISTING DESIGN SYSTEM (from the live app panel):
+- Background: dark slate/navy, near #0B0F17 to #111827
+- Card panels: rounded-2xl (16-20px radius), 1px soft borders (~#1F2937), subtle 
+  elevation, generous internal padding
+- Buttons: fully rounded pill shape (rounded-full), not rounded-rect — this applies 
+  to primary buttons, filter dropdowns, and all status tags
+- Status chip color system (reuse these exact semantics):
+  - Purple/violet pill = pending/awaiting state
+  - Teal/blue pill = active/tracking/interested state  
+  - Green pill = success/applied/positive state
+  - Red pill = rejected/negative state
+  - Amber/orange pill = warning/needs-attention state
+  - Gray/neutral pill = inactive/default state
+- Logo mark: small rounded-square icon with a subtle gradient fill (blue-to-purple 
+  style, like the current steering-wheel icon), paired with wordmark in clean 
+  sans-serif, plus a one-line description underneath (like "Visa-friendly roles 
+  abroad")
+- Typography: Inter or similar clean grotesk sans-serif throughout — headings 
+  bold/tight, body regular, no serif, no monospace, no display/decorative face
+- Dropdowns/selects: rounded-full pill controls with chevron icons, icon + label 
+  pattern (globe icon, grid icon, pin icon — like "All ATS", "All locations")
+- User avatar: circular gradient badge in top-right, consistent with header pattern
+- Overall texture: dashboard/product-UI density, not marketing-page whitespace — 
+  real information density, compact spacing, functional over decorative
+
+DO NOT diverge into: split-flap boards, monospace/mono display type, dark-graphite-
+plus-amber control-room aesthetics, pipeline/architecture diagrams as visual 
+centerpieces, or any different color system than the pill-chip palette above. The 
+homepage's job is continuity with the product, not a separate creative concept.
+
+PAGE STRUCTURE
+1. Header: reuse the exact header pattern from the app — logo mark + wordmark + 
+   tagline on the left, nav links, user/sign-in area on the right. Same rounded-
+   pill nav treatment as the app's control bar.
+2. Hero: headline stating what the product does in plain terms (e.g. "Every 
+   relocation-friendly engineering role in Europe, tracked in one place") + a 
+   real (or realistic) screenshot/mockup of the actual board UI — company cards, 
+   status pills, filters — as the primary visual, since the product IS the demo.
+3. "How it works" section: three or four rounded-2xl cards (same card style as 
+   the company cards in the app) explaining discovery → scraping → tracking → 
+   tailoring, using the same pill-chip visual language for each stage's status 
+   (e.g. a small "Scraped" teal chip, "Applied" green chip) so the explanation 
+   visually echoes the product itself.
+4. Stats strip: real documented metrics (25 ATS integrations, 299 tests / 90% 
+   coverage, 6h scheduled refresh, board load 89s→1.7s) shown as compact rounded 
+   panels matching the app's card style — not oversized marketing stat blocks.
+5. Feature/status legend section: since the product's core UX is the status-chip 
+   system, give it a dedicated section showing the actual chip vocabulary (Applied, 
+   Awaiting response, Looking to apply, Got rejection, Not for me, Waiting referral) 
+   as a mini legend — this doubles as onboarding and as a design flex.
+6. Footer: minimal, consistent rounded-pill link style, same dark background.
+
+COPY VOICE
+Plain, specific, product-literal language — describe what the tool tracks and does, 
+matching the direct tone already visible in the app's own UI labels ("Fetch jobs", 
+"Add company", "Set locations"). No marketing hyperbole.
+
+TECHNICAL
+- Next.js + Tailwind, componentized (Header, Hero, HowItWorks, StatsStrip, 
+  StatusLegend, Footer)
+- Reuse a shared Pill/Chip component and Card component so homepage and dashboard 
+  literally share the same building blocks
+- Fully responsive, visible keyboard focus states, respects prefers-reduced-motion
+- Dark mode only (matching the app — no light theme needed)
+
+Build this as production-ready code I can drop into my Next.js app.
+
+---
+
+Revise the kuchup.com homepage content and structure — keep the exact existing 
+design system (dark slate background, rounded-2xl cards, pill-shaped status chips 
+and buttons, gradient logo mark, Inter sans-serif) but rethink the CONTENT strategy. 
+
+PROBLEM WITH THE PREVIOUS VERSION: it led with developer metrics (test coverage, 
+scrape concurrency, ATS integration count) — this proves the system is well-built, 
+but tells a job seeker nothing about why they should use it. Nobody chooses a 
+product because of its coverage gate.
+
+REFERENCE MODEL: Uber.com's homepage. Uber doesn't open with "99.9% dispatch 
+uptime" or "40M rides matched" — it opens with the action itself (enter your 
+pickup location, right there, above the fold), then simple human-benefit copy 
+("Go anywhere, get anything"), then a few plain reassurance points (safety, 
+pricing, availability), and only afterward, small trust/scale signals in a 
+quiet footer strip. Adopt that shape: action first, benefit second, proof last 
+and minimal.
+
+NEW STRUCTURE
+
+1. Hero — lead with the action, not a claim.
+   Headline: plain and personal, e.g. "Find visa-sponsored engineering roles 
+   in Europe — before they're gone."
+   Primary element: a real input, front and center (like Uber's pickup box) — 
+   e.g. a rounded search bar: role/stack dropdown + country dropdown + "Search 
+   roles" pill button — using the same rounded-pill controls as the app's 
+   "All ATS" / "All locations" selectors. This IS the product, not a screenshot 
+   of it.
+   Secondary line under the input: something concrete and reassuring, e.g. 
+   "Updated every 6 hours from company career pages directly — no stale listings."
+
+2. What you get — 3 plain benefit cards (not process steps, not numbered), each 
+   answering "what's in it for me":
+   - "Every relevant role, one place" — no more checking 20 company career pages
+   - "Track it like a pipeline" — applied, rejected, waiting on referral, 
+     all in status pills you control
+   - "Tailor your resume per job" — AI-assisted, but you approve every line
+   Use the app's real card style; each card can show a small live-looking chip 
+   example (e.g. a mini "Applied" green pill) to make the benefit tangible, not 
+   abstract.
+
+3. See it in action — one real (or realistic) screenshot of the actual board 
+   UI with company cards and status pills, similar to a "here's what you'll 
+   use" moment — Uber-style product transparency, not marketing illustration.
+
+4. Reassurance strip — short, human, scannable, 3-4 items in plain language:
+   - "Free to use" / "No spam applications sent on your behalf, ever" / 
+     "Your tracking data stays private" / "Works across Germany, Netherlands, 
+     Ireland, and more"
+   Keep this light — icon + one line each, not paragraphs.
+
+5. Quiet proof footer — THIS is where engineering credibility goes, small and 
+   secondary: "25 ATS platforms supported · updated every 6 hours · built and 
+   tested like production software" — one understated line, not a stats 
+   dashboard section. Optional, low visual weight.
+
+6. Final CTA — single clear action repeated: "Search roles" or "See the board" 
+   pill button, same as hero.
+
+COPY RULE: every headline and card answers "what does this do for me," never 
+"how well-engineered is this." Save the engineering story for a docs/about page, 
+not the homepage.
+
+Keep all technical/component requirements from before (Next.js + Tailwind, shared 
+Pill/Card components, dark mode only, responsive, keyboard focus, reduced motion).
+
+---
+
+Apply a top-grade visual polish pass to the kuchup.com homepage. Keep the exact 
+content structure and copy strategy from the previous revision (action-first hero, 
+benefit cards, product screenshot, reassurance strip, quiet proof footer) and keep 
+the core design system (dark slate background, rounded-2xl cards, pill chips, 
+Inter sans-serif, gradient logo mark). This pass is about EXECUTION QUALITY — 
+making it feel expensive and considered, not about changing structure or content.
+
+DEPTH AND MATERIAL
+- Replace flat card backgrounds with a subtle two-layer surface system: base 
+  background slightly darker than card surfaces, cards themselves with a barely-
+  visible inner gradient (e.g. #141B2A to #10151F, ~4% shift) so panels feel like 
+  physical surfaces catching light, not flat rectangles
+- Add a soft ambient glow behind the hero search bar — a large, very low-opacity 
+  radial gradient in the logo's accent color (blue/purple), blurred, sitting behind 
+  the input as if it's the focal light source of the page
+- Card borders: 1px hairline at ~8-10% white opacity, with a slightly brighter 
+  top edge (1px highlight) to suggest light hitting from above — this is the 
+  "premium SaaS card" detail that separates polished work from flat templates
+- Status pills get a faint inner shadow or subtle gradient fill rather than flat 
+  color, so they read as small tactile objects, not just colored text backgrounds
+
+TYPOGRAPHY POLISH
+- Tighten letter-spacing on the hero headline (-0.02em) and increase font-weight 
+  contrast: headline at 600-700, supporting copy at 400, never both at default weight
+- Use a fluid type scale (clamp()) so the hero headline scales smoothly instead of 
+  jumping at breakpoints
+- Numbers/metrics in the proof footer get tabular-nums and slightly heavier weight 
+  than surrounding text, so they read as data, not prose
+
+MICRO-INTERACTIONS (subtle, not flashy)
+- Search bar: on focus, the ambient glow behind it intensifies slightly and the 
+  border transitions to the accent gradient color over ~200ms
+- Benefit cards: on hover, a barely-perceptible lift (translateY(-2px)) and border 
+  brightening, with a slightly slower transition (250-300ms ease-out) so it feels 
+  weighted, not springy
+- Status pill examples inside benefit cards: one pill per card gently pulses or 
+  cross-fades between two states on a loop (e.g. "Awaiting response" → "Applied") 
+  every few seconds, very subtle, to imply the product is alive without being a 
+  distracting animation
+- Primary CTA button: subtle gradient sheen that shifts slightly on hover, not a 
+  color swap — same hue, shifted lightness
+
+ENTRANCE SEQUENCE (page load only, once)
+- Hero content fades/slides up (16px, ~400ms, ease-out), staggered: eyebrow text, 
+  then headline, then search bar, then supporting line — each offset by ~80ms
+- Benefit cards fade in with a slight stagger as they enter viewport on scroll 
+  (intersection observer), not all at once
+- Respect prefers-reduced-motion: disable all entrance and looping animations, 
+  keep only necessary hover feedback
+
+DETAILS THAT SIGNAL CRAFT
+- Consistent optical alignment: icons inside pills/dropdowns vertically centered 
+  against cap-height, not bounding-box center
+- Real focus-visible rings on all interactive elements, styled to match the 
+  accent gradient rather than a default browser blue
+- Section transitions use consistent vertical rhythm (a defined spacing scale, 
+  e.g. 96px/128px between major sections) rather than arbitrary padding per section
+- Favicon/meta: gradient logomark treatment consistent with header
+
+DO NOT add: extra color hues outside the existing accent system, additional 
+illustration or 3D graphics, parallax scrolling, or any animation that runs 
+continuously in more than one place at a time. Restraint is part of the 
+"expensive" feeling — one considered motion moment per section, not motion 
+everywhere.
+
+Keep all technical requirements from before: Next.js + Tailwind, shared Pill/Card 
+components reused from the dashboard, dark mode only, fully responsive, keyboard 
+accessible.
+
+---
+
+see the homepage and find the bugs there i think your polish was not good enough
+
+---
+
+see the homepage and find the bugs there i think your polish was not good enough
+
+---
+
+Build the complete kuchup.com homepage — a modern, professional, top-grade landing 
+page for a real product (Relocation Jobs: an ATS-scraping and application-tracking 
+system for visa-sponsored EU engineering roles). This must feel continuous with 
+the existing product UI, not a separate marketing concept.
+
+═══════════════════════════════════════
+DESIGN SYSTEM — MATCH THE EXISTING APP
+═══════════════════════════════════════
+- Background: dark slate/navy (#0B0F17–#111827), base layer slightly darker than 
+  card surfaces
+- Cards: rounded-2xl (16-20px), subtle two-layer gradient fill (~#141B2A to 
+  #10151F), 1px hairline border at 8-10% white opacity with a slightly brighter 
+  top edge (light-from-above highlight)
+- Buttons, dropdowns, status tags: fully rounded pill shape (rounded-full) — 
+  reuse this everywhere, no rounded-rect controls
+- Status chip color semantics (reuse exactly): purple/violet = pending, teal/blue 
+  = active/tracking, green = applied/success, red = rejected, amber/orange = 
+  needs attention, gray = neutral/inactive. Pills get a faint inner gradient/shadow, 
+  not flat fill.
+- Logo: small rounded-square icon, blue-to-purple gradient fill, paired with 
+  wordmark + one-line tagline
+- Typography: Inter (or equivalent clean grotesk) throughout — no serif, no mono, 
+  no decorative face. Fluid type scale (clamp()) for the hero headline, tight 
+  letter-spacing (-0.02em) on headings, clear weight contrast (600-700 headings, 
+  400 body). Metrics use tabular-nums, slightly heavier weight.
+- Dark mode only.
+
+═══════════════════════════════════════
+CONTENT STRATEGY — ACTION FIRST, PROOF LAST
+═══════════════════════════════════════
+Model this after Uber.com: lead with the action, then the benefit, then light 
+reassurance, then engineering credibility last and small. Never open with 
+developer metrics — job seekers don't choose a tool because of its test coverage.
+
+1. HEADER
+   Logo + wordmark + tagline (left), nav links, sign-in/avatar (right) — same 
+   pill-control header style as the dashboard.
+
+2. HERO
+   - Eyebrow, then headline (staggered fade-up entrance, ~80ms offsets): plain, 
+     personal copy, e.g. "Find visa-sponsored engineering roles in Europe — 
+     before they're gone."
+   - A real, functional search bar as the centerpiece (role/stack dropdown + 
+     country dropdown + "Search roles" pill button) — this is the product, not 
+     a screenshot of it. Soft ambient radial glow (low-opacity, blurred, accent 
+     gradient color) behind it as the page's focal light source. On focus, glow 
+     intensifies and border transitions to accent gradient (~200ms).
+   - Supporting line: concrete and reassuring, e.g. "Updated every 6 hours 
+     directly from company career pages — no stale listings."
+
+3. WHAT YOU GET — 3 benefit cards (not numbered steps), each answering "what's 
+   in it for me," not "how it works":
+   - "Every relevant role, one place" — stop checking 20 career pages
+   - "Track it like a pipeline" — applied, rejected, waiting on referral, all 
+     as status pills you control
+   - "Tailor your resume per job" — AI-assisted, you approve every line
+   Each card shows one live status-pill example that gently cross-fades between 
+   two states every few seconds (subtle, not distracting). Cards lift slightly 
+   on hover (translateY(-2px), 250-300ms ease-out) and fade in staggered on 
+   scroll via intersection observer.
+
+4. SEE IT IN ACTION
+   One real/realistic screenshot of the actual board UI (company cards, status 
+   pills, filters) — product transparency, not illustration.
+
+5. REASSURANCE STRIP
+   3-4 short plain-language items with small icons: free to use, no applications 
+   sent without approval, your data stays private, works across Germany/
+   Netherlands/Ireland and more.
+
+6. QUIET PROOF FOOTER
+   One understated line, low visual weight: "25 ATS platforms supported · 
+   updated every 6 hours · built and tested like production software."
+
+7. FINAL CTA
+   Repeat the primary action: "Search roles" pill button, same style as hero. 
+   Subtle gradient sheen shift on hover (lightness only, same hue).
+
+8. FOOTER
+   Minimal, rounded-pill links, dark background, consistent with header.
+
+═══════════════════════════════════════
+CRAFT DETAILS
+═══════════════════════════════════════
+- Optical alignment: icons centered on cap-height, not bounding-box center
+- Focus-visible rings styled with accent gradient, not default browser blue
+- Consistent vertical rhythm between sections (96px/128px spacing scale)
+- One page-load entrance sequence in the hero only; everything else is hover-
+  feedback or scroll-triggered, never more than one continuous animation running 
+  at once
+- Fully respects prefers-reduced-motion (disable entrance/looping animation, 
+  keep only necessary hover states)
+- Fully responsive, keyboard accessible throughout
+
+DO NOT: use serif/mono display type, split-flap or dashboard-diagram aesthetics, 
+extra hues outside the existing accent system, 3D graphics/illustration, parallax, 
+or numbered-step icon rows. Restraint is part of the premium feel.
+
+═══════════════════════════════════════
+TECHNICAL
+═══════════════════════════════════════
+Next.js + Tailwind. Componentized: Header, Hero, SearchBar, BenefitCards, 
+ProductScreenshot, ReassuranceStrip, ProofFooter, CTA, Footer. Reuse a shared 
+Pill and Card component so homepage and dashboard share building blocks. 
+Production-ready code, dropped directly into the existing Next.js app.
+
+---
+
+didnt change anything on UX
+
+---
+
+you should not show companies with no jobs its not a good UX pattern.
+
+---
+
+no no no.
+i meant in homepage dont show companies without position it cannot help.
+
+revert the changes you applied on previous action and do for the homepage
+
+---
+
+no no no.
+i meant in homepage dont show companies without position it cannot help.
+
+revert the changes you applied on previous action and do for the homepage
+
+---
+
+ok deploy on server
+
+---
+
+deploy again
+
+---
+
+deploy again

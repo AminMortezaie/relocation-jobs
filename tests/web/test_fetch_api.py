@@ -144,6 +144,42 @@ def test_companies_fetch_api(v2_auth_client, seeded_catalog_v2, monkeypatch):
     assert started[0][1] == "Acme Backend Ltd"
 
 
+def test_companies_fetch_api_with_company_flag_only(v2_auth_client, seeded_catalog_v2, monkeypatch):
+    monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "0")
+    monkeypatch.setenv("PANEL_COMPANY_FETCH_ENABLED", "1")
+    started: list[str] = []
+
+    def fake_start(*, user_id, country_key, company_name):
+        started.append(company_name)
+        return 43
+
+    monkeypatch.setattr(
+        "relocation_jobs.web.routes.companies.start_company_fetch",
+        fake_start,
+    )
+
+    resp = v2_auth_client.post(
+        "/api/companies/fetch",
+        json={"country": "uk", "company": "Acme Backend Ltd"},
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["run_id"] == 43
+    assert started == ["Acme Backend Ltd"]
+
+    country = v2_auth_client.post("/api/fetch", json={"country": "uk"})
+    assert country.status_code == 503
+
+
+def test_companies_fetch_disabled(v2_auth_client, monkeypatch):
+    monkeypatch.setenv("PANEL_SCRAPE_ENABLED", "0")
+    monkeypatch.delenv("PANEL_COMPANY_FETCH_ENABLED", raising=False)
+    resp = v2_auth_client.post(
+        "/api/companies/fetch",
+        json={"country": "uk", "company": "Acme Backend Ltd"},
+    )
+    assert resp.status_code == 503
+
+
 def test_company_fetch_worker_integration(seeded_catalog_v2, db, monkeypatch):
     from relocation_jobs.users.repo import get_user_by_username
     from relocation_jobs.catalog.repo import get_company

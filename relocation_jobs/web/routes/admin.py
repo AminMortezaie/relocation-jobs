@@ -1,21 +1,16 @@
 from __future__ import annotations
 
-import os
-
 from flask import g, jsonify, request
 
 from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import admin_required
+from relocation_jobs.core.panel_flags import company_fetch_enabled, scrape_enabled
 from relocation_jobs.users.repo import list_users_with_stats
 from relocation_jobs.admin import service as admin_service
 from relocation_jobs.catalog.repo import get_catalog_overview
 from relocation_jobs.fetch import repo as fetch_repo
 from relocation_jobs.fetch import state as fetch_state
 from relocation_jobs.web.query import catalog_scope_flags
-
-
-def scrape_enabled() -> bool:
-    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
 
 
 def register(app):
@@ -35,6 +30,7 @@ def register(app):
                 admin_service.get_admin_dashboard(
                     fetch_state=fetch_state.build_fetch_status(),
                     scrape_enabled=scrape_enabled(),
+                    company_fetch_enabled=company_fetch_enabled(),
                     httpx_available=HTTPX_AVAILABLE,
                     fetch_runs_limit=limit,
                 )
@@ -131,6 +127,7 @@ def register(app):
             return jsonify(
                 admin_service.get_system_config(
                     scrape_enabled=scrape_enabled(),
+                    company_fetch_enabled=company_fetch_enabled(),
                     httpx_available=HTTPX_AVAILABLE,
                 )
             )

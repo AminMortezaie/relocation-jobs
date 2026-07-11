@@ -292,6 +292,7 @@ export function renderWorkerStatus(worker) {
   const countries = (worker.schedule_countries || "").trim()
     || "all supported countries";
   const panelScrape = worker.panel_scrape_enabled;
+  const panelCompanyFetch = worker.panel_company_fetch_enabled;
 
   mount.innerHTML = `
     <section class="admin-panel admin-fetch-panel">
@@ -299,7 +300,12 @@ export function renderWorkerStatus(worker) {
       <p class="hint admin-fetch-hint">
         Country scrapes run on the <code>relocation-fetch-worker</code> container
         ${scheduleOn ? `every ${interval}h` : "when enabled"} (concurrency ${concurrency}).
-        ${panelScrape ? "This host can also start manual fetches." : "Manual fetch is disabled on this panel host."}
+        ${panelScrape
+          ? "This host can also start manual country fetches."
+          : "Manual country fetch is disabled on this panel host."}
+        ${panelCompanyFetch
+          ? " Single-company fetch is enabled."
+          : " Single-company fetch is disabled."}
       </p>
       <div class="stats-grid admin-stats-grid admin-worker-grid">
         <div class="stat-card ${running ? "stat-card--accent" : ""}">

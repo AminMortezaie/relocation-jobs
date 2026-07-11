@@ -34,10 +34,12 @@ From repo root (SSH key `~/Downloads/relocation.pem`, `aws-postgres.env` present
 
 | Image | Dockerfile | Role |
 |-------|------------|------|
-| `relocation-panel:ec2` | `Dockerfile.ec2` | Slim panel — no Playwright; `PANEL_SCRAPE_ENABLED=0` |
+| `relocation-panel:ec2` | `Dockerfile.ec2` | Slim panel — no Playwright; `PANEL_SCRAPE_ENABLED=0`, `PANEL_COMPANY_FETCH_ENABLED=1` |
 | `relocation-fetch-worker:ec2` | `Dockerfile.ec2-worker` | Playwright + 6h scheduler; writes to shared Postgres |
 
-Manual scrape from your laptop still works (`PANEL_SCRAPE_ENABLED=1`); the worker skips a cycle if another fetch is already running (`fetch_runs.status = running`).
+Manual country scrape from your laptop still works (`PANEL_SCRAPE_ENABLED=1`); the worker skips a cycle if another fetch is already running (`fetch_runs.status = running`).
+
+**Panel company fetch:** `POST /api/companies/fetch` (board **Fetch jobs**) runs in the panel process when `PANEL_COMPANY_FETCH_ENABLED=1`. Country-wide `/api/fetch` stays off on the slim panel. Playwright-only ATS boards still need the worker or a local scrape.
 
 **Worker env (set by deploy):** `FETCH_SCHEDULE_ENABLED=1`, `FETCH_SCHEDULE_INTERVAL_HOURS=6`, `FETCH_SCHEDULE_CONCURRENCY=4`. Optional override: `FETCH_SCHEDULE_COUNTRIES=uk,netherlands`.
 

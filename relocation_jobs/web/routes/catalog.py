@@ -1,19 +1,14 @@
 from __future__ import annotations
 
-import os
-
 from flask import g, jsonify, request
 
 from relocation_jobs.core.auth import admin_required, login_required
 from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILABLE, MAX_CONCURRENCY
 from relocation_jobs.core.location_tags import add_custom_city, add_custom_country, all_country_labels
+from relocation_jobs.core.panel_flags import company_fetch_enabled, scrape_enabled
 from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.catalog.locations import list_company_locations
 from relocation_jobs.web import deps
-
-
-def scrape_enabled() -> bool:
-    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
 
 
 def register(app):
@@ -26,6 +21,7 @@ def register(app):
             "mode": "asyncio",
             "httpx_available": HTTPX_AVAILABLE,
             "scrape_enabled": scrape_enabled(),
+            "company_fetch_enabled": company_fetch_enabled(),
             "description": (
                 "Scraper uses an asyncio event loop with httpx for ATS API calls. "
                 f"'--workers N' means {DEFAULT_CONCURRENCY} companies in flight by default."

@@ -381,6 +381,7 @@ function renderConfig(data) {
         <dt>Database</dt><dd>${escapeHtml(data.database)}</dd>
         <dt>Countries store</dt><dd>${redisLabel}</dd>
         <dt>Scrape on this host</dt><dd>${data.scrape_enabled ? "enabled" : "disabled (worker only)"}</dd>
+        <dt>Company fetch</dt><dd>${data.company_fetch_enabled ? "enabled" : "disabled"}</dd>
         <dt>Registration</dt><dd>${data.allow_register ? "open" : "closed"}</dd>
         <dt>Concurrency</dt><dd>default ${data.default_concurrency}, max ${data.max_concurrency}</dd>
       </dl>

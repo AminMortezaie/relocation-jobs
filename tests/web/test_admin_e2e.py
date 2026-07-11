@@ -69,6 +69,7 @@ def test_admin_dashboard_worker_last_country_run(v2_auth_client, seeded_catalog_
     worker = payload["worker"]
     assert worker["fetch"]["running"] is False
     assert worker["panel_scrape_enabled"] is False
+    assert worker["panel_company_fetch_enabled"] is False
     last = worker["last_country_run"]
     assert last is not None
     assert last["scope"] == "country"

@@ -29,9 +29,17 @@ from relocation_jobs.panel.stats import compute_stats
 from relocation_jobs.core.db import db_read
 
 
-def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
+def get_system_config(
+    *,
+    scrape_enabled: bool,
+    httpx_available: bool,
+    company_fetch_enabled: bool | None = None,
+) -> dict:
     custom = load_custom_cities()
     archives = [country_archive_filename(key) for key in sorted(supported_countries())]
+    company_fetch = (
+        scrape_enabled if company_fetch_enabled is None else company_fetch_enabled
+    )
     return {
         "database": "postgres",
         "redis": "connected" if countries_use_redis() else ("configured" if redis_enabled() else "off"),
@@ -39,6 +47,7 @@ def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
         "countries_store": "redis" if countries_use_redis() else "postgres",
         "data_dir": str(data_dir()),
         "scrape_enabled": scrape_enabled,
+        "company_fetch_enabled": company_fetch,
         "allow_register": os.environ.get("PANEL_ALLOW_REGISTER", "").lower()
         in ("1", "true", "yes"),
         "httpx_available": httpx_available,
@@ -58,11 +67,20 @@ def get_system_config(*, scrape_enabled: bool, httpx_available: bool) -> dict:
     }
 
 
-def get_worker_status(*, fetch_state: dict | None, scrape_enabled: bool) -> dict:
+def get_worker_status(
+    *,
+    fetch_state: dict | None,
+    scrape_enabled: bool,
+    company_fetch_enabled: bool | None = None,
+) -> dict:
+    company_fetch = (
+        scrape_enabled if company_fetch_enabled is None else company_fetch_enabled
+    )
     return {
         "fetch": fetch_state or {"running": False},
         "last_country_run": fetch_repo.latest_finished_country_run(),
         "panel_scrape_enabled": scrape_enabled,
+        "panel_company_fetch_enabled": company_fetch,
         "schedule_enabled": schedule_enabled(),
         "schedule_interval_hours": schedule_interval_hours(),
         "schedule_concurrency": schedule_concurrency(),
@@ -181,6 +199,7 @@ def get_admin_dashboard(
     fetch_state: dict | None = None,
     scrape_enabled: bool,
     httpx_available: bool,
+    company_fetch_enabled: bool | None = None,
     fetch_runs_limit: int = 15,
 ) -> dict:
     catalog = get_catalog_overview()
@@ -189,6 +208,7 @@ def get_admin_dashboard(
         "worker": get_worker_status(
             fetch_state=fetch_state,
             scrape_enabled=scrape_enabled,
+            company_fetch_enabled=company_fetch_enabled,
         ),
         "panel_stats": None,
         "catalog": catalog,
@@ -196,6 +216,7 @@ def get_admin_dashboard(
         "runs": {"runs": fetch_repo.list_all_fetch_runs(limit=fetch_runs_limit)},
         "config": get_system_config(
             scrape_enabled=scrape_enabled,
+            company_fetch_enabled=company_fetch_enabled,
             httpx_available=httpx_available,
         ),
     }

@@ -157,6 +157,7 @@ docker run -d --name ${PANEL_CONTAINER} --restart unless-stopped \\
   -v ${REMOTE_DIR}/relocation_jobs/static:/app/relocation_jobs/static:ro \\
   -e PORT=${PANEL_PORT} \\
   -e PANEL_SCRAPE_ENABLED=0 \\
+  -e PANEL_COMPANY_FETCH_ENABLED=1 \\
   -e PANEL_DATA_DIR=/tmp/panel-data \\
   -e PANEL_SECRET_KEY='${secret}' \\
   -e PANEL_ADMIN_USER=admin \\

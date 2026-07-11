@@ -1,21 +1,16 @@
 from __future__ import annotations
 
-import os
-
 from flask import g, jsonify, request
 
 from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.auth import login_required
 from relocation_jobs.core.location_tags import country_label
+from relocation_jobs.core.panel_flags import company_fetch_enabled
 from relocation_jobs.core.paths import country_archive_filename, supported_countries
 from relocation_jobs.catalog.repo import get_company
 from relocation_jobs.fetch import state as fetch_state
 from relocation_jobs.fetch.runner import start_company_fetch
 from relocation_jobs.web import deps
-
-
-def scrape_enabled() -> bool:
-    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
 
 
 def register(app):
@@ -336,11 +331,11 @@ def register(app):
     @app.post("/api/companies/fetch")
     @login_required
     def api_companies_fetch():
-        if not scrape_enabled():
+        if not company_fetch_enabled():
             return jsonify({
                 "error": (
-                    "Scraping is disabled on this host. "
-                    "Run scrapes locally, then sync catalog to Postgres."
+                    "Company fetch is disabled on this host. "
+                    "Set PANEL_COMPANY_FETCH_ENABLED=1 or PANEL_SCRAPE_ENABLED=1."
                 ),
             }), 503
 

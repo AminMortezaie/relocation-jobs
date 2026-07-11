@@ -30,7 +30,10 @@ export function syncBoardView({ loading = false, preserveContent = false } = {})
       showRejected: [...state.showRejectedCompanies],
       fetchingCompanyKey: state.fetchingCompanyKey,
       serverFetchRunning: state.serverFetchRunning,
-      scrapeEnabled: state.scrapeConfig?.scrape_enabled !== false,
+      scrapeEnabled: (
+        state.scrapeConfig?.company_fetch_enabled
+        ?? state.scrapeConfig?.scrape_enabled
+      ) !== false,
       positionRejectedOnly: Boolean($("positionRejectedOnly")?.checked),
       visaOnly: Boolean($("visaOnly")?.checked),
     },

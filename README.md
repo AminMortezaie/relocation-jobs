@@ -55,7 +55,8 @@ Copy `.env.example` → `.env`. Real hosts/passwords stay in gitignored `.env` /
 | `REDIS_URL` | Optional country-label cache (`scripts/ec2_redis.sh`); Postgres fallback when unset |
 | `PANEL_SECRET_KEY` | Flask session signing |
 | `PANEL_ADMIN_USER` / `PANEL_ADMIN_PASSWORD` | Bootstrap admin on first run |
-| `PANEL_SCRAPE_ENABLED` | `1` locally for fetch; `0` on slim production panel image |
+| `PANEL_SCRAPE_ENABLED` | `1` locally for country + company fetch; `0` on slim production panel |
+| `PANEL_COMPANY_FETCH_ENABLED` | `1` on EC2 panel for board **Fetch jobs** without enabling country scrape |
 | `PANEL_DATA_DIR` | Local data dir for `custom_cities.json` (default `data/`) |
 | `PANEL_ALLOW_REGISTER` | Self-service registration after first user |
 | `MCP_USERNAME` / `MCP_USER_ID` | Panel user for Claude Desktop MCP (default `admin`) |
@@ -198,7 +199,7 @@ One AWS EC2 host: Postgres + Redis + panel + fetch worker + Caddy. Guide: [ec2-p
 |---------|------|
 | Postgres (`pg`) | Source of truth |
 | Redis | Country-label cache when configured |
-| Panel (`relocation-panel`) | Gunicorn; slim image; `PANEL_SCRAPE_ENABLED=0` |
+| Panel (`relocation-panel`) | Gunicorn; slim image; `PANEL_SCRAPE_ENABLED=0`, `PANEL_COMPANY_FETCH_ENABLED=1` |
 | Fetch worker (`relocation-fetch-worker`) | Playwright; country scrape every **6h** (concurrency **4**) |
 | Caddy | TLS + reverse proxy for kuchup.com / www (raw IP → 404) |
 | Cloudflare | DNS; optional orange-cloud + origin lock-down |

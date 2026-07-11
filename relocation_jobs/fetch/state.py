@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import os
 import threading
 from datetime import datetime, timezone
 
+from relocation_jobs.core.panel_flags import fetch_process_may_reap_orphans
 from relocation_jobs.fetch import repo as fetch_repo
 
 _fetch_lock = threading.RLock()
@@ -173,10 +173,6 @@ def persist_fetch_run(run_id: int | None = None) -> None:
         _fetch_state["run_id"] = None
 
 
-def _fetch_process_may_reap_orphans() -> bool:
-    return os.environ.get("PANEL_SCRAPE_ENABLED", "0").lower() in ("1", "true", "yes")
-
-
 def reap_zombie_fetch() -> None:
     should_finalize = False
     with _fetch_lock:
@@ -197,7 +193,7 @@ def reap_zombie_fetch() -> None:
         persist_fetch_run()
     with _fetch_lock:
         local_running = bool(_fetch_state.get("running"))
-    if not local_running and _fetch_process_may_reap_orphans():
+    if not local_running and fetch_process_may_reap_orphans():
         fetch_repo.reap_orphan_running_fetch_runs()
 
 

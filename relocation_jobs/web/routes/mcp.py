@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from urllib.parse import quote
 
 from flask import Response, g, jsonify, request
@@ -9,13 +8,10 @@ from pydantic import ValidationError
 
 from relocation_jobs.core.auth import login_required
 from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
+from relocation_jobs.core.panel_flags import company_fetch_enabled
 from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.mcp import service as mcp_service
 from relocation_jobs.mcp.types import ApplicationProfile
-
-
-def _scrape_enabled() -> bool:
-    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
 
 
 def register(app):
@@ -224,11 +220,11 @@ def register(app):
     @app.post("/api/mcp/positions/<path:idempotency_key>/fetch-description")
     @login_required
     def api_mcp_position_fetch_description(idempotency_key: str):
-        if not _scrape_enabled():
+        if not company_fetch_enabled():
             return jsonify({
                 "error": (
-                    "Scraping is disabled on this host. "
-                    "Run scrapes locally, then sync catalog to Postgres."
+                    "Company fetch is disabled on this host. "
+                    "Set PANEL_COMPANY_FETCH_ENABLED=1 or PANEL_SCRAPE_ENABLED=1."
                 ),
             }), 503
         if not HTTPX_AVAILABLE:

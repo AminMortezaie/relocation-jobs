@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import os
-
 from flask import g, jsonify, request
 
 from relocation_jobs.core.ats_constants import DEFAULT_CONCURRENCY, HTTPX_AVAILABLE, MAX_CONCURRENCY
 from relocation_jobs.core.auth import admin_required, login_required
 from relocation_jobs.core.location_tags import country_label
+from relocation_jobs.core.panel_flags import scrape_enabled
 from relocation_jobs.core.paths import country_archive_filename, supported_countries
 from relocation_jobs.users.repo import is_user_admin
 from relocation_jobs.web import deps
@@ -16,10 +15,6 @@ from relocation_jobs.fetch.runner import (
     start_country_fetch,
 )
 from relocation_jobs.fetch.types import AttemptStatus
-
-
-def scrape_enabled() -> bool:
-    return os.environ.get("PANEL_SCRAPE_ENABLED", "1").lower() not in ("0", "false", "no")
 
 
 def register(app):

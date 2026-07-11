@@ -84,7 +84,7 @@ Names should state **what** and **when**, not generic verbs.
 
 - **`process_company(..., fetch_board=...)`** — `fetch_board` is required and injected.
 - **Country fetch:** in-process asyncio runner (`fetch/country_runner.py`, `fetch/runner.py`), DB-backed status/cancel via `fetch_runs`. Parallel workers up to `MAX_CONCURRENCY` (16) — hard server cap in `core/ats_constants.py`.
-- **Single-company fetch:** `fetch/runner.py` + `POST /api/companies/fetch`.
+- **Single-company fetch:** `fetch/runner.py` + `POST /api/companies/fetch` (gated by `PANEL_COMPANY_FETCH_ENABLED` or `PANEL_SCRAPE_ENABLED`).
 - **Attempt logging** and **fetch run persistence** in `fetch/repo.py`.
 - **ATS boards:** greenhouse, lever, ashby, workable, recruitee, personio, smartrecruiters, teamtailor, generic, and others under `scrape/boards/`.
 

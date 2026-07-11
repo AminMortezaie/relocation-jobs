@@ -3,13 +3,35 @@
   "checkpoint_id": "257077b8c723",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
+  "checkpoints_count": 2,
   "files_touched": [
+    ".env.example",
+    "Dockerfile.ec2",
+    "README.md",
+    "docs/operations/ec2-panel.md",
+    "docs/reference/rules.md",
+    "relocation_jobs/admin/service.py",
+    "relocation_jobs/core/panel_flags.py",
+    "relocation_jobs/fetch/state.py",
     "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_ssgManifest.js",
     "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_buildManifest.js",
     "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_ssgManifest.js",
     "relocation_jobs/static/homepage/index.html",
-    "relocation_jobs/static/homepage/index.txt"
+    "relocation_jobs/static/homepage/index.txt",
+    "relocation_jobs/static/js/admin-worker.js",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/board-view.js",
+    "relocation_jobs/web/routes/admin.py",
+    "relocation_jobs/web/routes/catalog.py",
+    "relocation_jobs/web/routes/companies.py",
+    "relocation_jobs/web/routes/fetch.py",
+    "relocation_jobs/web/routes/mcp.py",
+    "scripts/ec2_app_deploy.sh",
+    "tests/fetch/test_fetch_state_reap.py",
+    "tests/web/test_admin_e2e.py",
+    "tests/web/test_fetch_api.py"
   ],
   "sessions": [
     {
@@ -17,6 +39,19 @@
       "transcript": "/25/7077b8c723/0/full.jsonl",
       "content_hash": "/25/7077b8c723/0/content_hash.txt",
       "prompt": "/25/7077b8c723/0/prompt.txt"
+    },
+    {
+      "metadata": "/25/7077b8c723/1/metadata.json",
+      "transcript": "/25/7077b8c723/1/full.jsonl",
+      "content_hash": "/25/7077b8c723/1/content_hash.txt",
+      "prompt": "/25/7077b8c723/1/prompt.txt"
     }
-  ]
+  ],
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  }
 }

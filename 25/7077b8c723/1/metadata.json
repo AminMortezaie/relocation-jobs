@@ -1,0 +1,88 @@
+{
+  "cli_version": "0.7.7",
+  "checkpoint_id": "257077b8c723",
+  "session_id": "a4f8a89b-0570-4512-a4df-95762bb9d98f",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-11T08:00:30.945234Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".env.example",
+    "Dockerfile.ec2",
+    "README.md",
+    "docs/operations/ec2-panel.md",
+    "docs/reference/rules.md",
+    "relocation_jobs/admin/service.py",
+    "relocation_jobs/core/panel_flags.py",
+    "relocation_jobs/fetch/state.py",
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_ssgManifest.js",
+    "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_ssgManifest.js",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt",
+    "relocation_jobs/static/js/admin-worker.js",
+    "relocation_jobs/static/js/admin.js",
+    "relocation_jobs/static/js/board-view.js",
+    "relocation_jobs/web/routes/admin.py",
+    "relocation_jobs/web/routes/catalog.py",
+    "relocation_jobs/web/routes/companies.py",
+    "relocation_jobs/web/routes/fetch.py",
+    "relocation_jobs/web/routes/mcp.py",
+    "scripts/ec2_app_deploy.sh",
+    "tests/fetch/test_fetch_state_reap.py",
+    "tests/web/test_admin_e2e.py",
+    "tests/web/test_fetch_api.py"
+  ],
+  "agent": "Claude Code",
+  "model": "default",
+  "turn_id": "6ac942b2b8c4",
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-11T08:00:30.942363Z",
+    "agent_lines": 132,
+    "agent_removed": 50,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 5,
+    "total_committed": 132,
+    "total_lines_changed": 187,
+    "agent_percentage": 97.32620320855615,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 17,
+      "user_lines_removed": 5,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/It0bgA9qHYxgROLLI_EbP/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/It0bgA9qHYxgROLLI_EbP/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 1,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/UT5YcIHduwVxLIjCry5Cs/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 1
+      }
+    }
+  ]
+}

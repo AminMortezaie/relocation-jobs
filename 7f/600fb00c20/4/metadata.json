@@ -1,0 +1,126 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "7f600fb00c20",
+  "session_id": "d9c92a15-f4e3-4bce-8b9e-58c0f6967152",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-12T19:27:12.684988Z",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "save_step_count": 6,
+  "files_touched": [
+    "Dockerfile.ec2",
+    "docs/operations/ec2-panel.md",
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_ssgManifest.js",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "8c673162c7a7",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 38951,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 830080,
+    "output_tokens": 8879,
+    "api_call_count": 1
+  },
+  "session_metrics": {
+    "duration_ms": 55261,
+    "turn_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-12T19:27:12.67715Z",
+    "agent_lines": 26,
+    "agent_removed": 28,
+    "human_added": 826,
+    "human_modified": 8,
+    "human_removed": 0,
+    "total_committed": 860,
+    "total_lines_changed": 958,
+    "agent_percentage": 5.6367432150313155,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 41,
+      "user_lines_removed": 8,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "Dockerfile.ec2": 19,
+        "docs/operations/ec2-panel.md": 4,
+        "docs/reference/mcp-application.md": 1,
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/XvhQvXLWTNlY_vu18guUi/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/XvhQvXLWTNlY_vu18guUi/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 1,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "docs/operations/ec2-panel.md": 2,
+        "docs/reference/mcp-application.md": 1,
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 29,
+      "agent_lines_removed": 8,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 29,
+      "agent_lines_removed": 8,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 29,
+      "agent_lines_removed": 8,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 29,
+      "agent_lines_removed": 8,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 29,
+      "agent_lines_removed": 8,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

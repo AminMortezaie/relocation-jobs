@@ -3,7 +3,7 @@
   "checkpoint_id": "7f600fb00c20",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 46,
+  "checkpoints_count": 52,
   "files_touched": [
     "Dockerfile.ec2",
     "docs/operations/ec2-panel.md",
@@ -80,13 +80,20 @@
       "compact_transcript": "/7f/600fb00c20/3/transcript.jsonl",
       "content_hash": "/7f/600fb00c20/3/content_hash.txt",
       "prompt": "/7f/600fb00c20/3/prompt.txt"
+    },
+    {
+      "metadata": "/7f/600fb00c20/4/metadata.json",
+      "transcript": "/7f/600fb00c20/4/full.jsonl",
+      "compact_transcript": "/7f/600fb00c20/4/transcript.jsonl",
+      "content_hash": "/7f/600fb00c20/4/content_hash.txt",
+      "prompt": "/7f/600fb00c20/4/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 780348,
+    "input_tokens": 819299,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 10024576,
-    "output_tokens": 52624,
-    "api_call_count": 11
+    "cache_read_tokens": 10854656,
+    "output_tokens": 61503,
+    "api_call_count": 12
   }
 }

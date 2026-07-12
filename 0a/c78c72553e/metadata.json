@@ -3,12 +3,17 @@
   "checkpoint_id": "0ac78c72553e",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 2,
+  "checkpoints_count": 11,
   "files_touched": [
+    "docs/reference/full-spa-ui-modernization-proposal.md",
     "relocation_jobs/static/admin.html",
     "relocation_jobs/static/apply.html",
     "relocation_jobs/static/company.html",
+    "relocation_jobs/static/icons/apple-touch-icon.png",
+    "relocation_jobs/static/icons/icon-192.png",
+    "relocation_jobs/static/icons/icon-512.png",
     "relocation_jobs/static/index.html",
+    "relocation_jobs/static/manifest.json",
     "relocation_jobs/static/public.html",
     "relocation_jobs/static/sw.js"
   ],
@@ -19,13 +24,20 @@
       "compact_transcript": "/0a/c78c72553e/0/transcript.jsonl",
       "content_hash": "/0a/c78c72553e/0/content_hash.txt",
       "prompt": "/0a/c78c72553e/0/prompt.txt"
+    },
+    {
+      "metadata": "/0a/c78c72553e/1/metadata.json",
+      "transcript": "/0a/c78c72553e/1/full.jsonl",
+      "compact_transcript": "/0a/c78c72553e/1/transcript.jsonl",
+      "content_hash": "/0a/c78c72553e/1/content_hash.txt",
+      "prompt": "/0a/c78c72553e/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 84820,
+    "input_tokens": 841771,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 0,
-    "output_tokens": 85,
-    "api_call_count": 2
+    "cache_read_tokens": 1151360,
+    "output_tokens": 20481,
+    "api_call_count": 9
   }
 }

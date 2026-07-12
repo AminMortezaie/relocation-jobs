@@ -12,7 +12,7 @@ Related: [architecture.md](architecture.md), [board.md](board.md), [business-rul
 
 The panel UI is a **hybrid multi-page app**: four static HTML shells, ~8,500 lines of vanilla ES modules, and a partial React island on the main board only. Styling is a single ~6,000-line `styles.css`. React and vanilla JS communicate through `window.relocationJobs` and delegated DOM clicks in `events.js` (~865 lines).
 
-**Recommended direction (default):** replace the hybrid front with a **single React SPA** (Vite), shared **AppShell** layout, **React Router** for all four views, a **design system** (Tailwind + shadcn/ui), **dark + light themes** with system preference, and **mobile-first** responsive patterns. Flask stays a JSON API; add an SPA fallback route. Migrate **page-by-page** over ~8–10 weeks; delete legacy `static/js/`, per-page HTML, and monolithic CSS after cutover.
+**Recommended direction (default):** replace the hybrid front with a **single React SPA** (Vite), shared **AppShell** layout, **React Router** for all four views, **Tailwind CSS** design tokens, **dark + light themes** with system preference, and **mobile-first** responsive patterns. Flask stays a JSON API; add an SPA fallback route. Migrate **page-by-page** over ~6–7 weeks; delete legacy `static/js/`, per-page HTML, and monolithic CSS after cutover.
 
 **Testing stance:** do **not** retroactively test the legacy hybrid front (throwaway code). Add a **thin safety net on the new stack** during migration: Vitest for pure helpers + optimistic cache logic; 3–5 Playwright smoke tests after Phase 1; keep existing pytest API/board tests green.
 
@@ -92,7 +92,7 @@ Single Vite build, React Router, shared AppShell, delete vanilla layer after mig
 
 | Pros | Cons |
 |------|------|
-| Removes `window.relocationJobs` and `events.js` permanently | ~8–10 weeks; large parallel track |
+| Removes `window.relocationJobs` and `events.js` permanently | ~6–7 weeks; large parallel track |
 | One design system, one test strategy | Regression risk during migration (mitigated below) |
 | Professional mobile + dark/light in one place | Requires Flask SPA fallback route |
 
@@ -110,7 +110,7 @@ Same as C but port to `.tsx` during migration.
 
 | Choice | When |
 |--------|------|
-| **C — Full SPA** | Owner wants production-grade UI, mobile, themes, and maintainability; accepts 8–10 week track |
+| **C — Full SPA** | Owner wants production-grade UI, mobile, themes, and maintainability; accepts 6–7 week track |
 | **A — Polish only** | Reliability/backend work is higher priority; UI refresh is cosmetic |
 | **B — Gradual React** | Want smaller PRs but eventually reach SPA |
 
@@ -124,9 +124,9 @@ Same as C but port to `.tsx` during migration.
 |-------|--------|-----|
 | **Router** | React Router v7 | Mirrors `/`, `/company/:country/:slug`, `/apply`, `/admin` |
 | **Styling** | Tailwind CSS v4 + CSS variables | Token-based theming; component-scoped utility |
-| **Primitives** | shadcn/ui (Radix) | Dialog, Sheet, Select, Dropdown, Toast — accessible defaults |
-| **Server state** | TanStack Query | Board pagination, admin tables, fetch runs |
-| **Client state** | Zustand (light) | Auth session, filter prefs (`storage.js` today), theme override |
+| **Primitives** | Native `<dialog>` + Tailwind | Covers dialogs/sheets/modals; no library dep |
+| **Server state** | Custom `useBoard` hook | 50 lines; board pagination + optimistic cache |
+| **Client state** | React Context + `useReducer` | Auth session, filter prefs (`storage.js` today), theme override |
 | **Icons** | lucide-react | Replace duplicated inline SVGs |
 | **Build** | Existing Vite → `relocation_jobs/static/dist/` | Deploy path unchanged |
 
@@ -161,7 +161,7 @@ Same as C but port to `.tsx` during migration.
 
 - Skeleton loaders per page (extend `BoardSkeleton.jsx`).
 - Empty states with clear CTAs.
-- Optimistic updates via TanStack Query `onMutate` / `setQueryData` (port `job-board.js` logic).
+- Optimistic updates via custom `useBoardMutations` hook (port `job-board.js` logic).
 - `prefers-reduced-motion` for sheets and loaders.
 - Focus traps on Dialog/Sheet; `focus-visible` on all interactives.
 
@@ -197,11 +197,11 @@ flowchart LR
 
 ```text
 frontend/src/
-  app/           App.jsx, router, providers (Query, theme, auth)
+  app/           App.jsx, router, providers (theme, auth)
   layouts/       AppShell, AuthGate
   pages/         BoardPage, CompanyPage, ApplyPage, AdminPage
   features/      board/, company/, apply/, admin/, fetch/, auth/
-  components/ui/ shadcn primitives
+  components/    shared components (dialog, sheet, card)
   lib/           api client (from api.js), query keys, formatters
   hooks/         useBoard, useJobMutations, useTheme, …
   styles/        globals.css (theme tokens), tailwind config
@@ -224,13 +224,13 @@ In `relocation_jobs/web/server.py`:
 
 ---
 
-## Phased migration (~8–10 weeks)
+## Phased migration (~6–7 weeks)
 
 Each phase ends deployable; production stays usable throughout.
 
 ### Phase 0 — Foundation (week 1–2)
 
-- Add Tailwind, shadcn/ui, React Router, TanStack Query, lucide-react.
+- Add Tailwind, React Router, lucide-react.
 - Theme tokens (dark/light); `AppShell` with header, user menu, theme toggle, nav.
 - Port `api.js` → `lib/api.js`; `auth.js` → `AuthGate`.
 - Flask SPA fallback; Vite dev proxy to `:5051`.
@@ -245,7 +245,7 @@ Each phase ends deployable; production stays usable throughout.
 | `events.js` delegated clicks | `useJobMutations` in `JobCard` / `CompanyCard` |
 | `dialogs.js` (~1,154 lines) | `AddCompanyDialog`, `EditCareersDialog`, `EditCityDialog` |
 | `FetchPanel.jsx` + `scrape.js` | `useFetchRun`; single fetch UI |
-| `job-board.js` optimistic patches | Query `onMutate` / `setQueryData` |
+| `job-board.js` optimistic patches | `useBoardMutations` hook (implement as needed) |
 
 Refactor existing React components to **own interactions** (no `data-action` delegation).
 
@@ -316,7 +316,7 @@ Map to [business-rules.md](business-rules.md): apply, reject, not-for-me, restor
 | `events.js` behavior regression | Migrate action-by-action; checklist vs business-rules |
 | Optimistic board updates wrong bucket | Port `patchJobOnBoard` into query cache helpers before deleting `job-board.js` |
 | Fetch polling stuck / double poll | Isolate `useFetchPolling`; mock poll in Vitest |
-| 6k-line CSS delete | Rebuild with shadcn + tokens; port only ATS ring, visa badges |
+| 6k-line CSS delete | Rebuild with Tailwind + tokens; port only ATS ring, visa badges |
 | Long admin migration | Admin last; board + company = 90% daily use |
 | Deploy breakage | SPA shell first; optional feature flag for old HTML one release |
 | Parallel backend reliability work | UI rewrite does not fix board load perf — coordinate with [board-read-model-proposal.md](board-read-model-proposal.md) |
@@ -346,7 +346,7 @@ Visible progress on day one without big-bang cutover.
 
 ## Open questions
 
-1. **Timing vs board performance** — start SPA while [board-read-model-proposal.md](board-read-model-proposal.md) is in flight, or sequence after read-model lands?
+1. **Timing vs board performance** — [board-read-model-proposal.md](board-read-model-proposal.md) is decided independently of this proposal, on its own merits and timeline. This proposal's approval does not wait on that decision. Phase 0 (tooling/AppShell, no board data path changes) can start regardless of board-read-model status. Re-evaluate sequencing only if Phase 1 (board page migration) would start while board-read-model migration work is actively in flight.
 2. **Feature flag** — keep old HTML shells for one release behind env flag?
 3. **React Hook Form** — adopt in Phase 3 apply page or stay uncontrolled + manual validation?
 4. **Admin table density** — horizontal scroll only, or card fallback on mobile in v1?

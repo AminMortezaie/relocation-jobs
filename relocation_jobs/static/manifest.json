@@ -1,0 +1,14 @@
+{
+  "name": "Relocation Jobs",
+  "short_name": "Relocation Jobs",
+  "description": "Visa-friendly software roles abroad — track applications and manage your job search.",
+  "start_url": "/panel",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090b10",
+  "theme_color": "#090b10",
+  "icons": [
+    { "src": "/static/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/static/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

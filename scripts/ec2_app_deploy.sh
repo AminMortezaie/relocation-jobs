@@ -2,13 +2,16 @@
 # Deploy relocation-jobs panel to EC2 (same host as Postgres + Redis).
 #
 # Usage:
-#   ./scripts/ec2_app_deploy.sh sync     # rsync repo to EC2
-#   ./scripts/ec2_app_deploy.sh deploy   # build + run panel + Caddy
-#   ./scripts/ec2_app_deploy.sh open-sg  # open HTTP/HTTPS on security group
+#   ./scripts/ec2_app_deploy.sh sync        # rsync repo to EC2
+#   ./scripts/ec2_app_deploy.sh deploy      # prune + build + run panel + Caddy
+#   ./scripts/ec2_app_deploy.sh prune       # free dangling Docker images/build cache
+#   ./scripts/ec2_app_deploy.sh open-sg     # open HTTP/HTTPS on security group
 #   ./scripts/ec2_app_deploy.sh status      # container + health check
 #   ./scripts/ec2_app_deploy.sh worker-logs # tail fetch scheduler logs
 #
 # Requires: aws-postgres.env, SSH key at ~/Downloads/relocation.pem
+# Disk: 8G root fills from leftover panel/worker images; deploy prunes before
+# and after each image rebuild so old+new layers do not stack.
 
 set -euo pipefail
 
@@ -50,6 +53,10 @@ rsync_cmd() {
     --exclude '.venv/' \
     --exclude 'node_modules/' \
     --exclude 'frontend/node_modules/' \
+    --exclude 'homepage/node_modules/' \
+    --exclude 'homepage/.next/' \
+    --exclude 'homepage/out/' \
+    --exclude '.entire/' \
     --exclude 'data/' \
     --exclude '/dist/' \
     --exclude '__pycache__/' \
@@ -134,6 +141,55 @@ cmd_open_sg() {
   log "Security group ${sg}: TCP 80/443 open"
 }
 
+# Docker disk reclaim — NEVER touch volumes or the Postgres/Redis containers.
+#
+# Data lives in named volumes (`pgdata`, redis data), not in images. Safe ops:
+#   docker image prune -f     # dangling (<none>) images only
+#   docker builder prune -af  # build cache only
+# Forbidden in this script (would risk DB wipe):
+#   docker volume prune / docker volume rm
+#   docker system prune --volumes
+#   docker rm -v pg
+#   any prune that stops or removes container `pg`
+remote_docker_prune() {
+  local label="${1:-}"
+  [[ -n "$label" ]] && log "Docker prune (${label})..."
+  ssh_cmd bash -s <<'EOF'
+set -euo pipefail
+
+assert_db_safe() {
+  local phase="$1"
+  if ! docker inspect -f '{{.State.Running}}' pg 2>/dev/null | grep -qx true; then
+    echo "[ec2-app] ERROR: Postgres container 'pg' is not running (${phase}) — refusing prune" >&2
+    exit 1
+  fi
+  if ! docker volume inspect pgdata >/dev/null 2>&1; then
+    echo "[ec2-app] ERROR: Docker volume 'pgdata' missing (${phase}) — refusing prune" >&2
+    exit 1
+  fi
+}
+
+assert_db_safe "before prune"
+printf '[ec2-app] disk before prune: '
+df -h / | awk 'NR==2 {print $3 " used / " $2 " (" $5 ")"}'
+
+# Dangling images only — not -a (unused), not volumes, not containers.
+docker image prune -f
+# BuildKit cache only — never --volumes / system prune.
+docker builder prune -af >/dev/null
+
+assert_db_safe "after prune"
+printf '[ec2-app] disk after prune:  '
+df -h / | awk 'NR==2 {print $3 " used / " $2 " (" $5 ")"}'
+printf '[ec2-app] db guard: pg running, volume pgdata present\n'
+EOF
+}
+
+cmd_prune() {
+  load_state
+  remote_docker_prune "manual"
+}
+
 cmd_deploy() {
   load_state
   local redis_pass db_url redis_url secret admin_pass
@@ -144,6 +200,8 @@ cmd_deploy() {
   redis_url="redis://:${redis_pass}@172.17.0.1:6379/0"
 
   cmd_sync
+  # Free leftover images from the previous deploy before old+new layers coexist.
+  remote_docker_prune "before builds"
 
   log "Building ${PANEL_IMAGE} on EC2 (arm64, may take a few minutes)..."
   ssh_cmd "cd ${REMOTE_DIR} && docker build -f Dockerfile.ec2 -t ${PANEL_IMAGE} ."
@@ -170,6 +228,9 @@ docker run -d --name ${PANEL_CONTAINER} --restart unless-stopped \\
   -e REDIS_URL='${redis_url}' \\
   ${PANEL_IMAGE}
 EOF
+
+  # Drop the previous panel image before the ~2.5GB worker rebuild.
+  remote_docker_prune "after panel"
 
   log "Building ${WORKER_IMAGE} on EC2 (Playwright, may take several minutes)..."
   ssh_cmd "cd ${REMOTE_DIR} && docker build -f Dockerfile.ec2-worker -t ${WORKER_IMAGE} ."
@@ -205,6 +266,7 @@ docker run -d --name ${CADDY_CONTAINER} --restart unless-stopped \\
   caddy:2-alpine
 EOF
 
+  remote_docker_prune "after worker"
   cmd_open_sg
   cmd_status
 }
@@ -248,8 +310,9 @@ cmd_worker_logs() {
 case "${1:-deploy}" in
   sync) cmd_sync ;;
   deploy) cmd_deploy ;;
+  prune) cmd_prune ;;
   open-sg) cmd_open_sg ;;
   status) load_state; cmd_status ;;
   worker-logs) cmd_worker_logs "$@" ;;
-  *) die "Usage: $0 {sync|deploy|open-sg|status|worker-logs}" ;;
+  *) die "Usage: $0 {sync|deploy|prune|open-sg|status|worker-logs}" ;;
 esac

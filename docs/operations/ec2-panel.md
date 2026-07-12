@@ -25,12 +25,17 @@ Panel talks to Postgres/Redis via Docker bridge gateway `172.17.0.1` (localhost 
 From repo root (SSH key `~/Downloads/relocation.pem`, `aws-postgres.env` present):
 
 ```bash
-./scripts/ec2_app_deploy.sh deploy        # rsync + build panel + worker + Caddy
+./scripts/ec2_app_deploy.sh deploy        # prune + rsync + build panel + worker + Caddy
+./scripts/ec2_app_deploy.sh prune         # free dangling Docker images / build cache only
 ./scripts/ec2_app_deploy.sh status        # containers + health check + worker logs
 ./scripts/ec2_app_deploy.sh worker-logs   # follow fetch scheduler logs
 ```
 
 `deploy` also opens security group ports **80** and **443**.
+
+**Disk (8G root):** each rebuild leaves the previous panel/worker image dangling (~GB). `deploy` runs `docker image prune -f` + `docker builder prune -af` before builds, after the panel swap, and after the worker swap so old+new layers do not stack. Use `prune` alone if the box is tight between deploys. If prune still cannot free enough headroom, grow the EBS volume.
+
+**DB safety:** prune never runs `docker volume prune`, `docker system prune --volumes`, or anything that stops/removes container `pg`. Postgres data is in named volume `pgdata`. Each prune asserts `pg` is running and `pgdata` exists before and after; it aborts if either check fails.
 
 | Image | Dockerfile | Role |
 |-------|------------|------|

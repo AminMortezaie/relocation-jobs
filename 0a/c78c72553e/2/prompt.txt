@@ -1,0 +1,14 @@
+add a link on logo on panel to redirect to home page 
+read the skills before
+
+---
+
+make the app PWA to install easily on phone and also use logo on website when i open it up on browser.
+
+---
+
+but i cannot login on pwa, why?
+
+---
+
+logo on pwa is incorrect and showing golang logo

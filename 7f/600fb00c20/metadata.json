@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "7f600fb00c20",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 15,
+  "files_touched": [
+    "Dockerfile.ec2",
+    "docs/operations/ec2-panel.md",
+    "docs/reference/mcp-application.md",
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_ssgManifest.js",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt"
+  ],
+  "sessions": [
+    {
+      "metadata": "/7f/600fb00c20/0/metadata.json",
+      "transcript": "/7f/600fb00c20/0/full.jsonl",
+      "compact_transcript": "/7f/600fb00c20/0/transcript.jsonl",
+      "content_hash": "/7f/600fb00c20/0/content_hash.txt",
+      "prompt": "/7f/600fb00c20/0/prompt.txt"
+    }
+  ]
+}

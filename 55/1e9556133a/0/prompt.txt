@@ -1,0 +1,15 @@
+problem with ec2_deploy
+
+---
+
+deploy
+
+---
+
+yes it should be put there to do this everytime to not fill the whole disk everytime.
+we need to think of it
+
+---
+
+i have a concern to not deleting a db during this flow.
+think of it cause it's security concern.

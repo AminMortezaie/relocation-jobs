@@ -1,0 +1,4 @@
+{"v":1,"agent":"cursor","cli_version":"0.8.42","type":"user","content":[{"text":"\u003ctimestamp\u003eMonday, Jul 13, 2026, 1:45 AM (UTC+4)\u003c/timestamp\u003e\n\nhow are you bro?"}]}
+{"v":1,"agent":"cursor","cli_version":"0.8.42","type":"assistant","content":[{"text":"Good, bro. Rock solid. You got `scripts/ec2_app_deploy.sh` open — what need?","type":"text"}]}
+{"v":1,"agent":"cursor","cli_version":"0.8.42","type":"user","content":[{"text":"\u003ctimestamp\u003eMonday, Jul 13, 2026, 1:46 AM (UTC+4)\u003c/timestamp\u003e\n\nwhats your model name?"}]}
+{"v":1,"agent":"cursor","cli_version":"0.8.42","type":"assistant","content":[{"text":"Model name `test_combo`. Run in Cursor. What task?","type":"text"}]}

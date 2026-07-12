@@ -1,0 +1,6 @@
+{"role":"user","message":{"content":[{"type":"text","text":"<timestamp>Monday, Jul 13, 2026, 1:45 AM (UTC+4)</timestamp>\n<user_query>\nhow are you bro?\n</user_query>"}]}}
+{"role":"assistant","message":{"content":[{"type":"text","text":"Good, bro. Rock solid. You got `scripts/ec2_app_deploy.sh` open — what need?"}]}}
+{"type":"turn_ended","status":"success"}
+{"role":"user","message":{"content":[{"type":"text","text":"<timestamp>Monday, Jul 13, 2026, 1:46 AM (UTC+4)</timestamp>\n<user_query>\nwhats your model name?\n</user_query>"}]}}
+{"role":"assistant","message":{"content":[{"type":"text","text":"Model name `test_combo`. Run in Cursor. What task?"}]}}
+{"type":"turn_ended","status":"success"}

@@ -1,0 +1,77 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "0ac78c72553e",
+  "session_id": "4e227393-8785-4e10-83f4-0b8735f49791",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-12T22:16:17.925308Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/static/admin.html",
+    "relocation_jobs/static/apply.html",
+    "relocation_jobs/static/company.html",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/public.html",
+    "relocation_jobs/static/sw.js"
+  ],
+  "agent": "Cursor",
+  "model": "unknown",
+  "turn_id": "e04fba689995",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 84820,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 85,
+    "api_call_count": 2
+  },
+  "session_metrics": {
+    "duration_ms": 809805,
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-12T22:16:17.919398Z",
+    "agent_lines": 2,
+    "agent_removed": 2,
+    "human_added": 3,
+    "human_modified": 2,
+    "human_removed": 0,
+    "total_committed": 7,
+    "total_lines_changed": 9,
+    "agent_percentage": 44.44444444444444,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 46,
+      "user_lines_removed": 2,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/static/admin.html": 4,
+        "relocation_jobs/static/apply.html": 4,
+        "relocation_jobs/static/company.html": 4,
+        "relocation_jobs/static/index.html": 6,
+        "relocation_jobs/static/manifest.json": 14,
+        "relocation_jobs/static/public.html": 2,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/index.html": 2
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 17,
+      "user_lines_removed": 0,
+      "agent_lines_added": 36,
+      "agent_lines_removed": 2,
+      "user_added_per_file": {
+        "relocation_jobs/static/index.html": 5,
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

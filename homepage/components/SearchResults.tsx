@@ -14,12 +14,7 @@ type PreviewCompany = {
   job_count: number;
   visa_job_count: number;
   latest_fetched?: string;
-  preview_jobs: { title?: string }[];
 };
-
-function companyHasPositions(company: PreviewCompany) {
-  return (company.preview_jobs || []).some((job) => (job.title || "").trim());
-}
 
 export function SearchResults() {
   const { filters } = useSearchFlow();
@@ -45,12 +40,14 @@ export function SearchResults() {
       })
       .then((payload) => {
         if (cancelled) return;
-        const rows = (payload.companies || []).filter(companyHasPositions).slice(0, 12);
+        const rows = (payload.companies || [])
+          .filter((c: PreviewCompany) => c.job_count > 0)
+          .slice(0, 12);
         setCompanies(rows);
       })
       .catch(() => {
         if (cancelled) return;
-        setError("Could not load roles right now. Try again in a moment.");
+        setError("Could not load companies right now. Try again in a moment.");
         setCompanies([]);
       })
       .finally(() => {
@@ -83,16 +80,16 @@ export function SearchResults() {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 id="search-results-heading" className="text-section-title text-text">
-            {loading ? "Searching catalog…" : "Matching roles"}
+            {loading ? "Searching catalog…" : "Companies hiring abroad"}
           </h2>
           <p className="mt-1 text-sm font-normal text-muted">
             {summary
-              ? `Preview for ${summary} — live from the shared catalog.`
-              : "Preview from the shared catalog."}
+              ? `Preview for ${summary} — sign in to see open roles.`
+              : "Preview from the shared catalog — sign in to see open roles."}
           </p>
         </div>
         <a href={panelHref(filters)} className="pill-control text-sm font-semibold">
-          Track in panel →
+          Sign in for full board →
         </a>
       </div>
 
@@ -114,15 +111,15 @@ export function SearchResults() {
 
       {!error && !loading && companies.length === 0 ? (
         <div className="surface-card rounded-app px-4 py-8 text-center">
-          <p className="text-sm font-medium text-text">No matching roles in the preview.</p>
+          <p className="text-sm font-medium text-text">No matching companies in the preview.</p>
           <p className="mt-2 text-sm font-normal text-muted">
-            Try a broader role or country, or sign in to search the full board.
+            Try a broader search or country, or sign in to browse the full board.
           </p>
           <a
             href={panelHref(filters)}
             className="btn-primary mt-4 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-white"
           >
-            Open full board
+            Sign in
           </a>
         </div>
       ) : null}
@@ -141,23 +138,17 @@ export function SearchResults() {
                 ) : null}
               </div>
               <p className="text-xs font-normal text-muted">
-                {company.job_count} open roles
+                {company.job_count} open role{company.job_count !== 1 ? "s" : ""}
                 {company.city ? ` · ${company.city}` : ""}
               </p>
-              {company.preview_jobs.length > 0 ? (
-                <ul className="mt-3 space-y-2 border-t border-white/[0.07] pt-3">
-                  {company.preview_jobs.map((job) => (
-                    <li key={job.title} className="text-sm font-normal text-text/90">
-                      {job.title}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
+              <p className="mt-3 border-t border-white/[0.07] pt-3 text-sm font-normal text-muted">
+                Sign in to see positions and track applications.
+              </p>
               <a
                 href={panelHref(filters)}
-                className="mt-4 inline-flex text-sm font-medium text-accent-hover hover:text-text"
+                className="mt-3 inline-flex text-sm font-medium text-accent-hover hover:text-text"
               >
-                Track applications →
+                Sign in to see roles →
               </a>
             </Card>
           ))}

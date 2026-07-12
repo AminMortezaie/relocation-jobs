@@ -21,6 +21,26 @@ ROOT = PROJECT_ROOT
 STATIC = STATIC_DIR
 HOMEPAGE_STATIC = STATIC / "homepage"
 
+# Public marketing paths — source of truth for sitemap, robots, and route serving.
+# These are exported from the homepage Next app as static HTML.
+PUBLIC_MARKETING_PATHS = (
+    "/",
+    "/how-it-works",
+    "/pricing",
+    "/relocation-jobs-germany",
+    "/relocation-jobs-netherlands",
+    "/relocation-jobs-uk",
+    "/relocation-jobs-portugal",
+)
+
+PRIVATE_ROBOTS_DISALLOW = (
+    "/panel",
+    "/admin",
+    "/apply",
+    "/company",
+    "/api/",
+)
+
 
 def _public_site_url() -> str:
     return (os.environ.get("PUBLIC_SITE_URL") or "https://kuchup.com").strip().rstrip("/")
@@ -126,9 +146,12 @@ def preview_page():
 @app.route("/robots.txt")
 def robots_txt():
     public_site_url = _public_site_url()
+    disallow_lines = "\n".join(f"Disallow: {p}" for p in PRIVATE_ROBOTS_DISALLOW)
     body = "\n".join((
         "User-agent: *",
         "Allow: /",
+        disallow_lines,
+        "",
         f"Sitemap: {public_site_url}/sitemap.xml",
         "",
     ))
@@ -138,12 +161,14 @@ def robots_txt():
 @app.route("/sitemap.xml")
 def sitemap_xml():
     public_site_url = _public_site_url()
+    urls = "\n".join(
+        f"  <url>\n    <loc>{public_site_url}{path}</loc>\n  </url>"
+        for path in PUBLIC_MARKETING_PATHS
+    )
     body = "\n".join((
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-        "  <url>",
-        f"    <loc>{public_site_url}/</loc>",
-        "  </url>",
+        urls,
         "</urlset>",
         "",
     ))
@@ -151,3 +176,28 @@ def sitemap_xml():
 
 
 register_routes(app)
+
+
+def _is_marketing_path(path: str) -> bool:
+    """Return True if *path* is one of the allowlisted marketing routes
+    (excluding the root, which has its own handler)."""
+    return path in PUBLIC_MARKETING_PATHS and path != "/"
+
+
+# Marketing route catch-all — must be the final route so Flask matches
+# all explicit routes (panel, admin, robots, sitemap, api/*, etc.) first.
+@app.route("/<path:slug>")
+def marketing_page(slug: str):
+    path = f"/{slug}"
+    if not _is_marketing_path(path):
+        return Response(status=404)
+    # Next.js static export produces <slug>.html at the root level.
+    # Strip trailing slash and serve the .html file.
+    segment = slug.rstrip("/")
+    filename = f"{segment}.html"
+    index = HOMEPAGE_STATIC / filename
+    if not index.is_file():
+        return Response(status=404)
+    resp = send_from_directory(HOMEPAGE_STATIC, filename)
+    resp.headers["Cache-Control"] = "no-store"
+    return resp

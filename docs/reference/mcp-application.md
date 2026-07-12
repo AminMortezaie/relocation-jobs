@@ -403,7 +403,7 @@ The JD is not stored in the catalog yet. On the panel, open `/company/<country>/
 
 `tectonic` (default via `MCP_LATEX_CMD`) cannot load `fontawesome5` — it aborts before a useful error. Compile **strips fontawesome packages, `\\fa…` icons, and unicode em-dashes** in a temp copy only (Postgres `.tex` unchanged).
 
-1. Set **`MCP_LATEX_CMD`** to tectonic’s **full path** in Claude Desktop MCP `env` (e.g. `/opt/homebrew/bin/tectonic`) — the GUI app often has no Homebrew on `PATH`. See `claude_desktop_config.json.example`.
+1. Set **`MCP_LATEX_CMD`** to tectonic’s **full path** in Claude Desktop MCP `env` (e.g. `/opt/homebrew/bin/tectonic`) — the GUI app often has no Homebrew on `PATH`. See `claude_desktop_config.json.example`. Production EC2 panel already ships tectonic in `Dockerfile.ec2` (no Homebrew path needed there; see [ec2-panel.md](../operations/ec2-panel.md)).
 2. Restart Claude Desktop after MCP server code changes.
 3. Panel **Re-render PDF** on the company workspace shows a progress overlay while compiling (~10s).
 4. If render still fails, read `validate_tex` first, then the error text from **Re-render PDF** or `render_pdf` log.

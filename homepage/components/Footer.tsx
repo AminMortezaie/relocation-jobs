@@ -1,5 +1,11 @@
 const FOOTER_LINKS = [
   { href: "/panel", label: "Board" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/relocation-jobs-germany", label: "Jobs in Germany" },
+  { href: "/relocation-jobs-netherlands", label: "Jobs in Netherlands" },
+  { href: "/relocation-jobs-uk", label: "Jobs in UK" },
+  { href: "/relocation-jobs-portugal", label: "Jobs in Portugal" },
   { href: "https://github.com/AminMortezaie/relocation-jobs/blob/main/docs/contributing.md", label: "Contributing", external: true },
   { href: "https://github.com/AminMortezaie/relocation-jobs", label: "Source", external: true },
 ] as const;

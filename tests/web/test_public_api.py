@@ -15,11 +15,10 @@ def test_public_preview_page_is_available_without_auth(v2_client, seeded_catalog
     resp = v2_client.get("/")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
-    assert "Relocation Jobs" in body
-    assert "Visa-friendly roles abroad" in body
-    assert "Search roles" in body
-    assert "Find visa-sponsored engineering roles" in body
-    assert 'href="/panel"' in body
+    assert "<title>Relocation Jobs" in body
+    assert "Find visa-sponsored" in body
+    assert "track applications" in body
+    assert "/panel" in body
 
 
 def test_legacy_preview_path_redirects_to_root(v2_client, seeded_catalog_v2):
@@ -60,11 +59,9 @@ def test_public_preview_returns_company_sample_without_user_state(v2_client, see
     company = payload["companies"][0]
     assert "name" in company
     assert "job_count" in company
-    assert "preview_jobs" in company
+    assert "preview_jobs" not in company
     assert "positions_applied" not in company
-    if company["preview_jobs"]:
-        assert "title" in company["preview_jobs"][0]
-        assert "applied" not in company["preview_jobs"][0]
+    assert "title" not in str(payload["companies"])
 
 
 def test_public_preview_accepts_country_and_query_filters(v2_client, seeded_catalog_v2):

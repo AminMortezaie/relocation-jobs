@@ -5,21 +5,10 @@ from relocation_jobs.core.location_tags import country_label
 
 PREVIEW_LIMIT = 8
 PREVIEW_SEARCH_LIMIT = 24
-PREVIEW_JOB_LIMIT = 2
-
-
-def _preview_job(job: dict) -> dict:
-    return {
-        "title": job.get("title"),
-        "url": job.get("url"),
-        "visa_sponsorship": job.get("visa_sponsorship"),
-        "fetched": job.get("fetched"),
-    }
 
 
 def _preview_company(company: dict) -> dict:
     jobs = list(company.get("matching_jobs") or [])
-    preview_jobs = jobs[:PREVIEW_JOB_LIMIT]
     visa_jobs = sum(1 for job in jobs if job.get("visa_sponsorship") is True)
     locations = list(company.get("locations") or [])
     primary_country = (
@@ -38,7 +27,6 @@ def _preview_company(company: dict) -> dict:
         "latest_fetched": latest_fetched,
         "job_count": len(jobs),
         "visa_job_count": visa_jobs,
-        "preview_jobs": [_preview_job(job) for job in preview_jobs],
     }
 
 
@@ -80,18 +68,6 @@ def _public_preview_payload(
         else []
     )
     companies = [_preview_company(company) for _, company in company_rows]
-    if query:
-        needle = query.lower()
-        companies = [
-            company
-            for company in companies
-            if needle in (company.get("name") or "").lower()
-            or needle in (company.get("country_label") or "").lower()
-            or any(
-                needle in (job.get("title") or "").lower()
-                for job in company.get("preview_jobs") or []
-            )
-        ]
     companies = companies[:limit]
     return {
         "companies": companies,

@@ -8,11 +8,30 @@ ENV PYTHONUNBUFFERED=1 \
     PANEL_COMPANY_FETCH_ENABLED=1 \
     PORT=10000
 
+ARG TECTONIC_VERSION=0.16.9
+
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    curl \
+    && ARCH="$(dpkg --print-architecture)" \
+    && case "$ARCH" in \
+         amd64) TECTONIC_TARGET=x86_64-unknown-linux-gnu ;; \
+         arm64) TECTONIC_TARGET=aarch64-unknown-linux-musl ;; \
+         *) echo "unsupported arch: $ARCH" >&2; exit 1 ;; \
+       esac \
+    && curl -fsSL "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic%40${TECTONIC_VERSION}/tectonic-${TECTONIC_VERSION}-${TECTONIC_TARGET}.tar.gz" \
+         | tar -xz -C /usr/local/bin tectonic \
+    && chmod +x /usr/local/bin/tectonic \
+    && apt-get purge -y curl \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
+
+# Warm Tectonic package cache so first production render does not download over the network.
+COPY deploy/ec2/tectonic-warm.tex /tmp/tectonic-warm/warm.tex
+RUN tectonic --outdir /tmp/tectonic-warm /tmp/tectonic-warm/warm.tex \
+    && rm -rf /tmp/tectonic-warm
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

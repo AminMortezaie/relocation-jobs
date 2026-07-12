@@ -1,8 +1,10 @@
 import { BrandMark } from "@/components/BrandMark";
 
 const NAV_LINKS = [
-  { href: "#benefits", label: "What you get" },
-  { href: "#board", label: "See the board" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/#benefits", label: "What you get" },
+  { href: "/#board", label: "See the board" },
 ] as const;
 
 export function Header() {

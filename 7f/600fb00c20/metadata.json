@@ -3,16 +3,54 @@
   "checkpoint_id": "7f600fb00c20",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 15,
+  "checkpoints_count": 33,
   "files_touched": [
     "Dockerfile.ec2",
     "docs/operations/ec2-panel.md",
+    "docs/operations/seo-indexing.md",
     "docs/reference/mcp-application.md",
+    "homepage/app/how-it-works/page.tsx",
+    "homepage/app/layout.tsx",
+    "homepage/app/pricing/page.tsx",
+    "homepage/app/relocation-jobs-germany/page.tsx",
+    "homepage/app/relocation-jobs-netherlands/page.tsx",
+    "homepage/app/relocation-jobs-portugal/page.tsx",
+    "homepage/app/relocation-jobs-uk/page.tsx",
+    "homepage/components/Footer.tsx",
+    "homepage/components/Header.tsx",
+    "homepage/components/SearchResults.tsx",
     "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/L70zCpMbldzQlpmrBTsuF/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/L70zCpMbldzQlpmrBTsuF/_ssgManifest.js",
     "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_buildManifest.js",
     "relocation_jobs/static/homepage/_next/static/NXASf0X7am-zN30D8hEAV/_ssgManifest.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-023a7fed8606eb81.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/page-a51c056613323f2f.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/page-c760e6753b390c5b.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-023a7fed8606eb81.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-germany/page-023a7fed8606eb81.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-netherlands/page-023a7fed8606eb81.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-portugal/page-023a7fed8606eb81.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-uk/page-023a7fed8606eb81.js",
+    "relocation_jobs/static/homepage/_next/static/css/049249938f291671.css",
+    "relocation_jobs/static/homepage/_next/static/css/691aef009bb17c9d.css",
+    "relocation_jobs/static/homepage/how-it-works.html",
+    "relocation_jobs/static/homepage/how-it-works.txt",
     "relocation_jobs/static/homepage/index.html",
-    "relocation_jobs/static/homepage/index.txt"
+    "relocation_jobs/static/homepage/index.txt",
+    "relocation_jobs/static/homepage/pricing.html",
+    "relocation_jobs/static/homepage/pricing.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.html",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.html",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.html",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.html",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.txt",
+    "relocation_jobs/web/routes/public.py",
+    "relocation_jobs/web/server.py",
+    "tests/web/test_public_api.py"
   ],
   "sessions": [
     {
@@ -21,6 +59,20 @@
       "compact_transcript": "/7f/600fb00c20/0/transcript.jsonl",
       "content_hash": "/7f/600fb00c20/0/content_hash.txt",
       "prompt": "/7f/600fb00c20/0/prompt.txt"
+    },
+    {
+      "metadata": "/7f/600fb00c20/1/metadata.json",
+      "transcript": "/7f/600fb00c20/1/full.jsonl",
+      "compact_transcript": "/7f/600fb00c20/1/transcript.jsonl",
+      "content_hash": "/7f/600fb00c20/1/content_hash.txt",
+      "prompt": "/7f/600fb00c20/1/prompt.txt"
     }
-  ]
+  ],
+  "token_usage": {
+    "input_tokens": 352689,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 7194624,
+    "output_tokens": 29784,
+    "api_call_count": 4
+  }
 }

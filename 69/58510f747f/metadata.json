@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "6958510f747f",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 25,
+  "files_touched": [
+    "docs/README.md",
+    "docs/backlog.md",
+    "docs/reference/fetch-panel-session.md",
+    "docs/reference/kafka-fetch-pipeline-proposal.md",
+    "docs/reference/multi-user-scaling-proposal.md",
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/scrape/board.py",
+    "relocation_jobs/scrape/boards/successfactors.py",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/board.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/fetch-actions.js",
+    "relocation_jobs/static/js/fetch-render.js",
+    "relocation_jobs/static/js/render.js",
+    "relocation_jobs/static/js/scrape.js",
+    "relocation_jobs/static/js/state.js",
+    "relocation_jobs/static/styles.css",
+    "tests/fetch/test_fetch_state_stale.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/69/58510f747f/0/metadata.json",
+      "transcript": "/69/58510f747f/0/full.jsonl",
+      "compact_transcript": "/69/58510f747f/0/transcript.jsonl",
+      "content_hash": "/69/58510f747f/0/content_hash.txt",
+      "prompt": "/69/58510f747f/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 7753236,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 15155584,
+    "output_tokens": 114446,
+    "api_call_count": 12
+  }
+}

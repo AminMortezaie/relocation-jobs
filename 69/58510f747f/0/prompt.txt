@@ -1,0 +1,109 @@
+during new changes the local panel gone slow.
+
+read the skills and find out why this is happening.
+
+---
+
+what do you mean by change 2?
+
+---
+
+is this related to latest changes?
+
+---
+
+no i think it was about network connection issue.
+the main problem is still about redis leaderboard proposal which we have talked before and documented.
+
+---
+
+problem in fetching swisslog company find the issue there
+
+---
+
+apply this fix
+
+---
+
+i dont know what was your change but i know for sure that changing the ATS and ats url can be handy in this Scenario we had.
+
+---
+
+restart the panel to apply it
+
+---
+
+no again i have the same fetch problem on this company.
+
+---
+
+run the application and click on a single fetch job you can see that we have a front issue there.
+find the real issue and fix it.
+
+---
+
+create a plan to fix this carefully and surely read the skills before.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+test it on webbrowser and you can see that firstly it shows it again the cached data from previous fetch which is not acceptable.
+
+---
+
+continue please
+
+---
+
+continue please
+
+---
+
+another problem is occuring here and this is about two time updating the panel.
+one after fetch complete and one after choosing between fetch okay or failed.
+see this problem and fix it
+
+---
+
+it's flakky and has problem again.
+i think we need to create a plan to completely fix this bug.
+
+investigate it and then give me your plan to completely fix this problem.
+
+---
+
+read the design skills and justify your plan based on their UX skills and choose a better UX for it
+
+---
+
+see the ux-skills.
+
+---
+
+let's build this.
+
+---
+
+continue please
+
+---
+
+continue please
+
+---
+
+continue please
+
+---
+
+continue please
+
+---
+
+great bro.
+please write down an article on docs for what we have done and why its precise.

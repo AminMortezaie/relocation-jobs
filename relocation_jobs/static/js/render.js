@@ -358,7 +358,7 @@ function touchFetchingCompanyTimestamp(companyKey) {
   company.updated = ts;
 }
 
-export function setFetchBusy(busy, companyKey = null, { countryScope = false } = {}) {
+export function setFetchBusy(busy, companyKey = null, { countryScope = false, syncBoard = true } = {}) {
   if (!busy) {
     state.fetchBusy = false;
     state.countryFetchActive = false;
@@ -367,7 +367,7 @@ export function setFetchBusy(busy, companyKey = null, { countryScope = false } =
     state.serverFetchRunning = false;
     $("addCompanyBtn").disabled = false;
     updateFetchHeaderUI();
-    syncBoardView();
+    if (syncBoard) syncBoardView();
     return;
   }
 
@@ -387,7 +387,7 @@ export function setFetchBusy(busy, companyKey = null, { countryScope = false } =
   state.serverFetchRunning = true;
   $("addCompanyBtn").disabled = !countryScope && state.fetchBusy;
   updateFetchHeaderUI();
-  syncBoardView();
+  if (syncBoard) syncBoardView();
 }
 
 export function syncFetchJobSummary(st) {

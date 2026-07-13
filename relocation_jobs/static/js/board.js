@@ -65,9 +65,22 @@ export function showJobsLoading() {
   syncBoardView({ loading: true });
 }
 
-export function applyBoardView() {
+export function applyBoardView({ enterAnimation = false } = {}) {
   state.allCompanies = state.boardCatalog;
+  const jobsEl = document.getElementById("jobs");
+  if (enterAnimation) {
+    jobsEl?.classList.add("board-enter");
+  } else {
+    jobsEl?.classList.remove("board-enter");
+  }
   syncBoardView();
+  if (enterAnimation && jobsEl) {
+    window.clearTimeout(state.boardEnterTimer);
+    state.boardEnterTimer = window.setTimeout(() => {
+      jobsEl.classList.remove("board-enter");
+      state.boardEnterTimer = null;
+    }, 400);
+  }
 }
 
 async function loadBoardCatalog(options = {}) {
@@ -112,6 +125,7 @@ export async function loadBoard(options = {}) {
   const preserveContent = options.preserveContent === true;
   const useOverlay = options.noOverlay !== true;
   const useTopBar = !useOverlay;
+  const enterAnimation = options.enterAnimation !== false && !preserveContent;
   if (useOverlay) {
     beginScreenLoad(overlayLabel(options, page, requestChanged));
   } else if (useTopBar) {
@@ -145,7 +159,7 @@ export async function loadBoard(options = {}) {
 
     if (useOverlay) setScreenLoadProgress(94);
     else if (useTopBar) setLoadingProgress(96);
-    applyBoardView();
+    applyBoardView({ enterAnimation });
   } finally {
     if (useOverlay) endScreenLoad();
     else if (useTopBar) finishLoadingProgress();

@@ -31,6 +31,18 @@ export const state = {
   lastFetchStatus: null,
   fetchControlsEnabled: false,
   frozenCompanyOrder: null,
+  fetchPollInFlight: false,
+  boardEnterTimer: null,
+
+  /** Fetch session — single-company fetch lifecycle to prevent stale UI. */
+  fetchSession: {
+    phase: "idle", // idle | starting | running | complete | settling
+    runId: null,
+    kind: null,    // "company" | "country"
+    country: null,
+    company: null,
+    boardDirty: false,
+  },
 };
 
 /** Called by api.js on 401 — wired in main.js to avoid circular imports. */
@@ -52,6 +64,55 @@ export function findCompany(country, company) {
 
 export function looseJobUrl(url) {
   return (url || "").trim().replace(/\/$/, "");
+}
+
+/**
+ * Fetch session helpers — single-company lifecycle.
+ * Each helper returns a shallow copy so callers can chain.
+ */
+export function beginCompanySession(country, company) {
+  state.fetchSession.phase = "starting";
+  state.fetchSession.runId = null;
+  state.fetchSession.kind = "company";
+  state.fetchSession.country = country;
+  state.fetchSession.company = company;
+  state.fetchSession.boardDirty = false;
+  return { ...state.fetchSession };
+}
+
+export function bindSessionRun(runId) {
+  state.fetchSession.phase = "running";
+  state.fetchSession.runId = runId;
+  return { ...state.fetchSession };
+}
+
+export function completeSession() {
+  state.fetchSession.phase = "complete";
+  state.fetchSession.boardDirty = true;
+  return { ...state.fetchSession };
+}
+
+export function endSession() {
+  state.fetchSession.phase = "idle";
+  state.fetchSession.runId = null;
+  state.fetchSession.kind = null;
+  state.fetchSession.country = null;
+  state.fetchSession.company = null;
+  state.fetchSession.boardDirty = false;
+}
+
+export function isSessionActive() {
+  return state.fetchSession.phase !== "idle";
+}
+
+export function isSessionRunning() {
+  return state.fetchSession.phase === "running" || state.fetchSession.phase === "starting";
+}
+
+export function sessionOwnsRun(runId) {
+  if (!isSessionRunning()) return false;
+  if (state.fetchSession.runId == null) return true; // no bound run yet — all status belongs to us
+  return Number(state.fetchSession.runId) === Number(runId);
 }
 
 function companyJobLists(company) {

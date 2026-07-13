@@ -1,6 +1,6 @@
 # Documentation
 
-**Last updated:** 2026-07-08
+**Last updated:** 2026-07-13
 
 All project docs live under `docs/`. [README](../README.md) at the repo root covers product setup and usage only.
 
@@ -18,7 +18,9 @@ All project docs live under `docs/`. [README](../README.md) at the repo root cov
 | Work on board sort, pagination, newest | [reference/board.md](reference/board.md) |
 | Board performance / read-model design (proposal) | [reference/board-read-model-proposal.md](reference/board-read-model-proposal.md) |
 | Fetch pipeline queue / Kafka placement (proposal) | [reference/kafka-fetch-pipeline-proposal.md](reference/kafka-fetch-pipeline-proposal.md) |
+| Multi-user scaling — SQS broker, DB pool, board projection (proposal) | [reference/multi-user-scaling-proposal.md](reference/multi-user-scaling-proposal.md) |
 | Full SPA UI modernization (proposal) | [reference/full-spa-ui-modernization-proposal.md](reference/full-spa-ui-modernization-proposal.md) |
+| Single-company fetch modal session (why it felt flaky) | [reference/fetch-panel-session.md](reference/fetch-panel-session.md) |
 | Catalog vs per-user tracking (design) | [reference/catalog-pattern.md](reference/catalog-pattern.md) |
 | Panel / admin statistics | [reference/stats.md](reference/stats.md) |
 | Test failures / catalog seed in tests | [reference/catalog-seed-test-failure.md](reference/catalog-seed-test-failure.md) |
@@ -44,7 +46,9 @@ docs/
     board.md                  pagination, “newest first” sort, timestamps
     board-read-model-proposal.md  board performance: projection table, cursors (proposal)
     kafka-fetch-pipeline-proposal.md  fetch/scrape work queue, Kafka placement (proposal)
+    multi-user-scaling-proposal.md  SQS job queue, DB pool, board projection for many users (proposal)
     full-spa-ui-modernization-proposal.md  React SPA, design system, dark/light, mobile (proposal)
+    fetch-panel-session.md    single-company fetch modal: session ownership + settle-once UX
     stats.md                  admin/user stats definitions
     business-rules.md         job buckets, orphans, apply/reject/not-for-me
     rules.md                  v2 coding standards (SQL in repo.py)
@@ -83,6 +87,7 @@ Agent skills: `.claude/skills/` (`getting-started` → `collaboration-style` →
 | Doc | Purpose |
 |-----|---------|
 | [reference/board.md](reference/board.md) | Board API, pagination, newest sort (mermaid) |
+| [reference/fetch-panel-session.md](reference/fetch-panel-session.md) | Single-company fetch modal session (stale UI / double board update) |
 | [reference/stats.md](reference/stats.md) | Admin/user stats definitions |
 | [reference/business-rules.md](reference/business-rules.md) | Job state contracts — read before tracking changes |
 

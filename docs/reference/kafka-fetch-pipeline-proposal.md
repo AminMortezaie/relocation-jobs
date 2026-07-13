@@ -6,6 +6,8 @@
 
 Related: [architecture.md](architecture.md), [rules.md](rules.md), [ec2-panel.md](../operations/ec2-panel.md), [stats.md](stats.md), [board-read-model-proposal.md](board-read-model-proposal.md)
 
+**Superseded (broker choice only):** [multi-user-scaling-proposal.md](multi-user-scaling-proposal.md) evaluates SQS (not considered here) against the options below for the specific case of per-user job submission (company fetch, PDF compile) and picks SQS — fully managed, $0 on a memory-constrained `t4g.micro`. This doc's problem statement (fetch pipeline coordination) and options A–D below are still accurate background; read both.
+
 ---
 
 ## Summary

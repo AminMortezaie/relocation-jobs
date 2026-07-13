@@ -104,6 +104,38 @@ Soft delete means every hide that affects the board should have a durable `job_t
 
 ---
 
+## Multi-user scaling (DB pool, SQS job queue, board projection)
+
+**Status:** planned (proposal written)
+**Priority:** high (blocks going beyond a single real user)
+**Context:** App has one real user today. Scaling to many concurrent users exposes: a single shared Postgres connection serializing all HTTP threads, per-request board re-flattening, and per-user job submission (company fetch, PDF compile) with no queue — one user's fetch/PDF request blocks another's via a global mutex. See [reference/multi-user-scaling-proposal.md](reference/multi-user-scaling-proposal.md).
+
+### Problem / goal
+
+- Concurrent users must not serialize on one DB connection or one global fetch mutex.
+- Per-user fetch/PDF job submission needs a durable queue with retry/DLQ, without adding memory load to the `t4g.micro` box.
+- Board reads must not degrade as user count grows (ties into the board read model item below).
+
+### Approach (summary)
+
+1. **Phase 0:** real Postgres connection pool (`core/db.py`) + gunicorn workers 1→2 — no new infra.
+2. **Phase 1:** Amazon SQS queues for company-fetch requests, country-fetch requests, and PDF render requests — chosen over Redis Streams/Celery/RabbitMQ (all add RAM load to the box) and Kafka/MSK (no free tier, ~$460+/mo). SQS is fully managed and has a permanent 1M req/mo free tier.
+3. **Phase 2:** board read model projection (`user_board_company`) — see item below, tracked independently.
+4. **Framework:** stay on sync Flask; do not adopt Quart (stagnant since Dec 2024); only consider FastAPI later if load-test profiling shows the sync request cycle itself is the ceiling.
+
+### Decision made
+
+- **Broker: SQS** (supersedes the Redis Streams / Kafka options considered in the fetch-pipeline-queue item below, for the specific case of per-user job submission).
+- **Framework: sync Flask**, FastAPI conditional on profiling data, Quart rejected.
+
+### Done when
+
+- [ ] Phase 0 shipped: connection pool, gunicorn workers=2, tests green
+- [ ] Phase 1 shipped: SQS queues + DLQs provisioned, fetch/PDF routes enqueue instead of blocking, worker script(s) deployed
+- [ ] Load test informs whether FastAPI (Phase 3) is warranted
+
+---
+
 ## Fetch pipeline queue (Kafka / Postgres / Redis Streams)
 
 **Status:** planned (proposal written)  

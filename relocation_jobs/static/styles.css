@@ -4947,7 +4947,7 @@ body.screen-loading #loadingBar {
   border-radius: var(--radius-sm);
 }
 
-/* ── Company card fade-in ──────────────────────────────── */
+/* ── Company card fade-in (entrance only) ──────────────── */
 @keyframes fadeInUp {
   /* Opacity-only fade — intentionally no `transform`. Animating transform and
      holding it via `both`/forwards fill leaves a matrix on the card (even the
@@ -4958,16 +4958,39 @@ body.screen-loading #loadingBar {
   to   { opacity: 1; }
 }
 
-.company-card {
+/* High-frequency republish (fetch settle, badge patch) must NOT replay entrance.
+   Only page load / pagination / filter-driven board loads set #jobs.board-enter. */
+#jobs.board-enter .company-card {
   animation: fadeInUp 0.25s ease both;
 }
 
-.company-card:nth-child(1)  { animation-delay: 0ms; }
-.company-card:nth-child(2)  { animation-delay: 30ms; }
-.company-card:nth-child(3)  { animation-delay: 60ms; }
-.company-card:nth-child(4)  { animation-delay: 90ms; }
-.company-card:nth-child(5)  { animation-delay: 120ms; }
-.company-card:nth-child(n+6){ animation-delay: 150ms; }
+#jobs.board-enter .company-card:nth-child(1)  { animation-delay: 0ms; }
+#jobs.board-enter .company-card:nth-child(2)  { animation-delay: 30ms; }
+#jobs.board-enter .company-card:nth-child(3)  { animation-delay: 60ms; }
+#jobs.board-enter .company-card:nth-child(4)  { animation-delay: 90ms; }
+#jobs.board-enter .company-card:nth-child(5)  { animation-delay: 120ms; }
+#jobs.board-enter .company-card:nth-child(n+6){ animation-delay: 150ms; }
+
+.fetch-review-ok-btn,
+.fetch-review-problem-btn {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.fetch-review-ok-btn:active:not(:disabled),
+.fetch-review-problem-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #jobs.board-enter .company-card {
+    animation: none;
+  }
+  .fetch-review-ok-btn:active:not(:disabled),
+  .fetch-review-problem-btn:active:not(:disabled) {
+    transform: none;
+  }
+}
 
 /* ── Mobile / touch foundations ────────────────────────── */
 

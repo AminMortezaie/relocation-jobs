@@ -73,6 +73,7 @@ ATS_TYPE_CHOICES: tuple[tuple[str, str], ...] = (
     ("workable", "Workable"),
     ("workday", "Workday"),
     ("hibob", "HiBob"),
+    ("successfactors", "SAP SuccessFactors"),
 )
 
 BOL_CAREERS_API = "https://careers.bol.com/api/v1/jobs/"

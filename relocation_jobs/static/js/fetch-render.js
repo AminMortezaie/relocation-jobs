@@ -254,7 +254,10 @@ export function showFetchPanel({
   clearFetchReviewContent();
   hideFetchReviewFooter();
   clearFetchCountryResults();
+  hideFetchCompletion();
   state.fetchReviewFeedback = null;
+  state.lastFetchReview = null;
+  state.lastFetchStatus = null;
   fetchPanelState.title = title || "Fetching companies";
   fetchPanelState.subtitle = subtitle || "Starting…";
   fetchPanelState.singleCompany = singleCompany;
@@ -421,12 +424,17 @@ export function finishFetchPanel({
   singleCompany = false,
   fetchRun = null,
   fetchStatus = null,
+  hideCompletionMeta = false,
 }) {
   fetchPanelState.title = title || (cancelled ? "Fetch cancelled" : "Fetch complete");
   fetchPanelState.subtitle = failed && !cancelled ? (subtitle || "Check the log for details.") : (subtitle || "");
-  updateFetchRunMeta(fetchStatus, { running: false, fetchRun });
+  if (hideCompletionMeta) {
+    hideFetchCompletion();
+  } else {
+    updateFetchRunMeta(fetchStatus, { running: false, fetchRun });
+  }
   setFetchPanelRunning(false);
-  state.fetchPanelSingle = false;
+  state.fetchPanelSingle = Boolean(singleCompany);
   setFetchLogMode(false);
   fetchPanelState.progressWrapHidden = singleCompany;
   if (cancelled) {

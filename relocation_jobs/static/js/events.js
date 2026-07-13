@@ -1,6 +1,6 @@
 /** DOM event listeners for the jobs panel. */
 
-import { state, companyKey, findCompany, onUnauthorized } from "./state.js";
+import { state, companyKey, findCompany, onUnauthorized, isSessionRunning } from "./state.js";
 import { $, toast, atsScoreTone, isNarrowViewport, debounce, SEARCH_DEBOUNCE_MS } from "./utils.js";
 import {
   removeCompany,
@@ -29,7 +29,7 @@ import {
   updateFetchHeaderUI,
 } from "./render.js";
 import { saveShowRejectedCompanies } from "./storage.js";
-import { fetchOneCompany, ensureFetchPolling } from "./scrape.js";
+import { fetchOneCompany, ensureFetchPolling, endSessionAndSettle } from "./scrape.js";
 import { fetchPanelState } from "./fetch-ui.js";
 import { openEditCareersDialog, openEditCompanyNameDialog, openEditCityDialog } from "./dialogs.js";
 import { saveCollapsedCompanies } from "./storage.js";
@@ -867,8 +867,12 @@ function bindToolbarEvents() {
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if (fetchPanelState.open) {
-      hideFetchPanel();
-      ensureFetchPolling();
+      if (isSessionRunning() || state.serverFetchRunning || state.fetchBusy || state.countryFetchActive) {
+        hideFetchPanel();
+        ensureFetchPolling();
+      } else {
+        void endSessionAndSettle({ closePanel: true }).then(() => ensureFetchPolling());
+      }
     }
     closeReferralPopovers();
     closeHideReasonPopovers();

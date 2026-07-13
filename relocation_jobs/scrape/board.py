@@ -30,6 +30,7 @@ from relocation_jobs.scrape.boards.playwright_ats import (
 )
 from relocation_jobs.scrape.boards.recruitee import fetch_recruitee_board
 from relocation_jobs.scrape.boards.smartrecruiters import fetch_smartrecruiters_board
+from relocation_jobs.scrape.boards.successfactors import fetch_successfactors_board
 from relocation_jobs.scrape.boards.teamtailor import fetch_teamtailor_board
 from relocation_jobs.scrape.boards.workable import fetch_workable_board
 from relocation_jobs.scrape.boards.workday import fetch_workday_board
@@ -59,6 +60,7 @@ _BOARD_FETCHERS: dict[str, BoardFetcher] = {
     "recruitee": fetch_recruitee_board,
     "rss": fetch_rss_board,
     "smartrecruiters": fetch_smartrecruiters_board,
+    "successfactors": fetch_successfactors_board,
     "teamtailor": fetch_teamtailor_board,
     "workable": fetch_workable_board,
     "workday": fetch_workday_board,

@@ -1,0 +1,87 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "cb2d63187567",
+  "session_id": "2a8bb205-a274-4efa-a639-86cd5c22f99e",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-13T17:20:14.170487Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "scripts/ec2_app_deploy.sh"
+  ],
+  "agent": "Cursor",
+  "model": "unknown",
+  "turn_id": "e19a9395aa17",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 164733,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1933696,
+    "output_tokens": 63995,
+    "api_call_count": 1
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-13T17:20:14.161063Z",
+    "agent_lines": 25,
+    "agent_removed": 10,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 25,
+    "total_lines_changed": 35,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 29,
+      "user_lines_removed": 17,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/a3I11ih5hwA5LoMlP0bS4/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/a3I11ih5hwA5LoMlP0bS4/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/how-it-works.html": 1,
+        "relocation_jobs/static/homepage/how-it-works.txt": 1,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 1,
+        "relocation_jobs/static/homepage/pricing.html": 1,
+        "relocation_jobs/static/homepage/pricing.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.txt": 1,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/U-RIF4z6pKpkGJiYvAJYh/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/U-RIF4z6pKpkGJiYvAJYh/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/how-it-works.html": 1,
+        "relocation_jobs/static/homepage/how-it-works.txt": 1,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 1,
+        "relocation_jobs/static/homepage/pricing.html": 1,
+        "relocation_jobs/static/homepage/pricing.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.txt": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.txt": 1
+      }
+    }
+  ]
+}

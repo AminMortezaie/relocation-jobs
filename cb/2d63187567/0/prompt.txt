@@ -1,0 +1,5 @@
+RUN tectonic --outdir /tmp/tectonic-warm /tmp/tectonic-warm/warm.tex     && rm -rf /tmp/tectonic-warm
+
+and some other commands are creating more downloads each time i deploy something on server.
+
+please see this and give me your solution on it.

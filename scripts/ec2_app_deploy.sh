@@ -151,11 +151,19 @@ cmd_open_sg() {
 #   docker system prune --volumes
 #   docker rm -v pg
 #   any prune that stops or removes container `pg`
+#
+# IMPORTANT: builder cache is only wiped on the FINAL prune call. Mid-deploy
+# prunes skip builder cache so layers from earlier builds (pip, tectonic
+# packages, Playwright chromium) are reused by later builds, avoiding
+# re-downloads on every deploy. Run `./ec2_app_deploy.sh prune` or wait
+# for the final deploy step to reclaim builder cache.
 remote_docker_prune() {
-  local label="${1:-}"
+  local builder="${1:-}"
+  local label="${2:-}"
   [[ -n "$label" ]] && log "Docker prune (${label})..."
-  ssh_cmd bash -s <<'EOF'
+  ssh_cmd bash -s -- "$builder" <<'SCRIPT'
 set -euo pipefail
+builder_arg="${1:-}"
 
 assert_db_safe() {
   local phase="$1"
@@ -173,21 +181,25 @@ assert_db_safe "before prune"
 printf '[ec2-app] disk before prune: '
 df -h / | awk 'NR==2 {print $3 " used / " $2 " (" $5 ")"}'
 
-# Dangling images only — not -a (unused), not volumes, not containers.
+# Dangling images only — never -a (unused), volumes, containers.
 docker image prune -f
-# BuildKit cache only — never --volumes / system prune.
-docker builder prune -af >/dev/null
+# Build cache — preserve between builds to avoid re-downloading tectonic
+# packages, pip deps, and Playwright chromium. Wipe only on final cleanup
+# and manual `prune` command.
+if [ "$builder_arg" = "builder" ]; then
+  docker builder prune -af >/dev/null
+fi
 
 assert_db_safe "after prune"
 printf '[ec2-app] disk after prune:  '
 df -h / | awk 'NR==2 {print $3 " used / " $2 " (" $5 ")"}'
 printf '[ec2-app] db guard: pg running, volume pgdata present\n'
-EOF
+SCRIPT
 }
 
 cmd_prune() {
   load_state
-  remote_docker_prune "manual"
+  remote_docker_prune "builder" "manual"
 }
 
 cmd_deploy() {
@@ -201,7 +213,8 @@ cmd_deploy() {
 
   cmd_sync
   # Free leftover images from the previous deploy before old+new layers coexist.
-  remote_docker_prune "before builds"
+  # Skip builder cache — keep pip/tectonic/playwright layers cached between builds.
+  remote_docker_prune "" "before builds"
 
   log "Building ${PANEL_IMAGE} on EC2 (arm64, may take a few minutes)..."
   ssh_cmd "cd ${REMOTE_DIR} && docker build -f Dockerfile.ec2 -t ${PANEL_IMAGE} ."
@@ -230,7 +243,8 @@ docker run -d --name ${PANEL_CONTAINER} --restart unless-stopped \\
 EOF
 
   # Drop the previous panel image before the ~2.5GB worker rebuild.
-  remote_docker_prune "after panel"
+  # Skip builder cache — preserve cached layers for worker build.
+  remote_docker_prune "" "after panel"
 
   log "Building ${WORKER_IMAGE} on EC2 (Playwright, may take several minutes)..."
   ssh_cmd "cd ${REMOTE_DIR} && docker build -f Dockerfile.ec2-worker -t ${WORKER_IMAGE} ."
@@ -266,7 +280,8 @@ docker run -d --name ${CADDY_CONTAINER} --restart unless-stopped \\
   caddy:2-alpine
 EOF
 
-  remote_docker_prune "after worker"
+  # Final cleanup — now ok to wipe builder cache since both builds are done.
+  remote_docker_prune "builder" "after worker"
   cmd_open_sg
   cmd_status
 }

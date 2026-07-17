@@ -1,0 +1,14 @@
+again its doing the same as before
+
+---
+
+The image size is gone too high.
+do you think is this related to this recent change?
+
+---
+
+can we reduce it?
+
+---
+
+Validation failed: new_years: Years not in master resume: 2026

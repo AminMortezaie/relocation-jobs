@@ -3,7 +3,7 @@
   "checkpoint_id": "beec450f7922",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 6,
+  "checkpoints_count": 7,
   "files_touched": [
     "relocation_jobs/scrape/boards/hibob.py",
     "relocation_jobs/scrape/boards/playwright_ats.py",
@@ -35,13 +35,20 @@
       "compact_transcript": "/be/ec450f7922/0/transcript.jsonl",
       "content_hash": "/be/ec450f7922/0/content_hash.txt",
       "prompt": "/be/ec450f7922/0/prompt.txt"
+    },
+    {
+      "metadata": "/be/ec450f7922/1/metadata.json",
+      "transcript": "/be/ec450f7922/1/full.jsonl",
+      "compact_transcript": "/be/ec450f7922/1/transcript.jsonl",
+      "content_hash": "/be/ec450f7922/1/content_hash.txt",
+      "prompt": "/be/ec450f7922/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 176918,
+    "input_tokens": 204872,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 3613312,
-    "output_tokens": 26886,
-    "api_call_count": 2
+    "cache_read_tokens": 4266112,
+    "output_tokens": 35492,
+    "api_call_count": 3
   }
 }

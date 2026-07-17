@@ -1,0 +1,6 @@
+i just deployed the website and the panel is down now.
+find the problem on aws.
+
+---
+
+start to do

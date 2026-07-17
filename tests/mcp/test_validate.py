@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+from datetime import date
+
 from relocation_jobs.mcp.validate import validate_tex_content
 
 MASTER = r"""
 \documentclass{article}
 \begin{document}
 \company{Example Corp} \hfill 2020 -- 2024\\
+\position{Backend Engineer}
+\end{document}
+"""
+
+MASTER_PRESENT = r"""
+\documentclass{article}
+\begin{document}
+\company{Example Corp} \hfill 2020 -- Present\\
 \position{Backend Engineer}
 \end{document}
 """
@@ -21,6 +31,23 @@ def test_validate_accepts_matching_tailored_tex():
 def test_validate_rejects_new_year():
     tailored = MASTER.replace("2024", "2025")
     result = validate_tex_content(tailored, MASTER)
+    assert result.ok is False
+    codes = {issue.code for issue in result.issues}
+    assert "new_years" in codes
+
+
+def test_validate_allows_current_year_when_master_has_present():
+    current = str(date.today().year)
+    tailored = MASTER_PRESENT.replace("Present", current)
+    result = validate_tex_content(tailored, MASTER_PRESENT)
+    assert result.ok is True
+    assert result.issues == []
+
+
+def test_validate_rejects_future_year_even_with_present():
+    future = str(date.today().year + 1)
+    tailored = MASTER_PRESENT.replace("Present", future)
+    result = validate_tex_content(tailored, MASTER_PRESENT)
     assert result.ok is False
     codes = {issue.code for issue in result.issues}
     assert "new_years" in codes

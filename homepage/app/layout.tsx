@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     "Find visa-sponsored software engineering roles in Europe. Search relocation-friendly openings in Germany, Netherlands, UK, and Portugal. Track applications and tailor your CV.",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/static/icons/apple-touch-icon.png" }],
   },
   openGraph: {
     title: "Relocation Jobs",

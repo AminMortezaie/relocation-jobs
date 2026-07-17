@@ -1,5 +1,6 @@
 # EC2 fetch worker (Playwright + scheduled country fetches).
-FROM python:3.12-bookworm
+# slim + chromium headless shell only — full bookworm + both chromium builds was ~2.5GB.
+FROM python:3.12-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -7,7 +8,8 @@ ENV PYTHONUNBUFFERED=1 \
     PANEL_SCRAPE_ENABLED=1 \
     FETCH_SCHEDULE_ENABLED=1 \
     FETCH_SCHEDULE_INTERVAL_HOURS=6 \
-    FETCH_SCHEDULE_CONCURRENCY=4
+    FETCH_SCHEDULE_CONCURRENCY=4 \
+    PLAYWRIGHT_CHROMIUM_USE_HEADLESS_SHELL=1
 
 WORKDIR /app
 
@@ -15,9 +17,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    && playwright install --with-deps chromium
+COPY requirements.txt requirements-playwright.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-playwright.txt \
+    && playwright install --with-deps --only-shell chromium
 
 COPY . .
 

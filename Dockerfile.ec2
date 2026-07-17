@@ -33,6 +33,7 @@ COPY deploy/ec2/tectonic-warm.tex /tmp/tectonic-warm/warm.tex
 RUN tectonic --outdir /tmp/tectonic-warm /tmp/tectonic-warm/warm.tex \
     && rm -rf /tmp/tectonic-warm
 
+# Panel does not scrape on EC2 — skip playwright (~130MB) and browsers.
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

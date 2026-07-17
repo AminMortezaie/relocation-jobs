@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 
 from relocation_jobs.mcp.types import ValidationIssue, ValidationResult
 
 _YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 _EMPLOYER_LINE_RE = re.compile(r"\\company\{([^}]+)\}")
+_OPEN_ENDED_RE = re.compile(r"\b(?:Present|Current|Now)\b", re.IGNORECASE)
 _MAX_LINES = 400
 
 
@@ -50,11 +52,17 @@ def _structure_issues(tex: str) -> list[ValidationIssue]:
     return issues
 
 
+def _years_allowed_from_open_ended(master_tex: str) -> set[str]:
+    if not _OPEN_ENDED_RE.search(master_tex):
+        return set()
+    return {str(date.today().year)}
+
+
 def _fact_issues(tex: str, master_tex: str) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     master_years = _extract_years(master_tex)
     tailored_years = _extract_years(tex)
-    extra_years = tailored_years - master_years
+    extra_years = tailored_years - master_years - _years_allowed_from_open_ended(master_tex)
     if extra_years:
         issues.append(ValidationIssue(
             code="new_years",

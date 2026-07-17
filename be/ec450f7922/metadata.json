@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "beec450f7922",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "files_touched": [
+    "relocation_jobs/scrape/boards/hibob.py",
+    "relocation_jobs/scrape/boards/playwright_ats.py",
+    "relocation_jobs/scrape/playwright_board.py",
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/jPECbl5vneSXwG6w3i-35/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/jPECbl5vneSXwG6w3i-35/_ssgManifest.js",
+    "relocation_jobs/static/homepage/how-it-works.html",
+    "relocation_jobs/static/homepage/how-it-works.txt",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt",
+    "relocation_jobs/static/homepage/pricing.html",
+    "relocation_jobs/static/homepage/pricing.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.html",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.html",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.html",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.html",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.txt",
+    "relocation_jobs/static/js/data.js",
+    "relocation_jobs/web/server.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/be/ec450f7922/0/metadata.json",
+      "transcript": "/be/ec450f7922/0/full.jsonl",
+      "compact_transcript": "/be/ec450f7922/0/transcript.jsonl",
+      "content_hash": "/be/ec450f7922/0/content_hash.txt",
+      "prompt": "/be/ec450f7922/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 176918,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3613312,
+    "output_tokens": 26886,
+    "api_call_count": 2
+  }
+}

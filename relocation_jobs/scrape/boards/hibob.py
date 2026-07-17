@@ -12,7 +12,9 @@ from relocation_jobs.core.ats_detection import (
     _playwright_sem,
 )
 from relocation_jobs.core.scrape_cancel import FetchCancelled, raise_if_cancelled
-from playwright.sync_api import sync_playwright
+
+if PLAYWRIGHT_AVAILABLE:
+    from playwright.sync_api import sync_playwright
 from relocation_jobs.scrape.boards._async import run_sync
 from relocation_jobs.scrape.descriptions import html_to_readable
 from relocation_jobs.scrape.listing import listing_job

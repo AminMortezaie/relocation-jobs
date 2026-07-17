@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -23,8 +24,8 @@ export default function PricingPage() {
       <div className="mx-auto max-w-site px-4 pb-8 pt-5 sm:px-5">
         <Header />
         <main className="mx-auto mt-12 max-w-2xl">
-          <h1 className="text-fluid-hero text-text">Plans & Pricing</h1>
-          <p className="mt-4 text-sm leading-relaxed text-muted">
+          <h1 className="text-fluid-hero text-text-primary">Plans & Pricing</h1>
+          <p className="mt-4 text-base leading-relaxed text-text-secondary">
             Relocation Jobs is in active development. The public preview is free
             for everyone. Paid packages for full board access, company workspace
             tools, and CV reframe pipeline are being designed.
@@ -32,42 +33,38 @@ export default function PricingPage() {
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2">
             <Card className="px-5 py-6">
-              <h2 className="text-lg font-semibold text-text">Free Preview</h2>
-              <p className="mt-1 text-2xl font-bold text-text">$0</p>
-              <ul className="mt-4 space-y-2 text-sm text-muted">
+              <h2 className="font-display text-xl font-bold text-text-primary">Free Preview</h2>
+              <p className="mt-1 font-display text-2xl font-extrabold text-text-primary">$0</p>
+              <ul className="mt-4 space-y-2 text-sm text-text-secondary">
                 <li>Public catalog overview</li>
                 <li>Company preview cards</li>
                 <li>Country-level stats</li>
                 <li>Search public preview</li>
               </ul>
-              <a
-                href="/"
-                className="btn-primary mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-white"
-              >
+              <Button as="a" href="/" variant="primary" className="mt-6">
                 Browse preview
-              </a>
+              </Button>
             </Card>
 
             <Card className="px-5 py-6" accentBar>
-              <h2 className="text-lg font-semibold text-text">Full Access</h2>
-              <p className="mt-1 text-2xl font-bold text-text">Coming soon</p>
-              <ul className="mt-4 space-y-2 text-sm text-muted">
+              <h2 className="font-display text-xl font-bold text-text-primary">Full Access</h2>
+              <p className="mt-1 font-display text-2xl font-extrabold text-text-primary">
+                Coming soon
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-text-secondary">
                 <li>Full company board</li>
                 <li>Per-user apply/reject tracking</li>
                 <li>Company workspace + documents</li>
                 <li>Tailored CV reframe pipeline</li>
                 <li>Cover letter generation</li>
               </ul>
-              <a
-                href="/panel"
-                className="btn-primary mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-white"
-              >
+              <Button as="a" href="/panel" variant="primary" className="mt-6">
                 Sign in for early access
-              </a>
+              </Button>
             </Card>
           </div>
 
-          <p className="mt-8 text-center text-xs text-muted">
+          <p className="mt-8 text-center text-xs text-text-muted">
             Pricing details will be announced when the full access plan launches.
             Current users get grandfathered access.
           </p>

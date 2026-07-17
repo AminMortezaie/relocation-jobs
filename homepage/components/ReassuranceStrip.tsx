@@ -7,15 +7,12 @@ const ITEMS = [
 
 export function ReassuranceStrip() {
   return (
-    <section className="section-compact" aria-label="Reassurance">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <section className="section-compact" aria-label="Trust">
+      <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-y border-border-subtle py-4">
         {ITEMS.map((item) => (
-          <div
-            key={item.text}
-            className="surface-card flex items-start gap-3 rounded-app px-4 py-3.5"
-          >
+          <div key={item.text} className="inline-flex items-center gap-2 text-text-muted">
             <ReassuranceIcon type={item.icon} />
-            <p className="text-sm font-normal leading-snug text-text">{item.text}</p>
+            <p className="text-sm font-medium">{item.text}</p>
           </div>
         ))}
       </div>
@@ -24,7 +21,7 @@ export function ReassuranceStrip() {
 }
 
 function ReassuranceIcon({ type }: { type: (typeof ITEMS)[number]["icon"] }) {
-  const className = "mt-px h-4 w-4 shrink-0 text-accent-hover";
+  const className = "h-4 w-4 shrink-0 text-accent-blue";
 
   if (type === "check") {
     return (

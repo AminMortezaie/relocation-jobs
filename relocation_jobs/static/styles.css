@@ -1,35 +1,8 @@
+@import url("./design-tokens.css");
+
 :root {
-  --bg: #090b10;
-  --bg-elevated: #0f1218;
-  --surface: #141820;
-  --surface2: #1a1f28;
-  --surface-hover: #212733;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.11);
-  --text: #eef1f6;
-  --muted: #8b93a3;
-  --accent: #5b8def;
-  --accent-hover: #7aa8ff;
-  --accent-soft: rgba(91, 141, 239, 0.14);
-  --success: #34d399;
-  --success-soft: rgba(52, 211, 153, 0.12);
-  --warn: #f5a623;
-  --warn-soft: rgba(245, 166, 35, 0.12);
-  --danger: #f87171;
-  --danger-soft: rgba(248, 113, 113, 0.12);
-  --referral: #7aa8ff;
-  --referral-soft: rgba(122, 168, 255, 0.12);
-  --visa: #a78bfa;
-  --visa-soft: rgba(167, 139, 250, 0.14);
-  --brand-sky: #38bdf8;
-  --brand-sky-soft: rgba(56, 189, 248, 0.14);
-  --brand-gradient: linear-gradient(135deg, #5b8def 0%, #38bdf8 52%, #a78bfa 100%);
-  --brand-gradient-soft: linear-gradient(135deg, rgba(91, 141, 239, 0.18) 0%, rgba(56, 189, 248, 0.1) 48%, rgba(167, 139, 250, 0.14) 100%);
-  --radius: 14px;
-  --radius-sm: 10px;
-  --radius-pill: 999px;
-  --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.22);
+  /* Night Flight semantic tokens live in design-tokens.css.
+     Panel keeps typography / spacing scale below. */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -76,6 +49,11 @@ textarea:focus-visible {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+
+  button.primary:hover:not(:disabled),
+  .company-card:hover {
+    transform: none;
+  }
 }
 
 .text-xs { font-size: var(--text-xs); line-height: var(--leading-tight); }
@@ -95,9 +73,8 @@ body {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   font-size: var(--text-base);
   background:
-    radial-gradient(ellipse 85% 55% at 50% -18%, rgba(56, 189, 248, 0.16), transparent 52%),
-    radial-gradient(ellipse 55% 42% at 100% 0%, rgba(167, 139, 250, 0.11), transparent 48%),
-    radial-gradient(ellipse 45% 35% at 0% 100%, rgba(91, 141, 239, 0.1), transparent 42%),
+    radial-gradient(ellipse 70% 45% at 85% 8%, rgba(59, 130, 246, 0.2), transparent 55%),
+    radial-gradient(ellipse 55% 40% at 8% 90%, rgba(255, 107, 53, 0.12), transparent 50%),
     var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -180,13 +157,13 @@ header {
   justify-content: center;
   width: 2.65rem;
   height: 2.65rem;
-  border-radius: 12px;
-  background: #fff;
+  border-radius: 0;
+  background: transparent;
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
-  overflow: hidden;
-  padding: 0.28rem;
+  box-shadow: none;
+  overflow: visible;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -196,6 +173,7 @@ header {
   height: 100%;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
 }
 
 .brand-text {
@@ -223,9 +201,9 @@ header {
 .brand-lockup--compact .brand-mark {
   width: 2.15rem;
   height: 2.15rem;
-  border-radius: 10px;
-  padding: 0.22rem;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
 .brand-lockup--compact .brand-mark svg,
@@ -258,8 +236,9 @@ header {
 .login-brand .brand-mark {
   width: 3.25rem;
   height: 3.25rem;
-  border-radius: 14px;
-  padding: 0.35rem;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .login-brand .brand-mark svg,
@@ -764,13 +743,18 @@ select, button {
 select:focus, button:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 button.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--accent-primary, var(--accent));
+  border-color: var(--accent-primary, var(--accent));
+  color: var(--text-on-accent, #fff);
   font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: background var(--duration-normal) var(--ease-out), transform var(--duration-normal) var(--ease-out);
 }
 
-button.primary:hover:not(:disabled) { background: var(--accent-hover); }
+button.primary:hover:not(:disabled) {
+  background: var(--accent-primary-hover, var(--accent-hover));
+  transform: scale(1.02);
+}
 
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -931,8 +915,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .stats-fetch-run-status--error {
-  color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .filters {
@@ -952,9 +936,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   gap: 0.55rem;
   margin-bottom: 0;
   padding: 0.6rem;
-  border-radius: var(--radius);
-  border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle, var(--border));
+  background: var(--bg-surface, var(--surface));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   overflow: visible;
 }
 
@@ -1373,11 +1359,13 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .company-card {
   position: relative;
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+  background: var(--bg-surface, var(--surface));
+  border: 1px solid var(--border-subtle, var(--border));
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-card, var(--shadow-sm));
+  transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out), transform var(--duration-normal) var(--ease-out);
 }
 
 .company-card::before {
@@ -1387,24 +1375,25 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   top: 0;
   bottom: 0;
   width: 4px;
-  background: linear-gradient(180deg, var(--brand-sky) 0%, var(--accent) 60%, var(--visa) 100%);
+  background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-blue) 60%, var(--accent-purple) 100%);
   opacity: 0.72;
   pointer-events: none;
   border-radius: var(--radius) 0 0 var(--radius);
 }
 
 .company-card:hover {
-  border-color: color-mix(in srgb, var(--brand-sky) 35%, var(--border-strong));
-  box-shadow: 0 8px 28px rgba(56, 189, 248, 0.12), var(--shadow-sm);
+  border-color: var(--border-hover, var(--border-strong));
+  box-shadow: var(--shadow-card, var(--shadow));
+  transform: translateY(-2px);
 }
 
 .company-card.company-applied {
   opacity: 0.78;
-  border-color: rgba(61, 214, 140, 0.35);
+  border-color: color-mix(in srgb, var(--accent-green) 35%, transparent);
 }
 
 .company-card.company-awaiting-response {
-  border-color: rgba(167, 139, 250, 0.35);
+  border-color: color-mix(in srgb, var(--accent-purple) 35%, transparent);
   background: color-mix(in srgb, var(--visa-soft) 35%, var(--bg-elevated));
 }
 
@@ -1828,16 +1817,16 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   text-transform: none;
 }
 
-.badge.visa { background: var(--visa-soft); color: #c4b5fd; border-color: rgba(167, 139, 250, 0.2); }
-.badge.job-city { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-hover); border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
-.badge.country { background: var(--accent-soft); color: var(--accent-hover); }
+.badge.visa { background: var(--accent-green-soft, var(--success-soft)); color: var(--accent-green); border-color: color-mix(in srgb, var(--accent-green) 28%, transparent); }
+.badge.job-city { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: color-mix(in srgb, var(--accent-blue) 25%, transparent); }
+.badge.country { background: var(--accent-blue-soft); color: var(--accent-blue); }
 .badge.date { background: var(--surface2); color: var(--muted); border-color: var(--border); }
-.badge.applied { background: var(--success-soft); color: #6ee7b7; border-color: rgba(52, 211, 153, 0.2); }
-.badge.awaiting-response { background: var(--visa-soft); color: #c4b5fd; border-color: rgba(167, 139, 250, 0.25); }
-.badge.rejected { background: var(--danger-soft); color: #fca5a5; border-color: rgba(248, 113, 113, 0.2); }
-.badge.seen { background: rgba(148, 163, 184, 0.08); color: #94a3b8; border-color: rgba(148, 163, 184, 0.18); }
-.badge.looking-to-apply { background: rgba(36, 140, 251, 0.1); color: #248cfb; border-color: rgba(36, 140, 251, 0.25); }
-.badge.fetch-problem { background: var(--warn-soft); color: #fbbf24; border-color: rgba(245, 166, 35, 0.2); }
+.badge.applied { background: var(--accent-green-soft, var(--success-soft)); color: var(--accent-green); border-color: color-mix(in srgb, var(--accent-green) 28%, transparent); }
+.badge.awaiting-response { background: var(--accent-purple-soft, var(--visa-soft)); color: var(--accent-purple); border-color: color-mix(in srgb, var(--accent-purple) 28%, transparent); }
+.badge.rejected { background: var(--danger-soft); color: var(--text-muted, var(--muted)); border-color: var(--border-subtle, var(--border)); }
+.badge.seen { background: color-mix(in srgb, var(--text-muted) 8%, transparent); color: var(--text-muted, var(--muted)); border-color: color-mix(in srgb, var(--text-muted) 18%, transparent); }
+.badge.looking-to-apply { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: color-mix(in srgb, var(--accent-blue) 28%, transparent); }
+.badge.fetch-problem { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 28%, transparent); }
 
 .job-card.applied {
   opacity: 0.72;
@@ -1930,21 +1919,21 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .looking-to-apply-btn {
-  border: 1px solid rgba(36, 140, 251, 0.35);
-  background: rgba(36, 140, 251, 0.08);
-  color: #248cfb;
+  border: 1px solid color-mix(in srgb, var(--accent-blue) 35%, transparent);
+  background: var(--accent-blue-soft);
+  color: var(--accent-blue);
 }
 
 .looking-to-apply-btn:hover:not(:disabled) {
-  background: rgba(36, 140, 251, 0.18);
-  border-color: rgba(36, 140, 251, 0.5);
-  color: #5aaeff;
+  background: color-mix(in srgb, var(--accent-blue) 22%, transparent);
+  border-color: color-mix(in srgb, var(--accent-blue) 50%, transparent);
+  color: var(--accent-blue);
 }
 
 .looking-to-apply-btn.active {
-  border-color: rgba(36, 140, 251, 0.55);
-  background: rgba(36, 140, 251, 0.2);
-  color: #7fbfff;
+  border-color: color-mix(in srgb, var(--accent-blue) 55%, transparent);
+  background: color-mix(in srgb, var(--accent-blue) 22%, transparent);
+  color: var(--accent-blue);
 }
 
 .saw-before-btn {

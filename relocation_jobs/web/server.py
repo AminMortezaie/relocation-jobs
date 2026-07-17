@@ -31,6 +31,7 @@ PUBLIC_MARKETING_PATHS = (
     "/relocation-jobs-netherlands",
     "/relocation-jobs-uk",
     "/relocation-jobs-portugal",
+    "/relocation-jobs-ireland",
 )
 
 PRIVATE_ROBOTS_DISALLOW = (
@@ -131,6 +132,17 @@ def homepage_icon():
     return Response(status=404)
 
 
+@app.route("/brand/<path:asset_path>")
+def homepage_brand_assets(asset_path):
+    brand_dir = HOMEPAGE_STATIC / "brand"
+    target = (brand_dir / asset_path).resolve()
+    if not str(target).startswith(str(brand_dir.resolve())) or not target.is_file():
+        return Response(status=404)
+    resp = send_from_directory(brand_dir, asset_path)
+    resp.headers["Cache-Control"] = "public, max-age=86400"
+    return resp
+
+
 @app.route("/panel")
 def panel_page():
     resp = send_from_directory(STATIC, "index.html")
@@ -186,18 +198,26 @@ def _is_marketing_path(path: str) -> bool:
 
 # Marketing route catch-all — must be the final route so Flask matches
 # all explicit routes (panel, admin, robots, sitemap, api/*, etc.) first.
+def _marketing_404():
+    not_found = HOMEPAGE_STATIC / "404.html"
+    if not_found.is_file():
+        resp = send_from_directory(HOMEPAGE_STATIC, "404.html")
+        resp.headers["Cache-Control"] = "no-store"
+        resp.status_code = 404
+        return resp
+    return Response(status=404)
+
+
 @app.route("/<path:slug>")
 def marketing_page(slug: str):
     path = f"/{slug}"
     if not _is_marketing_path(path):
-        return Response(status=404)
-    # Next.js static export produces <slug>.html at the root level.
-    # Strip trailing slash and serve the .html file.
+        return _marketing_404()
     segment = slug.rstrip("/")
     filename = f"{segment}.html"
     index = HOMEPAGE_STATIC / filename
     if not index.is_file():
-        return Response(status=404)
+        return _marketing_404()
     resp = send_from_directory(HOMEPAGE_STATIC, filename)
     resp.headers["Cache-Control"] = "no-store"
     return resp

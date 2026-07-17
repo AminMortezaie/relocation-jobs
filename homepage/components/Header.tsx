@@ -1,4 +1,5 @@
-import { BrandMark } from "@/components/BrandMark";
+import { BrandLockup } from "@/components/BrandMark";
+import { Button } from "@/components/ui/Button";
 
 const NAV_LINKS = [
   { href: "/how-it-works", label: "How it works" },
@@ -9,31 +10,21 @@ const NAV_LINKS = [
 
 export function Header() {
   return (
-    <header className="surface-card relative overflow-visible rounded-app shadow-header">
-      <span
-        className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-accent via-brand-sky to-visa"
-        aria-hidden="true"
-      />
-
-      <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-5">
-        <a href="/" className="inline-flex min-w-0 items-center gap-3 text-inherit no-underline">
-          <BrandMark />
-          <span className="flex min-w-0 flex-col gap-0.5">
-            <span className="text-lg font-semibold tracking-[-0.02em] text-text">
-              Relocation Jobs
-            </span>
-            <span className="text-xs font-normal text-muted">
-              Visa-friendly roles abroad
-            </span>
-          </span>
+    <header className="nav-glass sticky top-3 z-40 rounded-2xl shadow-header">
+      <div className="flex flex-wrap items-center justify-between gap-4 px-4 py-3.5 sm:px-5">
+        <a href="/" className="inline-flex min-w-0 items-center text-inherit no-underline">
+          <BrandLockup />
         </a>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <nav aria-label="Primary" className="hidden sm:block">
+          <nav aria-label="Primary" className="hidden md:block">
             <ul className="flex items-center gap-2">
               {NAV_LINKS.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="pill-control text-sm font-medium">
+                  <a
+                    href={link.href}
+                    className="rounded-lg px-3 py-1.5 text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
+                  >
                     {link.label}
                   </a>
                 </li>
@@ -41,24 +32,16 @@ export function Header() {
             </ul>
           </nav>
 
-          <a
-            href="/panel"
-            className="pill-control hidden text-sm font-semibold sm:inline-flex"
-          >
+          <Button as="a" href="/panel" variant="primary" className="hidden sm:inline-flex">
             Sign in
-          </a>
-
-          <a
-            href="/panel"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-accent to-[#6b5ce7] text-xs font-bold text-white shadow-[0_0_0_2px_#080a0f,0_0_0_3px_rgba(255,255,255,0.1)]"
-            aria-label="Sign in to Relocation Jobs"
-          >
-            RJ
-          </a>
+          </Button>
         </div>
       </div>
 
-      <nav aria-label="Primary mobile" className="border-t border-white/[0.07] px-4 py-3 sm:hidden">
+      <nav
+        aria-label="Primary mobile"
+        className="border-t border-border-subtle px-4 py-3 md:hidden"
+      >
         <ul className="flex flex-wrap gap-2">
           {NAV_LINKS.map((link) => (
             <li key={link.label}>

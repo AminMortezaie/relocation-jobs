@@ -3,14 +3,15 @@ from __future__ import annotations
 import logging
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
-from playwright.sync_api import sync_playwright
-
 from relocation_jobs.core.ats_detection import (
     PLAYWRIGHT_AVAILABLE,
     _playwright_browser_context,
     _playwright_pause,
     _playwright_sem,
 )
+
+if PLAYWRIGHT_AVAILABLE:
+    from playwright.sync_api import sync_playwright
 from relocation_jobs.core.scrape_cancel import FetchCancelled, raise_if_cancelled
 from relocation_jobs.fetch.timeouts import playwright_board_timeout_seconds
 from relocation_jobs.scrape.dom_listing import jobs_from_listing_html

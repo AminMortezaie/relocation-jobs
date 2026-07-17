@@ -79,10 +79,10 @@ export function SearchResults() {
     >
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 id="search-results-heading" className="text-section-title text-text">
+          <h2 id="search-results-heading" className="text-section-title text-text-primary">
             {loading ? "Searching catalog…" : "Companies hiring abroad"}
           </h2>
-          <p className="mt-1 text-sm font-normal text-muted">
+          <p className="mt-1 text-sm font-normal text-text-secondary">
             {summary
               ? `Preview for ${summary} — sign in to see open roles.`
               : "Preview from the shared catalog — sign in to see open roles."}
@@ -94,7 +94,7 @@ export function SearchResults() {
       </div>
 
       {error ? (
-        <div className="surface-card rounded-app px-4 py-6 text-sm text-muted">{error}</div>
+        <div className="card rounded-2xl px-4 py-6 text-sm text-text-muted">{error}</div>
       ) : null}
 
       {!error && loading ? (
@@ -102,7 +102,7 @@ export function SearchResults() {
           {[0, 1, 2].map((key) => (
             <div
               key={key}
-              className="surface-card h-40 animate-pulse rounded-app"
+              className="card h-40 animate-pulse rounded-2xl"
               aria-hidden="true"
             />
           ))}
@@ -110,14 +110,14 @@ export function SearchResults() {
       ) : null}
 
       {!error && !loading && companies.length === 0 ? (
-        <div className="surface-card rounded-app px-4 py-8 text-center">
-          <p className="text-sm font-medium text-text">No matching companies in the preview.</p>
-          <p className="mt-2 text-sm font-normal text-muted">
+        <div className="card rounded-2xl px-4 py-8 text-center">
+          <p className="text-sm font-medium text-text-primary">No matching companies in the preview.</p>
+          <p className="mt-2 text-sm font-normal text-text-secondary">
             Try a broader search or country, or sign in to browse the full board.
           </p>
           <a
             href={panelHref(filters)}
-            className="btn-primary mt-4 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-white"
+            className="btn-primary mt-4 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-text-on-accent"
           >
             Sign in
           </a>
@@ -129,7 +129,7 @@ export function SearchResults() {
           {companies.map((company) => (
             <Card key={`${company.country}-${company.name}`} accentBar className="flex h-full flex-col p-4 pl-5">
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-semibold tracking-[-0.02em] text-text">
+                <h3 className="font-display text-xl font-bold tracking-[-0.02em] text-text-primary">
                   {company.name}
                 </h3>
                 <Pill variant="country">{company.country_label || company.country}</Pill>
@@ -137,16 +137,16 @@ export function SearchResults() {
                   <Pill variant="visa">Visa-friendly</Pill>
                 ) : null}
               </div>
-              <p className="text-xs font-normal text-muted">
+              <p className="text-xs font-medium tracking-[0.02em] text-text-muted">
                 {company.job_count} open role{company.job_count !== 1 ? "s" : ""}
                 {company.city ? ` · ${company.city}` : ""}
               </p>
-              <p className="mt-3 border-t border-white/[0.07] pt-3 text-sm font-normal text-muted">
+              <p className="mt-3 border-t border-border-subtle pt-3 text-sm font-normal text-text-secondary">
                 Sign in to see positions and track applications.
               </p>
               <a
                 href={panelHref(filters)}
-                className="mt-3 inline-flex text-sm font-medium text-accent-hover hover:text-text"
+                className="mt-3 inline-flex text-sm font-medium text-accent-primary hover:text-accent-primary-hover"
               >
                 Sign in to see roles →
               </a>

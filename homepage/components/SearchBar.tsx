@@ -51,18 +51,18 @@ export function SearchBar({
     <form
       id={id}
       onSubmit={handleSubmit}
-      className={`flex flex-col gap-2 sm:flex-row sm:items-stretch ${compact ? "" : "sm:gap-3"}`}
+      className={`flex flex-col overflow-hidden rounded-xl border border-border-subtle bg-bg-surface sm:flex-row sm:items-stretch ${compact ? "" : ""}`}
     >
       <label className="sr-only" htmlFor={roleId}>
         Role or stack
       </label>
-      <div className="relative min-w-0 flex-1">
+      <div className="relative min-w-0 flex-1 border-b border-border-subtle sm:border-b-0 sm:border-r">
         <StackIcon />
         <select
           id={roleId}
           name="q"
           defaultValue={defaultFilters?.q ?? ""}
-          className="select-pill"
+          className="select-pill rounded-none border-0 bg-transparent shadow-none"
         >
           {ROLES.map((option) => (
             <option key={option.value || "all"} value={option.value}>
@@ -76,13 +76,13 @@ export function SearchBar({
       <label className="sr-only" htmlFor={countryId}>
         Country
       </label>
-      <div className="relative min-w-0 flex-1 sm:max-w-[11rem]">
+      <div className="relative min-w-0 flex-1 border-b border-border-subtle sm:max-w-[11rem] sm:border-b-0 sm:border-r">
         <GlobeIcon />
         <select
           id={countryId}
           name="country"
           defaultValue={defaultFilters?.country ?? "all"}
-          className="select-pill"
+          className="select-pill rounded-none border-0 bg-transparent shadow-none"
         >
           {COUNTRIES.map((option) => (
             <option key={option.value} value={option.value}>
@@ -95,7 +95,7 @@ export function SearchBar({
 
       <button
         type="submit"
-        className="btn-primary inline-flex shrink-0 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold text-white"
+        className="btn-primary inline-flex shrink-0 items-center justify-center rounded-none px-5 py-3 text-sm font-semibold text-text-on-accent sm:rounded-r-xl"
       >
         Search roles
       </button>
@@ -106,7 +106,7 @@ export function SearchBar({
 function StackIcon() {
   return (
     <svg
-      className="select-icon pointer-events-none absolute left-3.5 h-[15px] w-[15px] text-muted"
+      className="select-icon pointer-events-none absolute left-3.5 h-[15px] w-[15px] text-text-muted"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -124,7 +124,7 @@ function StackIcon() {
 function GlobeIcon() {
   return (
     <svg
-      className="select-icon pointer-events-none absolute left-3.5 h-[15px] w-[15px] text-muted"
+      className="select-icon pointer-events-none absolute left-3.5 h-[15px] w-[15px] text-text-muted"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -140,7 +140,7 @@ function GlobeIcon() {
 function Chevron() {
   return (
     <svg
-      className="select-icon pointer-events-none absolute right-3.5 h-3.5 w-3.5 text-muted"
+      className="select-icon pointer-events-none absolute right-3.5 h-3.5 w-3.5 text-text-muted"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

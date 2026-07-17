@@ -31,13 +31,20 @@ export async function loadCountries() {
   sel.innerHTML = countries.map((c) =>
     `<option value="${c.id}">${c.label}</option>`
   ).join("");
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get("country");
   const saved = localStorage.getItem("panel_country");
-  if (saved && countries.some((c) => c.id === saved)) {
-    sel.value = saved;
+  const pick = [fromUrl, saved].find((id) => id && countries.some((c) => c.id === id));
+  if (pick) {
+    sel.value = pick;
+    if (fromUrl) localStorage.setItem("panel_country", fromUrl);
   } else {
     const first = countries.find((c) => c.id !== "all");
     if (first) sel.value = first.id;
   }
+  const q = params.get("q");
+  const search = $("search");
+  if (q && search) search.value = q;
 }
 
 export function getCachedAtsTypes() {

@@ -1,0 +1,56 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "42755e1bf82a",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "files_touched": [
+    "homepage/app/globals.css",
+    "homepage/components/SearchResults.tsx",
+    "homepage/lib/search.ts",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/IV4d5nOlF92_lNodAknJ-/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/IV4d5nOlF92_lNodAknJ-/_ssgManifest.js",
+    "relocation_jobs/static/homepage/_next/static/ZZ5qS1Tb6ZY7q1Y20shxx/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/ZZ5qS1Tb6ZY7q1Y20shxx/_ssgManifest.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/page-5486b4016c3b0516.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/page-baa245517aec82df.js",
+    "relocation_jobs/static/homepage/_next/static/css/3e49254c054767d9.css",
+    "relocation_jobs/static/homepage/_next/static/css/a045a3740ed5428d.css",
+    "relocation_jobs/static/homepage/how-it-works.html",
+    "relocation_jobs/static/homepage/how-it-works.txt",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt",
+    "relocation_jobs/static/homepage/pricing.html",
+    "relocation_jobs/static/homepage/pricing.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.html",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-ireland.html",
+    "relocation_jobs/static/homepage/relocation-jobs-ireland.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.html",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.html",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.html",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.txt",
+    "relocation_jobs/web/routes/public.py",
+    "tests/web/test_public_api.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/42/755e1bf82a/0/metadata.json",
+      "transcript": "/42/755e1bf82a/0/full.jsonl",
+      "compact_transcript": "/42/755e1bf82a/0/transcript.jsonl",
+      "content_hash": "/42/755e1bf82a/0/content_hash.txt",
+      "prompt": "/42/755e1bf82a/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 219886,
+    "cache_creation_tokens": 1086010,
+    "cache_read_tokens": 21144669,
+    "output_tokens": 82974,
+    "api_call_count": 6
+  }
+}

@@ -1,0 +1,31 @@
+when i click on find roles on hompage it shows me lots of unrelevant to homepage.
+think about something that be a user friendly and focus on visa sponsership positions.
+
+use skills to create something that production and top grade solution and impress users
+
+---
+
+you dont have commit authority also you didnot find anything 
+you need to make it less and also show some highlighted company no need to put all the data, just show something that makes user impressed.
+
+---
+
+first you need to ensure that your query has result and then apply it on homepage.
+cause the queries you write is not having results.
+
+first ensure you have result then write it down.
+
+---
+
+no matter just change it and users see the companies.
+now.
+
+---
+
+ok now you should make this company card here in homepage and UX friendly, use skills to make it something that is modern design and complete user friendly, think deeply to find the best thing u can.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.

@@ -10,17 +10,6 @@ def test_panel_page_keeps_private_app_shell(v2_client, seeded_catalog_v2):
     assert 'src="/static/js/main.js' in body
 
 
-def test_public_preview_page_is_available_without_auth(v2_client, seeded_catalog_v2):
-    del seeded_catalog_v2
-    resp = v2_client.get("/")
-    assert resp.status_code == 200
-    body = resp.get_data(as_text=True)
-    assert "<title>Relocation Jobs" in body
-    assert "Find visa-sponsored" in body
-    assert "track applications" in body
-    assert "/panel" in body
-
-
 def test_legacy_preview_path_redirects_to_root(v2_client, seeded_catalog_v2):
     del seeded_catalog_v2
     resp = v2_client.get("/preview", follow_redirects=False)

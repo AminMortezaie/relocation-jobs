@@ -1,0 +1,91 @@
+when showing mobile version each company might have dozens of position and user needs to scroll untill company positions ends.
+its a bad UX pattern and should be relosved.
+
+whats your idea to fix this problem.
+you need to use skills to find out the best practice here.
+
+---
+
+when showing mobile version each company might have dozens of position and user needs to scroll untill company positions ends.
+its a bad UX pattern and should be relosved.
+
+whats your idea to fix this problem.
+you need to use skills to find out the best practice here.
+
+---
+
+use ux-skills and double check your method with it
+
+---
+
+go
+
+---
+
+also see the design there for each position and also company card they're not user friendly, see the ux-skills and then tell me how you can make it better and more use friendly.
+
+---
+
+2
+
+---
+
+use new skill which i added to .cursor skills ui-ux-pro max and review your idea
+
+---
+
+ok build it to see what you want to make
+
+---
+
+see the mobile version and get some screenshots and you can see that i has some problems in mobile version and you need to fix them
+
+---
+
+the size of button is different and the design is not good, use skills to refactor the design and give me a modern and industry grade design not this.
+
+---
+
+its so better now.
+
+---
+
+pin role should be seperated and not among buttons.
+
+---
+
+can you see hallmark in agents?
+
+---
+
+hallmark redesign
+
+---
+
+did you build it?
+
+---
+
+nothing changed
+
+---
+
+apply Cold Snap hallmark, can you do this?
+
+---
+
+i want to see how it changes so you should apply it  in only the company/position cards but keep the color pallet we use here.
+use skills to do this.
+
+---
+
+much better.
+if we want to change the color pallete to what the theme is, can you apply it?
+
+---
+
+great.
+i have problem with the colors used but its much better i think its time to apply to whole webiste with preserving orange we have in brand.
+
+write down a prompt to give another agent refactor the whole website.
+you need to use skills and mention which skills should be used

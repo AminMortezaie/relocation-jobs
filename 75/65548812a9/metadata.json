@@ -3,7 +3,7 @@
   "checkpoint_id": "7565548812a9",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 27,
+  "checkpoints_count": 46,
   "files_touched": [
     ".dockerignore",
     ".env.example",
@@ -13,6 +13,7 @@
     "docs/README.md",
     "docs/operations/ec2-panel.md",
     "docs/reference/mcp-application.md",
+    "frontend/src/CompanyCard.jsx",
     "homepage/app/[slug]/page.tsx",
     "homepage/app/globals.css",
     "homepage/app/relocation-jobs-germany/page.tsx",
@@ -41,6 +42,7 @@
     "relocation_jobs/static/admin.html",
     "relocation_jobs/static/apply.html",
     "relocation_jobs/static/company.html",
+    "relocation_jobs/static/dist/board.js",
     "relocation_jobs/static/homepage/404.html",
     "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_buildManifest.js",
     "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_ssgManifest.js",
@@ -74,6 +76,8 @@
     "relocation_jobs/static/homepage/relocation-jobs-uk.txt",
     "relocation_jobs/static/index.html",
     "relocation_jobs/static/js/apply.js",
+    "relocation_jobs/static/js/events.js",
+    "relocation_jobs/static/js/position-card.js",
     "relocation_jobs/static/styles.css",
     "relocation_jobs/web/routes/mcp.py",
     "relocation_jobs/web/server.py",
@@ -116,13 +120,20 @@
       "compact_transcript": "/75/65548812a9/3/transcript.jsonl",
       "content_hash": "/75/65548812a9/3/content_hash.txt",
       "prompt": "/75/65548812a9/3/prompt.txt"
+    },
+    {
+      "metadata": "/75/65548812a9/4/metadata.json",
+      "transcript": "/75/65548812a9/4/full.jsonl",
+      "compact_transcript": "/75/65548812a9/4/transcript.jsonl",
+      "content_hash": "/75/65548812a9/4/content_hash.txt",
+      "prompt": "/75/65548812a9/4/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 840434,
-    "cache_creation_tokens": 714511,
-    "cache_read_tokens": 28075751,
-    "output_tokens": 157600,
-    "api_call_count": 25
+    "input_tokens": 1701261,
+    "cache_creation_tokens": 1852656,
+    "cache_read_tokens": 55804171,
+    "output_tokens": 269966,
+    "api_call_count": 44
   }
 }

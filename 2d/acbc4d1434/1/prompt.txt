@@ -49,3 +49,7 @@ get back my bird and just use skills to redesign this shit.
 change the headline from From the right role to a ready application.
 to what was previously, All Oputronities in one place or something like this.
 find what was before and make that.
+
+---
+
+ok see the changes we made an uncommited and make decision on and then commit needed changes.

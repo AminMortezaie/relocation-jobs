@@ -1,0 +1,25 @@
+claude using mcp added a new country but it does not show for me.
+why this happening?
+
+---
+
+When MCP adds a new country, we need to invalidate the cache. it means that we need to add to Redis also at the same transaction. So it's the first thing that we need. And also about the static page on Next.js, it's completely you know A dummy model for this, and it should be loaded from the Redis cache to create the new pages based on the data we have on Redis, because if we have it on Redis exactly we have on database. So if we add a new country, we need to firstly update the Redis, and also we need to read from Redis to You know, add the page to next year's because the page is the same, and also it's the name of the country is different, and we shouldn't have something like unsupported country in case we have no countries on Redis, we should go for, for example, 4 or 4 or 4 pages it, which is not found page. And maybe it's a, you know, misdirection, misdirection to something that is nonexistent, not showing a page that is just say unsupported country. At the top of the page. So please plan for this and tell me what is the This practice based on the skills we have I just declared everything you need to develop and implement something on this application, and you need to read them carefully and then give me a plan to implement and fix this bug.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+restart the panel to see the changes
+
+---
+
+your code has a big bug and created the board going down completely.
+can you find your bug?
+
+---
+
+write down in docs about the bug you created with the code examples and explain it completely like a medium article.

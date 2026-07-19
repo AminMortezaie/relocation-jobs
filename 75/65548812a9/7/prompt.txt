@@ -133,3 +133,9 @@ can you find this theme?
 
 it also have this problem on desktop version on this.
 this is a problem with this circle.
+
+---
+
+make the files we have uncommitted organized and reviewed i want to finally commit them.
+if some of them are no needed remove them and add to git some of the files that didnt add.
+go ahead.

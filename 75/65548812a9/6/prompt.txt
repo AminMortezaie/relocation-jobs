@@ -1,0 +1,11 @@
+/plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
+/plugin install ui-ux-pro-max@ui-ux-pro-max-skill
+
+---
+
+npx skills add nutlope/hallmark
+install this also
+
+---
+
+how to use this?

@@ -4,6 +4,25 @@ import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
+const STEPS = [
+  {
+    title: "Browse the public preview",
+    body: "See which countries and companies are actively hiring. The homepage shows a live overview of supported countries and sampled company preview cards — no sign-in required.",
+  },
+  {
+    title: "Sign in to unlock tracking",
+    body: "Once you sign in, the full board is available: company-level tracking, per-user state for every role, apply/reject/not-for-me buckets, and a company workspace to store CVs and application documents.",
+  },
+  {
+    title: "Tailor your CV per job",
+    body: "Use the built-in reframe pipeline to align your CV with specific job descriptions. Project masters, cover letters, and LaTeX exports — all inside the workspace.",
+  },
+  {
+    title: "Stay current",
+    body: "The catalog refreshes automatically every 6 hours. New roles from company career pages appear in the board the same day. No stale syndicated listings.",
+  },
+] as const;
+
 export const metadata: Metadata = {
   title: "How It Works",
   description:
@@ -32,51 +51,25 @@ export default function HowItWorksPage() {
             listings syndicated from aggregators.
           </p>
 
-          <section className="mt-10 space-y-6">
-            <Card className="px-5 py-6">
-              <h2 className="font-display text-xl font-bold text-text-primary">
-                1. Browse the public preview
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                See which countries and companies are actively hiring. The
-                homepage shows a live overview of supported countries and sampled
-                company preview cards — no sign-in required.
-              </p>
-            </Card>
-
-            <Card className="px-5 py-6">
-              <h2 className="font-display text-xl font-bold text-text-primary">
-                2. Sign in to unlock tracking
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                Once you sign in, the full board is available: company-level
-                tracking, per-user state for every role, apply/reject/not-for-me
-                buckets, and a company workspace to store CVs and application
-                documents.
-              </p>
-            </Card>
-
-            <Card className="px-5 py-6">
-              <h2 className="font-display text-xl font-bold text-text-primary">
-                3. Tailor your CV per job
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                Use the built-in reframe pipeline to align your CV with specific
-                job descriptions. Project masters, cover letters, and LaTeX
-                exports — all inside the workspace.
-              </p>
-            </Card>
-
-            <Card className="px-5 py-6">
-              <h2 className="font-display text-xl font-bold text-text-primary">
-                4. Stay current
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                The catalog refreshes automatically every 6 hours. New roles from
-                company career pages appear in the board the same day. No stale
-                syndicated listings.
-              </p>
-            </Card>
+          <section className="mt-10" aria-label="Four steps">
+            <ol className="workflow">
+              {STEPS.map((step, index) => (
+                <li key={step.title} className="workflow-step">
+                  <span className="workflow-number" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <Card className="workflow-card px-5 py-6">
+                    <p className="workflow-label">Step {index + 1}</p>
+                    <h2 className="font-display text-xl font-semibold text-text-primary">
+                      {step.title}
+                    </h2>
+                    <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+                      {step.body}
+                    </p>
+                  </Card>
+                </li>
+              ))}
+            </ol>
           </section>
 
           <div className="mt-10 text-center">

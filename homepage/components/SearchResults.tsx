@@ -94,7 +94,7 @@ export function SearchResults() {
       </div>
 
       {error ? (
-        <div className="card rounded-2xl px-4 py-6 text-sm text-text-muted">{error}</div>
+        <div className="card rounded-app px-4 py-6 text-sm text-text-muted">{error}</div>
       ) : null}
 
       {!error && loading ? (
@@ -102,7 +102,7 @@ export function SearchResults() {
           {[0, 1, 2].map((key) => (
             <div
               key={key}
-              className="card h-40 animate-pulse rounded-2xl"
+            className="card h-40 animate-pulse rounded-app"
               aria-hidden="true"
             />
           ))}
@@ -110,14 +110,14 @@ export function SearchResults() {
       ) : null}
 
       {!error && !loading && companies.length === 0 ? (
-        <div className="card rounded-2xl px-4 py-8 text-center">
+        <div className="card rounded-app px-4 py-8 text-center">
           <p className="text-sm font-medium text-text-primary">No matching companies in the preview.</p>
           <p className="mt-2 text-sm font-normal text-text-secondary">
             Try a broader search or country, or sign in to browse the full board.
           </p>
           <a
             href={panelHref(filters)}
-            className="btn-primary mt-4 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-text-on-accent"
+            className="btn-primary mt-4 inline-flex rounded-app px-4 py-2 text-sm font-semibold text-text-on-accent"
           >
             Sign in
           </a>

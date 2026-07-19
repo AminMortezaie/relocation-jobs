@@ -6,6 +6,7 @@ from relocation_jobs.core.db import db_read, db_transaction
 from relocation_jobs.core.redis_client import get_redis, ping_redis, redis_enabled
 
 COUNTRIES_REDIS_KEY = "countries:labels"
+COUNTRIES_GENERATION_KEY = "countries:labels:generation"
 
 DEFAULT_COUNTRY_LABELS: dict[str, str] = {
     "germany": "Germany",
@@ -31,6 +32,22 @@ def seed_default_countries(conn) -> None:
         )
 
 
+def get_countries_generation() -> int:
+    if not countries_use_redis():
+        return 0
+    raw = get_redis().get(COUNTRIES_GENERATION_KEY)
+    if raw is None:
+        return 0
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return 0
+
+
+def bump_countries_generation() -> int:
+    return int(get_redis().incr(COUNTRIES_GENERATION_KEY))
+
+
 def load_countries_from_redis() -> dict[str, str]:
     raw = get_redis().hgetall(COUNTRIES_REDIS_KEY)
     return {
@@ -51,11 +68,25 @@ def save_countries_to_redis(data: dict[str, str]) -> None:
     pipe.delete(COUNTRIES_REDIS_KEY)
     if ordered:
         pipe.hset(COUNTRIES_REDIS_KEY, mapping=ordered)
+    pipe.incr(COUNTRIES_GENERATION_KEY)
     pipe.execute()
 
 
 def upsert_country_in_redis(country_key: str, label: str) -> None:
-    get_redis().hset(COUNTRIES_REDIS_KEY, country_key, label.strip())
+    client = get_redis()
+    pipe = client.pipeline()
+    pipe.hset(COUNTRIES_REDIS_KEY, country_key, label.strip())
+    pipe.incr(COUNTRIES_GENERATION_KEY)
+    pipe.execute()
+
+
+def remove_country_from_redis(country_key: str) -> bool:
+    client = get_redis()
+    pipe = client.pipeline()
+    pipe.hdel(COUNTRIES_REDIS_KEY, country_key)
+    pipe.incr(COUNTRIES_GENERATION_KEY)
+    results = pipe.execute()
+    return bool(results[0])
 
 
 def load_custom_countries_from_db() -> dict[str, str]:
@@ -70,6 +101,27 @@ def load_country_labels_store() -> dict[str, str]:
     if countries_use_redis():
         return load_countries_from_redis()
     return load_custom_countries_from_db()
+
+
+def _upsert_country_in_db(country_key: str, label: str) -> None:
+    with db_transaction() as conn:
+        conn.execute(
+            """
+            INSERT INTO custom_countries (country, label)
+            VALUES (%s, %s)
+            ON CONFLICT (country) DO UPDATE SET label = EXCLUDED.label
+            """,
+            (country_key, label.strip()),
+        )
+
+
+def _remove_country_from_db(country_key: str) -> bool:
+    with db_transaction() as conn:
+        cur = conn.execute(
+            "DELETE FROM custom_countries WHERE country = %s RETURNING country",
+            (country_key,),
+        )
+        return cur.fetchone() is not None
 
 
 def save_custom_countries_to_db(data: dict[str, str]) -> None:
@@ -91,39 +143,26 @@ def save_custom_countries_to_db(data: dict[str, str]) -> None:
 
 
 def save_country_labels_store(data: dict[str, str]) -> None:
+    save_custom_countries_to_db(data)
     if countries_use_redis():
         save_countries_to_redis(data)
-        return
-    save_custom_countries_to_db(data)
 
 
 def upsert_custom_country(country_key: str, label: str) -> None:
+    _upsert_country_in_db(country_key, label)
     if countries_use_redis():
         upsert_country_in_redis(country_key, label)
-        return
-    with db_transaction() as conn:
-        conn.execute(
-            """
-            INSERT INTO custom_countries (country, label)
-            VALUES (%s, %s)
-            ON CONFLICT (country) DO UPDATE SET label = EXCLUDED.label
-            """,
-            (country_key, label.strip()),
-        )
 
 
 def remove_custom_country(country_key: str) -> bool:
     key = (country_key or "").strip().lower()
     if not key:
         return False
+    removed_db = _remove_country_from_db(key)
+    removed_redis = False
     if countries_use_redis():
-        return bool(get_redis().hdel(COUNTRIES_REDIS_KEY, key))
-    with db_transaction() as conn:
-        cur = conn.execute(
-            "DELETE FROM custom_countries WHERE country = %s RETURNING country",
-            (key,),
-        )
-        return cur.fetchone() is not None
+        removed_redis = remove_country_from_redis(key)
+    return removed_db or removed_redis
 
 
 def list_catalog_country_keys() -> frozenset[str]:

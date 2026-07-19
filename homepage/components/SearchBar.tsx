@@ -24,14 +24,12 @@ const COUNTRIES = [
 
 type SearchBarProps = {
   id?: string;
-  compact?: boolean;
   defaultFilters?: SearchFilters;
   onSearch: (filters: SearchFilters) => void;
 };
 
 export function SearchBar({
   id,
-  compact = false,
   defaultFilters,
   onSearch,
 }: SearchBarProps) {
@@ -51,7 +49,7 @@ export function SearchBar({
     <form
       id={id}
       onSubmit={handleSubmit}
-      className={`flex flex-col overflow-hidden rounded-xl border border-border-subtle bg-bg-surface sm:flex-row sm:items-stretch ${compact ? "" : ""}`}
+      className="flex flex-col overflow-hidden rounded-app border border-[var(--color-rule)] bg-bg-surface shadow-app sm:flex-row sm:items-stretch"
     >
       <label className="sr-only" htmlFor={roleId}>
         Role or stack
@@ -62,7 +60,7 @@ export function SearchBar({
           id={roleId}
           name="q"
           defaultValue={defaultFilters?.q ?? ""}
-          className="select-pill rounded-none border-0 bg-transparent shadow-none"
+          className="select-pill min-h-12 rounded-none border-0 bg-transparent shadow-none"
         >
           {ROLES.map((option) => (
             <option key={option.value || "all"} value={option.value}>
@@ -82,7 +80,7 @@ export function SearchBar({
           id={countryId}
           name="country"
           defaultValue={defaultFilters?.country ?? "all"}
-          className="select-pill rounded-none border-0 bg-transparent shadow-none"
+          className="select-pill min-h-12 rounded-none border-0 bg-transparent shadow-none"
         >
           {COUNTRIES.map((option) => (
             <option key={option.value} value={option.value}>
@@ -95,7 +93,7 @@ export function SearchBar({
 
       <button
         type="submit"
-        className="btn-primary inline-flex shrink-0 items-center justify-center rounded-none px-5 py-3 text-sm font-semibold text-text-on-accent sm:rounded-r-xl"
+        className="btn-primary inline-flex min-h-12 w-full shrink-0 items-center justify-center rounded-none px-5 py-3 text-sm font-bold text-text-on-accent sm:w-auto"
       >
         Search roles
       </button>

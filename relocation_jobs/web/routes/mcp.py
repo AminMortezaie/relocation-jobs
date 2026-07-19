@@ -10,11 +10,51 @@ from relocation_jobs.core.auth import login_required
 from relocation_jobs.core.ats_constants import HTTPX_AVAILABLE
 from relocation_jobs.core.panel_flags import company_fetch_enabled
 from relocation_jobs.core.paths import supported_countries
+from relocation_jobs.mcp import oauth_repo
 from relocation_jobs.mcp import service as mcp_service
+from relocation_jobs.mcp.oauth_provider import panel_display_base_url
 from relocation_jobs.mcp.types import ApplicationProfile
 
 
 def register(app):
+    @app.get("/api/mcp/connect-info")
+    @login_required
+    def api_mcp_connect_info():
+        base = panel_display_base_url()
+        mcp_url = f"{base}/mcp"
+        return jsonify({
+            "base_url": base,
+            "mcp_url": mcp_url,
+            "resource_url": mcp_url,
+        })
+
+    @app.get("/api/mcp/tokens")
+    @login_required
+    def api_mcp_tokens_list():
+        return jsonify({"items": oauth_repo.list_api_tokens(g.user_id)})
+
+    @app.post("/api/mcp/tokens")
+    @login_required
+    def api_mcp_tokens_create():
+        body = request.get_json(silent=True) or {}
+        label = (body.get("label") or "").strip()
+        token_id, raw = oauth_repo.create_api_token(user_id=g.user_id, label=label)
+        return jsonify({
+            "ok": True,
+            "id": token_id,
+            "token": raw,
+            "label": label,
+            "warning": "Copy this token now — it will not be shown again.",
+        })
+
+    @app.delete("/api/mcp/tokens/<int:token_id>")
+    @login_required
+    def api_mcp_tokens_revoke(token_id: int):
+        ok = oauth_repo.revoke_api_token(user_id=g.user_id, token_id=token_id)
+        if not ok:
+            return jsonify({"error": "Token not found"}), 404
+        return jsonify({"ok": True})
+
     @app.get("/api/mcp/profile")
     @login_required
     def api_mcp_profile_get():

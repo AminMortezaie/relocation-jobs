@@ -27,8 +27,11 @@ from relocation_jobs.scrape.descriptions import format_job_description
 from relocation_jobs.scrape.job_text import fetch_job_description
 from relocation_jobs.core.db import _normalize_url
 from relocation_jobs.core.job_identity import job_idempotency_key, normalize_job_url
+from mcp.server.auth.middleware.auth_context import get_access_token
+
 from relocation_jobs.users.repo import get_user_by_username
 from relocation_jobs.mcp import repo, render, validate
+from relocation_jobs.mcp.context import get_current_user_id
 from relocation_jobs.mcp.names import (
     application_cover_letter_pdf_filename,
     application_pdf_filename,
@@ -195,6 +198,12 @@ def _apply_posted_at_to_job(job: dict, posted_at: str) -> None:
 
 
 def resolve_user_id() -> int:
+    scoped = get_current_user_id()
+    if scoped is not None:
+        return scoped
+    access = get_access_token()
+    if access is not None and access.subject:
+        return int(access.subject)
     raw_id = (os.environ.get("MCP_USER_ID") or "").strip()
     if raw_id:
         return int(raw_id)

@@ -20,3 +20,11 @@ data/
 /dist/mcp-resume-reframe-for-claude.zip
 /deploy/
 /design-skills/
+# Vendor / agent skill installs (use skills-lock locally; not product code)
+.agents/
+.cursor/skills/
+skills-lock.json
+# Hallmark session artifacts (design.md is the kept source of truth)
+.hallmark/
+# Local responsive/review captures (underscore-prefixed)
+**/brand/_*.png

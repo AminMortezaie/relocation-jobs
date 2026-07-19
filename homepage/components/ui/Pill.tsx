@@ -14,25 +14,25 @@ export type PillVariant =
 
 const VARIANT_CLASSES: Record<PillVariant, string> = {
   applied:
-    "border-[color-mix(in_srgb,var(--accent-green)_28%,transparent)] bg-[color-mix(in_srgb,var(--accent-green)_14%,transparent)] text-[var(--accent-green)]",
+    "border-[var(--color-ink)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]",
   awaiting:
-    "border-[color-mix(in_srgb,var(--accent-purple)_28%,transparent)] bg-[color-mix(in_srgb,var(--accent-purple)_14%,transparent)] text-[var(--accent-purple)]",
+    "border-[var(--color-rule)] bg-[var(--color-paper-3)] text-[var(--color-ink)]",
   looking:
-    "border-[color-mix(in_srgb,var(--accent-blue)_28%,transparent)] bg-[color-mix(in_srgb,var(--accent-blue)_14%,transparent)] text-[var(--accent-blue)]",
+    "border-[var(--color-ink)] bg-[var(--accent-primary-soft)] text-[var(--color-ink)]",
   rejected:
     "border-[var(--border-subtle)] bg-[color-mix(in_srgb,var(--text-muted)_10%,transparent)] text-[var(--text-muted)]",
   "not-for-me":
     "border-[color-mix(in_srgb,var(--warn)_28%,transparent)] bg-[color-mix(in_srgb,var(--warn)_12%,transparent)] text-[var(--warn)]",
   referral:
-    "border-[color-mix(in_srgb,var(--accent-blue)_28%,transparent)] bg-[color-mix(in_srgb,var(--accent-blue)_14%,transparent)] text-[var(--accent-blue)]",
+    "border-[var(--color-ink-2)] bg-[var(--accent-blue-soft)] text-[var(--color-ink-2)]",
   country:
-    "border-[color-mix(in_srgb,var(--accent-blue)_24%,transparent)] bg-[color-mix(in_srgb,var(--accent-blue)_12%,transparent)] text-[var(--accent-blue)]",
+    "border-[var(--color-rule)] bg-[var(--color-paper-2)] text-[var(--color-ink)]",
   neutral:
     "border-[var(--border-subtle)] bg-[color-mix(in_srgb,var(--text-muted)_8%,transparent)] text-[var(--text-muted)]",
   warn:
     "border-[color-mix(in_srgb,var(--warn)_28%,transparent)] bg-[color-mix(in_srgb,var(--warn)_12%,transparent)] text-[var(--warn)]",
   visa:
-    "border-[color-mix(in_srgb,var(--accent-green)_28%,transparent)] bg-[color-mix(in_srgb,var(--accent-green)_14%,transparent)] text-[var(--accent-green)]",
+    "border-[var(--color-rule)] bg-[var(--accent-green-soft)] text-[var(--accent-green)]",
 };
 
 type PillProps = {

@@ -13,10 +13,11 @@
 | Postgres | `pg` | 5432 |
 | Redis | `relocation-redis` | 6379 |
 | Panel (gunicorn) | `relocation-panel` | 127.0.0.1:10000 |
+| Remote MCP (OAuth + Streamable HTTP) | `relocation-mcp` | 127.0.0.1:10001 |
 | Fetch worker (scheduler) | `relocation-fetch-worker` | — |
 | Caddy (TLS + reverse proxy) | `relocation-caddy` | 80, 443 |
 
-Panel talks to Postgres/Redis via Docker bridge gateway `172.17.0.1` (localhost on the host). The fetch worker only needs Postgres; it runs country scrapes every **6 hours** (sequential countries, concurrency **4**).
+Panel talks to Postgres/Redis via Docker bridge gateway `172.17.0.1` (localhost on the host). The fetch worker only needs Postgres; it runs country scrapes every **6 hours** (sequential countries, concurrency **4**). Remote MCP uses the same Postgres and `MCP_PUBLIC_BASE_URL=https://mcp.kuchup.com`.
 
 ---
 
@@ -25,21 +26,34 @@ Panel talks to Postgres/Redis via Docker bridge gateway `172.17.0.1` (localhost 
 From repo root (SSH key `~/Downloads/relocation.pem`, `aws-postgres.env` present):
 
 ```bash
-./scripts/ec2_app_deploy.sh deploy        # prune + rsync + build panel + worker + Caddy
-./scripts/ec2_app_deploy.sh prune         # free dangling Docker images / build cache only
-./scripts/ec2_app_deploy.sh status        # containers + health check + worker logs
-./scripts/ec2_app_deploy.sh worker-logs   # follow fetch scheduler logs
+./scripts/ec2_app_deploy.sh deploy           # sync + rebuild images only when inputs change
+./scripts/ec2_app_deploy.sh deploy --force   # rebuild panel + worker even if hashes match
+./scripts/ec2_app_deploy.sh prune            # dangling images + trim BuildKit cache (disk recovery)
+./scripts/ec2_app_deploy.sh open-sg          # one-shot: open SG 80/443 to 0.0.0.0/0 (manual)
+./scripts/ec2_app_deploy.sh status           # containers + health check + worker logs
+./scripts/ec2_app_deploy.sh worker-logs      # follow fetch scheduler logs
 ```
 
-`deploy` also opens security group ports **80** and **443**.
+**What `deploy` does**
 
-**Disk (8G root):** each rebuild leaves the previous panel/worker image dangling (~GB). `deploy` runs `docker image prune -f` + `docker builder prune -af` before builds, after the panel swap, and after the worker swap so old+new layers do not stack. Use `prune` alone if the box is tight between deploys. If prune still cannot free enough headroom, grow the EBS volume.
+1. Conditionally rebuilds local frontend / homepage only when sources are newer than outputs (`FORCE_FRONTEND=1` / `FORCE_HOMEPAGE=1` to force).
+2. Rsyncs the repo to EC2.
+3. Prunes **dangling images only** (`docker image prune -f`) — never BuildKit cache.
+4. Hashes panel/worker inputs on EC2 (Dockerfiles, requirements, entrypoints, `relocation_jobs/` excluding bind-mounted `static/`). Skips `docker build` when the hash matches and the tagged image already exists.
+5. Recreates panel + worker containers (static files are bind-mounted into the panel, so CSS/homepage updates apply without a panel image rebuild).
+6. Recreates Caddy and runs health checks.
+
+`deploy` does **not** call `open-sg`. After Cloudflare origin lock-down, reopening `0.0.0.0/0` on every deploy would undo the SG lockdown — run `open-sg` only when you intentionally want world-open 80/443.
+
+**Disk (8G root):** each rebuild can leave the previous panel/worker image dangling (~GB). `deploy` prunes dangling images before and after builds so old+new layers do not stack, but **keeps BuildKit cache** (pip / tectonic / Playwright). Use `prune` alone only when the box is tight; it trims builder cache while keeping ~8GB of recent cache warm. Routine deploys should not need `prune` if disk is healthy. If prune still cannot free enough headroom, grow the EBS volume.
 
 **DB safety:** prune never runs `docker volume prune`, `docker system prune --volumes`, or anything that stops/removes container `pg`. Postgres data is in named volume `pgdata`. Each prune asserts `pg` is running and `pgdata` exists before and after; it aborts if either check fails.
 
+**Build cache:** panel and worker Dockerfiles use BuildKit cache mounts for pip (and split the Playwright browser install into its own layer). Expect BuildKit (`DOCKER_BUILDKIT=1`, the deploy default).
+
 | Image | Dockerfile | Role |
 |-------|------------|------|
-| `relocation-panel:ec2` | `Dockerfile.ec2` | Slim panel — no Playwright; includes **tectonic** for PDF render; `PANEL_SCRAPE_ENABLED=0`, `PANEL_COMPANY_FETCH_ENABLED=1` |
+| `relocation-panel:ec2` | `Dockerfile.ec2` | Slim panel — no Playwright; includes **tectonic** for PDF render; `PANEL_SCRAPE_ENABLED=0`, `PANEL_COMPANY_FETCH_ENABLED=1`. Same image runs `relocation-mcp` via `docker-entrypoint-mcp.sh`. |
 | `relocation-fetch-worker:ec2` | `Dockerfile.ec2-worker` | Playwright + 6h scheduler; writes to shared Postgres (no TeX) |
 
 **PDF render:** the panel image installs pinned tectonic and warms its package cache at build time. After deploy, smoke with `docker exec relocation-panel tectonic --version`, then **Re-render PDF** on a master or company workspace on [kuchup.com](https://kuchup.com).
@@ -64,8 +78,11 @@ Point the domain at the Elastic IP from `aws-postgres.env`:
 |------|------|---------|-------|
 | A | `@` | `<ELASTIC_IP>` | start grey; orange when locking origin (below) |
 | A | `www` | `<ELASTIC_IP>` | same |
+| A | `mcp` | `<ELASTIC_IP>` | same (remote MCP for Claude / Cursor) |
 
-Caddy in `deploy/ec2/Caddyfile` requests Let's Encrypt certs for `kuchup.com` and `www.kuchup.com`. The panel is **not** served on the raw Elastic IP — use the domain only.
+Caddy in `deploy/ec2/Caddyfile` requests Let's Encrypt certs for `kuchup.com`, `www.kuchup.com`, and `mcp.kuchup.com`. The panel and MCP are **not** served on the raw Elastic IP — use the domain only.
+
+**Claude remote connectors** reach `mcp.kuchup.com` from Anthropic’s cloud (not the user’s phone). If the security group is locked to Cloudflare only, that is enough when the orange cloud proxies MCP. If you later lock origin beyond Cloudflare, also allowlist [Anthropic egress ranges](https://platform.claude.com/docs/en/api/ip-addresses).
 
 **First cutover (simplest):** grey cloud (DNS only) until `https://kuchup.com` works.
 
@@ -114,7 +131,7 @@ In **EC2 → Security Groups** (panel instance), for inbound **HTTP (80)** and *
 1. Remove rules with source `0.0.0.0/0`.
 2. Add rules with source = [Cloudflare IPv4 ranges](https://www.cloudflare.com/ips-v4) (and [IPv6](https://www.cloudflare.com/ips-v6) if you use AAAA).
 
-**Do not** open 80/443 to the world again. `./scripts/ec2_app_deploy.sh open-sg` adds `0.0.0.0/0` — skip that step after lock-down, or remove those rules manually.
+**Do not** open 80/443 to the world again. `./scripts/ec2_app_deploy.sh open-sg` adds `0.0.0.0/0` — it is not part of `deploy`; run it only for initial bootstrap, then remove those rules after Cloudflare lock-down.
 
 **Keep separate (your IP only, never `0.0.0.0/0`):**
 

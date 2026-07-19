@@ -630,6 +630,12 @@ function bindJobsListEvents() {
   $("jobs").addEventListener("click", async (e) => {
     if (e.target.closest("position-card")) return;
 
+    document.querySelectorAll(".company-more[open]").forEach((menu) => {
+      if (!menu.contains(e.target) || e.target.closest("button")) {
+        menu.removeAttribute("open");
+      }
+    });
+
     const collapseBtn = e.target.closest(".collapse-company-btn");
     if (collapseBtn) {
       const card = collapseBtn.closest(".company-card");
@@ -877,6 +883,9 @@ function bindToolbarEvents() {
     closeReferralPopovers();
     closeHideReasonPopovers();
     closeAtsPopovers();
+    document.querySelectorAll(".company-more[open]").forEach((menu) => {
+      menu.removeAttribute("open");
+    });
   });
 
   $("atsScoreBackdrop")?.addEventListener("click", () => closeAtsPopovers());

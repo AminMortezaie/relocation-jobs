@@ -60,7 +60,7 @@ export function ProductScreenshot() {
         </p>
       </div>
 
-      <div className="card relative overflow-hidden rounded-2xl p-3 sm:p-4" aria-label="Board preview">
+      <div className="card relative overflow-hidden rounded-app p-3 sm:p-4" aria-label="Board preview">
         <div
           className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 opacity-40"
           aria-hidden="true"

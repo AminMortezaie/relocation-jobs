@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { JetBrains_Mono, Manrope } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-display",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -77,15 +77,26 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${inter.variable} ${manrope.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${jetbrains.variable}`}>
       <head>
-        <script
-          type="application/ld+json"
-          id="schema-org"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&display=swap"
+          rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen font-sans">{children}</body>
+      <body className={manrope.className}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

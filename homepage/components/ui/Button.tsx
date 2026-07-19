@@ -12,9 +12,9 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary:
-    "btn-primary inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold text-text-on-accent",
+    "btn-primary inline-flex items-center justify-center rounded-app px-5 py-2.5 text-sm font-bold text-text-on-accent",
   secondary:
-    "btn-secondary inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold",
+    "btn-secondary inline-flex items-center justify-center rounded-app px-5 py-2.5 text-sm font-semibold",
 };
 
 export function Button({

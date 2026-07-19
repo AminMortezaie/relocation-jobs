@@ -1,46 +1,76 @@
-/* Night Flight design tokens — single source of truth for marketing + panel */
+/* Hallmark · genre: modern-minimal · design-system: design.md · designed-as-app
+ * Warm Horizon · Kuchup logo palette (navy + orange) · light theme
+ * pre-emit critique: P5 H5 E5 S5 R5 V4 · tokens: pass (48)
+ */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* Base */
-  --bg-base: #0a0e27;
-  --bg-surface: #12173a;
-  --bg-surface-hover: #171c42;
+  /* Warm, optimistic base with open-sky supporting surfaces */
+  --color-paper: #fcfaf7;
+  --color-paper-2: #f2f7fa;
+  --color-paper-3: #e4f0f6;
+  --color-ink: #0e3a69;
+  --color-ink-2: #345c7c;
+  --color-muted: #5d7488;
+  --color-rule: #a9c1d1;
+  --color-accent: #ff6b35;
+  --color-accent-hover: #ff7f52;
+  --color-accent-deep: #d94f1f;
+  --color-accent-soft: rgba(255, 107, 53, 0.14);
+  --color-accent-2: #0e3a69;
+  --color-accent-ink: #082743;
+  --color-focus: #ff6b35;
 
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.16);
+  /* Base (panel / marketing shared names) */
+  --bg-base: var(--color-paper);
+  --bg-surface: var(--color-paper);
+  --bg-surface-hover: var(--color-paper-2);
 
-  /* Accents */
-  --accent-primary: #ff6b35;
-  --accent-primary-hover: #ff7f52;
-  --accent-blue: #3b82f6;
-  --accent-purple: #8b5cf6;
-  --accent-green: #22c55e;
+  /* Thin, calm boundaries; navy is reserved for emphasis */
+  --border-subtle: #d1e0e9;
+  --border-hover: #7fa2bb;
 
-  /* Soft accent fills */
-  --accent-primary-soft: rgba(255, 107, 53, 0.14);
-  --accent-blue-soft: rgba(59, 130, 246, 0.14);
-  --accent-purple-soft: rgba(139, 92, 246, 0.14);
-  --accent-green-soft: rgba(34, 197, 94, 0.12);
+  /* Orange leads; logo navy handles every secondary brand role */
+  --accent-primary: var(--color-accent);
+  --accent-primary-hover: var(--color-accent-hover);
+  --accent-blue: var(--color-ink-2);
+  --accent-purple: var(--color-ink);
+  --accent-green: oklch(42% 0.09 145);
+
+  --accent-primary-soft: var(--color-accent-soft);
+  --accent-blue-soft: color-mix(in srgb, var(--color-ink-2) 12%, var(--color-paper));
+  --accent-purple-soft: color-mix(in srgb, var(--color-rule) 12%, var(--color-paper));
+  --accent-green-soft: color-mix(in srgb, var(--accent-green) 14%, var(--color-paper));
 
   /* Text */
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-on-accent: #0a0e27;   /* navy on orange — WCAG AA for primary CTAs */
+  --text-primary: var(--color-ink);
+  --text-secondary: var(--color-ink-2);
+  --text-muted: var(--color-muted);
+  --text-on-accent: var(--color-accent-ink);
 
-  /* Glow blobs (use as background layers) */
-  --glow-blue: radial-gradient(circle, #3b82f6 0%, transparent 70%);
-  --glow-purple: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-  --glow-orange: radial-gradient(circle, #ff6b35 0%, transparent 70%);
+  /* Atmosphere — no multi-hue glow carnival */
+  --glow-blue: radial-gradient(circle, transparent 0%, transparent 70%);
+  --glow-purple: radial-gradient(circle, transparent 0%, transparent 70%);
+  --glow-orange: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 35%, transparent) 0%, transparent 70%);
 
-  /* Elevation */
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.24);
+  /* Gentle elevation — welcoming, not poster-heavy */
+  --shadow-card: 0 8px 24px rgba(14, 58, 105, 0.1);
+  --shadow-sm: 0 2px 8px rgba(14, 58, 105, 0.12);
+  --shadow-button: 0 3px 0 var(--color-accent-deep), 0 8px 16px -8px rgba(255, 107, 53, 0.45);
+  --shadow-button-hover: 0 4px 0 var(--color-accent-deep), 0 12px 22px -10px rgba(255, 107, 53, 0.5);
+  --shadow-button-pressed: 0 1px 0 var(--color-accent-deep), 0 3px 8px -5px rgba(255, 107, 53, 0.4);
   --radius-card: 1rem;
-  --radius-button: 0.5rem;
+  --radius-button: 999px;
   --radius-pill: 999px;
+  --radius-input: 0.75rem;
+  --ease-snap: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Typography stacks (faces loaded by page) */
+  --font-display: "Lexend", "Manrope", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-inter: var(--font-body);
 
   /* Panel aliases — keep existing class names working */
   --bg: var(--bg-base);
@@ -49,7 +79,7 @@
   --surface2: var(--bg-surface-hover);
   --surface-hover: var(--bg-surface-hover);
   --border: var(--border-subtle);
-  --border-strong: var(--border-hover);
+  --border-strong: var(--color-rule);
   --text: var(--text-primary);
   --muted: var(--text-muted);
   --accent: var(--accent-primary);
@@ -57,30 +87,32 @@
   --accent-soft: var(--accent-primary-soft);
   --success: var(--accent-green);
   --success-soft: var(--accent-green-soft);
-  --warn: #f5a623;
-  --warn-soft: rgba(245, 166, 35, 0.12);
-  --danger: var(--text-muted);
-  --danger-soft: rgba(148, 163, 184, 0.12);
-  --referral: var(--accent-blue);
+  --warn: oklch(55% 0.14 55);
+  --warn-soft: color-mix(in srgb, var(--warn) 14%, var(--color-paper));
+  --danger: var(--color-rule);
+  --danger-soft: color-mix(in srgb, var(--color-rule) 12%, var(--color-paper));
+  --referral: var(--color-ink-2);
   --referral-soft: var(--accent-blue-soft);
-  --visa: var(--accent-purple);
+  --visa: var(--color-rule);
   --visa-soft: var(--accent-purple-soft);
-  --brand-sky: var(--accent-blue);
+  --brand-sky: var(--color-ink-2);
   --brand-sky-soft: var(--accent-blue-soft);
   --brand-gradient: linear-gradient(
     135deg,
     var(--accent-primary) 0%,
-    var(--accent-blue) 52%,
-    var(--accent-purple) 100%
+    var(--accent-primary-hover) 100%
   );
   --brand-gradient-soft: linear-gradient(
     135deg,
-    rgba(255, 107, 53, 0.18) 0%,
-    rgba(59, 130, 246, 0.1) 48%,
-    rgba(139, 92, 246, 0.14) 100%
+    var(--accent-primary-soft) 0%,
+    color-mix(in srgb, var(--color-accent) 8%, var(--color-paper)) 100%
   );
   --radius: var(--radius-card);
-  --radius-sm: var(--radius-button);
+  --radius-sm: 0.625rem;
   --shadow: var(--shadow-card);
-  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.22);
+
+  /* Structure helpers */
+  --rule-width: 1px;
+  --shadow-offset: 0px;
+  --shadow-offset-sm: 0px;
 }

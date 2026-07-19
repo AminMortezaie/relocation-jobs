@@ -10,7 +10,7 @@
   <meta name="theme-color" content="#090b10" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=61" />
+  <link rel="stylesheet" href="/static/styles.css?v=65" />
 </head>
 <body>
   <div id="loadingBar" aria-hidden="true"><div id="loadingBarFill"></div></div>
@@ -66,7 +66,7 @@
             </span>
           </a>
           <h1 class="page-heading">Application data</h1>
-          <p class="admin-subtitle">Profile, master resumes, and project masters for Claude Desktop MCP</p>
+          <p class="admin-subtitle">Profile, master resumes, project masters, and remote MCP access</p>
         </div>
         <div class="admin-header-actions">
           <a href="/panel" class="header-secondary-btn admin-nav-link">Job panel</a>
@@ -81,6 +81,7 @@
         <button type="button" class="apply-tab apply-tab--active" data-tab="profile" id="applyTabProfile">Profile</button>
         <button type="button" class="apply-tab" data-tab="masters" id="applyTabMasters">Master resumes</button>
         <button type="button" class="apply-tab" data-tab="projects" id="applyTabProjects">Projects</button>
+        <button type="button" class="apply-tab" data-tab="connect" id="applyTabConnect">Connect MCP</button>
       </nav>
 
       <section class="admin-panel apply-panel" id="applyProfilePanel">
@@ -221,11 +222,41 @@
           </div>
         </div>
       </section>
+
+      <section class="admin-panel apply-panel" id="applyConnectPanel" hidden>
+        <h2 class="admin-panel-title">Connect Claude / Cursor</h2>
+        <p class="hint apply-hint">Add this URL as a custom connector. Claude and Cursor open our login page — sign in with your Kuchup username and password. Your data stays scoped to this account.</p>
+
+        <label for="applyMcpUrl">MCP URL</label>
+        <div class="apply-connect-url-row">
+          <input type="text" id="applyMcpUrl" class="apply-connect-url" readonly spellcheck="false" />
+          <button type="button" class="header-secondary-btn" id="applyMcpUrlCopyBtn">Copy</button>
+        </div>
+
+        <ol class="apply-connect-steps">
+          <li><strong>Claude (web → mobile):</strong> Customize → Connectors → Add custom connector → paste the URL → Connect → sign in on the Kuchup page. On the phone, enable the connector under chat + → Connectors.</li>
+          <li><strong>Cursor:</strong> add <code>{"kuchup":{"url":"…"}}</code> under MCP servers, then Connect and complete the same login.</li>
+        </ol>
+
+        <h3 class="apply-pipeline-title">API tokens (optional)</h3>
+        <p class="hint apply-hint">For scripts only. Claude and Cursor should use OAuth — you do not paste these into Claude.</p>
+        <div class="apply-connect-token-form">
+          <label for="applyTokenLabel">Label</label>
+          <input type="text" id="applyTokenLabel" placeholder="laptop scripts" />
+          <button type="button" class="header-primary-btn" id="applyTokenCreateBtn">Create token</button>
+        </div>
+        <div id="applyTokenOnce" class="apply-token-once" hidden>
+          <p class="apply-token-once-label">Copy now — shown once:</p>
+          <code id="applyTokenOnceValue"></code>
+          <button type="button" class="header-secondary-btn" id="applyTokenOnceCopyBtn">Copy token</button>
+        </div>
+        <ul class="apply-token-list" id="applyTokenList"></ul>
+      </section>
     </div>
   </div>
 
   <div class="toast" id="applyToast"></div>
 
-  <script type="module" src="/static/js/apply.js?v=11"></script>
+  <script type="module" src="/static/js/apply.js?v=12"></script>
 </body>
 </html>

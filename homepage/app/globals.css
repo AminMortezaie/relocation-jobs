@@ -1,3 +1,4 @@
+/* Hallmark · genre: modern-minimal · macrostructure: feature-stack · design-system: design.md · designed-as-app */
 @import "./design-tokens.css";
 @import "tailwindcss/base";
 @import "tailwindcss/components";
@@ -5,135 +6,267 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
   @apply font-sans font-normal text-text-primary antialiased;
-  background:
-    radial-gradient(ellipse 70% 45% at 85% 8%, rgba(59, 130, 246, 0.22), transparent 55%),
-    radial-gradient(ellipse 55% 40% at 8% 90%, rgba(255, 107, 53, 0.14), transparent 50%),
-    var(--bg-base);
+  font-family: var(--font-body), system-ui, sans-serif;
+  background: var(--bg-base);
   color: var(--text-primary);
+  overflow-x: clip;
 }
 
 /* ── Typography ── */
 
 .text-fluid-hero {
-  font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
   font-size: clamp(2.25rem, 4vw + 1rem, 3.5rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
 }
 
 .text-section-title {
-  font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
   font-size: clamp(1.5rem, 1.5vw + 1rem, 2rem);
+  font-style: normal;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 
 .font-display {
-  font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
+  font-style: normal;
 }
 
-/* ── Glass card ── */
+/* ── Hum-inspired warm cards ── */
 
 .card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border: var(--rule-width) solid var(--color-rule);
   box-shadow: var(--shadow-card);
+  border-radius: var(--radius-card);
 }
 
 .card-interactive {
   transition:
-    transform 200ms ease-out,
-    border-color 200ms ease-out,
-    box-shadow 200ms ease-out;
+    transform var(--dur-short, 180ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--dur-short, 180ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--dur-short, 180ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
 .card-interactive:hover {
   border-color: var(--border-hover);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -12px rgba(14, 58, 105, 0.2);
 }
 
-/* Legacy aliases used during migration */
 .surface-card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border: var(--rule-width) solid var(--color-rule);
   box-shadow: var(--shadow-card);
+  border-radius: var(--radius-card);
 }
 
 .surface-card-interactive {
   transition:
-    transform 200ms ease-out,
-    border-color 200ms ease-out,
-    box-shadow 200ms ease-out;
+    transform var(--dur-short, 180ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--dur-short, 180ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--dur-short, 180ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
 }
 
 .surface-card-interactive:hover {
   border-color: var(--border-hover);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -12px rgba(14, 58, 105, 0.2);
 }
 
-/* ── Buttons ── */
+/* ── Hum-inspired push buttons ── */
 
 .btn-primary {
   background: var(--accent-primary);
   color: var(--text-on-accent);
+  border: 0;
   border-radius: var(--radius-button);
-  box-shadow: 0 2px 12px rgba(255, 107, 53, 0.28);
+  box-shadow: var(--shadow-button);
+  min-height: 2.75rem;
   transition:
-    background 200ms ease-out,
-    transform 200ms ease-out,
-    box-shadow 200ms ease-out;
+    background 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 140ms var(--ease-snap),
+    box-shadow 140ms var(--ease-snap);
 }
 
 .btn-primary:hover {
   background: var(--accent-primary-hover);
-  transform: scale(1.02);
-  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.34);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-button-hover);
 }
 
 .btn-primary:active {
-  transform: scale(0.99);
+  transform: translateY(2px);
+  box-shadow: var(--shadow-button-pressed);
+  transition-duration: 70ms;
 }
 
 .btn-secondary {
-  background: transparent;
+  background: var(--color-paper);
   color: var(--text-primary);
-  border: 1px solid var(--border-subtle);
+  border: var(--rule-width) solid var(--border-hover);
   border-radius: var(--radius-button);
+  min-height: 2.75rem;
+  box-shadow: 0 3px 10px rgba(14, 58, 105, 0.08);
   transition:
-    border-color 200ms ease-out,
-    background 200ms ease-out;
+    border-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 100ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-secondary:hover {
-  border-color: var(--border-hover);
-  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--color-ink);
+  background: var(--color-paper-2);
 }
 
-/* ── Glow atmosphere ── */
+.btn-secondary:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 4px rgba(14, 58, 105, 0.08);
+}
+
+/* ── Benefit rhythm: one anchor + two supporting cards ── */
+
+.benefit-card {
+  background: var(--color-paper-2);
+}
+
+.benefit-card-1 {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-paper));
+}
+
+.benefit-card-2 {
+  background: var(--color-paper-2);
+}
+
+.benefit-card-3 {
+  background: color-mix(in srgb, var(--color-paper-3) 62%, var(--color-paper));
+}
+
+@media (min-width: 640px) {
+  .benefit-card-3 {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .benefit-card-1 {
+    grid-column: span 6;
+  }
+
+  .benefit-card-2,
+  .benefit-card-3 {
+    grid-column: span 3;
+  }
+}
+
+/* ── Narrative workflow ── */
+
+.workflow {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.workflow-step {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  gap: 1rem;
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.workflow-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 2.8rem;
+  bottom: -0.15rem;
+  left: 1.6rem;
+  width: 1px;
+  background: var(--color-rule);
+}
+
+.workflow-number {
+  display: grid;
+  place-items: center;
+  align-self: start;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  box-shadow: 0 3px 0 var(--color-accent-deep);
+  position: relative;
+  z-index: 1;
+}
+
+.workflow-step:nth-child(even) .workflow-number {
+  background: var(--color-paper-3);
+  color: var(--color-ink);
+  box-shadow: 0 3px 0 var(--border-hover);
+}
+
+.workflow-card {
+  box-shadow: 0 8px 24px -14px rgba(14, 58, 105, 0.28);
+}
+
+.workflow-step:nth-child(odd) .workflow-card {
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-paper));
+}
+
+.workflow-step:nth-child(even) .workflow-card {
+  background: var(--color-paper-2);
+}
+
+.workflow-label {
+  margin-bottom: 0.35rem;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 420px) {
+  .workflow-step {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .workflow-number {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 0.875rem;
+  }
+
+  .workflow-step:not(:last-child)::before {
+    top: 2.15rem;
+    left: 1.22rem;
+  }
+}
+
+/* Legacy glow classes — neutralized (no Night Flight blobs) */
 
 .hero-search-glow {
   position: relative;
 }
 
 .hero-search-glow::before {
-  content: "";
-  position: absolute;
-  inset: -40% -10% -30%;
-  z-index: 0;
-  background: var(--glow-blue);
-  filter: blur(100px);
-  opacity: 0.45;
-  pointer-events: none;
+  content: none;
 }
 
 .hero-search-glow > * {
@@ -146,14 +279,7 @@ body {
 }
 
 .glow-orange::before {
-  content: "";
-  position: absolute;
-  inset: -30% -20%;
-  z-index: 0;
-  background: var(--glow-orange);
-  filter: blur(100px);
-  opacity: 0.4;
-  pointer-events: none;
+  content: none;
 }
 
 .glow-orange > * {
@@ -164,10 +290,12 @@ body {
 /* ── Form controls ── */
 
 .select-pill {
-  @apply w-full appearance-none rounded-lg border py-3 pl-10 pr-10 text-sm font-normal;
+  @apply w-full appearance-none py-3 pl-10 pr-10 text-sm font-normal;
+  border-radius: var(--radius-input);
   color: var(--text-primary);
-  border-color: var(--border-subtle);
+  border: var(--rule-width) solid var(--border-subtle);
   background: var(--bg-surface-hover);
+  min-height: 2.75rem;
   transition:
     border-color 200ms ease,
     box-shadow 200ms ease;
@@ -175,10 +303,8 @@ body {
 
 .select-pill:focus-visible {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow:
-    0 0 0 2px var(--bg-base),
-    0 0 0 4px rgba(255, 107, 53, 0.45);
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px var(--accent-primary-soft);
 }
 
 .select-icon {
@@ -193,23 +319,28 @@ body {
 }
 
 :focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 2px var(--bg-base),
-    0 0 0 4px rgba(255, 107, 53, 0.55);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 .btn-primary:focus-visible {
-  box-shadow:
-    0 0 0 2px var(--bg-base),
-    0 0 0 4px rgba(255, 107, 53, 0.72);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /* ── Section rhythm ── */
 
 .section-major {
-  padding-top: 3.5rem;
-  padding-bottom: 3.5rem;
+  padding-top: 2.75rem;
+  padding-bottom: 2.75rem;
+}
+
+@media (min-width: 640px) {
+  .section-major {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -220,8 +351,15 @@ body {
 }
 
 .section-major-first {
-  padding-top: 2.5rem;
-  padding-bottom: 3.5rem;
+  padding-top: 1.75rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .section-major-first {
+    padding-top: 2.5rem;
+    padding-bottom: 3.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -232,34 +370,72 @@ body {
 }
 
 .section-compact {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .section-compact {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+.mobile-menu-panel {
+  transform-origin: top right;
+  border: var(--rule-width) solid var(--color-rule);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-card);
+  transition:
+    opacity 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0ms linear 180ms;
+}
+
+.mobile-menu-panel[data-open="false"] {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.mobile-menu-panel[data-open="true"] {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  visibility: visible;
+  transition:
+    opacity 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0ms linear 0ms;
 }
 
 /* ── Pill controls (nav, filters) ── */
 
 .pill-control {
-  @apply inline-flex items-center rounded-full px-3.5 py-1.5;
-  color: color-mix(in srgb, var(--text-primary) 85%, transparent);
-  border: 1px solid var(--border-subtle);
+  @apply inline-flex items-center px-3.5 py-1.5;
+  border-radius: var(--radius-button);
+  color: var(--text-primary);
+  border: var(--rule-width) solid var(--border-subtle);
   background: var(--bg-surface);
+  min-height: 2.75rem;
   transition:
     border-color 200ms ease,
     color 200ms ease;
 }
 
 .pill-control:hover {
-  border-color: var(--border-hover);
+  border-color: var(--color-rule);
   color: var(--text-primary);
 }
 
-/* ── Sticky nav glass ── */
+/* ── Sticky nav ── */
 
 .nav-glass {
-  background: color-mix(in srgb, var(--bg-base) 80%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
+  background: var(--color-paper);
+  border: var(--rule-width) solid var(--color-rule);
+  box-shadow: var(--shadow-card);
 }
 
 /* ── Entrance (page load) ── */
@@ -267,7 +443,7 @@ body {
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -311,7 +487,7 @@ body {
 
 .reveal-card.card-interactive.is-visible:hover,
 .reveal-card.surface-card-interactive.is-visible:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 @keyframes pill-swap-in {
@@ -368,13 +544,16 @@ body {
     transform: none;
   }
 
-  .alive-pill-swap {
-    animation: none;
+  .btn-secondary:active {
+    transform: none;
   }
 
-  .hero-search-glow::before,
-  .glow-orange::before {
+  .mobile-menu-panel {
     transition: none;
+  }
+
+  .alive-pill-swap {
+    animation: none;
   }
 
   .btn-primary {

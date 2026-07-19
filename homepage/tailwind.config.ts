@@ -22,7 +22,6 @@ const config: Config = {
         "text-secondary": "var(--text-secondary)",
         "text-muted": "var(--text-muted)",
         "text-on-accent": "var(--text-on-accent)",
-        /* Legacy aliases used by existing class names during migration */
         bg: "var(--bg-base)",
         "bg-elevated": "var(--bg-surface)",
         surface: "var(--bg-surface)",
@@ -39,12 +38,18 @@ const config: Config = {
         "brand-sky": "var(--accent-blue)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "Manrope", "system-ui", "sans-serif"],
+        sans: ["var(--font-body)", "Manrope", "system-ui", "sans-serif"],
+        display: [
+          "var(--font-display)",
+          "Lexend",
+          "system-ui",
+          "sans-serif",
+        ],
+        mono: ["var(--font-mono)", "JetBrains Mono", "ui-monospace", "monospace"],
       },
       borderRadius: {
-        app: "1rem",
-        "app-sm": "0.5rem",
+        app: "0.25rem",
+        "app-sm": "0.25rem",
       },
       boxShadow: {
         app: "var(--shadow-card)",

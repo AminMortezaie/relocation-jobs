@@ -27,13 +27,13 @@ export function Card({
 
   return (
     <Tag
-      className={`card surface-card relative overflow-hidden rounded-2xl ${interactiveClass} ${className}`}
+      className={`card surface-card relative overflow-hidden rounded-app ${interactiveClass} ${className}`}
       style={style}
       data-variant={variant}
     >
       {accentBar ? (
         <span
-          className="pointer-events-none absolute bottom-0 left-0 top-0 w-1 rounded-l-2xl bg-gradient-to-b from-accent-primary via-accent-blue to-accent-purple opacity-70"
+          className="pointer-events-none absolute bottom-0 left-0 top-0 w-1 bg-accent-primary"
           aria-hidden="true"
         />
       ) : null}
@@ -62,7 +62,7 @@ export function FeatureCard({
   return (
     <Card interactive variant="feature" className={`flex h-full flex-col p-5 ${className}`} style={style}>
       <div className="mb-4 flex items-start justify-between gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-surface-hover text-accent-blue">
+        <span className="flex h-10 w-10 items-center justify-center rounded-app border border-[var(--color-rule)] bg-bg-surface-hover text-accent-primary">
           {icon}
         </span>
         {chip}
@@ -107,7 +107,7 @@ export function CompanyBoardCard({
               <h3 className="font-display text-xl font-bold tracking-[-0.02em] text-text-primary">
                 {name}
               </h3>
-              <span className="rounded-full border border-border-subtle bg-bg-surface-hover px-2.5 py-0.5 text-xs font-medium text-accent-blue">
+              <span className="rounded-app border border-[var(--color-rule)] bg-bg-surface-hover px-2.5 py-0.5 text-xs font-medium text-text-primary">
                 {country}
               </span>
               {status}
@@ -125,7 +125,7 @@ export function CompanyBoardCard({
         {jobs.map((job) => (
           <div
             key={job.title}
-            className="rounded-lg border border-border-subtle bg-bg-base/60 px-3 py-2.5"
+            className="rounded-app border border-border-subtle bg-bg-base/60 px-3 py-2.5"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-medium text-text-primary">{job.title}</p>

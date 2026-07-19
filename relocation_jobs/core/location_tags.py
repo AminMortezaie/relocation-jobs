@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import threading
+import time
 import unicodedata
 from datetime import date
 from pathlib import Path
@@ -36,6 +37,9 @@ _custom_countries_lock = threading.Lock()
 _custom_countries_cache: dict[str, str] | None = None
 _country_labels_cache: dict[str, str] | None = None
 _country_suffix_labels_cache: tuple[str, ...] | None = None
+_countries_cache_generation: int | None = None
+_countries_generation_checked_at: float = 0.0
+_COUNTRIES_GENERATION_TTL_S = 5.0
 
 
 def custom_cities_path() -> Path:
@@ -52,21 +56,65 @@ def _invalidate_custom_cities_cache() -> None:
 
 
 def _invalidate_custom_countries_cache() -> None:
-    global _custom_countries_cache, _country_labels_cache, _country_suffix_labels_cache
+    global _custom_countries_cache, _country_labels_cache
+    global _country_suffix_labels_cache, _countries_cache_generation
+    global _countries_generation_checked_at
     _custom_countries_cache = None
     _country_labels_cache = None
     _country_suffix_labels_cache = None
+    _countries_cache_generation = None
+    _countries_generation_checked_at = 0.0
 
 
 def invalidate_country_labels_cache() -> None:
-    global _country_labels_cache, _country_suffix_labels_cache
+    global _country_labels_cache, _country_suffix_labels_cache, _countries_cache_generation
+    global _countries_generation_checked_at
     _country_labels_cache = None
     _country_suffix_labels_cache = None
+    _countries_cache_generation = None
+    _countries_generation_checked_at = 0.0
+
+
+def _countries_generation_is_current() -> bool:
+    global _countries_generation_checked_at
+    now = time.monotonic()
+    if now - _countries_generation_checked_at < _COUNTRIES_GENERATION_TTL_S:
+        return True
+
+    from relocation_jobs.catalog.custom_countries import (
+        countries_use_redis,
+        get_countries_generation,
+    )
+
+    _countries_generation_checked_at = now
+    if not countries_use_redis():
+        return True
+    if _countries_cache_generation is None:
+        return False
+    return _countries_cache_generation == get_countries_generation()
+
+
+def _remember_countries_generation() -> None:
+    global _countries_cache_generation, _countries_generation_checked_at
+    from relocation_jobs.catalog.custom_countries import (
+        countries_use_redis,
+        get_countries_generation,
+    )
+
+    if countries_use_redis():
+        _countries_cache_generation = get_countries_generation()
+    else:
+        _countries_cache_generation = None
+    _countries_generation_checked_at = time.monotonic()
 
 
 def load_custom_countries(*, use_cache: bool = True) -> dict[str, str]:
     global _custom_countries_cache
-    if use_cache and _custom_countries_cache is not None:
+    if (
+        use_cache
+        and _custom_countries_cache is not None
+        and _countries_generation_is_current()
+    ):
         return _custom_countries_cache
 
     from relocation_jobs.catalog.custom_countries import load_country_labels_store
@@ -74,6 +122,7 @@ def load_custom_countries(*, use_cache: bool = True) -> dict[str, str]:
     parsed = load_country_labels_store()
     if use_cache:
         _custom_countries_cache = parsed
+        _remember_countries_generation()
     return parsed
 
 
@@ -86,7 +135,7 @@ def save_custom_countries(data: dict[str, str]) -> None:
 
 def all_country_labels() -> dict[str, str]:
     global _country_labels_cache
-    if _country_labels_cache is not None:
+    if _country_labels_cache is not None and _countries_generation_is_current():
         return _country_labels_cache
 
     from relocation_jobs.catalog.custom_countries import list_catalog_country_keys
@@ -96,6 +145,7 @@ def all_country_labels() -> dict[str, str]:
         if key not in merged:
             merged[key] = key.replace("-", " ").title()
     _country_labels_cache = merged
+    _remember_countries_generation()
     return merged
 
 

@@ -380,6 +380,21 @@ class PositionCard extends HTMLElement {
     const latest = newestStatusDate(hist, j.applied_date || "");
     const label = formatAppliedLabel({ date: latest, at: j.applied_at || "" });
     const title = formatAppliedHistoryTitle(evts.length ? evts : hist);
+    const appliedControl = j.applied
+      ? `<button type="button" class="applied-btn active" data-applied="1" aria-pressed="true"${title ? ` title="Applied on: ${escapeHtml(title)}"` : ' title="Clear applied mark"'}>Clear applied</button>`
+      : '<button type="button" class="applied-btn" data-applied="0" aria-pressed="false" title="Mark that you applied">Mark applied</button>';
+    const appliedStatus = j.applied
+      ? `<div class="position-application-status" title="${escapeHtml(title || label)}">
+          <span class="position-application-state"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Applied</span>
+          <span class="position-application-date">${escapeHtml(label.replace(/^Applied\s*·?\s*/, ""))}</span>
+        </div>`
+      : "";
+    const lookingControl = j.applied ? "" : (j.looking_to_apply
+      ? `<button type="button" class="looking-to-apply-btn active" data-looking="1" aria-pressed="true" title="${j.looking_to_apply_date ? `Interested since ${escapeHtml(j.looking_to_apply_date)}` : "Clear looking-to-apply mark"}">Interested</button>`
+      : '<button type="button" class="looking-to-apply-btn" data-looking="0" aria-pressed="false" title="Mark as interested in applying">Looking to apply</button>');
+    const seenControl = j.seen
+      ? `<button type="button" class="saw-before-btn active" data-seen="1" aria-pressed="true" title="${j.seen_date ? `Seen on ${escapeHtml(j.seen_date)}` : "Clear seen-before mark"}">Seen before</button>`
+      : '<button type="button" class="saw-before-btn" data-seen="0" aria-pressed="false" title="Mark that you saw this position before">Seen before</button>';
 
     return `<div class="position-card${posCls(j)}" ${this._attrRow()}>
       <div class="position-top">
@@ -387,28 +402,27 @@ class PositionCard extends HTMLElement {
           ${this._titleRow(j)}
           <div class="position-badges">
             ${j.visa_sponsorship === true ? '<span class="badge visa">Visa / relocation</span>' : ""}
-            ${j.applied ? `<span class="badge applied"${title ? ` title="Applied on: ${escapeHtml(title)}"` : ""}>${escapeHtml(label)}</span>` : ""}
             ${!j.applied && latest ? `<span class="badge applied" title="${escapeHtml(formatAppliedHistoryTitle(evts.length ? evts : hist))}">${escapeHtml(formatAppliedLabel({ date: latest, at: j.applied_at || "" }, { before: true }))}</span>` : ""}
-            ${j.waiting_referral && j.referral_linkedin_url ? `<a class="badge referral" href="${escapeHtml(j.referral_linkedin_url)}" target="_blank" rel="noopener noreferrer">Referrer</a>` : j.waiting_referral ? '<span class="badge referral">Waiting referral</span>' : ""}
-            ${j.looking_to_apply && !j.applied ? `<span class="badge looking-to-apply">Looking to apply${j.looking_to_apply_date ? ` · ${escapeHtml(j.looking_to_apply_date)}` : ""}</span>` : ""}
-            ${j.seen ? `<span class="badge seen">Saw before${j.seen_date ? ` · ${escapeHtml(j.seen_date)}` : ""}</span>` : ""}
             ${cvBadges(j)}
             <span class="badge date">${formatActivityBadge(jobActivityTs(j))}</span>
           </div>
         </div>
-        <div class="position-side">${this._pinBtn()}${this._atsWidget()}</div>
+        <div class="position-side">${this._atsWidget()}${this._pinBtn()}</div>
       </div>
-      <div class="position-actions">
-        ${j.applied ? `<button type="button" class="applied-btn active" data-applied="1"${title ? ` title="Applied on: ${escapeHtml(title)}"` : ' title="Clear applied mark"'}>${escapeHtml(label)}</button>`
-          : '<button type="button" class="applied-btn" data-applied="0" title="Mark that you applied">I applied</button>'}
-        <button type="button" class="rejected-btn" data-rejected="0" title="Mark that you got a rejection">Got rejection</button>
-        ${!j.applied ? (j.looking_to_apply
-          ? `<button type="button" class="looking-to-apply-btn active" data-looking="1" title="Clear looking-to-apply mark">Looking to apply${j.looking_to_apply_date ? ` · ${escapeHtml(j.looking_to_apply_date)}` : ""}</button>`
-          : '<button type="button" class="looking-to-apply-btn" data-looking="0" title="Mark as interested in applying">Looking to apply</button>') : ""}
-        ${j.seen ? `<button type="button" class="saw-before-btn active" data-seen="1" title="Clear saw-before mark">Saw before${j.seen_date ? ` · ${escapeHtml(j.seen_date)}` : ""}</button>`
-          : '<button type="button" class="saw-before-btn" data-seen="0" title="Mark that you saw this position before">Saw before</button>'}
+      ${appliedStatus}
+      <div class="position-actions-primary">
+        ${j.applied ? "" : appliedControl}
+        ${j.applied ? '<button type="button" class="rejected-btn" data-rejected="0" title="Mark that you got a rejection">Mark rejected</button>' : this._hideReason()}
+        <button type="button" class="position-more-btn" aria-expanded="false" aria-label="Show more role actions" title="More role actions">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg><span>More</span>
+        </button>
+      </div>
+      <div class="position-actions-secondary" aria-label="More role actions">
+        ${j.applied ? appliedControl : ""}
+        ${lookingControl}
+        ${seenControl}
         ${this._referralTrigger()}
-        ${!j.applied ? this._hideReason() : ""}
+        ${!j.applied ? '<button type="button" class="rejected-btn" data-rejected="0" title="Mark that you got a rejection">Mark rejected</button>' : ""}
       </div>
     </div>`;
   }
@@ -471,7 +485,7 @@ class PositionCard extends HTMLElement {
 
   _pinBtn() {
     const p = Boolean(this._job.pinned);
-    return `<button type="button" class="pin-job-btn${p ? " is-pinned" : ""}" title="${p ? "Pinned to top of this company" : "Pin role to top of this company"}" aria-label="${p ? "Pinned in company" : "Pin in company"}" aria-pressed="${p}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H8c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1.03-1 1.03 1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg></button>`;
+    return `<button type="button" class="pin-job-btn${p ? " is-pinned" : ""}" title="${p ? "Pinned to top of this company" : "Pin role to top of this company"}" aria-label="${p ? "Pinned in company" : "Pin in company"}" aria-pressed="${p}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H8c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1.03-1 1.03 1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg><span class="pin-job-label">${p ? "Pinned" : "Pin role"}</span></button>`;
   }
 
   _atsWidget() {
@@ -549,6 +563,14 @@ class PositionCard extends HTMLElement {
     if (!t) return;
 
     if (t.closest(".expand-cities-btn")) { e.stopPropagation(); this._citiesExpanded = !this._citiesExpanded; this.render(); return; }
+    if (t.closest(".position-more-btn")) {
+      e.stopPropagation();
+      const card = t.closest(".position-card");
+      const open = !card?.classList.contains("position-more-open");
+      card?.classList.toggle("position-more-open", open);
+      t.setAttribute("aria-expanded", open ? "true" : "false");
+      return;
+    }
 
     if (t.closest(".job-title")) { e.stopPropagation(); void this._markSeen(); return; }
 
@@ -601,6 +623,17 @@ class PositionCard extends HTMLElement {
   }
 
   _onKeydown(e) {
+    if (e.key === "Escape") {
+      const card = this.querySelector(".position-card.position-more-open");
+      if (card) {
+        card.classList.remove("position-more-open");
+        const trigger = card.querySelector(".position-more-btn");
+        trigger?.setAttribute("aria-expanded", "false");
+        trigger?.focus();
+        e.stopPropagation();
+        return;
+      }
+    }
     if (e.key !== "Enter") return;
     const number = e.target.closest(".ats-score-number");
     if (!number) return;

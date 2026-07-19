@@ -81,3 +81,34 @@ def test_public_seo_endpoints_are_available(v2_client):
     sitemap = v2_client.get("/sitemap.xml")
     assert sitemap.status_code == 200
     assert "<loc>https://kuchup.com/</loc>" in sitemap.get_data(as_text=True)
+
+
+def test_unknown_country_marketing_path_returns_404(v2_client):
+    resp = v2_client.get("/relocation-jobs-no-such-country")
+    assert resp.status_code == 404
+
+
+def test_country_marketing_path_requires_label_and_html(v2_client, monkeypatch, tmp_path):
+    from relocation_jobs.web import server as web_server
+
+    html_dir = tmp_path / "homepage"
+    html_dir.mkdir()
+    (html_dir / "relocation-jobs-armenia.html").write_text("<html>armenia</html>", encoding="utf-8")
+    monkeypatch.setattr(web_server, "HOMEPAGE_STATIC", html_dir)
+    monkeypatch.setattr(
+        web_server,
+        "all_country_labels",
+        lambda: {"armenia": "Armenia", "germany": "Germany"},
+    )
+
+    missing_html = v2_client.get("/relocation-jobs-germany")
+    assert missing_html.status_code == 404
+
+    ok = v2_client.get("/relocation-jobs-armenia")
+    assert ok.status_code == 200
+    assert "armenia" in ok.get_data(as_text=True)
+
+    sitemap = v2_client.get("/sitemap.xml")
+    body = sitemap.get_data(as_text=True)
+    assert "<loc>https://kuchup.com/relocation-jobs-armenia</loc>" in body
+    assert "relocation-jobs-germany" not in body

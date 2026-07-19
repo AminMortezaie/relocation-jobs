@@ -66,9 +66,15 @@ function setTab(tab) {
   const profile = $("applyProfilePanel");
   const masters = $("applyMastersPanel");
   const projects = $("applyProjectsPanel");
+  const connect = $("applyConnectPanel");
   if (profile) profile.hidden = tab !== "profile";
   if (masters) masters.hidden = tab !== "masters";
   if (projects) projects.hidden = tab !== "projects";
+  if (connect) connect.hidden = tab !== "connect";
+
+  if (tab === "connect") {
+    loadConnectPanel().catch((err) => showError(err.message || "Failed to load MCP connect info"));
+  }
 
   // PDF iframes load while their panel is hidden (profile is the default tab).
   // Re-set src after show so the browser PDF viewer gets the real viewport size.
@@ -682,6 +688,66 @@ async function logout() {
   showLogin();
 }
 
+async function loadConnectPanel() {
+  const info = await api("/api/mcp/connect-info");
+  const urlInput = $("applyMcpUrl");
+  if (urlInput) urlInput.value = info.mcp_url || "";
+  await refreshTokenList();
+}
+
+async function refreshTokenList() {
+  const data = await api("/api/mcp/tokens");
+  const list = $("applyTokenList");
+  if (!list) return;
+  const items = data.items || [];
+  if (!items.length) {
+    list.innerHTML = '<li class="apply-pipeline-empty">No API tokens yet.</li>';
+    return;
+  }
+  list.innerHTML = items
+    .map((item) => {
+      const status = item.revoked ? "Revoked" : "Active";
+      const revoke = item.revoked
+        ? ""
+        : `<button type="button" class="link-btn apply-token-revoke" data-id="${item.id}">Revoke</button>`;
+      return `<li class="apply-token-item">
+        <span class="apply-token-meta">${escapeHtml(item.label || "Untitled")} · ${escapeHtml(status)} · ${escapeHtml(item.created_at || "")}</span>
+        ${revoke}
+      </li>`;
+    })
+    .join("");
+}
+
+async function createApiToken() {
+  const label = ($("applyTokenLabel")?.value || "").trim();
+  const data = await api("/api/mcp/tokens", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ label }),
+  });
+  const once = $("applyTokenOnce");
+  const value = $("applyTokenOnceValue");
+  if (once && value) {
+    value.textContent = data.token || "";
+    once.hidden = false;
+  }
+  if ($("applyTokenLabel")) $("applyTokenLabel").value = "";
+  await refreshTokenList();
+  showToast("Token created — copy it now");
+}
+
+async function revokeApiToken(tokenId) {
+  await api(`/api/mcp/tokens/${tokenId}`, { method: "DELETE" });
+  showToast("Token revoked");
+  await refreshTokenList();
+}
+
+async function copyText(value, okMessage) {
+  if (!value) return;
+  await navigator.clipboard.writeText(value);
+  showToast(okMessage);
+}
+
 function bindEvents() {
   $("applyLoginForm")?.addEventListener("submit", submitLogin);
   $("applyLogoutBtn")?.addEventListener("click", logout);
@@ -717,6 +783,21 @@ function bindEvents() {
   for (const tabBtn of document.querySelectorAll(".apply-tab")) {
     tabBtn.addEventListener("click", () => setTab(tabBtn.dataset.tab));
   }
+
+  $("applyMcpUrlCopyBtn")?.addEventListener("click", () => {
+    copyText($("applyMcpUrl")?.value || "", "MCP URL copied");
+  });
+  $("applyTokenCreateBtn")?.addEventListener("click", () => {
+    createApiToken().catch((err) => showError(err.message || "Failed to create token"));
+  });
+  $("applyTokenOnceCopyBtn")?.addEventListener("click", () => {
+    copyText($("applyTokenOnceValue")?.textContent || "", "Token copied");
+  });
+  $("applyTokenList")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".apply-token-revoke");
+    if (!btn) return;
+    revokeApiToken(Number(btn.dataset.id)).catch((err) => showError(err.message || "Failed to revoke token"));
+  });
 }
 
 async function init() {

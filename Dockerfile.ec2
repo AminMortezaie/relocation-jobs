@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # EC2 panel image (no Playwright browser — scrape stays local or enable later on larger instance).
 FROM python:3.12-slim-bookworm
 
@@ -35,13 +36,14 @@ RUN tectonic --outdir /tmp/tectonic-warm /tmp/tectonic-warm/warm.tex \
 
 # Panel does not scrape on EC2 — skip playwright (~130MB) and browsers.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,id=relocation-panel-pip,target=/root/.cache/pip \
+    pip install -r requirements.txt
 
 COPY . .
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh docker-entrypoint-mcp.sh
 
 RUN mkdir -p /tmp/panel-data
 
-EXPOSE 10000
+EXPOSE 10000 10001
 
 CMD ["./docker-entrypoint.sh"]

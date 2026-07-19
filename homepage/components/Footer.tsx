@@ -1,12 +1,12 @@
-const FOOTER_LINKS = [
+import { countryLinks } from "@/lib/countries";
+
+const PRODUCT_LINKS = [
   { href: "/panel", label: "Board" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/relocation-jobs-germany", label: "Jobs in Germany" },
-  { href: "/relocation-jobs-netherlands", label: "Jobs in Netherlands" },
-  { href: "/relocation-jobs-uk", label: "Jobs in UK" },
-  { href: "/relocation-jobs-portugal", label: "Jobs in Portugal" },
-  { href: "/relocation-jobs-ireland", label: "Jobs in Ireland" },
+] as const;
+
+const META_LINKS = [
   {
     href: "https://github.com/AminMortezaie/relocation-jobs/blob/main/docs/contributing.md",
     label: "Contributing",
@@ -20,30 +20,55 @@ const FOOTER_LINKS = [
 ] as const;
 
 export function Footer() {
+  const countryNav = countryLinks();
   return (
     <footer className="border-t border-border-subtle py-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-6">
         <p className="font-display text-sm font-bold tracking-[0.06em] text-text-primary">
           KUCHUP
         </p>
-        <nav aria-label="Footer">
-          <ul className="flex flex-wrap gap-2">
-            {FOOTER_LINKS.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text-primary"
-                  {...("external" in link && link.external
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+
+        <div className="grid gap-5 sm:grid-cols-3">
+          <FooterGroup title="Product" links={PRODUCT_LINKS} />
+          <FooterGroup title="Countries" links={countryNav} />
+          <FooterGroup title="Project" links={META_LINKS} />
+        </div>
       </div>
     </footer>
+  );
+}
+
+function FooterGroup({
+  title,
+  links,
+}: {
+  title: string;
+  links: readonly {
+    href: string;
+    label: string;
+    external?: boolean;
+  }[];
+}) {
+  return (
+    <nav aria-label={title}>
+      <p className="mb-2 text-xs font-medium uppercase tracking-[0.08em] text-text-muted">
+        {title}
+      </p>
+      <ul className="flex flex-col gap-1.5">
+        {links.map((link) => (
+          <li key={link.label}>
+            <a
+              href={link.href}
+              className="text-sm font-medium text-text-secondary transition-colors duration-150 ease-out hover:text-text-primary"
+              {...(link.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }

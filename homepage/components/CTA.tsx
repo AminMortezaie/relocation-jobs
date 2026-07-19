@@ -20,7 +20,6 @@ export function CTA() {
         </p>
         <div className="hero-search-glow mt-6 max-w-2xl">
           <SearchBar
-            compact
             key={`cta-${filters?.country ?? "all"}-${filters?.q ?? ""}`}
             onSearch={onSearch}
             defaultFilters={filters ?? undefined}

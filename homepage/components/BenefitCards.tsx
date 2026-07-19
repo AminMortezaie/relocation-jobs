@@ -51,13 +51,13 @@ export function BenefitCards() {
       className="section-major"
       aria-labelledby="benefits-heading"
     >
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <h2 id="benefits-heading" className="text-section-title text-text-primary">
           What you get
         </h2>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="benefit-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-12">
         {BENEFITS.map((item, index) => (
           <FeatureCard
             key={item.title}
@@ -71,7 +71,7 @@ export function BenefitCards() {
                 <Pill variant={item.chip.variant}>{item.chip.label}</Pill>
               )
             }
-            className={`reveal-card ${animate ? "reveal-pending" : ""} ${visible ? "is-visible" : ""}`}
+            className={`benefit-card benefit-card-${index + 1} reveal-card ${animate ? "reveal-pending" : ""} ${visible ? "is-visible" : ""}`}
             style={{ transitionDelay: visible && animate ? `${index * 80}ms` : undefined }}
           />
         ))}

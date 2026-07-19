@@ -2,11 +2,16 @@
 
 **Last updated:** 2026-07-08
 
-Plan and reference for the `relocation_jobs/mcp/` domain: a local MCP server for **Claude Desktop** that prepares tailored resume PDFs for jobs on the panel. v0 does **not** submit applications automatically and does **not** use the Claude API — Claude Desktop (subscription) does the resume reframing in chat; this app supplies data, validation, PDF rendering, and board state updates.
+Plan and reference for the `relocation_jobs/mcp/` domain: MCP tools that prepare tailored resume PDFs for jobs on the panel. v0 does **not** submit applications automatically and does **not** use the Claude API — Claude (or Cursor) does the resume reframing in chat; this app supplies data, validation, PDF rendering, and board state updates.
 
 **Private data is stored in Postgres per user — nothing sensitive is committed to git.**
 
-Use the panel **Application data** page at `/apply` (also linked from the account menu) to edit your profile, **pipeline prompts**, **master resumes**, and **project masters** in the browser. Claude Desktop MCP tools read the same data for the configured MCP user (`MCP_USERNAME` / `MCP_USER_ID` env).
+Transports:
+
+- **Remote (production):** Streamable HTTP + OAuth at `https://mcp.kuchup.com/mcp` — Claude custom connectors (including mobile) and Cursor.
+- **Local stdio:** `scripts/mcp_server.py` with `MCP_USERNAME` / `MCP_USER_ID` for Claude Desktop on a laptop.
+
+Use the panel **Application data** page at `/apply` to edit profile, pipeline prompts, masters, and **Connect MCP** (URL + optional API tokens).
 
 Related: [architecture.md](architecture.md), [business-rules.md](business-rules.md), [contributing.md](../contributing.md).
 
@@ -30,16 +35,18 @@ Related: [architecture.md](architecture.md), [business-rules.md](business-rules.
 ## Architecture
 
 ```text
-Claude Desktop
-        ▼
-scripts/mcp_server.py  (stdio MCP)
-        ▼
+Claude / Cursor (remote)          Claude Desktop (local)
+        ▼                                    ▼
+scripts/mcp_http_server.py          scripts/mcp_server.py
+  (Streamable HTTP + OAuth)           (stdio + MCP_USERNAME)
+        ▼                                    ▼
 relocation_jobs/mcp/
-  server.py      MCP tools
-  service.py     Orchestration (no SQL)
-  repo.py        Postgres
-  validate.py    Structure + fact checks vs master
-  render.py      LaTeX compile (temp dir)
+  server.py / http_app.py   MCP tools + HTTP wiring
+  oauth_provider.py         OAuth AS (panel login)
+  oauth_repo.py             Clients, codes, tokens, API tokens
+  service.py                Orchestration (no SQL)
+  repo.py                   Postgres application data
+  validate.py / render.py   Structure checks + LaTeX
         │
         ├── catalog/repo
         ├── positions/service
@@ -351,14 +358,52 @@ Apply using the mcp-resume-reframe skill to the first job in my UK queue:
 
 ---
 
+## Remote MCP (Claude / Cursor, OAuth)
+
+Production endpoint: `https://mcp.kuchup.com/mcp` (Streamable HTTP + MCP OAuth). Each user signs in with their **panel username/password** on our login page; tokens are scoped to that `user_id`.
+
+**Claude (web → mobile)**
+
+1. Panel → `/apply` → **Connect MCP** → copy the MCP URL.
+2. [Customize → Connectors](https://claude.ai/customize/connectors) → Add custom connector → paste URL only → Connect.
+3. Complete login/consent on `mcp.kuchup.com`.
+4. On the phone: chat **+** → Connectors → enable (no URL paste on mobile).
+
+**Cursor**
+
+```json
+{
+  "mcpServers": {
+    "kuchup": {
+      "url": "https://mcp.kuchup.com/mcp"
+    }
+  }
+}
+```
+
+Settings → MCP → **Connect** → same Kuchup login page.
+
+**Optional API tokens** on `/apply` → Connect MCP are for scripts only (`Authorization: Bearer kch_…`). Do not paste them into Claude when using OAuth.
+
+Local HTTP for development:
+
+```bash
+MCP_PUBLIC_BASE_URL=http://127.0.0.1:10001 MCP_HTTP_PORT=10001 python3 scripts/mcp_http_server.py
+```
+
+Local **stdio** Claude Desktop (`scripts/mcp_server.py` + `MCP_USERNAME`) remains supported.
+
 ## Configuration
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `MCP_USERNAME` | `admin` | Panel user |
-| `MCP_USER_ID` | (unset) | Override user id |
+| `MCP_USERNAME` | `admin` | Panel user (stdio only) |
+| `MCP_USER_ID` | (unset) | Override user id (stdio only) |
 | `MCP_LATEX_CMD` | `tectonic` | LaTeX binary |
 | `DATABASE_URL` | (required) | Same as panel |
+| `MCP_PUBLIC_BASE_URL` | `http://127.0.0.1:10001` | Public origin for OAuth redirects / metadata |
+| `MCP_HTTP_HOST` | `0.0.0.0` | HTTP bind host |
+| `MCP_HTTP_PORT` | `10001` | HTTP bind port |
 
 ### Troubleshooting
 
@@ -429,10 +474,16 @@ relocation_jobs/mcp/
   repo.py
   service.py
   server.py
+  http_app.py
+  oauth_provider.py
+  oauth_repo.py
+  oauth_pages.py
+  context.py
   validate.py
   render.py
   types.py
 
 scripts/mcp_server.py
+scripts/mcp_http_server.py
 tests/mcp/
 ```

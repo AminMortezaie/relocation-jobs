@@ -112,6 +112,7 @@ def _migrate_schema(conn) -> None:
     run_migration_once(conn, "mcp_cover_letter_v1", _migrate_mcp_cover_letter_v1)
     run_migration_once(conn, "mcp_project_masters_v1", _migrate_mcp_project_masters_v1)
     run_migration_once(conn, "mcp_project_masters_pdf_v1", _migrate_mcp_project_masters_pdf_v1)
+    run_migration_once(conn, "mcp_oauth_remote_v1", _ensure_mcp_oauth_remote_tables)
     run_migration_once(conn, "location_gate_override_v1", _apply_location_gate_override_column)
 
 
@@ -269,6 +270,68 @@ def _migrate_mcp_project_masters_pdf_v1(conn) -> None:
         ADD COLUMN IF NOT EXISTS pdf_bytes BYTEA;
         ALTER TABLE mcp_project_masters
         ADD COLUMN IF NOT EXISTS pdf_updated_at TEXT;
+        """
+    )
+
+
+def _ensure_mcp_oauth_remote_tables(conn) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS mcp_oauth_clients (
+            client_id TEXT PRIMARY KEY,
+            client_info_json TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS mcp_oauth_pending (
+            request_id TEXT PRIMARY KEY,
+            client_id TEXT NOT NULL,
+            params_json TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS mcp_oauth_auth_codes (
+            code_hash TEXT PRIMARY KEY,
+            client_id TEXT NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            scopes_json TEXT NOT NULL DEFAULT '[]',
+            code_challenge TEXT NOT NULL,
+            redirect_uri TEXT NOT NULL,
+            redirect_uri_provided_explicitly INTEGER NOT NULL DEFAULT 0,
+            resource TEXT,
+            expires_at TEXT NOT NULL,
+            consumed_at TEXT,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS mcp_oauth_tokens (
+            token_hash TEXT PRIMARY KEY,
+            token_kind TEXT NOT NULL,
+            client_id TEXT NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            scopes_json TEXT NOT NULL DEFAULT '[]',
+            resource TEXT,
+            expires_at TEXT,
+            revoked_at TEXT,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_mcp_oauth_tokens_user
+            ON mcp_oauth_tokens(user_id, token_kind);
+
+        CREATE TABLE IF NOT EXISTS mcp_api_tokens (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            token_hash TEXT NOT NULL UNIQUE,
+            label TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL,
+            last_used_at TEXT,
+            revoked_at TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_mcp_api_tokens_user
+            ON mcp_api_tokens(user_id);
         """
     )
 

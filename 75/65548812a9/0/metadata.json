@@ -1,0 +1,350 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "7565548812a9",
+  "session_id": "0561df91-bf5d-4719-a53e-ca56eec050e5",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-19T14:57:20.128218Z",
+  "branch": "main",
+  "checkpoints_count": 15,
+  "save_step_count": 15,
+  "files_touched": [
+    ".dockerignore",
+    ".env.example",
+    "Dockerfile.ec2",
+    "Dockerfile.ec2-worker",
+    "docker-entrypoint-mcp.sh",
+    "docs/README.md",
+    "docs/operations/ec2-panel.md",
+    "docs/reference/mcp-application.md",
+    "homepage/app/[slug]/page.tsx",
+    "homepage/app/globals.css",
+    "homepage/app/relocation-jobs-germany/page.tsx",
+    "homepage/app/relocation-jobs-ireland/page.tsx",
+    "homepage/app/relocation-jobs-netherlands/page.tsx",
+    "homepage/app/relocation-jobs-portugal/page.tsx",
+    "homepage/app/relocation-jobs-uk/page.tsx",
+    "homepage/components/BenefitCards.tsx",
+    "homepage/components/BrandMark.tsx",
+    "homepage/components/CTA.tsx",
+    "homepage/components/Footer.tsx",
+    "homepage/components/Header.tsx",
+    "homepage/components/Hero.tsx",
+    "homepage/components/ReassuranceStrip.tsx",
+    "homepage/components/SearchBar.tsx",
+    "homepage/lib/countries.ts",
+    "relocation_jobs/catalog/custom_countries.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/core/migrations.py",
+    "relocation_jobs/mcp/context.py",
+    "relocation_jobs/mcp/http_app.py",
+    "relocation_jobs/mcp/oauth_pages.py",
+    "relocation_jobs/mcp/oauth_provider.py",
+    "relocation_jobs/mcp/oauth_repo.py",
+    "relocation_jobs/mcp/service.py",
+    "relocation_jobs/static/apply.html",
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_ssgManifest.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/[slug]/page-99108f236d26f6aa.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-3dfc35d67d515875.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-99108f236d26f6aa.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/page-fe9090335e9288c5.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-3dfc35d67d515875.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-99108f236d26f6aa.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-germany/page-3dfc35d67d515875.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-ireland/page-3dfc35d67d515875.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-netherlands/page-3dfc35d67d515875.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-portugal/page-3dfc35d67d515875.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-uk/page-3dfc35d67d515875.js",
+    "relocation_jobs/static/homepage/_next/static/css/4426b7a9e8f41f14.css",
+    "relocation_jobs/static/homepage/how-it-works.html",
+    "relocation_jobs/static/homepage/how-it-works.txt",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt",
+    "relocation_jobs/static/homepage/pricing.html",
+    "relocation_jobs/static/homepage/pricing.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.html",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-ireland.html",
+    "relocation_jobs/static/homepage/relocation-jobs-ireland.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.html",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.html",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.html",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.txt",
+    "relocation_jobs/static/js/apply.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/mcp.py",
+    "relocation_jobs/web/server.py",
+    "requirements.txt",
+    "scripts/build_homepage.sh",
+    "scripts/ec2_app_deploy.sh",
+    "scripts/export_homepage_countries.py",
+    "scripts/mcp_http_server.py",
+    "tests/catalog/test_countries_redis.py",
+    "tests/helpers/route_manifest.py",
+    "tests/mcp/test_mcp_oauth.py",
+    "tests/web/test_mcp_tokens.py",
+    "tests/web/test_public_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "e2607d3cda60",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 610142,
+    "cache_creation_tokens": 416404,
+    "cache_read_tokens": 16616542,
+    "output_tokens": 85798,
+    "api_call_count": 14
+  },
+  "session_metrics": {
+    "duration_ms": 39371281,
+    "turn_count": 15,
+    "context_tokens": 285908,
+    "context_window_size": 300000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-19T14:57:20.077371Z",
+    "agent_lines": 2917,
+    "agent_removed": 762,
+    "human_added": 591,
+    "human_modified": 298,
+    "human_removed": 0,
+    "total_committed": 3806,
+    "total_lines_changed": 4859,
+    "agent_percentage": 75.7151677299856,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 467,
+      "user_lines_removed": 298,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "homepage/app/globals.css": 78,
+        "homepage/components/BenefitCards.tsx": 2,
+        "homepage/components/BrandMark.tsx": 4,
+        "homepage/components/Footer.tsx": 54,
+        "homepage/components/Header.tsx": 97,
+        "homepage/components/Hero.tsx": 19,
+        "homepage/components/ReassuranceStrip.tsx": 3,
+        "homepage/components/SearchBar.tsx": 4,
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/725-5976e28cda9aa97d.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-be7608bf431e9ef7.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/page-0499bcc0941ac78e.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-be7608bf431e9ef7.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-germany/page-be7608bf431e9ef7.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-ireland/page-be7608bf431e9ef7.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-netherlands/page-be7608bf431e9ef7.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-portugal/page-be7608bf431e9ef7.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-uk/page-be7608bf431e9ef7.js": 1,
+        "relocation_jobs/static/homepage/_next/static/css/bdeefd3d4a74dab3.css": 4,
+        "relocation_jobs/static/homepage/_next/static/xopDHaN46I8nMRqdWZsbF/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/xopDHaN46I8nMRqdWZsbF/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/how-it-works.html": 1,
+        "relocation_jobs/static/homepage/how-it-works.txt": 21,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 28,
+        "relocation_jobs/static/homepage/pricing.html": 1,
+        "relocation_jobs/static/homepage/pricing.txt": 19,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.txt": 20,
+        "relocation_jobs/static/homepage/relocation-jobs-ireland.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-ireland.txt": 21,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt": 21,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.txt": 20,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.txt": 20,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "homepage/app/globals.css": 13,
+        "homepage/components/BenefitCards.tsx": 2,
+        "homepage/components/BrandMark.tsx": 3,
+        "homepage/components/CTA.tsx": 1,
+        "homepage/components/Footer.tsx": 24,
+        "homepage/components/Header.tsx": 28,
+        "homepage/components/Hero.tsx": 9,
+        "homepage/components/ReassuranceStrip.tsx": 3,
+        "homepage/components/SearchBar.tsx": 6,
+        "relocation_jobs/static/homepage/404.html": 1,
+        "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_buildManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_ssgManifest.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-3dfc35d67d515875.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/page-fe9090335e9288c5.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-3dfc35d67d515875.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-germany/page-3dfc35d67d515875.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-ireland/page-3dfc35d67d515875.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-netherlands/page-3dfc35d67d515875.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-portugal/page-3dfc35d67d515875.js": 1,
+        "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-uk/page-3dfc35d67d515875.js": 1,
+        "relocation_jobs/static/homepage/_next/static/css/4426b7a9e8f41f14.css": 4,
+        "relocation_jobs/static/homepage/how-it-works.html": 1,
+        "relocation_jobs/static/homepage/how-it-works.txt": 22,
+        "relocation_jobs/static/homepage/index.html": 1,
+        "relocation_jobs/static/homepage/index.txt": 32,
+        "relocation_jobs/static/homepage/pricing.html": 1,
+        "relocation_jobs/static/homepage/pricing.txt": 22,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-germany.txt": 22,
+        "relocation_jobs/static/homepage/relocation-jobs-ireland.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-ireland.txt": 22,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt": 22,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-portugal.txt": 22,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.html": 1,
+        "relocation_jobs/static/homepage/relocation-jobs-uk.txt": 22
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 298,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 298,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 298,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 298,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 298,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 298,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2170,
+      "agent_lines_removed": 766,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 9,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2403,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 10,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2403,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 11,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2403,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 12,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2403,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 13,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2403,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 14,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2403,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 15,
+      "user_lines_added": 224,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2443,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "docs/README.md": 2,
+        "docs/reference/country-cache-redis-hotpath-incident.md": 210,
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

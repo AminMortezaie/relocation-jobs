@@ -1,0 +1,67 @@
+plan to deploy mcp on other application on aws to have access to it on internet also it should be user-based and each user can access to just their data.
+
+---
+
+plan to deploy mcp on other application on aws to have access to it on internet also it should be user-based and each user can access to just their data.
+
+---
+
+q1: 1
+q2: 1
+
+---
+
+can i add the mcp connector to mobile app of claude?
+
+---
+
+yes please update it
+
+---
+
+yes please update it, and also i think we can handle with the same way for cursor on OAuth also, am i right?
+
+---
+
+and also it should be a place to user get its oauth and input their data on claude.
+am i right?
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+restart the panel
+
+---
+
+panel is not starting up
+
+---
+
+i think it cannot connect to aws.
+
+---
+
+start locally and point to it to see is this going correctly or not then we deploy
+
+---
+
+but the board is not going up you can check
+
+---
+
+check for it i think the problem is something else
+
+---
+
+unset redis
+
+---
+
+ok, fixed.
+i have created the mcp.Kuchup.com on cloudflare and its ready.
+you can ping it and if everything is okay you can deploy to check for the changes

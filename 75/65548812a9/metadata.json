@@ -3,7 +3,7 @@
   "checkpoint_id": "7565548812a9",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 15,
+  "checkpoints_count": 16,
   "files_touched": [
     ".dockerignore",
     ".env.example",
@@ -38,7 +38,9 @@
     "relocation_jobs/mcp/oauth_provider.py",
     "relocation_jobs/mcp/oauth_repo.py",
     "relocation_jobs/mcp/service.py",
+    "relocation_jobs/static/admin.html",
     "relocation_jobs/static/apply.html",
+    "relocation_jobs/static/company.html",
     "relocation_jobs/static/homepage/404.html",
     "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_buildManifest.js",
     "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_ssgManifest.js",
@@ -70,6 +72,7 @@
     "relocation_jobs/static/homepage/relocation-jobs-portugal.txt",
     "relocation_jobs/static/homepage/relocation-jobs-uk.html",
     "relocation_jobs/static/homepage/relocation-jobs-uk.txt",
+    "relocation_jobs/static/index.html",
     "relocation_jobs/static/js/apply.js",
     "relocation_jobs/static/styles.css",
     "relocation_jobs/web/routes/mcp.py",
@@ -92,13 +95,20 @@
       "compact_transcript": "/75/65548812a9/0/transcript.jsonl",
       "content_hash": "/75/65548812a9/0/content_hash.txt",
       "prompt": "/75/65548812a9/0/prompt.txt"
+    },
+    {
+      "metadata": "/75/65548812a9/1/metadata.json",
+      "transcript": "/75/65548812a9/1/full.jsonl",
+      "compact_transcript": "/75/65548812a9/1/transcript.jsonl",
+      "content_hash": "/75/65548812a9/1/content_hash.txt",
+      "prompt": "/75/65548812a9/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 610142,
-    "cache_creation_tokens": 416404,
+    "input_tokens": 610145,
+    "cache_creation_tokens": 439248,
     "cache_read_tokens": 16616542,
-    "output_tokens": 85798,
-    "api_call_count": 14
+    "output_tokens": 85958,
+    "api_call_count": 15
   }
 }

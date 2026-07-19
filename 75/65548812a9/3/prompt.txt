@@ -1,0 +1,21 @@
+in deploying on AWS  i see that its taking long time to deploy and maybe the shell file is written wrongly and some packages are always downloading again and again and there is no need to it and it can be so faster than this.
+
+can you assess the shell file and tell me the problems it has?
+
+---
+
+in deploying on AWS  i see that its taking long time to deploy and maybe the shell file is written wrongly and some packages are always downloading again and again and there is no need to it and it can be so faster than this.
+
+can you assess the shell file and tell me the problems it has?
+
+---
+
+create a plan to implement it and fix all the problems you see.
+
+---
+
+start to implement and then write down what you did and what was happening before and why this made everything better.
+
+---
+
+go

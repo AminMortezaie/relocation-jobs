@@ -1,0 +1,135 @@
+## Prompt: Hallmark redesign — whole site (Cold Snap structure + brand orange)
+
+### Goal
+Refactor the **entire user-facing panel UI** (and related shared tokens) so it uses **Hallmark Carnival / Cold Snap structure** while **preserving Kuchup brand orange** as the primary accent. Do **not** invent a new product IA, routes, or business logic. Visual/interaction layer only.
+
+Local panel: `http://127.0.0.1:5051/panel` with `PANEL_SCRAPE_ENABLED=1`.
+
+### Mandatory skills (read and follow in this order)
+
+1. **`.claude/skills/getting-started/SKILL.md`**
+2. **`.claude/skills/collaboration-style/SKILL.md`** — ask before structural/file-deletion decisions; reason first.
+3. **`.claude/skills/engineering-standards/SKILL.md`** — no lazy imports; no drive-by refactors; don’t commit unless asked.
+4. **`.claude/skills/codebase-memory/SKILL.md`** + **`codebase-memory-mcp`** — graph/search before broad Grep/file reads.
+5. **`.agents/skills/hallmark/SKILL.md`** then **`hallmark redesign`** via **`.agents/skills/hallmark/references/verbs/redesign.md`**
+6. **`.agents/skills/hallmark/references/themes/carnival.md`** — Cold Snap is Drop 01 (default). Use its **structure and rhythm**, not a blind mustard/oxblood swap for brand.
+7. Load Hallmark refs as needed: `typography.md`, `color.md`, `layout-and-space.md`, `motion.md`, `microinteractions.md`, `interaction-and-states.md`, `responsive.md`, `anti-patterns.md`, `slop-test.md`, `copy.md`
+8. **`.cursor/skills/brand/SKILL.md`** — keep brand identity coherent; orange is non-negotiable.
+9. Optional validators: **`.cursor/skills/ui-ux-pro-max/SKILL.md`**, **`.claude/ux-skills/apple-design/SKILL.md`**, **`.claude/ux-skills/emil-design-eng/SKILL.md`** for craft checks (touch targets, press feedback, hierarchy).
+
+### Brand orange (must preserve)
+
+Source of truth today: `relocation_jobs/static/design-tokens.css`
+
+- Primary: `#ff6b35` (`--accent-primary`)
+- Hover: `#ff7f52`
+- Soft: `rgba(255, 107, 53, 0.14)`
+- On-accent text: `#0a0e27` (`--text-on-accent`) — keep WCAG AA on orange fills
+
+**Rule:** Cold Snap’s mustard (`oklch(86% 0.18 95)`) and oxblood (`oklch(40% 0.21 25)`) are **reference roles**, not locked hexes. Remap:
+
+| Cold Snap role | Site mapping |
+|---|---|
+| Accent (mustard) | Brand orange `#ff6b35` (primary CTA / highlight fills) |
+| Accent-2 / rules / ink-weight | Deep aubergine/ink OR a darker orange-adjacent ink — **not** purple-cyan neon |
+| Paper | Warm tinted light paper (Cold Snap cream family) **or** a deliberate dark Cold Snap–adapted paper if keeping dark mode — pick one system and stick to it |
+| Ink | Deep aubergine / near-black with warm chroma |
+
+Do **not** keep Night Flight’s multi-accent carnival (blue + purple + green + orange all competing). Status colors may remain semantic, but secondary accents must be quieter than brand orange.
+
+### What already works (do not regress)
+
+Previous work on **company + position cards** already includes:
+
+- Progressive disclosure of roles on mobile (`ROLE_PREVIEW_LIMIT`)
+- Action hierarchy: primary / secondary / overflow menus
+- Pin as header utility (not buried in action grids)
+- Flat position rows (no card-in-card)
+- Cold Snap **structure**: 2px rules, tight radius, hard-offset shadows, heavier headings
+- Scoped Cold Snap palette on cards only (temporary) in `styles.css`
+
+**Your job:** lift this from “cards only” to **whole site**, with orange as brand accent, via tokens — not one-off card overrides forever.
+
+### Scope
+
+**In scope**
+- Shared tokens: `relocation_jobs/static/design-tokens.css` (+ any homepage tokens that share Night Flight)
+- Panel chrome: header, filters, toolbar, dialogs, buttons, badges, forms
+- Company/position cards (unify under global tokens; remove temporary card-only palette forks where possible)
+- Rebuild frontend: `cd frontend && npm run build`
+- Bump cache query params in `relocation_jobs/static/index.html`
+
+**Out of scope unless user confirms**
+- Deleting routes/components
+- Changing job-state business rules
+- Deploying to EC2 / kuchup.com
+- Rewriting product copy
+
+If homepage (`homepage/`) shares tokens/brand, include it in the same token pass; ask once if homepage styling diverges.
+
+### Hallmark process requirements
+
+1. Pre-flight scan existing tokens/fonts/motion.
+2. Multi-page/app flow from `redesign.md`: propose a locked **`design.md`** (genre, theme family, typography, spacing, motion, CTA voice) **and wait for confirmation** before rewriting everything.
+3. Genre: treat as **app surface** — prefer **modern-minimal / technical tone** with Carnival Cold Snap **poster structure** (rules, offset shadows, weight), not carnival marketing loudness across every screen.
+4. Stamp CSS; append `.hallmark/log.json`.
+5. Run responsive checks at **320 / 375 / 414 / 768**.
+6. Run slop-test gates relevant to app UI (no purple gradients, no Inter-as-only-stack if you can improve pairing while preserving brand, no invented metrics, locked tokens, ≥44px targets, `overflow-x: clip`).
+
+### Implementation constraints
+
+- Prefer token-first: change `:root` / `design-tokens.css`, then thin component CSS.
+- Keep React/`position-card` event handlers and APIs intact.
+- No secrets in docs; do not commit unless asked.
+- After build, verify served assets at `127.0.0.1:5051` include new `?v=` and markers; hard-refresh if needed.
+
+### Success criteria
+
+- Whole panel feels like one Cold Snap–structured system.
+- Brand orange is the clear primary accent (CTAs, focus, key highlights).
+- Cards remain usable on mobile (no nested cards, consistent control heights, pin separate).
+- Contrast passes on light/dark choice you commit to.
+- Preview screenshots at 375 and 768 before declaring done.
+
+### First message expected from the agent
+
+1. Skills loaded list  
+2. Pre-flight findings (tokens/fonts)  
+3. Proposed `design.md` summary: paper mode (light Cold Snap vs dark adaptation), orange mapping, type pairing  
+4. File plan (modify / create / delete — deletions need approval)  
+5. Wait for “go ahead”
+
+“Include `homepage/` marketing pages in the same token system.”
+
+create a plan for it.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+now based on the logo we have you need to review the colors is using in whole application.
+i want light theme for website so we should not use dark colors but i didnt the colors we used is not fit with the logo and brand.
+use skills and decide on colors.
+
+---
+
+no it has no emphaty in this color and its so tick.
+we want to transfer engaging to people to have oportunities for them to apply and relocate aboard.
+
+---
+
+https://www.usehallmark.com/examples/hum-07/ 
+can you find this theme?
+
+---
+
+2
+
+---
+
+it also have this problem on desktop version on this.
+this is a problem with this circle.

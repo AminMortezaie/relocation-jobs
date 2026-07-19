@@ -12,6 +12,7 @@ export function filtersToQuery(filters: SearchFilters) {
 
 export function panelHref(filters: SearchFilters) {
   const params = filtersToQuery(filters);
+  params.set("visa_only", "1");
   const query = params.toString();
   return query ? `/panel?${query}` : "/panel";
 }

@@ -439,6 +439,75 @@ def load_catalog_companies_page(
     return out
 
 
+def list_sponsored_catalog_jobs(
+    country_keys: list[str],
+    *,
+    limit: int,
+    search: str | None = None,
+) -> list[dict]:
+    if not country_keys or limit <= 0:
+        return []
+    country_sql, country_params = _country_in_clause(country_keys)
+    search_sql = ""
+    search_params: list[str] = []
+    if search:
+        pattern = f"%{search.strip().lower()}%"
+        search_sql = " AND (LOWER(j.title) LIKE %s OR LOWER(c.name) LIKE %s)"
+        search_params = [pattern, pattern]
+    with db_read() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT j.title, j.url, j.fetched, j.last_seen, j.location,
+                   c.name AS company_name, c.country, c.city
+            FROM matching_jobs j
+            JOIN companies c ON c.id = j.company_id
+            WHERE {country_sql}
+              AND j.visa_sponsorship = 1
+              {search_sql}
+            ORDER BY COALESCE(NULLIF(j.last_seen, ''), j.fetched) DESC,
+                     c.name, j.title
+            LIMIT %s
+            """,
+            (*country_params, *search_params, limit),
+        ).fetchall()
+    return [_row(row) for row in rows]
+
+
+def list_sponsored_catalog_companies(
+    country_keys: list[str],
+    *,
+    limit: int,
+    search: str | None = None,
+) -> list[dict]:
+    if not country_keys or limit <= 0:
+        return []
+    country_sql, country_params = _country_in_clause(country_keys)
+    search_sql = ""
+    search_params: list[str] = []
+    if search:
+        pattern = f"%{search.strip().lower()}%"
+        search_sql = " AND (LOWER(j.title) LIKE %s OR LOWER(c.name) LIKE %s)"
+        search_params = [pattern, pattern]
+    with db_read() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT c.name, c.country, c.city, c.careers_url,
+                   COUNT(j.id) AS visa_role_count,
+                   MAX(COALESCE(NULLIF(j.last_seen, ''), j.fetched)) AS last_seen
+            FROM companies c
+            JOIN matching_jobs j ON j.company_id = c.id
+            WHERE {country_sql}
+              AND j.visa_sponsorship = 1
+              {search_sql}
+            GROUP BY c.id, c.name, c.country, c.city, c.careers_url
+            ORDER BY last_seen DESC, c.name
+            LIMIT %s
+            """,
+            (*country_params, *search_params, limit),
+        ).fetchall()
+    return [_row(row) for row in rows]
+
+
 def list_country_company_stubs(country_key: str) -> list[dict]:
     with db_read() as conn:
         rows = conn.execute(

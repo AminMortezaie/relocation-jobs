@@ -1,0 +1,51 @@
+based on the design we used for redesigning the website, we need to use the theme we have choosen to redisgn the home page which is landing page.
+see the theme instruction and then create something like that and you can change the home page content based on the theme would tell you.
+
+plan for it
+
+---
+
+its not all about design i mean you need to think about transfering the content on a single paged like what we have in this theme.
+@Browser you can see what i mean for the home page.
+but you need to keep the brand meaning.
+
+i mean you think about the sections we have, now the homepage contents are not good except the first section all other cannot make impressed people.
+
+you need to have a complete plan alongside the design you change.
+
+---
+
+go ahead
+
+---
+
+wtf.
+see the page.
+
+---
+
+why are you get stucked here.
+
+its clear that your css files are not working on homepage and everything showing messed
+
+---
+
+its bad pattern fix it.
+use skills to make it correct.
+
+---
+
+no i didnt want this, also in mobile version we have two birds.
+this part was not desired for me so you can rollback and just rethink about this.
+
+---
+
+no  i dont think bird is bad, surely the bird is good and you should not remove it.
+i mean redesign this fucking thing.
+get back my bird and just use skills to redesign this shit.
+
+---
+
+change the headline from From the right role to a ready application.
+to what was previously, All Oputronities in one place or something like this.
+find what was before and make that.

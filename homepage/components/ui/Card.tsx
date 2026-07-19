@@ -27,7 +27,7 @@ export function Card({
 
   return (
     <Tag
-      className={`card surface-card relative overflow-hidden rounded-app ${interactiveClass} ${className}`}
+      className={`card surface-card relative overflow-hidden ${interactiveClass} ${className}`}
       style={style}
       data-variant={variant}
     >

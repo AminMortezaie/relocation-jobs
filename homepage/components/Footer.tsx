@@ -22,11 +22,17 @@ const META_LINKS = [
 export function Footer() {
   const countryNav = countryLinks();
   return (
-    <footer className="border-t border-border-subtle py-8">
-      <div className="flex flex-col gap-6">
-        <p className="font-display text-sm font-bold tracking-[0.06em] text-text-primary">
-          KUCHUP
-        </p>
+    <footer className="landing-footer">
+      <div className="landing-shell flex flex-col gap-7 py-10">
+        <div className="footer-brand">
+          <p className="font-display text-sm font-bold tracking-[0.06em] text-text-primary">
+            KUCHUP
+          </p>
+          <p>
+            A relocation job-search workspace for finding the role, keeping the
+            thread, and preparing what comes next.
+          </p>
+        </div>
 
         <div className="grid gap-5 sm:grid-cols-3">
           <FooterGroup title="Product" links={PRODUCT_LINKS} />

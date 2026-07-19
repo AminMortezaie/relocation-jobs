@@ -117,7 +117,7 @@ export function SearchResults() {
           </p>
           <a
             href={panelHref(filters)}
-            className="btn-primary mt-4 inline-flex rounded-app px-4 py-2 text-sm font-semibold text-text-on-accent"
+            className="btn-primary mt-4 inline-flex px-4 py-2 text-sm font-semibold text-text-on-accent"
           >
             Sign in
           </a>

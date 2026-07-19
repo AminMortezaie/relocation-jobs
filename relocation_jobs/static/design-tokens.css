@@ -65,6 +65,19 @@
   --radius-pill: 999px;
   --radius-input: 0.75rem;
   --ease-snap: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-short: 180ms;
+
+  /* 4-point named spacing scale (design.md) */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.5rem;
+  --space-3xl: 7rem;
 
   /* Typography stacks (faces loaded by page) */
   --font-display: "Lexend", "Manrope", system-ui, sans-serif;

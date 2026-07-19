@@ -48,8 +48,8 @@ const config: Config = {
         mono: ["var(--font-mono)", "JetBrains Mono", "ui-monospace", "monospace"],
       },
       borderRadius: {
-        app: "0.25rem",
-        "app-sm": "0.25rem",
+        app: "var(--radius-card)",
+        "app-sm": "var(--radius-input)",
       },
       boxShadow: {
         app: "var(--shadow-card)",

@@ -5,10 +5,10 @@ import { BrandLockup } from "@/components/BrandMark";
 import { Button } from "@/components/ui/Button";
 
 const NAV_LINKS = [
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/#benefits", label: "What you get" },
-  { href: "/#board", label: "See the board" },
+  { href: "/#product", label: "Product" },
+  { href: "/#countries", label: "Countries" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#access", label: "Access" },
 ] as const;
 
 export function Header() {

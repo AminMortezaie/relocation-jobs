@@ -1,36 +1,24 @@
-"use client";
-
-import { SearchBar } from "@/components/SearchBar";
-import { useSearchFlow } from "@/components/SearchFlowContext";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
 export function CTA() {
-  const { filters, onSearch } = useSearchFlow();
-
   return (
-    <section className="section-compact" aria-labelledby="cta-heading">
-      <Card className="px-5 py-7 sm:px-7">
-        <h2 id="cta-heading" className="text-section-title text-text-primary">
-          Ready to search?
-        </h2>
-        <p className="mt-2 text-sm font-normal text-text-secondary">
-          Results appear above. Sign in when you want to track applications and
-          tailor your CV per role.
-        </p>
-        <div className="hero-search-glow mt-6 max-w-2xl">
-          <SearchBar
-            key={`cta-${filters?.country ?? "all"}-${filters?.q ?? ""}`}
-            onSearch={onSearch}
-            defaultFilters={filters ?? undefined}
-          />
+    <section className="landing-close" aria-labelledby="cta-heading">
+      <div className="landing-shell landing-close-inner">
+        <div>
+          <p className="section-kicker">Take the next step</p>
+          <h2 id="cta-heading" className="text-section-display text-text-primary">
+            The move is complex. Your search does not have to be.
+          </h2>
+          <p>
+            Start with the public catalog, then carry the roles that matter
+            into one focused workspace.
+          </p>
         </div>
-        <div className="mt-5">
-          <Button as="a" href="/panel" variant="secondary">
-            Sign in to track
-          </Button>
+        <div className="landing-close-actions">
+          <Button as="a" href="/panel" variant="primary">Open the board</Button>
+          <a href="#search" className="text-link">Return to search <span aria-hidden="true">↑</span></a>
         </div>
-      </Card>
+      </div>
     </section>
   );
 }

@@ -49,53 +49,60 @@ export function SearchBar({
     <form
       id={id}
       onSubmit={handleSubmit}
-      className="flex flex-col overflow-hidden rounded-app border border-[var(--color-rule)] bg-bg-surface shadow-app sm:flex-row sm:items-stretch"
+      className="hero-search-form"
     >
-      <label className="sr-only" htmlFor={roleId}>
-        Role or stack
-      </label>
-      <div className="relative min-w-0 flex-1 border-b border-border-subtle sm:border-b-0 sm:border-r">
-        <StackIcon />
-        <select
-          id={roleId}
-          name="q"
-          defaultValue={defaultFilters?.q ?? ""}
-          className="select-pill min-h-12 rounded-none border-0 bg-transparent shadow-none"
-        >
-          {ROLES.map((option) => (
-            <option key={option.value || "all"} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <Chevron />
-      </div>
+      <div className="hero-search-fields">
+        <div className="hero-search-field">
+          <label className="hero-search-label" htmlFor={roleId}>
+            Role or stack
+          </label>
+          <div className="hero-search-control">
+            <StackIcon />
+            <select
+              id={roleId}
+              name="q"
+              defaultValue={defaultFilters?.q ?? ""}
+              className="hero-search-select"
+            >
+              {ROLES.map((option) => (
+                <option key={option.value || "all"} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <Chevron />
+          </div>
+        </div>
 
-      <label className="sr-only" htmlFor={countryId}>
-        Country
-      </label>
-      <div className="relative min-w-0 flex-1 border-b border-border-subtle sm:max-w-[11rem] sm:border-b-0 sm:border-r">
-        <GlobeIcon />
-        <select
-          id={countryId}
-          name="country"
-          defaultValue={defaultFilters?.country ?? "all"}
-          className="select-pill min-h-12 rounded-none border-0 bg-transparent shadow-none"
-        >
-          {COUNTRIES.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <Chevron />
+        <div className="hero-search-field">
+          <label className="hero-search-label" htmlFor={countryId}>
+            Destination
+          </label>
+          <div className="hero-search-control">
+            <GlobeIcon />
+            <select
+              id={countryId}
+              name="country"
+              defaultValue={defaultFilters?.country ?? "all"}
+              className="hero-search-select"
+            >
+              {COUNTRIES.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <Chevron />
+          </div>
+        </div>
       </div>
 
       <button
         type="submit"
-        className="btn-primary inline-flex min-h-12 w-full shrink-0 items-center justify-center rounded-none px-5 py-3 text-sm font-bold text-text-on-accent sm:w-auto"
+        className="btn-primary hero-search-submit"
       >
-        Search roles
+        <span>Find roles</span>
+        <ArrowIcon />
       </button>
     </form>
   );
@@ -104,7 +111,7 @@ export function SearchBar({
 function StackIcon() {
   return (
     <svg
-      className="select-icon pointer-events-none absolute left-3.5 h-[15px] w-[15px] text-text-muted"
+      className="hero-search-icon"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -122,7 +129,7 @@ function StackIcon() {
 function GlobeIcon() {
   return (
     <svg
-      className="select-icon pointer-events-none absolute left-3.5 h-[15px] w-[15px] text-text-muted"
+      className="hero-search-icon"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -138,7 +145,7 @@ function GlobeIcon() {
 function Chevron() {
   return (
     <svg
-      className="select-icon pointer-events-none absolute right-3.5 h-3.5 w-3.5 text-text-muted"
+      className="hero-search-chevron"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -146,6 +153,21 @@ function Chevron() {
       aria-hidden="true"
     >
       <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg
+      className="hero-search-arrow"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
 }

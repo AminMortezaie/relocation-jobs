@@ -1,32 +1,42 @@
-import { BenefitCards } from "@/components/BenefitCards";
+import { AccessSection } from "@/components/AccessSection";
 import { CTA } from "@/components/CTA";
+import { CountryPathways } from "@/components/CountryPathways";
+import { EvidenceRail } from "@/components/EvidenceRail";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { ProductScreenshot } from "@/components/ProductScreenshot";
-import { ProofFooter } from "@/components/ProofFooter";
-import { ReassuranceStrip } from "@/components/ReassuranceStrip";
+import { HomeFAQ } from "@/components/HomeFAQ";
+import { HomeWorkflow } from "@/components/HomeWorkflow";
+import { ProductJourney } from "@/components/ProductJourney";
+import { RelocationProblem } from "@/components/RelocationProblem";
 import { SearchFlowProvider } from "@/components/SearchFlowContext";
 import { SearchResults } from "@/components/SearchResults";
+import { TrustPrinciples } from "@/components/TrustPrinciples";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-site px-4 pb-8 pt-5 sm:px-5">
+      <div className="landing-nav-shell">
         <Header />
-        <SearchFlowProvider>
-          <main>
-            <Hero />
-            <SearchResults />
-            <BenefitCards />
-            <ProductScreenshot />
-            <ReassuranceStrip />
-            <ProofFooter />
-            <CTA />
-          </main>
-        </SearchFlowProvider>
-        <Footer />
       </div>
+      <SearchFlowProvider>
+        <main>
+          <Hero />
+          <div className="landing-shell">
+            <SearchResults />
+          </div>
+          <EvidenceRail />
+          <RelocationProblem />
+          <ProductJourney />
+          <CountryPathways />
+          <HomeWorkflow />
+          <AccessSection />
+          <TrustPrinciples />
+          <HomeFAQ />
+          <CTA />
+        </main>
+      </SearchFlowProvider>
+      <Footer />
     </div>
   );
 }

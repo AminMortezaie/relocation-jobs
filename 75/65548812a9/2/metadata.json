@@ -1,19 +1,20 @@
 {
   "cli_version": "0.8.42",
   "checkpoint_id": "7565548812a9",
+  "session_id": "78588280-6492-481d-bd33-a8d9a27c56cb",
   "strategy": "manual-commit",
+  "created_at": "2026-07-19T14:57:20.509548Z",
   "branch": "main",
-  "checkpoints_count": 23,
+  "checkpoints_count": 7,
+  "save_step_count": 8,
   "files_touched": [
     ".dockerignore",
     ".env.example",
     "Dockerfile.ec2",
     "Dockerfile.ec2-worker",
-    "docker-entrypoint-mcp.sh",
     "docs/README.md",
     "docs/operations/ec2-panel.md",
     "docs/reference/mcp-application.md",
-    "homepage/app/[slug]/page.tsx",
     "homepage/app/globals.css",
     "homepage/app/relocation-jobs-germany/page.tsx",
     "homepage/app/relocation-jobs-ireland/page.tsx",
@@ -28,15 +29,9 @@
     "homepage/components/Hero.tsx",
     "homepage/components/ReassuranceStrip.tsx",
     "homepage/components/SearchBar.tsx",
-    "homepage/lib/countries.ts",
     "relocation_jobs/catalog/custom_countries.py",
     "relocation_jobs/core/location_tags.py",
     "relocation_jobs/core/migrations.py",
-    "relocation_jobs/mcp/context.py",
-    "relocation_jobs/mcp/http_app.py",
-    "relocation_jobs/mcp/oauth_pages.py",
-    "relocation_jobs/mcp/oauth_provider.py",
-    "relocation_jobs/mcp/oauth_repo.py",
     "relocation_jobs/mcp/service.py",
     "relocation_jobs/static/admin.html",
     "relocation_jobs/static/apply.html",
@@ -44,12 +39,9 @@
     "relocation_jobs/static/homepage/404.html",
     "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_buildManifest.js",
     "relocation_jobs/static/homepage/_next/static/IOP25Ou0aINl0UhYP_2sm/_ssgManifest.js",
-    "relocation_jobs/static/homepage/_next/static/chunks/app/[slug]/page-99108f236d26f6aa.js",
     "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-3dfc35d67d515875.js",
-    "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-99108f236d26f6aa.js",
     "relocation_jobs/static/homepage/_next/static/chunks/app/page-fe9090335e9288c5.js",
     "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-3dfc35d67d515875.js",
-    "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-99108f236d26f6aa.js",
     "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-germany/page-3dfc35d67d515875.js",
     "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-ireland/page-3dfc35d67d515875.js",
     "relocation_jobs/static/homepage/_next/static/chunks/app/relocation-jobs-netherlands/page-3dfc35d67d515875.js",
@@ -80,42 +72,114 @@
     "requirements.txt",
     "scripts/build_homepage.sh",
     "scripts/ec2_app_deploy.sh",
-    "scripts/export_homepage_countries.py",
-    "scripts/mcp_http_server.py",
     "tests/catalog/test_countries_redis.py",
     "tests/helpers/route_manifest.py",
-    "tests/mcp/test_mcp_oauth.py",
-    "tests/web/test_mcp_tokens.py",
     "tests/web/test_public_api.py"
   ],
-  "sessions": [
-    {
-      "metadata": "/75/65548812a9/0/metadata.json",
-      "transcript": "/75/65548812a9/0/full.jsonl",
-      "compact_transcript": "/75/65548812a9/0/transcript.jsonl",
-      "content_hash": "/75/65548812a9/0/content_hash.txt",
-      "prompt": "/75/65548812a9/0/prompt.txt"
-    },
-    {
-      "metadata": "/75/65548812a9/1/metadata.json",
-      "transcript": "/75/65548812a9/1/full.jsonl",
-      "compact_transcript": "/75/65548812a9/1/transcript.jsonl",
-      "content_hash": "/75/65548812a9/1/content_hash.txt",
-      "prompt": "/75/65548812a9/1/prompt.txt"
-    },
-    {
-      "metadata": "/75/65548812a9/2/metadata.json",
-      "transcript": "/75/65548812a9/2/full.jsonl",
-      "compact_transcript": "/75/65548812a9/2/transcript.jsonl",
-      "content_hash": "/75/65548812a9/2/content_hash.txt",
-      "prompt": "/75/65548812a9/2/prompt.txt"
-    }
-  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "74345e65b350",
+  "compact_transcript_start": 0,
   "token_usage": {
-    "input_tokens": 701191,
-    "cache_creation_tokens": 714511,
-    "cache_read_tokens": 27409063,
-    "output_tokens": 133539,
-    "api_call_count": 21
-  }
+    "input_tokens": 91046,
+    "cache_creation_tokens": 275263,
+    "cache_read_tokens": 10792521,
+    "output_tokens": 47581,
+    "api_call_count": 6
+  },
+  "session_metrics": {
+    "duration_ms": 150367423,
+    "turn_count": 15,
+    "context_tokens": 241317,
+    "context_window_size": 256000
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-19T14:57:20.436438Z",
+    "agent_lines": 2395,
+    "agent_removed": 1019,
+    "human_added": 2051,
+    "human_modified": 49,
+    "human_removed": 0,
+    "total_committed": 4495,
+    "total_lines_changed": 5797,
+    "agent_percentage": 58.892530619285836,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 140,
+      "user_lines_removed": 49,
+      "agent_lines_added": 19,
+      "agent_lines_removed": 19,
+      "user_added_per_file": {
+        "homepage/components/BrandMark.tsx": 3,
+        "homepage/components/Header.tsx": 106,
+        "homepage/components/Hero.tsx": 19,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "homepage/components/BrandMark.tsx": 2,
+        "homepage/components/Header.tsx": 38,
+        "homepage/components/Hero.tsx": 9
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 298,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2692,
+      "agent_lines_removed": 812,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 7,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2695,
+      "agent_lines_removed": 820,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 8,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2728,
+      "agent_lines_removed": 838,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
 }

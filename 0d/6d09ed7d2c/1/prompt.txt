@@ -1,0 +1,33 @@
+see the mcp-reframe-skill which we have here.
+
+---
+
+i think that sending resume with lots of stuff can be tricky for the hiring manager to skim and skam.
+
+and maybe i get rejection.
+
+based on the internet data on authorized sources and receriutres reviews whats the best resume based on the senior positions i usually apply for and whats the best balance for it?
+
+i think sending a resume with 12 bullets for a company can be highly recommanded to not send.
+
+and instatly rejecting by hiring manager.
+
+investigate this claim and tell me whats the best balance for this issue?
+
+---
+
+yes please write down this on the skill to claude do it for each positions and don't miss this cause it make rejection.
+
+completely explain it there.
+
+---
+
+you need to update zip file in dist folder
+
+---
+
+field 'description' in SKILL.md must be at most 1024 characters
+
+---
+
+update zip file

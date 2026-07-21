@@ -1,0 +1,139 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "f70d09c4b0cd",
+  "session_id": "78c8643e-80ae-4835-a539-1ce9722cbb3b",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-21T15:09:42.935714Z",
+  "branch": "main",
+  "checkpoints_count": 6,
+  "save_step_count": 6,
+  "files_touched": [
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/fetch/country_runner.py",
+    "relocation_jobs/fetch/scheduler.py",
+    "relocation_jobs/scrape/board.py",
+    "relocation_jobs/scrape/company.py",
+    "relocation_jobs/scrape/filter.py",
+    "relocation_jobs/scrape/listing.py",
+    "relocation_jobs/scrape/review.py",
+    "relocation_jobs/static/js/fetch-render.js",
+    "relocation_jobs/web/server.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "5bc4e98ee867",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 173026,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1914240,
+    "output_tokens": 23035,
+    "api_call_count": 6
+  },
+  "session_metrics": {
+    "duration_ms": 6849854,
+    "turn_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-21T15:09:42.92302Z",
+    "agent_lines": 59,
+    "agent_removed": 5,
+    "human_added": 35,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 95,
+    "total_lines_changed": 100,
+    "agent_percentage": 64,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 793,
+      "user_lines_removed": 1,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/catalog/repo.py": 90,
+        "relocation_jobs/core/ats_constants.py": 4,
+        "relocation_jobs/core/ats_detection.py": 2,
+        "relocation_jobs/core/location_tags.py": 1,
+        "relocation_jobs/fetch/country_runner.py": 2,
+        "relocation_jobs/fetch/scheduler.py": 2,
+        "relocation_jobs/scrape/aggregator_seeds.py": 58,
+        "relocation_jobs/scrape/aggregator_sync.py": 90,
+        "relocation_jobs/scrape/board.py": 4,
+        "relocation_jobs/scrape/boards/remotedxb.py": 94,
+        "relocation_jobs/scrape/boards/remoteok.py": 121,
+        "relocation_jobs/scrape/company.py": 58,
+        "relocation_jobs/scrape/filter.py": 6,
+        "relocation_jobs/scrape/listing.py": 8,
+        "relocation_jobs/scrape/review.py": 7,
+        "relocation_jobs/static/js/fetch-render.js": 2,
+        "relocation_jobs/web/server.py": 2,
+        "scripts/.claude/settings.local.json": 12,
+        "tests/scrape/test_aggregator_fanout.py": 56,
+        "tests/scrape/test_aggregator_sync.py": 46,
+        "tests/scrape/test_remotedxb_board.py": 40,
+        "tests/scrape/test_remoteok_board.py": 88
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/scrape/review.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 877,
+      "agent_lines_removed": 6,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 877,
+      "agent_lines_removed": 6,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 882,
+      "agent_lines_removed": 11,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 5,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 882,
+      "agent_lines_removed": 11,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 6,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 882,
+      "agent_lines_removed": 11,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

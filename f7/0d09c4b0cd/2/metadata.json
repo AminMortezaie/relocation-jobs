@@ -1,0 +1,106 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "f70d09c4b0cd",
+  "session_id": "768897dc-df85-4c20-b2ee-af6aa68817c7",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-21T15:09:42.813543Z",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "save_step_count": 4,
+  "files_touched": [
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/fetch/country_runner.py",
+    "relocation_jobs/fetch/scheduler.py",
+    "relocation_jobs/scrape/aggregator_seeds.py",
+    "relocation_jobs/scrape/aggregator_sync.py",
+    "relocation_jobs/scrape/board.py",
+    "relocation_jobs/scrape/boards/remotedxb.py",
+    "relocation_jobs/scrape/boards/remoteok.py",
+    "relocation_jobs/scrape/company.py",
+    "relocation_jobs/scrape/filter.py",
+    "relocation_jobs/scrape/listing.py",
+    "relocation_jobs/scrape/review.py",
+    "relocation_jobs/static/js/fetch-render.js",
+    "relocation_jobs/web/server.py",
+    "tests/scrape/test_aggregator_fanout.py",
+    "tests/scrape/test_aggregator_review.py",
+    "tests/scrape/test_aggregator_sync.py",
+    "tests/scrape/test_remotedxb_board.py",
+    "tests/scrape/test_remoteok_board.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "f6a21d63cdff",
+  "checkpoint_transcript_start": 25,
+  "transcript_lines_at_start": 25,
+  "compact_transcript_start": 6,
+  "token_usage": {
+    "input_tokens": 190835,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 8337024,
+    "output_tokens": 35718,
+    "api_call_count": 4
+  },
+  "session_metrics": {
+    "duration_ms": 56707916,
+    "turn_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-21T15:09:42.768954Z",
+    "agent_lines": 877,
+    "agent_removed": 6,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 877,
+    "total_lines_changed": 883,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 765,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 765,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 765,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

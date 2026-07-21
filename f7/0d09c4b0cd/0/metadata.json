@@ -1,0 +1,122 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "f70d09c4b0cd",
+  "session_id": "07bf2409-591b-4e6f-9c48-87d4e8ee47f2",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-21T15:09:42.590735Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/fetch/country_runner.py",
+    "relocation_jobs/fetch/scheduler.py",
+    "relocation_jobs/scrape/aggregator_seeds.py",
+    "relocation_jobs/scrape/aggregator_sync.py",
+    "relocation_jobs/scrape/board.py",
+    "relocation_jobs/scrape/boards/remotedxb.py",
+    "relocation_jobs/scrape/boards/remoteok.py",
+    "relocation_jobs/scrape/company.py",
+    "relocation_jobs/scrape/filter.py",
+    "relocation_jobs/scrape/listing.py",
+    "relocation_jobs/scrape/review.py",
+    "relocation_jobs/static/js/fetch-render.js",
+    "relocation_jobs/web/server.py",
+    "tests/scrape/test_aggregator_fanout.py",
+    "tests/scrape/test_aggregator_review.py",
+    "tests/scrape/test_aggregator_sync.py",
+    "tests/scrape/test_remotedxb_board.py",
+    "tests/scrape/test_remoteok_board.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "f78fe2635a46",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 60506,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 420608,
+    "output_tokens": 9268,
+    "api_call_count": 2
+  },
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-21T15:09:42.584891Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 6,
+    "total_committed": 0,
+    "total_lines_changed": 6,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 894,
+      "user_lines_removed": 11,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "docs/reference/mcp-application.md": 5,
+        "relocation_jobs/catalog/repo.py": 90,
+        "relocation_jobs/companies/service.py": 60,
+        "relocation_jobs/core/ats_constants.py": 4,
+        "relocation_jobs/core/ats_detection.py": 2,
+        "relocation_jobs/core/location_tags.py": 1,
+        "relocation_jobs/fetch/country_runner.py": 2,
+        "relocation_jobs/fetch/scheduler.py": 2,
+        "relocation_jobs/scrape/aggregator_seeds.py": 58,
+        "relocation_jobs/scrape/aggregator_sync.py": 90,
+        "relocation_jobs/scrape/board.py": 4,
+        "relocation_jobs/scrape/boards/remotedxb.py": 94,
+        "relocation_jobs/scrape/boards/remoteok.py": 121,
+        "relocation_jobs/scrape/company.py": 58,
+        "relocation_jobs/scrape/filter.py": 6,
+        "relocation_jobs/scrape/listing.py": 8,
+        "relocation_jobs/scrape/review.py": 7,
+        "relocation_jobs/static/js/fetch-render.js": 2,
+        "relocation_jobs/web/server.py": 2,
+        "scripts/.claude/settings.local.json": 12,
+        "tests/scrape/test_aggregator_fanout.py": 56,
+        "tests/scrape/test_aggregator_review.py": 36,
+        "tests/scrape/test_aggregator_sync.py": 46,
+        "tests/scrape/test_remotedxb_board.py": 40,
+        "tests/scrape/test_remoteok_board.py": 88
+      },
+      "user_removed_per_file": {
+        "docs/reference/mcp-application.md": 5,
+        "relocation_jobs/companies/service.py": 5,
+        "relocation_jobs/scrape/review.py": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 882,
+      "agent_lines_removed": 11,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 882,
+      "agent_lines_removed": 11,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

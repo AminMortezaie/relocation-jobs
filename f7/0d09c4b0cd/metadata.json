@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "f70d09c4b0cd",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/companies/service.py",
+    "relocation_jobs/core/ats_constants.py",
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/core/location_tags.py",
+    "relocation_jobs/fetch/country_runner.py",
+    "relocation_jobs/fetch/scheduler.py",
+    "relocation_jobs/scrape/aggregator_seeds.py",
+    "relocation_jobs/scrape/aggregator_sync.py",
+    "relocation_jobs/scrape/board.py",
+    "relocation_jobs/scrape/boards/remotedxb.py",
+    "relocation_jobs/scrape/boards/remoteok.py",
+    "relocation_jobs/scrape/company.py",
+    "relocation_jobs/scrape/filter.py",
+    "relocation_jobs/scrape/listing.py",
+    "relocation_jobs/scrape/review.py",
+    "relocation_jobs/static/js/fetch-render.js",
+    "relocation_jobs/web/server.py",
+    "tests/scrape/test_aggregator_fanout.py",
+    "tests/scrape/test_aggregator_review.py",
+    "tests/scrape/test_aggregator_sync.py",
+    "tests/scrape/test_remotedxb_board.py",
+    "tests/scrape/test_remoteok_board.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/f7/0d09c4b0cd/0/metadata.json",
+      "transcript": "/f7/0d09c4b0cd/0/full.jsonl",
+      "compact_transcript": "/f7/0d09c4b0cd/0/transcript.jsonl",
+      "content_hash": "/f7/0d09c4b0cd/0/content_hash.txt",
+      "prompt": "/f7/0d09c4b0cd/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 60506,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 420608,
+    "output_tokens": 9268,
+    "api_call_count": 2
+  }
+}

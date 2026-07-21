@@ -1,0 +1,13 @@
+we have implemented a new section which is remote positions and two of websites have been added to our application and now i want to completely seperate the remote positions in UI from relocation jobs.
+
+everything can be similar but a different panel should have for remote positions to move any remote positions there.
+
+cause it makes the relocation panel pulluted and maybe finding the relocation position can be a little hard.
+
+give me a complete plan for it to seperate it in UI.
+
+---
+
+i think techincally the main functionallites on backend side also should be completely seperated and just calling a shared contract between remote and relocation positions.
+
+what do you think of this?

@@ -1,0 +1,19 @@
+Software Engineer - Backend Platform
+unsupported country (sweden)
+whats this?
+supported country means the country we have in db and cache, which i added sweden and now it has page but it still says unsupported country.
+
+find the bug.
+
+i think its declared staticly and in code which is wrong.
+find the real problem here.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+restart the server

@@ -1,0 +1,54 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "8eed5887325a",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "docs/reference/architecture.md",
+    "docs/reference/board.md",
+    "relocation_jobs/catalog/repo.py",
+    "relocation_jobs/catalog/schema.py",
+    "relocation_jobs/catalog/serialize.py",
+    "relocation_jobs/panel/board.py",
+    "relocation_jobs/panel/service.py",
+    "relocation_jobs/panel/types.py",
+    "relocation_jobs/remote/__init__.py",
+    "relocation_jobs/remote/board.py",
+    "relocation_jobs/remote/countries.py",
+    "relocation_jobs/scrape/aggregator_seeds.py",
+    "relocation_jobs/scrape/aggregator_sync.py",
+    "relocation_jobs/shared/board_contract.py",
+    "relocation_jobs/static/index.html",
+    "relocation_jobs/static/js/api.js",
+    "relocation_jobs/static/js/auth.js",
+    "relocation_jobs/static/js/board.js",
+    "relocation_jobs/static/js/data.js",
+    "relocation_jobs/static/js/main.js",
+    "relocation_jobs/static/js/panel-mode.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/routes/__init__.py",
+    "relocation_jobs/web/routes/board.py",
+    "relocation_jobs/web/routes/catalog.py",
+    "relocation_jobs/web/routes/remote.py",
+    "relocation_jobs/web/server.py",
+    "tests/scrape/test_aggregator_fanout.py",
+    "tests/web/test_remote_board_api.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/8e/ed5887325a/0/metadata.json",
+      "transcript": "/8e/ed5887325a/0/full.jsonl",
+      "compact_transcript": "/8e/ed5887325a/0/transcript.jsonl",
+      "content_hash": "/8e/ed5887325a/0/content_hash.txt",
+      "prompt": "/8e/ed5887325a/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 202539,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 8278016,
+    "output_tokens": 47795,
+    "api_call_count": 2
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "893ad6565d6c",
+  "session_id": "768897dc-df85-4c20-b2ee-af6aa68817c7",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-21T12:50:16.883139Z",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "save_step_count": 2,
+  "files_touched": [
+    "relocation_jobs/core/ats_detection.py",
+    "relocation_jobs/core/location_tags.py",
+    "tests/core/test_ats_detection.py",
+    "tests/core/test_location_gate.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "b343dc6d338b",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 144978,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 927616,
+    "output_tokens": 14966,
+    "api_call_count": 2
+  },
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-21T12:50:16.872692Z",
+    "agent_lines": 123,
+    "agent_removed": 20,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 123,
+    "total_lines_changed": 143,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 12,
+      "user_lines_removed": 0,
+      "agent_lines_added": 123,
+      "agent_lines_removed": 20,
+      "user_added_per_file": {
+        "scripts/.claude/settings.local.json": 12
+      }
+    }
+  ]
+}

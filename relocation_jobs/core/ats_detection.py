@@ -708,6 +708,8 @@ _CAREERS_PAGE_AS_ATS = frozenset({
     "jibe",
     "movingimage",
     "project_a",
+    "remotedxb",
+    "remoteok",
     "rss",
 })
 

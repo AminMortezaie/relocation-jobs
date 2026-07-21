@@ -1081,6 +1081,96 @@ def upsert_company(country_key: str, company: dict, *, updated: str | None = Non
     invalidate_country_cache(country_key)
 
 
+def _upsert_jobs_additive_on_conn(conn, company_id: int, jobs: list[dict]) -> int:
+    touched = 0
+    for job in jobs:
+        stamp_job_identity(job)
+        key = job.get("idempotency_key") or job_idempotency_key(job.get("url", ""))
+        if not key:
+            continue
+        conn.execute(
+            """
+            INSERT INTO matching_jobs (
+                company_id, idempotency_key, title, url, fetched, last_seen,
+                visa_sponsorship, location, locations_json, description_text
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (company_id, idempotency_key) DO UPDATE SET
+                title = EXCLUDED.title,
+                url = EXCLUDED.url,
+                last_seen = EXCLUDED.last_seen,
+                visa_sponsorship = EXCLUDED.visa_sponsorship,
+                location = COALESCE(NULLIF(EXCLUDED.location, ''), matching_jobs.location),
+                locations_json = CASE
+                    WHEN EXCLUDED.locations_json IS NOT NULL
+                         AND EXCLUDED.locations_json != '[]'
+                    THEN EXCLUDED.locations_json
+                    ELSE matching_jobs.locations_json
+                END,
+                description_text = CASE
+                    WHEN EXCLUDED.description_text IS NOT NULL
+                         AND EXCLUDED.description_text != ''
+                    THEN EXCLUDED.description_text
+                    ELSE matching_jobs.description_text
+                END
+            """,
+            (
+                company_id,
+                key,
+                job.get("title") or "",
+                job.get("url") or "",
+                job.get("fetched") or _today_iso(),
+                job.get("last_seen") or job.get("fetched") or _today_iso(),
+                _visa_to_db(job.get("visa_sponsorship")),
+                (job.get("location") or "").strip(),
+                job_locations_json(job),
+                (job.get("description_text") or "").strip(),
+            ),
+        )
+        touched += 1
+    return touched
+
+
+def sync_aggregator_employer_jobs(
+    country_key: str,
+    employer_name: str,
+    jobs: list[dict],
+    *,
+    source: str,
+    careers_url: str,
+) -> int:
+    name = (employer_name or "").strip()
+    if not name or not jobs:
+        return 0
+    ts = _today_iso()
+    source_key = (source or "aggregator").strip().lower() or "aggregator"
+    company = {
+        "name": name,
+        "city": "",
+        "size": "",
+        "careers_url": (careers_url or "").strip(),
+        "ats_type": "sourced",
+        "ats_url": "",
+        "matching_jobs": [],
+        "sources": [source_key],
+        "added": ts,
+        "updated": ts,
+        "fetch_ok": True,
+        "fetch_ok_date": ts,
+    }
+    with db_transaction() as conn:
+        company_id = _upsert_company_row_on_conn(conn, country_key, company, updated=ts)
+        touched = _upsert_jobs_additive_on_conn(conn, company_id, jobs)
+        count_row = conn.execute(
+            "SELECT COUNT(*) AS n FROM companies WHERE country = %s",
+            (country_key,),
+        ).fetchone()
+        total = int(_row(count_row).get("n") or 0)
+        _ensure_country_meta(conn, country_key, updated=ts, total=total)
+    if touched:
+        invalidate_country_cache(country_key)
+    return touched
+
+
 def upsert_companies(
     country_key: str,
     companies: list[dict],

@@ -13,6 +13,11 @@ from relocation_jobs.fetch.ports import (
     OnCompanyResult,
     OnReview,
 )
+from relocation_jobs.scrape.aggregator_sync import (
+    aggregator_success_line,
+    is_aggregator_ats,
+    sync_aggregator_board,
+)
 from relocation_jobs.scrape.filter import filter_relevant_jobs
 from relocation_jobs.scrape.merge import merge_matching_jobs, now_iso
 from relocation_jobs.scrape.review import build_review_payload, review_filtered_jobs
@@ -229,6 +234,18 @@ async def scrape_company_board(
     name = company.get("name") or ""
     ats = (company.get("ats_type") or "generic").strip()
     log_event(f"scraping board ats={ats}", company=name)
+    if is_aggregator_ats(ats):
+        return await _scrape_aggregator_board(
+            client,
+            company,
+            prefix,
+            fetch_board=fetch_board,
+            catalog_country=catalog_country,
+            sync_board=sync_board,
+            review_mode=review_mode,
+            on_review=on_review,
+            on_company_result=on_company_result,
+        )
     existing = list(company.get("matching_jobs") or [])
     scraped, raw = await _filter_board_listings(
         client, company,
@@ -263,6 +280,47 @@ async def scrape_company_board(
         new_count=new_count,
         stale_kept=stale_kept,
     ), new_count
+
+
+async def _scrape_aggregator_board(
+    client,
+    company: dict,
+    prefix: str,
+    *,
+    fetch_board: BoardFetcher,
+    catalog_country: str,
+    sync_board: SyncBoardToCatalog,
+    review_mode: bool = False,
+    on_review: OnReview = None,
+    on_company_result: OnCompanyResult = None,
+) -> tuple[str, int]:
+    name = company.get("name") or ""
+    raw = await fetch_board(client, company)
+    log_event(f"board returned {len(raw)} raw job(s)", company=name)
+    raise_if_cancelled()
+    matched = filter_relevant_jobs(raw, True)
+    employers, job_total = sync_aggregator_board(
+        catalog_country,
+        company,
+        raw,
+        relevant_only=True,
+    )
+    if review_mode and on_review:
+        filtered_out = review_filtered_jobs(
+            raw, matched, company, catalog_country=catalog_country,
+        )
+        on_review(build_review_payload(included=matched, filtered=filtered_out))
+        log_event(
+            f"review: {len(matched)} included, {len(filtered_out)} filtered",
+            company=name,
+        )
+    if on_company_result and job_total > 0:
+        on_company_result(name, job_total, _slim_new_jobs(matched))
+    company["matching_jobs"] = []
+    company["updated"] = now_iso()
+    _mark_fetch_ok(company)
+    _call_sync_board(sync_board)
+    return aggregator_success_line(prefix, employers, job_total), job_total
 
 
 async def process_company(

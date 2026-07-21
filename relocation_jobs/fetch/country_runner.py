@@ -19,6 +19,7 @@ from relocation_jobs.fetch.log import log_event
 from relocation_jobs.fetch.pipeline import fetch_and_persist_company
 from relocation_jobs.fetch.client import make_fetch_client
 from relocation_jobs.fetch.timeouts import company_timeout_seconds
+from relocation_jobs.scrape.aggregator_sync import should_skip_country_fetch
 from relocation_jobs.scrape.merge import now_iso
 
 
@@ -31,6 +32,7 @@ def _companies_to_fetch(
     companies = list_country_company_stubs(country_key)
     if not companies:
         raise LookupError(f"No catalog for country: {country_key}")
+    companies = [c for c in companies if not should_skip_country_fetch(c.get("ats_type"))]
     if ats_type:
         want = ats_type.strip().lower()
         companies = [c for c in companies if (c.get("ats_type") or "").strip().lower() == want]

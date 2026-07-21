@@ -18,5 +18,11 @@ def filter_relevant_jobs(jobs: list[dict], relevant_only: bool) -> list[dict]:
             entry["location"] = location
         if job.get("locations") is not None:
             entry["locations"] = job["locations"]
+        employer = (job.get("employer") or "").strip()
+        if employer:
+            entry["employer"] = employer
+        description = (job.get("description_text") or "").strip()
+        if description:
+            entry["description_text"] = description
         out.append(entry)
     return out

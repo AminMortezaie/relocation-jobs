@@ -11,6 +11,7 @@ from relocation_jobs.core.paths import PROJECT_ROOT, STATIC_DIR
 from relocation_jobs.db import init_db
 from relocation_jobs.db.migrate import apply_v2_migrations
 from relocation_jobs.fetch.log import configure_fetch_logging
+from relocation_jobs.scrape.aggregator_seeds import ensure_aggregator_seeds
 from relocation_jobs.web.routes import register_routes
 
 try:
@@ -80,6 +81,7 @@ def bootstrap_app() -> None:
     init_db()
     configure_fetch_logging()
     apply_v2_migrations(get_connection())
+    ensure_aggregator_seeds()
     init_auth(app)
     _bootstrapped = True
 

@@ -25,7 +25,13 @@ def review_entry(job: dict) -> dict | None:
     title = (job.get("title") or "").strip()
     if title and _JUNK_REVIEW_TITLE.match(title):
         return None
-    entry = {"title": title or url, "url": url}
+    employer = (job.get("employer") or "").strip()
+    role_title = title or url
+    display = f"{employer} — {role_title}" if employer and title else role_title
+    entry = {"title": display, "url": url}
+    if employer:
+        entry["employer"] = employer
+        entry["role_title"] = role_title
     reason = (job.get("filter_reason") or job.get("location_filter_reason") or "").strip()
     if reason:
         entry["filter_reason"] = reason

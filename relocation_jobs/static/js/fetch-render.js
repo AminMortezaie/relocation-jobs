@@ -32,6 +32,8 @@ export function normalizeReviewJobs(jobs) {
       title: title || url,
       url,
       filter_reason: String(job?.filter_reason || "").trim(),
+      employer: String(job?.employer || "").trim(),
+      role_title: String(job?.role_title || "").trim(),
     });
   }
   return out;

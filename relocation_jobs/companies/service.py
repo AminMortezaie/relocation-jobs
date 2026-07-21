@@ -21,6 +21,7 @@ from relocation_jobs.catalog.repo import (
     delete_country_catalog,
     insert_jobs,
     rename_company_in_catalog,
+    sync_aggregator_employer_jobs,
     update_company_fields,
     update_company_location,
     upsert_company as upsert_company_catalog,
@@ -41,6 +42,7 @@ from relocation_jobs.core.location_tags import (
     sync_company_location_fields,
 )
 from relocation_jobs.catalog.util import today
+from relocation_jobs.scrape.aggregator_sync import is_aggregator_ats
 from relocation_jobs.scrape.merge import now_iso
 from relocation_jobs.schemas import CompanyCreateInput, CompanyResponse
 
@@ -570,10 +572,17 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
     if country_key not in supported_countries():
         raise ValueError(f"Unknown country: {country_key}")
 
+    company = get_company(country_key, company_name)
+    if company is None:
+        raise LookupError(f"Company not found: {company_name}")
+
+    if is_aggregator_ats(company.get("ats_type")):
+        return _add_manual_jobs_aggregator(country_key, company, jobs)
+
     ts = today()
     to_add = []
     for j in jobs:
-        title = (j.get("title") or "").strip()
+        title = (j.get("role_title") or j.get("title") or "").strip()
         url = normalize_job_url(j.get("url") or "")
         if not title or not url:
             continue
@@ -594,10 +603,6 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
     if not to_add:
         raise ValueError("No valid jobs to add")
 
-    company = get_company(country_key, company_name)
-    if company is None:
-        raise LookupError(f"Company not found: {company_name}")
-
     existing_total = len(company.get("matching_jobs") or [])
     new_count = insert_jobs(country_key, company["name"], to_add)
 
@@ -607,6 +612,56 @@ def add_manual_jobs(country_key: str, company_name: str, jobs: list[dict]) -> di
         "company": company["name"],
         "added": new_count,
         "total": existing_total + new_count,
+    }
+
+
+def _add_manual_jobs_aggregator(country_key: str, source_company: dict, jobs: list[dict]) -> dict:
+    ts = today()
+    by_employer: dict[str, list[dict]] = {}
+    for j in jobs:
+        employer = (j.get("employer") or "").strip() or source_company["name"]
+        title = (j.get("role_title") or j.get("title") or "").strip()
+        if employer and title.startswith(f"{employer} — "):
+            title = title[len(employer) + 3:].strip()
+        url = normalize_job_url(j.get("url") or "")
+        if not title or not url:
+            continue
+        row = {
+            "title": title,
+            "url": url,
+            "fetched": ts,
+            "last_seen": ts,
+        }
+        location = (j.get("location") or "").strip()
+        if location:
+            row["location"] = location
+        description = (j.get("description_text") or "").strip()
+        if description:
+            row["description_text"] = description
+        by_employer.setdefault(employer, []).append(row)
+    if not by_employer:
+        raise ValueError("No valid jobs to add")
+
+    source = (source_company.get("ats_type") or "aggregator").strip().lower()
+    careers = (
+        (source_company.get("careers_url") or source_company.get("ats_url") or "").strip()
+    )
+    added = 0
+    for employer, employer_jobs in by_employer.items():
+        added += sync_aggregator_employer_jobs(
+            country_key,
+            employer,
+            employer_jobs,
+            source=source,
+            careers_url=careers or employer_jobs[0]["url"],
+        )
+    return {
+        "country": country_key,
+        "country_label": country_label(country_key),
+        "company": source_company["name"],
+        "added": added,
+        "total": added,
+        "employers": len(by_employer),
     }
 
 

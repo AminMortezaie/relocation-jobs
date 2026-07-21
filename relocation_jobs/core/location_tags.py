@@ -606,6 +606,7 @@ _COUNTRY_TEXT_ALIASES: dict[str, tuple[str, ...]] = {
         "england", "scotland", "wales", "northern ireland", "gb",
     ),
     "portugal": ("portugal", "portuguese", "pt"),
+    "uae": ("uae", "u.a.e.", "united arab emirates", "dubai", "abu dhabi"),
 }
 
 _CITY_TEXT_ALIASES: dict[str, tuple[str, ...]] = {

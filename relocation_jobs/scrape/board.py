@@ -29,6 +29,8 @@ from relocation_jobs.scrape.boards.playwright_ats import (
     fetch_jibe_board,
 )
 from relocation_jobs.scrape.boards.recruitee import fetch_recruitee_board
+from relocation_jobs.scrape.boards.remotedxb import fetch_remotedxb_board
+from relocation_jobs.scrape.boards.remoteok import fetch_remoteok_board
 from relocation_jobs.scrape.boards.smartrecruiters import fetch_smartrecruiters_board
 from relocation_jobs.scrape.boards.successfactors import fetch_successfactors_board
 from relocation_jobs.scrape.boards.teamtailor import fetch_teamtailor_board
@@ -58,6 +60,8 @@ _BOARD_FETCHERS: dict[str, BoardFetcher] = {
     "personio": fetch_personio_board,
     "project_a": fetch_project_a_board,
     "recruitee": fetch_recruitee_board,
+    "remotedxb": fetch_remotedxb_board,
+    "remoteok": fetch_remoteok_board,
     "rss": fetch_rss_board,
     "smartrecruiters": fetch_smartrecruiters_board,
     "successfactors": fetch_successfactors_board,

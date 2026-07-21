@@ -14,6 +14,7 @@ from relocation_jobs.fetch.log import configure_fetch_logging, log_event
 from relocation_jobs.fetch import state as fetch_state
 from relocation_jobs.fetch.runner import start_country_fetch
 from relocation_jobs.fetch.timeouts import country_timeout_seconds
+from relocation_jobs.scrape.aggregator_seeds import ensure_aggregator_seeds
 
 LOGGER = logging.getLogger("relocation_jobs.fetch.scheduler")
 
@@ -61,6 +62,7 @@ def bootstrap_scheduler() -> None:
     bootstrap_admin()
     configure_fetch_logging()
     fetch_repo.reap_orphan_running_fetch_runs()
+    ensure_aggregator_seeds()
 
 
 def run_fetch_cycle(*, user_id: int | None = None) -> dict:

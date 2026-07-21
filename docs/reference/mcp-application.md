@@ -15,7 +15,7 @@ Use the panel **Application data** page at `/apply` to edit profile, pipeline pr
 
 Related: [architecture.md](architecture.md), [business-rules.md](business-rules.md), [contributing.md](../contributing.md).
 
-**Claude skill:** [`.claude/skills/mcp-resume-reframe/SKILL.md`](../../.claude/skills/mcp-resume-reframe/SKILL.md) — **interactive** gated reframe (one phase per turn, user approval), **additive** JD-mirror bullets on the full master CV (never remove responsibilities without permission), `save_tailored_tex` after final sign-off; PDF render on the panel.
+**Claude skill:** [`.claude/skills/mcp-resume-reframe/SKILL.md`](../../.claude/skills/mcp-resume-reframe/SKILL.md) — **interactive** gated reframe (one phase per turn, user approval), **add** 1–2 JD-mirror bullets then enforce a **skim budget** per role (trim with approval — dense 10–12 bullet walls cause HM skim rejection), `save_tailored_tex` after final sign-off; PDF render on the panel.
 
 ---
 
@@ -150,7 +150,7 @@ flowchart TD
   G -->|yes| H[Phase 2: master + mirror pick]
   H --> I{User: go ahead?}
   I -->|edit| H
-  I -->|yes| J[Phase 3: add 1–2 mirror bullets]
+  I -->|yes| J[Phase 3: mirror bullets + skim budget]
   J --> K{User: go ahead?}
   K -->|edit| J
   K -->|yes| L[Phase 4: full CV draft markdown]
@@ -233,7 +233,7 @@ For each string in `pipeline[0]`, `pipeline[1]`, … **in order**:
 1. Run **only that phase** for this job (use `get_job_context.description_text` as the JD + masters / project masters as needed).
 2. Output **markdown** (not LaTeX) until the final phase.
 3. End with **go ahead?** and **wait** for the user before the next phase.
-4. **Mirror additions (phase 3):** add **1–2 new bullets** to one real role for ATS/JD similarity — prefer facts from a matching **project master**; **all master bullets kept**. User approves new bullets in phase 2–3. Never remove or shorten master content without explicit user approval. Do not dump the full project narrative into the CV.
+4. **Mirror additions + skim budget (phase 3):** add **1–2 new bullets** to one real role for ATS/JD similarity — prefer facts from a matching **project master**; then enforce skim budget on **every** experience block (mirror ~5–7, soft max 8; older roles taper). User approves new bullets **and** KEEP/DROP list. Never remove silently; never ship 10–12 bullets under one employer. Do not dump the full project narrative into the CV.
 5. **Final acceptance** on the full markdown draft (master + additions) before any `.tex` work.
 
 There is no `run_pipeline` MCP tool. Use `get_reframe_pipeline` or `get_application_profile().pipeline`.
@@ -246,7 +246,7 @@ save_tailored_tex(country, company, url, content, master_resume_slug="java")
 validate_tex(...)              # optional in chat; fix blocking issues
 ```
 
-Use the chosen master's LaTeX structure (preamble, macros, sections). Employers and dates stay fixed. **Copy all master content**; apply only approved additions (new mirror bullets, optional summary tweak, skills reorder).
+Use the chosen master's LaTeX structure (preamble, macros, sections). Employers and dates stay fixed. Apply only the **approved** phase-3/4 draft: new mirror bullets, skim-budget keep-set, optional summary tweak, skills reorder — not the untrimmed master archive.
 
 #### 6. Render PDF on the panel
 
@@ -345,7 +345,7 @@ Apply using the mcp-resume-reframe skill to the first job in my UK queue:
 
 1. Setup on `/apply`: master resumes + profile + **five** gated pipeline prompts.
 2. Pin job or mark **looking to apply** on the panel.
-3. Claude: bootstrap MCP → **one phase per turn** → user checkpoints → **add** mirror bullets to master (never trim without permission).
+3. Claude: bootstrap MCP → **one phase per turn** → user checkpoints → **add** mirror bullets then **skim-budget trim** with KEEP/DROP approval (never ship 10–12-bullet walls).
 4. After final acceptance: `save_tailored_tex` → optional `validate_tex`.
 5. Panel: **Re-render PDF** → upload manually → `mark_applied`.
 

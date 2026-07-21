@@ -10,6 +10,7 @@ import {
   refreshJobBoard,
 } from "./job-board.js";
 import { toast, browserTimezone } from "./utils.js";
+import { panelApiPrefix, isRemotePanel } from "./panel-mode.js";
 
 async function reloadBoardFallback() {
   const { loadBoard } = await import("./board.js");
@@ -546,7 +547,7 @@ export function boardQueryParams({ page = 1, pageSize = 25 } = {}) {
   params.set("timezone", browserTimezone());
   params.set("page", String(page));
   params.set("page_size", String(pageSize));
-  params.set("visa_only", filterQueryFlag("visaOnly"));
+  params.set("visa_only", isRemotePanel() ? "0" : filterQueryFlag("visaOnly"));
   params.set("hide_applied", filterQueryFlag("hideApplied"));
   params.set("hide_empty", filterQueryFlag("hideEmpty"));
   params.set("not_applied_only", filterQueryFlag("notAppliedOnly"));
@@ -570,7 +571,8 @@ export async function fetchBoard(options = {}) {
     pageSize: options.pageSize ?? 25,
   });
   const bust = options.bustCache ? `&_=${Date.now()}` : "";
-  const res = await apiFetch(`/api/board?${params.toString()}${bust}`, {
+  const prefix = panelApiPrefix();
+  const res = await apiFetch(`${prefix}/board?${params.toString()}${bust}`, {
     cache: "no-store",
   });
   const data = await parseJsonResponse(res);
@@ -589,7 +591,8 @@ export async function fetchBoardUserStats() {
   if (latest != null) {
     params.set("latest_fetch_new_jobs", String(latest));
   }
-  const res = await apiFetch(`/api/board/stats?${params.toString()}`, {
+  const prefix = panelApiPrefix();
+  const res = await apiFetch(`${prefix}/board/stats?${params.toString()}`, {
     cache: "no-store",
   });
   const data = await parseJsonResponse(res);
@@ -646,7 +649,7 @@ export async function fetchConfig() {
 }
 
 export async function fetchCountries() {
-  const res = await apiFetch("/api/countries");
+  const res = await apiFetch(`${panelApiPrefix()}/countries`);
   return res.json();
 }
 
@@ -684,7 +687,7 @@ export async function fetchCities(country = "all") {
 export async function fetchLocations(country = "all", { picker = false } = {}) {
   const params = new URLSearchParams({ country });
   if (picker) params.set("picker", "1");
-  const res = await apiFetch(`/api/locations?${params}`);
+  const res = await apiFetch(`${panelApiPrefix()}/locations?${params}`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     toast(data.error || "Could not load locations");
@@ -708,7 +711,7 @@ export async function addCustomLocation(country, city) {
 }
 
 export async function fetchAtsTypes() {
-  const res = await apiFetch("/api/ats-types");
+  const res = await apiFetch(`${panelApiPrefix()}/ats-types`);
   const data = await parseJsonResponse(res);
   if (!res.ok) {
     toast(data.error || "Could not load ATS list");

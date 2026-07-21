@@ -8,6 +8,12 @@ from relocation_jobs.core.location_tags import add_custom_city, add_custom_count
 from relocation_jobs.core.panel_flags import company_fetch_enabled, scrape_enabled
 from relocation_jobs.core.paths import supported_countries
 from relocation_jobs.catalog.locations import list_company_locations
+from relocation_jobs.shared.board_contract import (
+    AGGREGATOR_ATS_TYPES,
+    CATALOG_KIND_RELOCATION,
+    countries_for_kind,
+    is_remote_country_key,
+)
 from relocation_jobs.web import deps
 
 
@@ -31,13 +37,7 @@ def register(app):
     @app.get("/api/countries")
     @login_required
     def api_countries():
-        return jsonify([
-            {"id": "all", "label": "All countries"},
-            *[
-                {"id": key, "label": label}
-                for key, label in sorted(all_country_labels().items())
-            ],
-        ])
+        return jsonify(countries_for_kind(CATALOG_KIND_RELOCATION, all_country_labels()))
 
     @app.post("/api/countries")
     @login_required
@@ -48,6 +48,8 @@ def register(app):
             return jsonify({"error": "Country name is required"}), 400
         try:
             country = add_custom_country(label)
+            if is_remote_country_key(country.get("id")):
+                return jsonify({"error": "Remote boards are managed separately"}), 400
             return jsonify({"ok": True, "country": country})
         except ValueError as exc:
             return jsonify({"error": str(exc)}), 400
@@ -75,7 +77,12 @@ def register(app):
     @app.get("/api/ats-types")
     @login_required
     def api_ats_types():
-        return jsonify({"ats_types": deps.list_ats_types()})
+        return jsonify({
+            "ats_types": [
+                row for row in deps.list_ats_types()
+                if row.get("id") not in AGGREGATOR_ATS_TYPES
+            ],
+        })
 
     @app.get("/api/cities")
     @login_required
@@ -84,8 +91,16 @@ def register(app):
         country_key = country if country != "all" else None
         if country != "all" and country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
+        if country_key and is_remote_country_key(country_key):
+            return jsonify({"error": f"Unknown country: {country}"}), 400
         for_picker = request.args.get("picker", "").lower() in ("1", "true", "yes")
-        locations = list_company_locations(country_key, for_picker=for_picker)
+        if country_key:
+            locations = list_company_locations(country_key, for_picker=for_picker)
+        else:
+            locations = [
+                loc for loc in list_company_locations(None, for_picker=for_picker)
+                if not is_remote_country_key(loc.get("country"))
+            ]
         return jsonify({
             "cities": [loc["city"] for loc in locations],
             "locations": locations,
@@ -98,9 +113,18 @@ def register(app):
         country_key = country if country != "all" else None
         if country != "all" and country not in supported_countries():
             return jsonify({"error": f"Unknown country: {country}"}), 400
+        if country_key and is_remote_country_key(country_key):
+            return jsonify({"error": f"Unknown country: {country}"}), 400
         for_picker = request.args.get("picker", "").lower() in ("1", "true", "yes")
+        if country_key:
+            locations = list_company_locations(country_key, for_picker=for_picker)
+        else:
+            locations = [
+                loc for loc in list_company_locations(None, for_picker=for_picker)
+                if not is_remote_country_key(loc.get("country"))
+            ]
         return jsonify({
-            "locations": list_company_locations(country_key, for_picker=for_picker),
+            "locations": locations,
         })
 
     @app.post("/api/locations")

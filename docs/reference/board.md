@@ -1,6 +1,6 @@
 # Panel board — pagination, sort, and activity timestamps
 
-**Last updated:** 2026-07-02
+**Last updated:** 2026-07-21
 
 How the main company board loads, paginates, and sorts by “newest”. Read before changing `panel/`, `static/js/board*.js`, `static/js/render.js`, or `GET /api/board`.
 
@@ -8,21 +8,43 @@ Related: [business-rules.md](business-rules.md) (job buckets), [architecture.md]
 
 ---
 
+## Relocation vs remote domains
+
+Two panels share the same board **read contract** (`companies` / `meta` / `user_stats`) and the same position **action** APIs (apply / reject / buckets). Pipelines and HTTP namespaces stay separate:
+
+| | Relocation | Remote |
+|--|------------|--------|
+| UI | `/panel` | `/remote` |
+| Board API | `GET /api/board` | `GET /api/remote/board` |
+| Countries | `GET /api/countries` (no remote boards) | `GET /api/remote/countries` |
+| Catalog | `catalog_kind=relocation` | `catalog_kind=remote` |
+| Ingest | Country ATS + location gates | Aggregator boards + employer fan-out |
+
+Shared helpers live in [`relocation_jobs/shared/board_contract.py`](../../relocation_jobs/shared/board_contract.py). Remote board orchestration is under [`relocation_jobs/remote/`](../../relocation_jobs/remote/). Do not gate remote behind a `board_kind` flag inside relocation routes.
+
+Remote boards: `remote-ok`, `remote-dxb`, `remote-joblet` (Remotedxb is not under `uae`).
+
+---
+
 ## Board load path
 
 ```
 GET /api/board
-  → panel/board.load_catalog_board_page()
+  → panel/board.load_catalog_board_page(catalog_kind=relocation)
   → panel/service.flatten_companies_page()
       → catalog/repo.load_catalog_companies_page()   # DB batch, ORDER BY country, name
       → panel/flatten.flatten_company()              # per-user merge + filters
   → web/routes/board.py                              # meta + user_stats
+
+GET /api/remote/board
+  → remote/board.load_remote_board_page()
+  → same flatten path with catalog_kind=remote
 ```
 
 Client:
 
 ```
-board.js (fetch page)
+board.js (fetch page via panelApiPrefix())
   → board-view.js syncBoardView()
   → render.js getDisplayCompanies()
       → applyPanelFilters()

@@ -10,9 +10,11 @@ from relocation_jobs.scrape.aggregator_sync import (
 def test_aggregator_ats_helpers():
     assert is_aggregator_ats("remoteok")
     assert is_aggregator_ats("remotedxb")
+    assert is_aggregator_ats("joblet")
     assert not is_aggregator_ats("greenhouse")
     assert should_skip_country_fetch("sourced")
     assert not should_skip_country_fetch("remoteok")
+    assert not should_skip_country_fetch("joblet")
 
 
 def test_group_jobs_by_employer():

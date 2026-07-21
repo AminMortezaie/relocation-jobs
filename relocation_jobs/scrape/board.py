@@ -21,6 +21,7 @@ from relocation_jobs.scrape.boards.http_sync import (
     fetch_rss_board,
 )
 from relocation_jobs.scrape.boards.job_shop import fetch_job_shop_board
+from relocation_jobs.scrape.boards.joblet import fetch_joblet_board
 from relocation_jobs.scrape.boards.join import fetch_join_board
 from relocation_jobs.scrape.boards.lever import fetch_lever_board
 from relocation_jobs.scrape.boards.personio import fetch_personio_board
@@ -53,6 +54,7 @@ _BOARD_FETCHERS: dict[str, BoardFetcher] = {
     "hirehive": fetch_hirehive_board,
     "jibe": fetch_jibe_board,
     "job_shop": fetch_job_shop_board,
+    "joblet": fetch_joblet_board,
     "join": fetch_join_board,
     "lever": fetch_lever_board,
     "lever_eu": fetch_lever_board,

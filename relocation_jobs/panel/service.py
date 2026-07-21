@@ -19,6 +19,12 @@ from relocation_jobs.mcp import repo as mcp_repo
 from relocation_jobs.panel.flatten import PanelContext, flatten_company, summarize_company_for_stats
 from relocation_jobs.panel.tracking import build_tracking_alias_index
 from relocation_jobs.panel.types import FlattenFilters
+from relocation_jobs.shared.board_contract import (
+    CATALOG_KIND_RELOCATION,
+    CATALOG_KIND_REMOTE,
+    is_remote_country_key,
+    normalize_catalog_kind,
+)
 from relocation_jobs.shared.timestamps import normalize_ts_for_sort
 
 
@@ -269,6 +275,7 @@ def _flatten_companies_page_streaming(
         country_keys,
         ats_type=filters.ats_type,
         search=search_key,
+        catalog_kind=filters.catalog_kind,
     )
     fetch_problem_count = count_fetch_problems(country_keys)
     companies_out: list[dict] = []
@@ -288,6 +295,7 @@ def _flatten_companies_page_streaming(
             limit=batch_size,
             ats_type=filters.ats_type,
             search=search_key,
+            catalog_kind=filters.catalog_kind,
         )
         if not batch:
             break
@@ -340,6 +348,7 @@ def _flatten_companies_page_by_activity(
         include_descriptions=False,
         ats_type=filters.ats_type,
         search=search_key,
+        catalog_kind=filters.catalog_kind,
     )
     visible_rows: list[dict] = []
     for key in country_keys:
@@ -367,9 +376,18 @@ def _flatten_companies_page_by_activity(
 
 
 def _country_keys_for_filters(filters: FlattenFilters) -> list[str]:
+    kind = normalize_catalog_kind(filters.catalog_kind)
     if filters.country_key and filters.country_key != "all":
-        return [filters.country_key]
-    return sorted(supported_countries())
+        key = filters.country_key
+        if kind == CATALOG_KIND_REMOTE and not is_remote_country_key(key):
+            return []
+        if kind == CATALOG_KIND_RELOCATION and is_remote_country_key(key):
+            return []
+        return [key]
+    keys = sorted(supported_countries())
+    if kind == CATALOG_KIND_REMOTE:
+        return [k for k in keys if is_remote_country_key(k)]
+    return [k for k in keys if not is_remote_country_key(k)]
 
 
 def flatten_with_filters(filters: FlattenFilters) -> tuple[list[dict], list[dict], int]:

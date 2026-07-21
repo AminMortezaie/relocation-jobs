@@ -17,11 +17,18 @@ AGGREGATOR_SEEDS: tuple[dict[str, str], ...] = (
         "careers_url": "https://remoteok.com/api?tags=dev",
     },
     {
-        "country_key": "uae",
-        "country_label": "UAE",
+        "country_key": "remote-dxb",
+        "country_label": "Remote DXB",
         "name": "Remote DXB",
         "ats_type": "remotedxb",
         "careers_url": "https://www.remotedxb.com/rss",
+    },
+    {
+        "country_key": "remote-joblet",
+        "country_label": "Joblet",
+        "name": "Joblet",
+        "ats_type": "joblet",
+        "careers_url": "https://joblet.ai/jobs?employmentType=Remote",
     },
 )
 
@@ -50,6 +57,7 @@ def ensure_aggregator_seeds() -> list[dict]:
             "ats_url": seed["careers_url"],
             "matching_jobs": [],
             "sources": ["aggregator"],
+            "catalog_kind": "remote",
             "added": ts,
             "updated": ts,
         }

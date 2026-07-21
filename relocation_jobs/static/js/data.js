@@ -4,6 +4,7 @@ import { state } from "./state.js";
 import { $, escapeAttr, escapeHtml, setLoadingProgress, finishLoadingProgress } from "./utils.js";
 import { fetchConfig, fetchCountries, fetchAtsTypes, fetchLocations } from "./api.js";
 import { loadBoard, showJobsLoading } from "./board.js";
+import { panelStorageKey } from "./panel-mode.js";
 
 export { setLoadingProgress, finishLoadingProgress, showJobsLoading };
 
@@ -12,7 +13,9 @@ let pickerLocationsCache = null;
 let pickerLocationsPromise = null;
 
 function savedLocationKey() {
-  return localStorage.getItem("panel_location")
+  return localStorage.getItem(panelStorageKey("location"))
+    || localStorage.getItem(panelStorageKey("city"))
+    || localStorage.getItem("panel_location")
     || localStorage.getItem("panel_city")
     || "all";
 }
@@ -33,11 +36,11 @@ export async function loadCountries() {
   ).join("");
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get("country");
-  const saved = localStorage.getItem("panel_country");
+  const saved = localStorage.getItem(panelStorageKey("country"));
   const pick = [fromUrl, saved].find((id) => id && countries.some((c) => c.id === id));
   if (pick) {
     sel.value = pick;
-    if (fromUrl) localStorage.setItem("panel_country", fromUrl);
+    if (fromUrl) localStorage.setItem(panelStorageKey("country"), fromUrl);
   } else {
     const first = countries.find((c) => c.id !== "all");
     if (first) sel.value = first.id;
@@ -64,7 +67,7 @@ export async function loadAtsTypes() {
       `<option value="${escapeAttr(t.id)}">${escapeHtml(t.label)}</option>`
     ),
   ].join("");
-  const saved = localStorage.getItem("panel_ats");
+  const saved = localStorage.getItem(panelStorageKey("ats"));
   if (saved) sel.value = saved;
 }
 

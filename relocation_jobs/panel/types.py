@@ -16,6 +16,7 @@ class FlattenFilters(BaseSchema):
     location: str | None = None
     city: str | None = None
     ats_type: str | None = None
+    catalog_kind: str = "relocation"
     position_filters: PositionFilters = PositionFilters()
 
     @property

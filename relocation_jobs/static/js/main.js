@@ -14,6 +14,7 @@ import { goToBoardPage } from "./board.js";
 import { saveWaitingReferral, markJobSeen } from "./api.js";
 import { toast } from "./utils.js";
 import { resumeFetchIfRunning, syncFetchStateFromServer } from "./scrape.js";
+import { applyPanelChrome } from "./panel-mode.js";
 import {
   loadCollapsedCompanies,
   loadShowNotForMeCompanies,
@@ -31,6 +32,7 @@ window.relocationJobs.toast = toast;
 
 async function init() {
   setOnUnauthorized(showLogin);
+  applyPanelChrome();
 
   loadCollapsedCompanies();
   loadShowNotForMeCompanies();
@@ -38,6 +40,7 @@ async function init() {
   loadSortPreference();
   loadFilterPreferences();
   setLoginMode("login");
+  applyPanelChrome();
 
   bindEvents();
   bindDialogEvents();

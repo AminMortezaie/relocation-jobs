@@ -6,6 +6,7 @@ import { loadConfig, loadCountries, loadAtsTypes, loadBoardWithLocations, showJo
 import { beginScreenLoad } from "./screen-loader.js";
 import { refreshFilterBar } from "./filters.js";
 import { updateFetchHeaderUI } from "./render.js";
+import { applyPanelChrome, isRemotePanel } from "./panel-mode.js";
 
 export function showLogin(message = "") {
   $("mainContent").classList.add("hidden");
@@ -26,6 +27,7 @@ export function setAdminNavVisible(visible) {
 export function showApp() {
   $("loginPanel").hidden = true;
   $("mainContent").classList.remove("hidden");
+  applyPanelChrome();
   const user = state.authState.user;
   if (user) {
     const initial = (user.username || "?").charAt(0).toUpperCase();
@@ -50,7 +52,9 @@ export function setLoginMode(mode) {
   $("toggleRegister").textContent = register ? "Back to sign in" : "Create account";
   $("loginHint").textContent = register
     ? "Password must be at least 8 characters."
-    : "Track applications and relocation-friendly roles per country.";
+    : (isRemotePanel()
+      ? "Track remote roles from aggregator boards."
+      : "Track applications and relocation-friendly roles per country.");
 }
 
 export async function refreshAuth() {

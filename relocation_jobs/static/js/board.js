@@ -6,6 +6,7 @@ import { fetchBoard, fetchBoardUserStats } from "./api.js";
 import { releaseCompanyOrder } from "./render.js";
 import { syncBoardView } from "./board-view.js";
 import { beginScreenLoad, endScreenLoad, setScreenLoadProgress } from "./screen-loader.js";
+import { panelStorageKey } from "./panel-mode.js";
 
 function overlayLabel(options, page, requestChanged) {
   if (options.overlayLabel) return options.overlayLabel;
@@ -56,9 +57,9 @@ export function boardTotalPages() {
 
 function persistScopeSelection() {
   const country = $("country")?.value;
-  if (country) localStorage.setItem("panel_country", country);
-  if ($("ats")) localStorage.setItem("panel_ats", $("ats").value);
-  if ($("location")) localStorage.setItem("panel_location", $("location").value);
+  if (country) localStorage.setItem(panelStorageKey("country"), country);
+  if ($("ats")) localStorage.setItem(panelStorageKey("ats"), $("ats").value);
+  if ($("location")) localStorage.setItem(panelStorageKey("location"), $("location").value);
 }
 
 export function showJobsLoading() {

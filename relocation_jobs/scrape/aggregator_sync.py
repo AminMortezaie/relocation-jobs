@@ -6,13 +6,15 @@ from datetime import date
 from relocation_jobs.catalog.repo import sync_aggregator_employer_jobs
 from relocation_jobs.fetch.log import log_event
 from relocation_jobs.scrape.filter import filter_relevant_jobs
-
-AGGREGATOR_ATS_TYPES = frozenset({"remoteok", "remotedxb"})
-SOURCED_ATS_TYPE = "sourced"
+from relocation_jobs.shared.board_contract import (
+    AGGREGATOR_ATS_TYPES,
+    SOURCED_ATS_TYPE,
+)
 
 _SOURCE_LABEL = {
     "remoteok": "remoteok",
     "remotedxb": "remotedxb",
+    "joblet": "joblet",
 }
 
 

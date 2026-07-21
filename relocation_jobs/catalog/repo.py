@@ -18,6 +18,11 @@ from relocation_jobs.catalog.serialize import (
     job_locations_json,
     json_sources,
     locations_json_from_company,
+    parse_sources,
+)
+from relocation_jobs.shared.board_contract import (
+    catalog_kind_for_write,
+    normalize_catalog_kind,
 )
 
 def _row(row) -> dict:
@@ -46,6 +51,17 @@ def _json_column(value) -> str:
     if isinstance(value, list) and value:
         return json.dumps(value)
     return "[]"
+
+
+def _company_catalog_kind(country_key: str, company: dict) -> str:
+    explicit = (company.get("catalog_kind") or "").strip().lower()
+    if explicit:
+        return normalize_catalog_kind(explicit)
+    return catalog_kind_for_write(
+        country_key=country_key,
+        ats_type=company.get("ats_type"),
+        sources=company.get("sources") if isinstance(company.get("sources"), list) else [],
+    )
 
 
 def _job_locations_column(job: dict) -> str:
@@ -139,6 +155,14 @@ _JOB_LOOKUP_COLUMNS = """
 
 
 def _company_row(row: dict, jobs: list[dict]) -> dict:
+    sources = parse_sources(row.get("sources_json"))
+    kind = normalize_catalog_kind(row.get("catalog_kind"))
+    if not row.get("catalog_kind"):
+        kind = catalog_kind_for_write(
+            country_key=row.get("country"),
+            ats_type=row.get("ats_type"),
+            sources=sources,
+        )
     return {
         "name": row["name"],
         "city": row.get("city") or "",
@@ -154,7 +178,8 @@ def _company_row(row: dict, jobs: list[dict]) -> dict:
         "fetch_ok_date": row.get("fetch_ok_date") or "",
         "added": row.get("added") or "",
         "updated": row.get("updated") or "",
-        "sources": [],
+        "sources": sources,
+        "catalog_kind": kind,
         "matching_jobs": jobs,
     }
 
@@ -210,12 +235,17 @@ def load_catalog_for_countries(
     include_descriptions: bool = True,
     ats_type: str | None = None,
     search: str | None = None,
+    catalog_kind: str | None = None,
 ) -> dict[str, dict]:
     keys = [key for key in country_keys if key]
     if not keys:
         return {}
     country_sql, country_params = _country_in_clause(keys)
-    filter_sql, filter_params = _catalog_company_filters(ats_type=ats_type, search=search)
+    filter_sql, filter_params = _catalog_company_filters(
+        ats_type=ats_type,
+        search=search,
+        catalog_kind=catalog_kind,
+    )
     job_columns_sql = _JOB_LIST_COLUMNS_J_WITH_DESC if include_descriptions else _JOB_LIST_COLUMNS_J
     job_row_fn = _job_row if include_descriptions else _job_stats_row
     with db_read() as conn:
@@ -301,9 +331,13 @@ def _catalog_company_filters(
     *,
     ats_type: str | None,
     search: str | None,
+    catalog_kind: str | None = None,
 ) -> tuple[str, list]:
     clauses: list[str] = []
     params: list = []
+    if catalog_kind:
+        clauses.append("LOWER(TRIM(c.catalog_kind)) = LOWER(%s)")
+        params.append(normalize_catalog_kind(catalog_kind))
     if ats_type == "generic":
         clauses.append(
             "(c.ats_type IS NULL OR TRIM(c.ats_type) = '' OR LOWER(TRIM(c.ats_type)) = 'generic')"
@@ -341,11 +375,16 @@ def count_catalog_companies(
     *,
     ats_type: str | None = None,
     search: str | None = None,
+    catalog_kind: str | None = None,
 ) -> int:
     if not country_keys:
         return 0
     country_sql, country_params = _country_in_clause(country_keys)
-    filter_sql, filter_params = _catalog_company_filters(ats_type=ats_type, search=search)
+    filter_sql, filter_params = _catalog_company_filters(
+        ats_type=ats_type,
+        search=search,
+        catalog_kind=catalog_kind,
+    )
     with db_read() as conn:
         row = conn.execute(
             f"""
@@ -397,11 +436,16 @@ def load_catalog_companies_page(
     limit: int,
     ats_type: str | None = None,
     search: str | None = None,
+    catalog_kind: str | None = None,
 ) -> list[tuple[str, dict]]:
     if not country_keys or limit <= 0:
         return []
     country_sql, country_params = _country_in_clause(country_keys)
-    filter_sql, filter_params = _catalog_company_filters(ats_type=ats_type, search=search)
+    filter_sql, filter_params = _catalog_company_filters(
+        ats_type=ats_type,
+        search=search,
+        catalog_kind=catalog_kind,
+    )
     with db_read() as conn:
         company_rows = conn.execute(
             f"""
@@ -748,13 +792,15 @@ def _upsert_company_catalog_row(
     if not name:
         raise ValueError("company name is required")
     sync_company_location_fields(company, catalog_country=country_key)
+    kind = _company_catalog_kind(country_key, company)
+    company["catalog_kind"] = kind
     row = conn.execute(
         """
         INSERT INTO companies (
             country, name, city, cities_json, locations_json, size, careers_url,
             ats_type, ats_url, fetch_problem, fetch_problem_date, fetch_ok, fetch_ok_date,
-            added, updated, sources_json
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            added, updated, sources_json, catalog_kind
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (country, name) DO UPDATE SET
             city = EXCLUDED.city,
             cities_json = EXCLUDED.cities_json,
@@ -768,7 +814,8 @@ def _upsert_company_catalog_row(
             fetch_ok = EXCLUDED.fetch_ok,
             fetch_ok_date = EXCLUDED.fetch_ok_date,
             updated = EXCLUDED.updated,
-            sources_json = EXCLUDED.sources_json
+            sources_json = EXCLUDED.sources_json,
+            catalog_kind = EXCLUDED.catalog_kind
         RETURNING id
         """,
         (
@@ -788,6 +835,7 @@ def _upsert_company_catalog_row(
             company.get("added") or updated,
             company.get("updated") or updated,
             _json_column(company.get("sources")),
+            kind,
         ),
     ).fetchone()
     return int(row["id"])
@@ -935,6 +983,8 @@ def _upsert_company_row_on_conn(
     added = company.get("added") or updated
     company_updated = company.get("updated") or updated
     sync_company_location_fields(company, catalog_country=country_key)
+    kind = _company_catalog_kind(country_key, company)
+    company["catalog_kind"] = kind
     params = (
         country_key,
         name,
@@ -952,14 +1002,15 @@ def _upsert_company_row_on_conn(
         added,
         company_updated,
         json_sources(company),
+        kind,
     )
     cur = conn.execute(
         """
         INSERT INTO companies (
             country, name, city, cities_json, locations_json, size, careers_url, ats_type, ats_url,
             fetch_problem, fetch_problem_date, fetch_ok, fetch_ok_date,
-            added, updated, sources_json
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            added, updated, sources_json, catalog_kind
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (country, name) DO UPDATE SET
             city = EXCLUDED.city,
             cities_json = EXCLUDED.cities_json,
@@ -973,7 +1024,8 @@ def _upsert_company_row_on_conn(
             fetch_ok = EXCLUDED.fetch_ok,
             fetch_ok_date = EXCLUDED.fetch_ok_date,
             updated = EXCLUDED.updated,
-            sources_json = EXCLUDED.sources_json
+            sources_json = EXCLUDED.sources_json,
+            catalog_kind = EXCLUDED.catalog_kind
         RETURNING id
         """,
         params,
@@ -1152,6 +1204,7 @@ def sync_aggregator_employer_jobs(
         "ats_url": "",
         "matching_jobs": [],
         "sources": [source_key],
+        "catalog_kind": "remote",
         "added": ts,
         "updated": ts,
         "fetch_ok": True,

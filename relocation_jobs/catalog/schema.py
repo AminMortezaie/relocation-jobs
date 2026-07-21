@@ -94,6 +94,8 @@ def init_catalog_schema() -> None:
 
         run_migration_once(conn, "custom_countries_seed_defaults_v1", seed_default_countries)
         run_migration_once(conn, "custom_countries_json_import_v1", migrate_custom_countries_from_json)
+        run_migration_once(conn, "catalog_kind_v1", _migrate_catalog_kind_v1)
+        run_migration_once(conn, "remotedxb_to_remote_dxb_v1", _migrate_remotedxb_to_remote_dxb_v1)
 
 
 def _ensure_job_description_column(conn) -> None:
@@ -132,4 +134,103 @@ def _ensure_job_columns(conn) -> None:
     )
     conn.execute(
         "ALTER TABLE matching_jobs ADD COLUMN IF NOT EXISTS description_text TEXT NOT NULL DEFAULT ''"
+    )
+
+
+def _migrate_catalog_kind_v1(conn) -> None:
+    conn.execute(
+        """
+        ALTER TABLE companies
+        ADD COLUMN IF NOT EXISTS catalog_kind TEXT NOT NULL DEFAULT 'relocation'
+        """
+    )
+    conn.execute(
+        """
+        UPDATE companies
+        SET catalog_kind = 'remote'
+        WHERE country IN ('remote-ok', 'remote-dxb')
+           OR LOWER(TRIM(ats_type)) IN ('remoteok', 'remotedxb', 'sourced')
+        """
+    )
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_companies_catalog_kind
+        ON companies(catalog_kind)
+        """
+    )
+
+
+def _migrate_remotedxb_to_remote_dxb_v1(conn) -> None:
+    conn.execute(
+        """
+        INSERT INTO custom_countries (country, label)
+        VALUES ('remote-dxb', 'Remote DXB')
+        ON CONFLICT (country) DO UPDATE SET label = EXCLUDED.label
+        """
+    )
+    rows = conn.execute(
+        """
+        SELECT id, name
+        FROM companies
+        WHERE country = 'uae'
+          AND (
+            LOWER(TRIM(ats_type)) = 'remotedxb'
+            OR LOWER(TRIM(ats_type)) = 'sourced'
+          )
+        """
+    ).fetchall()
+    names: list[str] = []
+    for row in rows:
+        data = dict(row) if not isinstance(row, dict) else row
+        ats_row = conn.execute(
+            "SELECT ats_type, sources_json FROM companies WHERE id = %s",
+            (data["id"],),
+        ).fetchone()
+        ats_data = dict(ats_row) if ats_row is not None and not isinstance(ats_row, dict) else (ats_row or {})
+        ats = (ats_data.get("ats_type") or "").strip().lower()
+        sources_raw = str(ats_data.get("sources_json") or "").lower()
+        if ats == "sourced" and "remotedxb" not in sources_raw:
+            continue
+        names.append(data["name"])
+        conn.execute(
+            """
+            UPDATE companies
+            SET country = 'remote-dxb', catalog_kind = 'remote'
+            WHERE id = %s
+            """,
+            (data["id"],),
+        )
+    if not names:
+        return
+    placeholders = ", ".join("%s" for _ in names)
+    params = ("remote-dxb", "uae", *names)
+    for table in (
+        "job_tracking",
+        "company_tracking",
+        "job_status_events",
+        "mcp_applications",
+    ):
+        try:
+            conn.execute(
+                f"""
+                UPDATE {table}
+                SET country = %s
+                WHERE country = %s AND company_name IN ({placeholders})
+                """,
+                params,
+            )
+        except Exception:
+            continue
+    count_row = conn.execute(
+        "SELECT COUNT(*) AS n FROM companies WHERE country = %s",
+        ("remote-dxb",),
+    ).fetchone()
+    total = int((dict(count_row) if count_row is not None and not isinstance(count_row, dict) else (count_row or {})).get("n") or 0)
+    conn.execute(
+        """
+        INSERT INTO country_meta (country, source, fetched, updated, jobs_fetched, total)
+        VALUES (%s, '', '', '', '', %s)
+        ON CONFLICT (country) DO UPDATE SET total = EXCLUDED.total
+        """,
+        ("remote-dxb", total),
     )

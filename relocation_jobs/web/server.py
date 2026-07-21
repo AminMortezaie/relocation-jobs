@@ -31,6 +31,7 @@ FIXED_MARKETING_PATHS = (
 
 PRIVATE_ROBOTS_DISALLOW = (
     "/panel",
+    "/remote",
     "/admin",
     "/apply",
     "/company",
@@ -165,6 +166,7 @@ def homepage_brand_assets(asset_path):
 
 
 @app.route("/panel")
+@app.route("/remote")
 def panel_page():
     resp = send_from_directory(STATIC, "index.html")
     resp.headers["Cache-Control"] = "no-store"

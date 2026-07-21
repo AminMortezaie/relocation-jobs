@@ -19,6 +19,7 @@ def load_catalog_board_page(
     panel_flags: dict | None = None,
     count_total: bool = False,
     sort: str | None = "newest",
+    catalog_kind: str = "relocation",
 ) -> tuple[list[dict], list[dict], int, int | None, bool]:
     flags = panel_flags or {}
     filters = FlattenFilters.from_kwargs(
@@ -26,6 +27,7 @@ def load_catalog_board_page(
         user_id=user_id,
         location=location,
         ats_type=ats_type,
+        catalog_kind=catalog_kind,
         visa_only=flags.get("visa_only", False),
         hide_applied=flags.get("hide_applied", False),
         hide_empty=flags.get("hide_empty", False),

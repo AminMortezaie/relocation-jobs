@@ -6,16 +6,22 @@ from relocation_jobs.scrape.aggregator_sync import sync_aggregator_board
 
 
 def test_ensure_aggregator_seeds_creates_countries_and_sources(db):
-    created = ensure_aggregator_seeds()
-    assert {row["company"] for row in created} >= {"Remote OK", "Remote DXB"}
+    ensure_aggregator_seeds()
     again = ensure_aggregator_seeds()
     assert again == []
     remote_ok = get_company("remote-ok", "Remote OK")
     assert remote_ok is not None
     assert remote_ok["ats_type"] == "remoteok"
-    dxb = get_company("uae", "Remote DXB")
+    assert remote_ok.get("catalog_kind") == "remote"
+    dxb = get_company("remote-dxb", "Remote DXB")
     assert dxb is not None
     assert dxb["ats_type"] == "remotedxb"
+    assert dxb.get("catalog_kind") == "remote"
+    joblet = get_company("remote-joblet", "Joblet")
+    assert joblet is not None
+    assert joblet["ats_type"] == "joblet"
+    assert joblet.get("catalog_kind") == "remote"
+    assert get_company("uae", "Remote DXB") is None
 
 
 def test_sync_aggregator_board_fans_out_employers(db):
@@ -49,6 +55,7 @@ def test_sync_aggregator_board_fans_out_employers(db):
     acme = get_company("remote-ok", "Acme Labs")
     assert acme is not None
     assert acme["ats_type"] == "sourced"
+    assert acme.get("catalog_kind") == "remote"
     assert len(acme["matching_jobs"]) == 1
     assert acme["matching_jobs"][0]["title"] == "Senior Backend Engineer"
     stubs = list_country_company_stubs("remote-ok")

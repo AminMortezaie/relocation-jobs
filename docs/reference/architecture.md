@@ -28,15 +28,16 @@ static/js/ + frontend/   ← UI; React pagination in static/dist/
 relocation_jobs/
 ├── catalog/      repo — companies, jobs, sync_company_board_to_catalog
 ├── positions/    repo + service — apply, reject, not-for-me
-├── panel/        flatten_companies, flatten_companies_page, stats, filters
+├── panel/        relocation board flatten + stats
+├── remote/       remote board service + country list (aggregators)
 ├── fetch/        country_runner, runner — in-process asyncio fetch
-├── scrape/       boards/, merge, enrich, ats_resolve
+├── scrape/       boards/, merge, enrich, aggregator_* 
 ├── companies/    company CRUD
 ├── users/        history, applied
 ├── mcp/          Claude Desktop MCP: application prep, tex → PDF (v0)
 ├── admin/        dashboard aggregates
 ├── web/          server, routes, deps
-├── shared/       predicates, coerce, schema
+├── shared/       board_contract, predicates, coerce, schema
 └── db/           v2-only migrations
 ```
 
@@ -56,7 +57,8 @@ relocation_jobs/
 
 ## Panel read path
 
-**Main board:** `GET /api/board` → `panel/board.load_catalog_board_page()` → `flatten_companies_page()`.
+**Main board:** `GET /api/board` → `panel/board.load_catalog_board_page(catalog_kind=relocation)` → `flatten_companies_page()`.
+**Remote board:** `GET /api/remote/board` → `remote/board.load_remote_board_page()` (same flatten contract, `catalog_kind=remote`). See [board.md](board.md).
 
 1. Load catalog for **selected country only**
 2. Load per-user tracking scoped to that country

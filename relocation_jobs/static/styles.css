@@ -154,6 +154,37 @@ header {
   border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
 }
 
+.panel-domain-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: var(--space-2);
+  padding: 0.15rem;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  flex-shrink: 0;
+}
+
+.panel-domain-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: var(--muted);
+}
+
+.panel-domain-link:hover {
+  color: var(--color-ink);
+}
+
+.panel-domain-link.is-active {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--accent-primary) 16%, transparent);
+}
+
 .brand-lockup {
   display: inline-flex;
   align-items: center;

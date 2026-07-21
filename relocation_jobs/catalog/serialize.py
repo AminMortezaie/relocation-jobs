@@ -10,6 +10,10 @@ from relocation_jobs.core.location_tags import (
     sync_company_location_fields,
 )
 from relocation_jobs.schemas import Location
+from relocation_jobs.shared.board_contract import (
+    catalog_kind_for_write,
+    normalize_catalog_kind,
+)
 
 from relocation_jobs.catalog.util import row_dict, visa_from_db
 
@@ -172,6 +176,13 @@ def company_row_to_dict(row, jobs: list[dict]) -> dict:
         "added": data.get("added") or "",
         "updated": data.get("updated") or "",
         "sources": sources,
+        "catalog_kind": normalize_catalog_kind(data.get("catalog_kind"))
+        if data.get("catalog_kind")
+        else catalog_kind_for_write(
+            country_key=catalog_country,
+            ats_type=data.get("ats_type"),
+            sources=sources,
+        ),
         "matching_jobs": jobs,
     }
     return company

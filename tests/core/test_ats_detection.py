@@ -3,6 +3,19 @@ from __future__ import annotations
 from relocation_jobs.core import ats_detection as mod
 
 
+def test_smartrecruiters_company_id_from_oneclick_ui_url():
+    assert (
+        mod._smartrecruiters_company_id(
+            "https://jobs.smartrecruiters.com/oneclick-ui/company/Evolution/"
+        )
+        == "Evolution"
+    )
+    assert (
+        mod._smartrecruiters_company_id("https://jobs.smartrecruiters.com/Evolution")
+        == "Evolution"
+    )
+
+
 def test_recruitee_careers_host_requires_live_board(monkeypatch):
     monkeypatch.setattr(mod, "_recruitee_board_exists", lambda slug: slug == "realco")
     monkeypatch.setattr(mod, "_recruitee_board_has_real_jobs", lambda slug: slug == "realco")

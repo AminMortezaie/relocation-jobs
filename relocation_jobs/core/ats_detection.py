@@ -111,6 +111,7 @@ def _smartrecruiters_company_id(ats_url: str) -> str:
     for pattern in (
         r"api\.smartrecruiters\.com/v1/companies/([A-Za-z0-9_-]+)",
         r"careers\.smartrecruiters\.com/([A-Za-z0-9_-]+)",
+        r"jobs\.smartrecruiters\.com/oneclick-ui/company/([A-Za-z0-9_-]+)",
         r"jobs\.smartrecruiters\.com/([A-Za-z0-9_-]+)",
     ):
         m = re.search(pattern, url, re.I)

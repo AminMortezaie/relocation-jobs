@@ -679,17 +679,38 @@ _INDIA_CITY_HINTS = frozenset({
 })
 
 
-def _unsupported_country_key_from_text(text: str) -> str | None:
-    hay = f" {text.casefold()} "
-    for country_key, aliases in _UNSUPPORTED_COUNTRY_ALIASES.items():
+def _token_in_hay(token: str, hay: str) -> bool:
+    if len(token) <= 2:
+        return bool(re.search(rf"(?<![a-z]){re.escape(token)}(?![a-z])", hay))
+    return token in hay
+
+
+def _key_from_alias_map(hay: str, aliases_by_key: dict[str, tuple[str, ...]]) -> str | None:
+    for country_key, aliases in aliases_by_key.items():
         for alias in aliases:
-            token = alias.casefold()
-            if len(token) <= 2:
-                if re.search(rf"(?<![a-z]){re.escape(token)}(?![a-z])", hay):
-                    return country_key
-            elif token in hay:
+            if _token_in_hay(alias.casefold(), hay):
                 return country_key
     return None
+
+
+def _supported_country_alias_map() -> dict[str, tuple[str, ...]]:
+    merged: dict[str, list[str]] = {
+        key: list(aliases) for key, aliases in _COUNTRY_TEXT_ALIASES.items()
+    }
+    for key, label in all_country_labels().items():
+        bucket = merged.setdefault(key, [])
+        seen = {item.casefold() for item in bucket}
+        for token in (key.replace("-", " "), (label or "").strip()):
+            folded = token.casefold()
+            if folded and folded not in seen:
+                bucket.append(folded)
+                seen.add(folded)
+    return {key: tuple(aliases) for key, aliases in merged.items()}
+
+
+def _unsupported_country_key_from_text(text: str) -> str | None:
+    hay = f" {text.casefold()} "
+    return _key_from_alias_map(hay, _UNSUPPORTED_COUNTRY_ALIASES)
 
 
 def company_expected_locations(
@@ -778,15 +799,7 @@ def job_listing_location_texts(job: dict) -> list[str]:
 
 def _country_key_from_text(text: str) -> str | None:
     hay = f" {text.casefold()} "
-    for country_key, aliases in _COUNTRY_TEXT_ALIASES.items():
-        for alias in aliases:
-            token = alias.casefold()
-            if len(token) <= 2:
-                if re.search(rf"(?<![a-z]){re.escape(token)}(?![a-z])", hay):
-                    return country_key
-            elif token in hay:
-                return country_key
-    return None
+    return _key_from_alias_map(hay, _supported_country_alias_map())
 
 
 def _city_keys_from_text(text: str, *, country_key: str | None = None) -> set[str]:
@@ -824,8 +837,16 @@ def _parse_listing_location(text: str) -> tuple[str | None, set[str], bool]:
     if _REMOTE_ONLY_RE.match(cleaned):
         return None, set(), True
 
+    country_key = _country_key_from_text(cleaned)
+    if country_key:
+        city_keys = _city_keys_from_text(cleaned, country_key=country_key)
+        return country_key, city_keys, False
+
     unsupported = _unsupported_country_key_from_text(cleaned)
     if unsupported:
+        if unsupported in supported_country_keys():
+            city_keys = _city_keys_from_text(cleaned, country_key=unsupported)
+            return unsupported, city_keys, False
         return f"unsupported:{unsupported}", set(), False
 
     region_match = _TRAILING_REGION_RE.search(cleaned)
@@ -842,9 +863,8 @@ def _parse_listing_location(text: str) -> tuple[str | None, set[str], bool]:
         if code in _US_STATE_CODES:
             return "unsupported:usa", city_keys, False
 
-    country_key = _country_key_from_text(cleaned)
-    city_keys = _city_keys_from_text(cleaned, country_key=country_key)
-    return country_key, city_keys, False
+    city_keys = _city_keys_from_text(cleaned, country_key=None)
+    return None, city_keys, False
 
 
 def _text_matches_expected_offices(text: str, expected: list[dict]) -> bool:

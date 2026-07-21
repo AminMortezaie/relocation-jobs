@@ -84,3 +84,72 @@ def test_title_team_suffix_without_location_is_not_a_gate():
         _expected(company),
     )
     assert ok is True
+
+
+def test_custom_catalog_country_is_not_treated_as_unsupported(monkeypatch):
+    import relocation_jobs.core.location_tags as mod
+
+    labels = {
+        "germany": "Germany",
+        "netherlands": "Netherlands",
+        "uk": "United Kingdom",
+        "portugal": "Portugal",
+        "sweden": "Sweden",
+    }
+    monkeypatch.setattr(mod, "all_country_labels", lambda: labels)
+    company = {
+        "name": "Evolution",
+        "cities": ["Stockholm"],
+        "locations": [{"country": "sweden", "city": "Stockholm"}],
+        "matching_jobs": [],
+    }
+    sync_company_location_fields(company, catalog_country="sweden")
+    expected = company_expected_locations(company, catalog_country="sweden")
+    ok, reason = job_matches_expected_locations(
+        {"location": "Stockholm, Stockholm County, Sweden"},
+        expected,
+    )
+    assert ok is True, reason
+    ok_demonym, reason_demonym = job_matches_expected_locations(
+        {"location": "Swedish"},
+        expected,
+    )
+    assert ok_demonym is True, reason_demonym
+    ok_fr, reason_fr = job_matches_expected_locations(
+        {"location": "Paris, France"},
+        expected,
+    )
+    assert ok_fr is False
+    assert "france" in (reason_fr or "")
+
+
+def test_non_denylist_custom_country_matches_by_label(monkeypatch):
+    import relocation_jobs.core.location_tags as mod
+
+    labels = {
+        "germany": "Germany",
+        "netherlands": "Netherlands",
+        "uk": "United Kingdom",
+        "portugal": "Portugal",
+        "georgia": "Georgia",
+    }
+    monkeypatch.setattr(mod, "all_country_labels", lambda: labels)
+    company = {
+        "name": "TBC Bank",
+        "cities": ["Tbilisi"],
+        "locations": [{"country": "georgia", "city": "Tbilisi"}],
+        "matching_jobs": [],
+    }
+    sync_company_location_fields(company, catalog_country="georgia")
+    expected = company_expected_locations(company, catalog_country="georgia")
+    ok, reason = job_matches_expected_locations(
+        {"location": "Tbilisi, Georgia"},
+        expected,
+    )
+    assert ok is True, reason
+    ok_de, reason_de = job_matches_expected_locations(
+        {"location": "Berlin, Germany"},
+        expected,
+    )
+    assert ok_de is False
+    assert "germany" in (reason_de or "") or "outside tagged" in (reason_de or "")

@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "0d6d09ed7d2c",
+  "session_id": "07bf2409-591b-4e6f-9c48-87d4e8ee47f2",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-21T15:09:43.348382Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [
+    "docs/reference/mcp-application.md"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "f78fe2635a46",
+  "compact_transcript_start": 0,
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-21T15:09:43.343073Z",
+    "agent_lines": 5,
+    "agent_removed": 5,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 5,
+    "total_lines_changed": 10,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}

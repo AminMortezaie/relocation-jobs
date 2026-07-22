@@ -1,0 +1,22 @@
+if you see the color of buttons and the marks are so light and no recegonizable.
+
+we have this problem on every pages.
+
+find them all and fix it.
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+keep the orange color there it was the default brand theme for the business,
+keep the primary colors there just make the colors with less opacity to something darker
+
+---
+
+the startegy for seen jobs are making less opacity for the card but i think we can make them different for example what google works we can make the job title different.
+
+to not make the opacity less.

@@ -1,0 +1,180 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "7a95c5f431c3",
+  "session_id": "e8ae1b93-ff33-462f-95e9-a3a90e724b75",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-22T12:18:26.274179Z",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "save_step_count": 4,
+  "files_touched": [
+    "docs/operations/seo-indexing.md",
+    "homepage/app/[slug]/page.tsx",
+    "homepage/app/design-tokens.css",
+    "homepage/app/globals.css",
+    "homepage/app/how-it-works/page.tsx",
+    "homepage/app/layout.tsx",
+    "homepage/app/mcp/page.tsx",
+    "homepage/app/page.tsx",
+    "homepage/app/pricing/page.tsx",
+    "homepage/components/AccessSection.tsx",
+    "homepage/components/CTA.tsx",
+    "homepage/components/Footer.tsx",
+    "homepage/components/Header.tsx",
+    "homepage/components/Hero.tsx",
+    "homepage/components/HomeFAQ.tsx",
+    "homepage/components/HomeWorkflow.tsx",
+    "homepage/components/ProductJourney.tsx",
+    "homepage/components/TrustPrinciples.tsx",
+    "relocation_jobs/static/design-tokens.css",
+    "relocation_jobs/static/homepage/404.html",
+    "relocation_jobs/static/homepage/_next/static/IV4d5nOlF92_lNodAknJ-/_buildManifest.js",
+    "relocation_jobs/static/homepage/_next/static/IV4d5nOlF92_lNodAknJ-/_ssgManifest.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/246-b4f5a6a46b33ff0f.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/246-eb18f77a7603e373.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/[slug]/page-0928660dae69ae1f.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/how-it-works/page-0928660dae69ae1f.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/page-baa245517aec82df.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/page-ce6076d2d966b482.js",
+    "relocation_jobs/static/homepage/_next/static/chunks/app/pricing/page-0928660dae69ae1f.js",
+    "relocation_jobs/static/homepage/_next/static/css/a045a3740ed5428d.css",
+    "relocation_jobs/static/homepage/how-it-works.html",
+    "relocation_jobs/static/homepage/how-it-works.txt",
+    "relocation_jobs/static/homepage/index.html",
+    "relocation_jobs/static/homepage/index.txt",
+    "relocation_jobs/static/homepage/mcp.html",
+    "relocation_jobs/static/homepage/mcp.txt",
+    "relocation_jobs/static/homepage/pricing.html",
+    "relocation_jobs/static/homepage/pricing.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.html",
+    "relocation_jobs/static/homepage/relocation-jobs-germany.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-ireland.html",
+    "relocation_jobs/static/homepage/relocation-jobs-ireland.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.html",
+    "relocation_jobs/static/homepage/relocation-jobs-netherlands.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.html",
+    "relocation_jobs/static/homepage/relocation-jobs-portugal.txt",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.html",
+    "relocation_jobs/static/homepage/relocation-jobs-uk.txt",
+    "relocation_jobs/static/js/position-card.js",
+    "relocation_jobs/static/styles.css",
+    "relocation_jobs/web/server.py",
+    "scripts/build_homepage.sh",
+    "tests/web/test_public_api.py"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "90fd50dd11ae",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 139196,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1923968,
+    "output_tokens": 20689,
+    "api_call_count": 4
+  },
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-22T12:18:26.264004Z",
+    "agent_lines": 739,
+    "agent_removed": 241,
+    "human_added": 1094,
+    "human_modified": 44,
+    "human_removed": 0,
+    "total_committed": 1873,
+    "total_lines_changed": 2136,
+    "agent_percentage": 45.88014981273408,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 24,
+      "user_lines_removed": 4,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "relocation_jobs/static/js/position-card.js": 5,
+        "relocation_jobs/static/styles.css": 7,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/js/position-card.js": 2,
+        "relocation_jobs/static/styles.css": 2
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 105,
+      "user_lines_removed": 17,
+      "agent_lines_added": 353,
+      "agent_lines_removed": 59,
+      "user_added_per_file": {
+        "homepage/app/how-it-works/page.tsx": 1,
+        "homepage/app/page.tsx": 2,
+        "homepage/components/AccessSection.tsx": 14,
+        "homepage/components/CTA.tsx": 4,
+        "homepage/components/Header.tsx": 1,
+        "homepage/components/Hero.tsx": 10,
+        "homepage/components/HomeFAQ.tsx": 5,
+        "homepage/components/HomeWorkflow.tsx": 2,
+        "homepage/components/McpFeature.tsx": 50,
+        "homepage/components/ProductJourney.tsx": 3,
+        "homepage/components/TrustPrinciples.tsx": 1,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "homepage/app/how-it-works/page.tsx": 1,
+        "homepage/components/AccessSection.tsx": 5,
+        "homepage/components/CTA.tsx": 2,
+        "homepage/components/Hero.tsx": 2,
+        "homepage/components/HomeFAQ.tsx": 1,
+        "homepage/components/HomeWorkflow.tsx": 2,
+        "homepage/components/ProductJourney.tsx": 3,
+        "homepage/components/TrustPrinciples.tsx": 1
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 541,
+      "user_lines_removed": 15,
+      "agent_lines_added": 720,
+      "agent_lines_removed": 266,
+      "user_added_per_file": {
+        "docs/operations/seo-indexing.md": 1,
+        "homepage/app/[slug]/page.tsx": 202,
+        "homepage/lib/country-pages.ts": 322,
+        "relocation_jobs/static/homepage/mcp.html": 1,
+        "relocation_jobs/static/homepage/mcp.txt": 3,
+        "scripts/.claude/settings.local.json": 12
+      },
+      "user_removed_per_file": {
+        "docs/operations/seo-indexing.md": 1,
+        "homepage/app/[slug]/page.tsx": 10,
+        "relocation_jobs/static/homepage/mcp.html": 1,
+        "relocation_jobs/static/homepage/mcp.txt": 3
+      }
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 524,
+      "user_lines_removed": 4,
+      "agent_lines_added": 1288,
+      "agent_lines_removed": 255,
+      "user_added_per_file": {
+        "homepage/components/CountryCatalogPanel.tsx": 325,
+        "homepage/lib/country-snapshots.ts": 38,
+        "relocation_jobs/static/homepage/mcp.html": 1,
+        "relocation_jobs/static/homepage/mcp.txt": 3,
+        "scripts/.claude/settings.local.json": 12,
+        "scripts/export_homepage_country_snapshots.py": 145
+      },
+      "user_removed_per_file": {
+        "relocation_jobs/static/homepage/mcp.html": 1,
+        "relocation_jobs/static/homepage/mcp.txt": 3
+      }
+    }
+  ]
+}

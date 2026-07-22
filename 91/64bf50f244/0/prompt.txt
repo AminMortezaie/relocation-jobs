@@ -1,0 +1,18 @@
+the pop up window for not for me is going anywhere but it should sticked to the button not for me aand shows there
+
+---
+
+see the problem in mobile version
+
+---
+
+problem is exists
+
+---
+
+after this changes no pop up opens
+
+---
+
+no, its not working.
+again

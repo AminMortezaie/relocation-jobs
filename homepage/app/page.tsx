@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HomeFAQ } from "@/components/HomeFAQ";
 import { HomeWorkflow } from "@/components/HomeWorkflow";
+import { McpFeature } from "@/components/McpFeature";
 import { ProductJourney } from "@/components/ProductJourney";
 import { RelocationProblem } from "@/components/RelocationProblem";
 import { SearchFlowProvider } from "@/components/SearchFlowContext";
@@ -28,6 +29,7 @@ export default function HomePage() {
           <EvidenceRail />
           <RelocationProblem />
           <ProductJourney />
+          <McpFeature />
           <CountryPathways />
           <HomeWorkflow />
           <AccessSection />

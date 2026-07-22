@@ -8,8 +8,8 @@ const STEPS = [
     body: "Sign in when you want the full board, personal status tracking, and company workspaces.",
   },
   {
-    title: "Prepare for one job at a time",
-    body: "Bring the job description, master CV, and project evidence together before reviewing the output.",
+    title: "Prepare with MCP for one job at a time",
+    body: "Connect Claude or Cursor to Kuchup MCP. Bring the JD, master CV, and project evidence together — then review the tailored PDF yourself.",
   },
   {
     title: "Return to a current search",
@@ -28,9 +28,14 @@ export function HomeWorkflow() {
               A repeatable path, not another tab to manage.
             </h2>
           </div>
-          <a href="/how-it-works" className="text-link">
-            Read the full workflow <span aria-hidden="true">→</span>
-          </a>
+          <div className="workflow-home-links">
+            <a href="/how-it-works" className="text-link">
+              Read the full workflow <span aria-hidden="true">→</span>
+            </a>
+            <a href="/mcp" className="text-link">
+              Claude &amp; Cursor MCP <span aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
 
         <ol className="workflow-home-list">

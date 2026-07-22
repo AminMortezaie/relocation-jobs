@@ -102,8 +102,8 @@
   --success-soft: var(--accent-green-soft);
   --warn: oklch(55% 0.14 55);
   --warn-soft: color-mix(in srgb, var(--warn) 14%, var(--color-paper));
-  --danger: var(--color-rule);
-  --danger-soft: color-mix(in srgb, var(--color-rule) 12%, var(--color-paper));
+  --danger: oklch(48% 0.14 25);
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, var(--color-paper));
   --referral: var(--color-ink-2);
   --referral-soft: var(--accent-blue-soft);
   --visa: var(--color-rule);

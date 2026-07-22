@@ -3,6 +3,7 @@ import { countryLinks } from "@/lib/countries";
 const PRODUCT_LINKS = [
   { href: "/panel", label: "Board" },
   { href: "/how-it-works", label: "How it works" },
+  { href: "/mcp", label: "MCP" },
   { href: "/pricing", label: "Pricing" },
 ] as const;
 

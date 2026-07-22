@@ -22,7 +22,7 @@ How to get kuchup.com found on Google.
    - Enter `https://kuchup.com/sitemap.xml` and submit
 5. Request manual indexing for key pages:
    - **URL inspection** → paste root URL → **Request indexing**
-   - Repeat for: `/how-it-works`, `/pricing`, `/relocation-jobs-germany`, `/relocation-jobs-netherlands`, `/relocation-jobs-uk`, `/relocation-jobs-portugal`
+   - Repeat for: `/how-it-works`, `/pricing`, `/mcp`, `/relocation-jobs-germany`, `/relocation-jobs-netherlands`, `/relocation-jobs-uk`, `/relocation-jobs-portugal`, `/relocation-jobs-ireland`
 
 ## What to expect
 

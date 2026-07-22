@@ -5,7 +5,7 @@ const PRINCIPLES = [
   },
   {
     title: "Evidence before polish",
-    body: "CV reframing uses your master material and project evidence; it should never invent experience.",
+    body: "MCP-assisted CV reframing uses your master material and project evidence; it should never invent experience.",
   },
   {
     title: "Review is part of the workflow",

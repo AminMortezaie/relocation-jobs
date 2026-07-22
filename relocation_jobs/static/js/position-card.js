@@ -546,7 +546,7 @@ class PositionCard extends HTMLElement {
     const popTitle = cur ? "Change category" : "Why hide this role?";
     return `<div class="hide-reason-wrap" data-current-reason="${escapeHtml(cur)}">
       <button type="button" class="hide-reason-trigger hide-reason-trigger--${tone}" aria-expanded="false" aria-haspopup="menu" title="${cur ? "Change hide category" : "Hide this role"}">${label}<svg class="hide-reason-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-      <div class="hide-reason-popover" hidden role="menu" aria-label="${popTitle}" style="position:fixed;z-index:10000">
+      <div class="hide-reason-popover" hidden role="menu" aria-label="${popTitle}">
         <p class="hide-reason-popover-title">${popTitle}</p>
         <div class="hide-reason-options">${HIDE_REASONS.map(r => {
           const isCur = Boolean(cur) && r.id === cur;
@@ -709,8 +709,11 @@ class PositionCard extends HTMLElement {
     this._closeAllPopovers(open ? wrap : null);
     trigger.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) {
+      // Absolute under .hide-reason-wrap — stays stuck to the button. Do not use
+      // position:fixed here: company-card:hover transform creates a containing
+      // block and viewport coords then place the menu far from the trigger.
       popover.hidden = false;
-      this._positionPopover(popover, trigger);
+      this._setRaised(true);
     }
   }
 
@@ -785,12 +788,8 @@ class PositionCard extends HTMLElement {
     }
   }
 
-  /** Lift this card and its company above siblings while a popover is open.
-   *  Dimmed cards (.position-seen use opacity < 1) create a stacking context
-   *  that traps the popover's z-index behind later siblings. We target the
-   *  inner .position-card (which carries the opacity SC) so the SC itself
-   *  gets positioned above siblings.  We also raise the .company-card so
-   *  the popover doesn't fall behind the *next* company card. */
+  /** Lift this card and its company above siblings while a popover is open
+   *  so the popover is not clipped behind later position/company cards. */
   _setRaised(on) {
     const inner = this.querySelector(".position-card");
     if (inner) {

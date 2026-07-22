@@ -1413,7 +1413,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .filter-btn.board-page-num.is-active {
   border-color: color-mix(in srgb, var(--accent-blue) 65%, var(--border));
   background: var(--accent-blue-soft);
-  color: color-mix(in srgb, var(--accent-blue) 65%, white);
+  color: var(--accent-blue);
 }
 
 .filter-btn.board-page-nav:disabled,
@@ -1658,23 +1658,23 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .fetch-company-btn:hover:not(:disabled) {
-  border-color: rgba(91, 141, 239, 0.45);
-  background: rgba(91, 141, 239, 0.2);
-  color: #c7dcff;
+  border-color: color-mix(in srgb, var(--accent-blue) 45%, transparent);
+  background: color-mix(in srgb, var(--accent-blue) 16%, transparent);
+  color: var(--color-ink);
 }
 
 .fetch-company-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .remove-company-btn {
-  border-color: rgba(248, 113, 113, 0.28);
+  border-color: color-mix(in srgb, var(--danger) 28%, transparent);
   background: var(--danger-soft);
-  color: #fca5a5;
+  color: var(--danger);
 }
 
 .remove-company-btn:hover:not(:disabled) {
-  background: rgba(248, 113, 113, 0.2);
-  border-color: rgba(248, 113, 113, 0.45);
-  color: #fecaca;
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+  color: var(--danger);
 }
 
 .remove-company-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -1710,8 +1710,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .fetch-ok-btn:hover:not(:disabled) {
-  border-color: rgba(52, 211, 153, 0.35);
-  color: #6ee7b7;
+  border-color: color-mix(in srgb, var(--success) 35%, transparent);
+  color: var(--success);
   background: var(--success-soft);
 }
 
@@ -1844,19 +1844,15 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   background: transparent;
 }
 
-.position-card.position-seen:not(.position-applied):not(.position-rejected) {
-  opacity: 0.72;
-}
+/* Seen = visited-link treatment on the title (Google-style), full card opacity */
 .position-card.position-seen .job-title,
 .position-card.position-seen .job-title:visited {
-  color: #7dd3fc;
-}
-.position-card.position-seen:not(.position-applied):not(.position-rejected):hover {
-  opacity: 1;
+  color: var(--color-muted);
+  font-weight: 500;
 }
 .position-card.position-seen .job-title:hover,
 .position-card.position-seen .job-title:visited:hover {
-  color: #bae6fd;
+  color: var(--color-ink-2);
 }
 
 .position-card.position-rejected.position-applied {
@@ -1921,7 +1917,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .badge.date { background: var(--surface2); color: var(--muted); border-color: var(--border); }
 .badge.applied { background: var(--accent-green-soft, var(--success-soft)); color: var(--accent-green); border-color: color-mix(in srgb, var(--accent-green) 28%, transparent); }
 .badge.awaiting-response { background: var(--accent-purple-soft, var(--visa-soft)); color: var(--accent-purple); border-color: color-mix(in srgb, var(--accent-purple) 28%, transparent); }
-.badge.rejected { background: var(--danger-soft); color: var(--text-muted, var(--muted)); border-color: var(--border-subtle, var(--border)); }
+.badge.rejected { background: var(--danger-soft); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 28%, transparent); }
 .badge.seen { background: color-mix(in srgb, var(--text-muted) 8%, transparent); color: var(--text-muted, var(--muted)); border-color: color-mix(in srgb, var(--text-muted) 18%, transparent); }
 .badge.looking-to-apply { background: var(--accent-blue-soft); color: var(--accent-blue); border-color: color-mix(in srgb, var(--accent-blue) 28%, transparent); }
 .badge.fetch-problem { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 28%, transparent); }
@@ -1963,57 +1959,57 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .applied-btn {
-  border: 1px solid rgba(52, 211, 153, 0.35);
+  border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
   background: var(--success-soft);
-  color: #6ee7b7;
+  color: var(--success);
 }
 
 .applied-btn:hover:not(:disabled) {
-  background: rgba(52, 211, 153, 0.2);
-  border-color: rgba(52, 211, 153, 0.5);
-  color: #a7f3d0;
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  border-color: color-mix(in srgb, var(--success) 50%, transparent);
+  color: var(--success);
 }
 
 .applied-btn.active {
-  border-color: rgba(52, 211, 153, 0.55);
-  background: rgba(52, 211, 153, 0.22);
-  color: #a7f3d0;
+  border-color: color-mix(in srgb, var(--success) 55%, transparent);
+  background: color-mix(in srgb, var(--success) 20%, transparent);
+  color: var(--success);
 }
 
 .rejected-btn {
-  border: 1px solid rgba(248, 113, 113, 0.35);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
   background: var(--danger-soft);
-  color: #fca5a5;
+  color: var(--danger);
 }
 
 .rejected-btn:hover:not(:disabled) {
-  background: rgba(248, 113, 113, 0.2);
-  border-color: rgba(248, 113, 113, 0.5);
-  color: #fecaca;
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 50%, transparent);
+  color: var(--danger);
 }
 
 .rejected-btn.active {
-  border-color: rgba(248, 113, 113, 0.55);
-  background: rgba(248, 113, 113, 0.22);
-  color: #fecaca;
+  border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+  background: color-mix(in srgb, var(--danger) 20%, transparent);
+  color: var(--danger);
 }
 
 .referral-btn {
-  border: 1px solid rgba(122, 168, 255, 0.35);
+  border: 1px solid color-mix(in srgb, var(--referral) 35%, transparent);
   background: var(--referral-soft);
-  color: #8eb8ff;
+  color: var(--referral);
 }
 
 .referral-btn:hover:not(:disabled) {
-  background: rgba(122, 168, 255, 0.2);
-  border-color: rgba(122, 168, 255, 0.5);
-  color: #b8d4ff;
+  background: color-mix(in srgb, var(--referral) 18%, transparent);
+  border-color: color-mix(in srgb, var(--referral) 50%, transparent);
+  color: var(--referral);
 }
 
 .referral-btn.active {
-  border-color: rgba(122, 168, 255, 0.55);
-  background: rgba(122, 168, 255, 0.22);
-  color: #c7dcff;
+  border-color: color-mix(in srgb, var(--referral) 55%, transparent);
+  background: color-mix(in srgb, var(--referral) 20%, transparent);
+  color: var(--referral);
 }
 
 .looking-to-apply-btn {
@@ -2035,21 +2031,21 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .saw-before-btn {
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(148, 163, 184, 0.08);
-  color: #94a3b8;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 35%, transparent);
+  background: color-mix(in srgb, var(--color-muted) 8%, var(--color-paper));
+  color: var(--color-ink-2);
 }
 
 .saw-before-btn:hover:not(:disabled) {
-  background: rgba(148, 163, 184, 0.16);
-  border-color: rgba(148, 163, 184, 0.5);
-  color: #cbd5e1;
+  background: color-mix(in srgb, var(--color-muted) 14%, var(--color-paper));
+  border-color: color-mix(in srgb, var(--color-muted) 50%, transparent);
+  color: var(--color-ink);
 }
 
 .saw-before-btn.active {
-  border-color: rgba(148, 163, 184, 0.55);
-  background: rgba(148, 163, 184, 0.18);
-  color: #cbd5e1;
+  border-color: color-mix(in srgb, var(--color-muted) 55%, transparent);
+  background: color-mix(in srgb, var(--color-muted) 16%, var(--color-paper));
+  color: var(--color-ink);
 }
 
 .pin-job-btn {
@@ -2076,15 +2072,15 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .pin-job-btn.is-pinned {
-  border-color: rgba(251, 191, 36, 0.45);
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  background: var(--warn-soft);
+  color: var(--warn);
 }
 
 .pin-job-btn.is-pinned:hover:not(:disabled) {
-  background: rgba(251, 191, 36, 0.2);
-  border-color: rgba(251, 191, 36, 0.55);
-  color: #fcd34d;
+  background: color-mix(in srgb, var(--warn) 18%, transparent);
+  border-color: color-mix(in srgb, var(--warn) 55%, transparent);
+  color: var(--warn);
 }
 
 .pin-job-btn:disabled {
@@ -2105,6 +2101,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .hide-reason-wrap {
   position: relative;
+  overflow: visible;
+}
+
+.hide-reason-wrap:has(.hide-reason-trigger[aria-expanded="true"]) {
+  z-index: 80;
 }
 
 .hide-reason-trigger {
@@ -2128,21 +2129,21 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .hide-reason-trigger--wrong-location {
-  border-color: rgba(45, 212, 191, 0.35);
-  background: rgba(45, 212, 191, 0.1);
-  color: #5eead4;
+  border-color: color-mix(in srgb, oklch(40% 0.08 180) 35%, transparent);
+  background: color-mix(in srgb, oklch(40% 0.08 180) 10%, var(--color-paper));
+  color: oklch(40% 0.08 180);
 }
 
 .hide-reason-trigger--no-relocation {
-  border-color: rgba(139, 147, 163, 0.4);
-  background: rgba(139, 147, 163, 0.1);
+  border-color: color-mix(in srgb, var(--color-muted) 40%, transparent);
+  background: color-mix(in srgb, var(--color-muted) 10%, var(--color-paper));
   color: var(--muted);
 }
 
 .hide-reason-trigger--expired {
-  border-color: rgba(148, 163, 184, 0.35);
-  background: rgba(148, 163, 184, 0.1);
-  color: #94a3b8;
+  border-color: color-mix(in srgb, var(--color-muted) 35%, transparent);
+  background: color-mix(in srgb, var(--color-muted) 10%, var(--color-paper));
+  color: var(--color-ink-2);
 }
 
 .hide-reason-trigger:hover:not(:disabled) {
@@ -2169,8 +2170,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   position: absolute;
   top: calc(100% + 0.45rem);
   left: 0;
-  z-index: 60;
-  min-width: 15rem;
+  z-index: 80;
+  min-width: max(15rem, 100%);
   padding: 0.55rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-strong);
@@ -2238,9 +2239,9 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .hide-reason-option--not-for-me .hide-reason-option-dot { background: var(--warn); }
-.hide-reason-option--wrong-location .hide-reason-option-dot { background: #5eead4; }
+.hide-reason-option--wrong-location .hide-reason-option-dot { background: oklch(40% 0.08 180); }
 .hide-reason-option--no-relocation .hide-reason-option-dot { background: var(--muted); }
-.hide-reason-option--expired .hide-reason-option-dot { background: #94a3b8; }
+.hide-reason-option--expired .hide-reason-option-dot { background: var(--color-ink-2); }
 
 .hide-reason-option-text {
   display: flex;
@@ -2370,7 +2371,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   text-decoration: none;
 }
 
-.badge.referral:hover { color: #c7dcff; }
+.badge.referral:hover { color: var(--color-ink); }
 
 .position-meta {
   display: flex;
@@ -2421,7 +2422,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .ats-score-trigger.ats-high { color: var(--success); }
 .ats-score-trigger.ats-mid { color: var(--warn); }
-.ats-score-trigger.ats-low { color: #ff9a9a; }
+.ats-score-trigger.ats-low { color: var(--danger); }
 
 .ats-score-trigger-text {
   letter-spacing: 0.03em;
@@ -2748,14 +2749,14 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .show-not-for-me-btn:hover:not(:disabled) {
-  border-color: rgba(245, 166, 35, 0.45);
-  color: #fbbf24;
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  color: var(--warn);
 }
 
 .show-not-for-me-btn.active {
-  border-color: rgba(245, 166, 35, 0.45);
-  background: rgba(245, 166, 35, 0.18);
-  color: #fbbf24;
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  background: color-mix(in srgb, var(--warn) 16%, transparent);
+  color: var(--warn);
 }
 
 .position-card.not-for-me-role {
@@ -2777,42 +2778,42 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .badge.not-for-me {
   background: var(--warn-soft);
-  color: #fbbf24;
-  border-color: rgba(245, 166, 35, 0.2);
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 20%, transparent);
 }
 
 .show-rejected-btn {
-  border-color: rgba(248, 113, 113, 0.28);
+  border-color: color-mix(in srgb, var(--danger) 28%, transparent);
   background: var(--danger-soft);
-  color: #fca5a5;
+  color: var(--danger);
 }
 
 .show-rejected-btn:hover:not(:disabled) {
-  border-color: rgba(248, 113, 113, 0.45);
-  color: #fecaca;
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+  color: var(--danger);
 }
 
 .show-rejected-btn.active {
-  border-color: rgba(248, 113, 113, 0.45);
-  background: rgba(248, 113, 113, 0.18);
-  color: #fecaca;
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  color: var(--danger);
 }
 
 .awaiting-response-btn {
-  border-color: rgba(167, 139, 250, 0.28);
+  border-color: color-mix(in srgb, var(--accent-purple) 28%, transparent);
   background: var(--visa-soft);
-  color: #c4b5fd;
+  color: var(--accent-purple);
 }
 
 .awaiting-response-btn:hover:not(:disabled) {
-  border-color: rgba(167, 139, 250, 0.45);
-  color: #ddd6fe;
+  border-color: color-mix(in srgb, var(--accent-purple) 45%, transparent);
+  color: var(--color-ink);
 }
 
 .awaiting-response-btn.active {
-  border-color: rgba(167, 139, 250, 0.45);
-  background: rgba(167, 139, 250, 0.18);
-  color: #ddd6fe;
+  border-color: color-mix(in srgb, var(--accent-purple) 45%, transparent);
+  background: color-mix(in srgb, var(--accent-purple) 14%, transparent);
+  color: var(--color-ink);
 }
 
 .position-card.rejected-role {
@@ -2826,10 +2827,10 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #fca5a5;
+  color: var(--danger);
   margin: 0.65rem 0 0.35rem;
   padding-top: 0.55rem;
-  border-top: 1px dashed rgba(248, 113, 113, 0.25);
+  border-top: 1px dashed color-mix(in srgb, var(--danger) 25%, transparent);
 }
 
 .reapply-btn {
@@ -2839,39 +2840,39 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .reapply-btn:hover:not(:disabled) {
-  background: rgba(91, 141, 239, 0.22);
-  border-color: rgba(91, 141, 239, 0.5);
-  color: #9ec0ff;
+  background: color-mix(in srgb, var(--accent-blue) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent-blue) 50%, transparent);
+  color: var(--color-ink);
 }
 
 .badge.no-relocation {
-  background: rgba(139, 147, 163, 0.12);
+  background: color-mix(in srgb, var(--color-muted) 12%, var(--color-paper));
   color: var(--muted);
-  border-color: rgba(139, 147, 163, 0.2);
+  border-color: color-mix(in srgb, var(--color-muted) 20%, transparent);
 }
 
 .badge.wrong-location {
-  background: rgba(45, 212, 191, 0.12);
-  color: #5eead4;
-  border-color: rgba(45, 212, 191, 0.2);
+  background: color-mix(in srgb, oklch(40% 0.08 180) 12%, var(--color-paper));
+  color: oklch(40% 0.08 180);
+  border-color: color-mix(in srgb, oklch(40% 0.08 180) 20%, transparent);
 }
 
 .badge.expired {
-  background: rgba(148, 163, 184, 0.14);
-  color: #94a3b8;
-  border-color: rgba(148, 163, 184, 0.25);
+  background: color-mix(in srgb, var(--color-muted) 12%, var(--color-paper));
+  color: var(--color-ink-2);
+  border-color: color-mix(in srgb, var(--color-muted) 25%, transparent);
 }
 
 .restore-job-btn {
-  border: 1px solid rgba(52, 211, 153, 0.35);
+  border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
   background: var(--success-soft);
-  color: #6ee7b7;
+  color: var(--success);
 }
 
 .restore-job-btn:hover:not(:disabled) {
-  background: rgba(52, 211, 153, 0.2);
-  border-color: rgba(52, 211, 153, 0.5);
-  color: #a7f3d0;
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  border-color: color-mix(in srgb, var(--success) 50%, transparent);
+  color: var(--success);
 }
 
 .empty {
@@ -6849,7 +6850,7 @@ body.scroll-locked {
 }
 
 .company-more-menu .remove-company-btn {
-  color: #fca5a5;
+  color: var(--danger);
 }
 
 .collapse-company-chevron {
@@ -7137,10 +7138,14 @@ body.scroll-locked {
 }
 
 .company-card .position-card.position-seen .job-title,
-.company-card .position-card.position-seen .job-title:visited,
+.company-card .position-card.position-seen .job-title:visited {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
 .company-card .position-card.position-seen .job-title:hover,
 .company-card .position-card.position-seen .job-title:visited:hover {
-  color: var(--color-accent-2);
+  color: var(--color-ink-2);
 }
 
 .company-card .badge,

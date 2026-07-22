@@ -6,6 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # Snapshot country labels from Redis/Postgres into homepage/data/countries.json
 # before the static Next export. New marketing pages appear after this rebuild.
 python3 "$ROOT/scripts/export_homepage_countries.py"
+python3 "$ROOT/scripts/export_homepage_country_snapshots.py"
 
 cd "$ROOT/homepage"
 if [[ ! -d node_modules ]]; then

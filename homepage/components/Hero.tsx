@@ -25,7 +25,8 @@ export function Hero() {
           <p className="hero-enter hero-enter-delay-2 hero-lede">
             Kuchup helps international software engineers discover
             relocation-focused roles, keep every decision organized, and
-            prepare a focused application without losing the thread.
+            tailor applications with Claude or Cursor via MCP — without losing
+            the thread.
           </p>
 
           <div className="hero-enter hero-enter-delay-3 hero-search">
@@ -42,7 +43,14 @@ export function Hero() {
                 Public preview. No sign-in required. Updated every six hours
                 from company career pages.
               </p>
-              <a href="/panel">Open the full board <span aria-hidden="true">→</span></a>
+              <div className="hero-search-links">
+                <a href="/panel">
+                  Open the full board <span aria-hidden="true">→</span>
+                </a>
+                <a href="/mcp">
+                  Claude &amp; Cursor MCP <span aria-hidden="true">→</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

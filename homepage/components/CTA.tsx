@@ -10,12 +10,14 @@ export function CTA() {
             The move is complex. Your search does not have to be.
           </h2>
           <p>
-            Start with the public catalog, then carry the roles that matter
-            into one focused workspace.
+            Start with the public catalog, carry the roles that matter into
+            one workspace, and connect Claude or Cursor via MCP when you are
+            ready to prepare.
           </p>
         </div>
         <div className="landing-close-actions">
           <Button as="a" href="/panel" variant="primary">Open the board</Button>
+          <Button as="a" href="/mcp" variant="secondary">Explore MCP</Button>
           <a href="#search" className="text-link">Return to search <span aria-hidden="true">↑</span></a>
         </div>
       </div>

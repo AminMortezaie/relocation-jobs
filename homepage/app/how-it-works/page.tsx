@@ -15,7 +15,7 @@ const STEPS = [
   },
   {
     title: "Tailor your CV per job",
-    body: "Use the built-in reframe pipeline to align your CV with specific job descriptions. Project masters, cover letters, and LaTeX exports — all inside the workspace.",
+    body: "Connect Claude or Cursor to Kuchup MCP to align your CV with specific job descriptions. Project masters, cover letters, and LaTeX exports stay in the company workspace — you review and submit.",
   },
   {
     title: "Stay current",
@@ -73,9 +73,14 @@ export default function HowItWorksPage() {
           </section>
 
           <div className="mt-10 text-center">
-            <Button as="a" href="/panel" variant="primary">
-              Sign in to start tracking
-            </Button>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Button as="a" href="/panel" variant="primary">
+                Sign in to start tracking
+              </Button>
+              <Button as="a" href="/mcp" variant="secondary">
+                Explore MCP
+              </Button>
+            </div>
           </div>
         </main>
         <Footer />

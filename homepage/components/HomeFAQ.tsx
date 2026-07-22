@@ -1,25 +1,43 @@
-const QUESTIONS = [
+import type { ReactNode } from "react";
+
+const QUESTIONS: readonly { question: string; answer: ReactNode }[] = [
   {
     question: "Does every role guarantee visa sponsorship?",
-    answer: "No. Kuchup focuses the search on relocation-friendly companies and highlights available sponsorship signals, but eligibility depends on the role, country, company policy, and your circumstances. Always confirm the current job description before applying.",
+    answer:
+      "No. Kuchup focuses the search on relocation-friendly companies and highlights available sponsorship signals, but eligibility depends on the role, country, company policy, and your circumstances. Always confirm the current job description before applying.",
   },
   {
     question: "Where do the jobs come from?",
-    answer: "The catalog is built from company career pages. Kuchup detects the employer's applicant-tracking system and reads current openings from that source instead of relying on a syndicated job-board feed.",
+    answer:
+      "The catalog is built from company career pages. Kuchup detects the employer's applicant-tracking system and reads current openings from that source instead of relying on a syndicated job-board feed.",
   },
   {
     question: "How current is the catalog?",
-    answer: "The production catalog is scheduled to refresh every six hours. A role can still change between refreshes, so the company career page remains the final source of truth.",
+    answer:
+      "The production catalog is scheduled to refresh every six hours. A role can still change between refreshes, so the company career page remains the final source of truth.",
   },
   {
     question: "Will Kuchup apply for me?",
-    answer: "No. Kuchup helps you discover, track, and prepare. You review the application material and choose when and where to submit it.",
+    answer:
+      "No. Kuchup helps you discover, track, and prepare. You review the application material and choose when and where to submit it.",
+  },
+  {
+    question: "What is Kuchup MCP?",
+    answer: (
+      <>
+        An MCP server for Claude and Cursor that loads job context from your
+        catalog, runs a gated CV reframe with your approval, and stores tailored
+        LaTeX and PDFs in your workspace. It does not submit applications.{" "}
+        <a href="/mcp">Learn how to connect →</a>
+      </>
+    ),
   },
   {
     question: "What can I use without signing in?",
-    answer: "You can search the public preview, explore supported countries, and inspect sample company results. Sign in to use the full board, personal tracking, company workspaces, and application documents.",
+    answer:
+      "You can search the public preview, explore supported countries, and inspect sample company results. Sign in to use the full board, personal tracking, company workspaces, MCP connect, and application documents.",
   },
-] as const;
+];
 
 export function HomeFAQ() {
   return (

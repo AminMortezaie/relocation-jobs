@@ -20,7 +20,7 @@ const CHAPTERS = [
     id: "prepare",
     eyebrow: "Prepare",
     title: "Build the application from evidence.",
-    body: "Match a job description against your master CV and project evidence, then review the tailored CV and cover letter yourself. Kuchup prepares the workspace; you stay in control of every claim and submission.",
+    body: "Connect Claude or Cursor to Kuchup MCP. The agent loads the JD from your catalog, reframes against your master CV and project evidence with your approval, then leaves tailored PDFs in the workspace — you submit.",
   },
 ] as const;
 
@@ -152,9 +152,9 @@ function PrepareView() {
         <div className="prepare-line is-long" />
         <div className="prepare-line" />
         <div className="prepare-evidence">
-          <span>Evidence found</span>
+          <span>MCP · Claude / Cursor</span>
           <strong>Project master · API platform</strong>
-          <p>Use verified project context to reframe the relevant experience.</p>
+          <p>Agent reframes from verified project context — you approve each phase.</p>
         </div>
         <div className="prepare-actions">
           <span>Tailored CV</span>

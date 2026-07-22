@@ -9,8 +9,8 @@ const PREVIEW_ITEMS = [
 const WORKSPACE_ITEMS = [
   "Open the full company board",
   "Track personal application status",
-  "Keep role-specific CV and cover-letter files",
-  "Use the gated application-preparation workflow",
+  "Connect Claude or Cursor via Kuchup MCP",
+  "Keep role-specific CV and cover-letter PDFs",
 ] as const;
 
 export function AccessSection() {
@@ -47,13 +47,22 @@ export function AccessSection() {
             <ul>
               {WORKSPACE_ITEMS.map((item) => <li key={item}>{item}</li>)}
             </ul>
-            <Button as="a" href="/panel" variant="primary">Open the workspace</Button>
+            <div className="access-panel-actions">
+              <Button as="a" href="/panel" variant="primary">
+                Open the workspace
+              </Button>
+              <Button as="a" href="/mcp" variant="secondary">
+                Learn about MCP
+              </Button>
+            </div>
           </article>
         </div>
 
         <p className="access-note">
-          The public preview is free. Commercial pricing for expanded access
-          has not been announced. <a href="/pricing">See access details →</a>
+          Application prep runs through{" "}
+          <a href="/mcp">Kuchup MCP for Claude and Cursor</a>. The public
+          preview is free.{" "}
+          <a href="/pricing">See access details →</a>
         </p>
       </div>
     </section>

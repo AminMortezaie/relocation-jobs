@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: "Relocation Jobs | Visa-Sponsored Software Roles in Europe",
   },
   description:
-    "Find visa-sponsored software engineering roles in Europe. Search relocation-friendly openings in Germany, Netherlands, UK, Portugal, and Ireland. Track applications and tailor your CV.",
+    "Find visa-sponsored software engineering roles in Europe. Search relocation-friendly openings in Germany, Netherlands, UK, Portugal, and Ireland. Track applications and tailor your CV with Claude or Cursor via MCP.",
   icons: {
     icon: [{ url: "/static/icons/kuchup-bird.svg", type: "image/svg+xml" }],
     apple: [{ url: "/static/icons/apple-touch-icon.png" }],

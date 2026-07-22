@@ -6,7 +6,6 @@ from flask import Flask, Response, redirect, request, send_from_directory
 
 from relocation_jobs.core.auth import init_auth
 from relocation_jobs.core.db import get_connection
-from relocation_jobs.core.location_tags import all_country_labels
 from relocation_jobs.core.paths import PROJECT_ROOT, STATIC_DIR
 from relocation_jobs.db import init_db
 from relocation_jobs.db.migrate import apply_v2_migrations
@@ -27,6 +26,7 @@ FIXED_MARKETING_PATHS = (
     "/",
     "/how-it-works",
     "/pricing",
+    "/mcp",
 )
 
 PRIVATE_ROBOTS_DISALLOW = (
@@ -51,6 +51,17 @@ def _country_html_exists(country_key: str) -> bool:
     return (HOMEPAGE_STATIC / f"relocation-jobs-{country_key}.html").is_file()
 
 
+def _exported_country_marketing_keys() -> tuple[str, ...]:
+    if not HOMEPAGE_STATIC.is_dir():
+        return ()
+    keys: list[str] = []
+    for path in HOMEPAGE_STATIC.glob("relocation-jobs-*.html"):
+        key = path.name.removeprefix("relocation-jobs-").removesuffix(".html").strip().lower()
+        if key:
+            keys.append(key)
+    return tuple(sorted(set(keys)))
+
+
 def _country_key_from_marketing_path(path: str) -> str | None:
     prefix = "/relocation-jobs-"
     if not path.startswith(prefix):
@@ -62,8 +73,7 @@ def _country_key_from_marketing_path(path: str) -> str | None:
 def public_marketing_paths() -> tuple[str, ...]:
     country_paths = tuple(
         _country_marketing_path(key)
-        for key in sorted(all_country_labels())
-        if _country_html_exists(key)
+        for key in _exported_country_marketing_keys()
     )
     return FIXED_MARKETING_PATHS + country_paths
 
@@ -217,9 +227,9 @@ def _is_marketing_path(path: str) -> bool:
     if path in FIXED_MARKETING_PATHS and path != "/":
         return True
     country_key = _country_key_from_marketing_path(path)
-    if not country_key or not _country_html_exists(country_key):
+    if not country_key:
         return False
-    return country_key in all_country_labels()
+    return _country_html_exists(country_key)
 
 
 # Marketing route catch-all — must be the final route so Flask matches

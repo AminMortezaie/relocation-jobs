@@ -55,12 +55,17 @@ export default function PricingPage() {
                 <li>Full company board</li>
                 <li>Per-user apply/reject tracking</li>
                 <li>Company workspace + documents</li>
-                <li>Tailored CV reframe pipeline</li>
+                <li>Claude / Cursor MCP for CV reframe</li>
                 <li>Cover letter generation</li>
               </ul>
-              <Button as="a" href="/panel" variant="primary" className="mt-6">
-                Sign in for early access
-              </Button>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button as="a" href="/panel" variant="primary">
+                  Sign in for early access
+                </Button>
+                <Button as="a" href="/mcp" variant="secondary">
+                  Explore MCP
+                </Button>
+              </div>
             </Card>
           </div>
 

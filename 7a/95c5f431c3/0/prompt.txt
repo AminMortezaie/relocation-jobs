@@ -1,0 +1,36 @@
+new page for introducing mcp capabilities and SEO purposes.
+plan for it
+
+---
+
+ok
+
+---
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+---
+
+restart the panel.
+to see the changes
+
+---
+
+you should highlight this feature on homepage and make advertise this feature cause its so important and should be showed anywhere
+
+---
+
+also complete the pages contents for countries, they're left with no content there.
+
+---
+
+they're completely the same.
+i think we need to put some data about the countries there that are tied to the country.
+
+---
+
+no need to exactly show the compaines just showing some of them for instance can be helpful, but mostly i meant that you should explain the visa and sponsers in diffreent countires and whats the flow there.
+
+some general data about them using google to find the data we want to just make the site more SEO optimized

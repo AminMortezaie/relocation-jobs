@@ -2183,7 +2183,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 220;
+  right: auto;
+  bottom: auto;
+  transform: none;
+  /* Above raised company/position cards (they use z-index 10000 while open). */
+  z-index: 10050;
   pointer-events: auto;
   background: var(--surface);
 }
@@ -7195,8 +7199,17 @@ body.scroll-locked {
 .company-card:hover,
 .company-card.fetch-ok:hover {
   border-color: var(--border-hover);
-  transform: translateY(-3px);
   box-shadow: 0 16px 32px -12px rgba(14, 58, 105, 0.2);
+}
+
+/* Lift only on fine pointers — transform on the card becomes a containing
+   block for absolute/fixed popovers; sticky :hover after tap on mobile then
+   parks the "Not for me" menu under the whole card instead of the button. */
+@media (hover: hover) and (pointer: fine) {
+  .company-card:hover,
+  .company-card.fetch-ok:hover {
+    transform: translateY(-3px);
+  }
 }
 
 .company-card:nth-child(even):hover {

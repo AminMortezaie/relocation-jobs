@@ -106,6 +106,9 @@ class PositionCard extends HTMLElement {
     this._variant = "open";
     this._citiesExpanded = false;
     this._closeOnScrollHandler = null;
+    this._hideReasonWrap = null;
+    this._activeHideReasonPopover = null;
+    this._onDocHideReasonClick = (e) => this._handleDocHideReasonClick(e);
   }
 
   get job() { return this._job; }
@@ -145,6 +148,7 @@ class PositionCard extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._closeHideReasonPopover();
     if (this._popoverClose) {
       document.removeEventListener("position-card-popover-open", this._popoverClose);
     }
@@ -341,6 +345,7 @@ class PositionCard extends HTMLElement {
 
   render() {
     // Rebuilding innerHTML drops any open popover, so clear the raised stacking.
+    this._closeHideReasonPopover();
     this._setRaised(false);
     if (!this._job) { this.innerHTML = ""; return; }
     const v = this._variant;
@@ -592,8 +597,10 @@ class PositionCard extends HTMLElement {
     if (t.closest(".ats-score-clear-btn")) { e.stopPropagation(); void this._saveAtsScore(null); return; }
     if (t.closest(".hide-reason-trigger")) { e.stopPropagation(); this._toggleHideReasonPopover(t.closest(".hide-reason-wrap")); return; }
     if (t.closest(".hide-reason-option")) {
-      e.stopPropagation(); const wrap = t.closest(".hide-reason-wrap"); const reason = t.dataset.reason;
-      if (wrap && reason) void this._setNotForMe(reason); return;
+      e.stopPropagation();
+      const reason = t.dataset.reason;
+      if (reason) void this._setNotForMe(reason);
+      return;
     }
     if (t.closest(".referral-btn")) { e.stopPropagation(); this._toggleReferralPopover(); return; }
     if (t.closest(".referral-close")) { e.stopPropagation(); this._closeReferralPopover(); return; }
@@ -702,24 +709,136 @@ class PositionCard extends HTMLElement {
 
   _toggleHideReasonPopover(wrap) {
     if (!wrap) return;
-    const popover = wrap.querySelector(".hide-reason-popover");
+    const popover = this._activeHideReasonPopover
+      || wrap.querySelector(".hide-reason-popover");
     const trigger = wrap.querySelector(".hide-reason-trigger");
     if (!popover || !trigger) return;
-    const open = popover.hidden;
-    this._closeAllPopovers(open ? wrap : null);
-    trigger.setAttribute("aria-expanded", open ? "true" : "false");
-    if (open) {
-      // Absolute under .hide-reason-wrap — stays stuck to the button. Do not use
-      // position:fixed here: company-card:hover transform creates a containing
-      // block and viewport coords then place the menu far from the trigger.
-      popover.hidden = false;
-      this._setRaised(true);
+
+    const willOpen = popover.hidden;
+    // Close sibling popovers without tearing down the menu we are about to open.
+    this._closeAtsPopover();
+    this._closeReferralPopover();
+    if (!willOpen) {
+      this._closeHideReasonPopover();
+      return;
     }
+
+    this._hideReasonWrap = wrap;
+    this._mountHideReasonPopover(wrap, popover);
+    trigger.setAttribute("aria-expanded", "true");
+    popover.hidden = false;
+    popover.classList.add("is-floating");
+    popover.classList.remove("is-sheet");
+    popover.style.right = "auto";
+    popover.style.bottom = "auto";
+    // Do not raise the company card — the menu is portaled to <body>; raising
+    // the card (z-index 10000) would paint over the floating menu (was 220).
+    this._placeHideReasonPopover(popover, trigger);
+    // Ignore the opening tap + any layout scroll from mounting to <body>.
+    this._hideReasonIgnoreOutsideUntil = Date.now() + 400;
+    document.removeEventListener("pointerdown", this._onDocHideReasonClick, true);
+    document.addEventListener("pointerdown", this._onDocHideReasonClick, true);
+  }
+
+  _mountHideReasonPopover(wrap, popover) {
+    if (popover.parentElement === document.body) {
+      this._activeHideReasonPopover = popover;
+      return;
+    }
+    const placeholder = document.createComment("hide-reason-popover-anchor");
+    popover.parentNode.insertBefore(placeholder, popover);
+    wrap._hideReasonPlaceholder = placeholder;
+    document.body.appendChild(popover);
+    this._activeHideReasonPopover = popover;
+  }
+
+  _unmountHideReasonPopover() {
+    const wrap = this._hideReasonWrap;
+    const popover = this._activeHideReasonPopover;
+    if (!popover) return;
+    popover.hidden = true;
+    popover.classList.remove("is-floating", "is-sheet");
+    popover.style.top = "";
+    popover.style.left = "";
+    popover.style.right = "";
+    popover.style.bottom = "";
+    popover.style.minWidth = "";
+    popover.style.width = "";
+    popover.style.maxHeight = "";
+    popover.style.overflowY = "";
+    const placeholder = wrap?._hideReasonPlaceholder;
+    if (popover.parentElement === document.body) {
+      if (placeholder?.parentNode) {
+        placeholder.parentNode.insertBefore(popover, placeholder);
+        placeholder.remove();
+      } else if (wrap?.isConnected) {
+        wrap.appendChild(popover);
+      } else {
+        popover.remove();
+      }
+    }
+    if (wrap) delete wrap._hideReasonPlaceholder;
+    this._activeHideReasonPopover = null;
+    this._hideReasonWrap = null;
+  }
+
+  _placeHideReasonPopover(popover, trigger) {
+    const place = () => {
+      if (popover.hidden || !trigger.isConnected) return;
+      const tr = trigger.getBoundingClientRect();
+      const pr = popover.getBoundingClientRect();
+      const gap = 8;
+      const margin = 12;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const height = pr.height || popover.offsetHeight || 240;
+      const width = pr.width || popover.offsetWidth || Math.max(tr.width, 240);
+
+      // Prefer above the button; if that does not fit, place below. Never clamp
+      // on top of the trigger — keep the menu visually attached to it.
+      let top = tr.top - height - gap;
+      if (top < margin) top = tr.bottom + gap;
+      if (top + height > vh - margin && tr.top - height - gap >= margin) {
+        top = tr.top - height - gap;
+      }
+
+      let left = tr.left;
+      if (left + width > vw - margin) left = vw - width - margin;
+      left = Math.max(margin, left);
+
+      popover.style.top = `${Math.round(top)}px`;
+      popover.style.left = `${Math.round(left)}px`;
+      popover.style.minWidth = `${Math.round(Math.max(tr.width, 240))}px`;
+      popover.style.maxHeight = `${Math.round(Math.max(160, Math.min(height, vh - margin * 2)))}px`;
+      popover.style.overflowY = "auto";
+    };
+    place();
+    requestAnimationFrame(place);
+  }
+
+  _handleDocHideReasonClick(e) {
+    if (Date.now() < (this._hideReasonIgnoreOutsideUntil || 0)) return;
+    const popover = this._activeHideReasonPopover;
+    if (!popover || popover.hidden) return;
+    if (popover.contains(e.target)) {
+      const option = e.target.closest(".hide-reason-option");
+      if (option && !option.disabled) {
+        e.preventDefault();
+        e.stopPropagation();
+        void this._setNotForMe(option.dataset.reason);
+      }
+      return;
+    }
+    if (e.target.closest?.(".hide-reason-trigger")) return;
+    this._closeHideReasonPopover();
   }
 
   _closeHideReasonPopover() {
-    this.querySelectorAll(".hide-reason-popover").forEach(p => p.hidden = true);
-    this.querySelectorAll(".hide-reason-trigger").forEach(t => t.setAttribute("aria-expanded", "false"));
+    document.removeEventListener("pointerdown", this._onDocHideReasonClick, true);
+    document.removeEventListener("click", this._onDocHideReasonClick, true);
+    this.querySelectorAll(".hide-reason-trigger").forEach((t) => t.setAttribute("aria-expanded", "false"));
+    this._unmountHideReasonPopover();
+    this.querySelectorAll(".hide-reason-popover").forEach((p) => { p.hidden = true; });
     this._setRaised(false);
   }
 
